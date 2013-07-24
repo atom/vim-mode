@@ -1,0 +1,2 @@
+'main': './lib/vim-mode'
+'activationEvents': ['vim-mode:toggle']
