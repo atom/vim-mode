@@ -1,4 +1,4 @@
-Point = require 'point'
+#Point = require 'point'
 getWordRegex = -> /(\w+)|([^\w\s]+)/g
 
 class Motion
@@ -84,6 +84,6 @@ class MoveToNextParagraph extends Motion
       row = @editor.getLastBufferRow()
       column = @editor.getBuffer().getLastLine().length - 1
 
-    new Point(row, column)
+    #new Point(row, column)
 
 module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph }

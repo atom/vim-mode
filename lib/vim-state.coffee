@@ -11,8 +11,6 @@ class VimState
   opStack: null
 
   constructor: (@editor) ->
-    requireStylesheet 'vim-mode.css'
-
     @opStack = []
     @activateCommandMode()
 
