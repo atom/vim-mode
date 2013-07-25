@@ -46,6 +46,8 @@ describe "VimState", ->
       keydown('\\', element: editor[0])
       expect(editor.getText()).toEqual('')
 
+    # FIXME: Need to discuss this with probablycorey or nathansobo
+    xit "does not allow the cursor to be placed on the \n character, unless the line is empty", ->
       editor.setText("012345\n\nabcdef")
       editor.setCursorScreenPosition([0, 5])
       expect(editor.getCursorScreenPosition()).toEqual [0,5]
