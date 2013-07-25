@@ -1,3 +1,4 @@
+$ = require 'jquery'
 
 RootView = require 'root-view'
 
@@ -11,7 +12,29 @@ describe "VimState", ->
     atom.activatePackage('vim-mode', immediate: true)
 
     editor = rootView.getActiveView()
+    editor.enableKeymap()
     vimState = editor.vimState
+
+  keydown = (key, {element, ctrl, shift, alt, meta}={}) ->
+    dispatchKeyboardEvent = (target, eventArgs...) ->
+      e = document.createEvent("KeyboardEvent")
+      e.initKeyboardEvent eventArgs...
+      target.dispatchEvent e
+
+    dispatchTextEvent = (target, eventArgs...) ->
+      e = document.createEvent("TextEvent")
+      e.initTextEvent eventArgs...
+      target.dispatchEvent e
+
+    element ||= document.activeElement
+    eventArgs = [true, true, null, key, 0, ctrl, alt, shift, meta] # bubbles, cancelable, view, key, location
+
+    canceled = not dispatchKeyboardEvent(element, "keydown", eventArgs...)
+    dispatchKeyboardEvent(element, "keypress", eventArgs...)
+    if not canceled
+       if dispatchTextEvent(element, "textInput", eventArgs...)
+         element.value += key
+    dispatchKeyboardEvent(element, "keyup", eventArgs...)
 
   describe "initialize", ->
     it "puts the editor in command-mode initially", ->
@@ -41,15 +64,15 @@ describe "VimState", ->
       expect(editor.getCursorScreenPosition()).toEqual [1,0]
 
     it "clears the operator stack when commands can't be composed", ->
-      editor.trigger keydownEvent('d')
-      expect(vimMode.opStack.length).toBe 1
-      editor.trigger keydownEvent('x')
-      expect(vimMode.opStack.length).toBe 0
+      keydown('d', element: editor[0])
+      expect(vimState.opStack.length).toBe 1
+      keydown('x', element: editor[0])
+      expect(vimState.opStack.length).toBe 0
 
-      editor.trigger keydownEvent('d')
-      expect(vimMode.opStack.length).toBe 1
-      editor.trigger keydownEvent('\\') # \ is an unused key in vim
-      expect(vimMode.opStack.length).toBe 0
+      keydown('d', element: editor[0])
+      expect(vimState.opStack.length).toBe 1
+      keydown('\\', element: editor[0])
+      expect(vimState.opStack.length).toBe 0
 
     describe "the escape keybinding", ->
       it "clears the operator stack", ->
