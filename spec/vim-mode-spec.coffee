@@ -38,6 +38,7 @@ describe "VimState", ->
 
   describe "initialize", ->
     it "puts the editor in command-mode initially", ->
+      expect(editor).toHaveClass 'vim-mode'
       expect(editor).toHaveClass 'command-mode'
 
   describe "command-mode", ->
