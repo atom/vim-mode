@@ -42,18 +42,10 @@ describe "VimState", ->
       expect(editor).toHaveClass 'command-mode'
 
   describe "command-mode", ->
-    it "stops propagation on key events would otherwise insert a character, but allows unhandled non-insertions through", ->
-      event = keydownEvent('\\')
-      spyOn(event, 'stopPropagation')
-      editor.trigger event
-      expect(event.stopPropagation).toHaveBeenCalled()
+    it "stops propagation on key events would otherwise insert a character", ->
+      keydown('\\', element: editor[0])
+      expect(editor.getText()).toEqual('')
 
-      event = keydownEvent('/', metaKey: true)
-      spyOn(event, 'stopPropagation')
-      editor.trigger event
-      expect(event.stopPropagation).not.toHaveBeenCalled()
-
-    it "does not allow the cursor to be placed on the \n character, unless the line is empty", ->
       editor.setText("012345\n\nabcdef")
       editor.setCursorScreenPosition([0, 5])
       expect(editor.getCursorScreenPosition()).toEqual [0,5]
