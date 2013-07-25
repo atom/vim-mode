@@ -1,16 +1,17 @@
-VimMode = require '../lib/vim-mode'
 
-Editor = require 'editor'
-VimMode = require 'vim-mode'
+RootView = require 'root-view'
 
-xdescribe "VimState", ->
-  [editor, vimMode] = []
+describe "VimState", ->
+  [editor, vimState] = []
 
   beforeEach ->
-    editor = new Editor
-    editor.enableKeymap()
-    editor.isFocused = true
-    vimMode = new VimMode(editor)
+    window.rootView = new RootView
+    rootView.open()
+    rootView.simulateDomAttachment()
+    atom.activatePackage('vim-mode', immediate: true)
+
+    editor = rootView.getActiveView()
+    vimState = editor.vimState
 
   describe "initialize", ->
     it "puts the editor in command-mode initially", ->
@@ -53,10 +54,10 @@ xdescribe "VimState", ->
     describe "the escape keybinding", ->
       it "clears the operator stack", ->
         editor.trigger keydownEvent('d')
-        expect(vimMode.opStack.length).toBe 1
+        expect(vimState.opStack.length).toBe 1
 
         editor.trigger keydownEvent('escape')
-        expect(vimMode.opStack.length).toBe 0
+        expect(vimState.opStack.length).toBe 0
 
     describe "the i keybinding", ->
       it "puts the editor into insert mode", ->

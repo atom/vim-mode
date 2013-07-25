@@ -7,4 +7,4 @@ module.exports =
       return unless editor.attached
 
       editor.addClass("vim-mode")
-      view = new VimState(editor)
+      editor.vimState = new VimState(editor)

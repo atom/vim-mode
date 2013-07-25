@@ -1,3 +1,4 @@
+$ = require 'jquery'
 _ = require 'underscore'
 
 operators = require './operators'
@@ -21,6 +22,7 @@ class VimState
       if @mode == 'insert'
         true
       else
+        @resetCommandMode()
         false
 
     @handleCommands
