@@ -1,2 +1,18 @@
 'body':
   'meta-alt-ctrl-o': 'vim-mode:toggle'
+
+'.vim-mode.insert-mode':
+  'escape': 'vim-mode:activate-command-mode'
+
+'.vim-mode.command-mode':
+  'i': 'vim-mode:insert'
+  'd': 'vim-mode:delete'
+  'x': 'vim-mode:delete-right'
+  'h': 'vim-mode:move-left'
+  'j': 'vim-mode:move-down'
+  'k': 'vim-mode:move-up'
+  'l': 'vim-mode:move-right'
+  'w': 'vim-mode:move-to-next-word'
+  'b': 'vim-mode:move-to-previous-word'
+  '}': 'vim-mode:move-to-next-paragraph'
+  'escape': 'vim-mode:reset-command-mode'

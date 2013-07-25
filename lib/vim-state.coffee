@@ -1,5 +1,4 @@
 _ = require 'underscore'
-$ = require 'jquery'
 
 operators = require './operators'
 commands = require './commands'
@@ -9,74 +8,52 @@ module.exports =
 class VimState
   editor: null
   opStack: null
+  mode: null
 
   constructor: (@editor) ->
     @opStack = []
+    @mode = 'command'
     @activateCommandMode()
-
-    window.keymap.bindKeys '.editor', 'escape': 'activate-command-mode'
-    @editor.on 'activate-command-mode', => @activateCommandMode()
-
     @setupCommandMode()
 
   setupCommandMode: ->
-    window.keymap.bindKeys '.command-mode', (e) =>
-      if e.keystroke.match /^\d$/
-        return 'command-mode:numeric-prefix'
-      if e.keystroke.match /^.$/
-        @resetCommandMode()
-        return false
-
-    @bindCommandModeKeys
-      'i': 'insert'
-      'd': 'delete'
-      'x': 'delete-right'
-      'h': 'core:move-left'
-      'j': 'core:move-down'
-      'k': 'core:move-up'
-      'l': 'core:move-right'
-      'w': 'move-to-next-word'
-      'b': 'move-to-previous-word'
-      '}': 'move-to-next-paragraph'
-      'escape': 'reset-command-mode'
-      'left': 'move-left'
-      'right': 'move-right'
+    @editor.preempt 'textInput', (e) =>
+      if @mode == 'insert'
+        true
+      else
+        false
 
     @handleCommands
+      'activate-command-mode': => @activateCommandMode()
+      'reset-command-mode': => @resetCommandMode()
       'insert': => @activateInsertMode()
       'delete': => @delete()
       'delete-right': => new commands.DeleteRight(@editor)
-      'core:move-left': => new motions.MoveLeft(@editor)
-      'core:move-up': => new motions.MoveUp(@editor)
-      'core:move-down': => new motions.MoveDown @editor
-      'core:move-right': => new motions.MoveRight @editor
+      'move-left': => new motions.MoveLeft(@editor)
+      'move-up': => new motions.MoveUp(@editor)
+      'move-down': => new motions.MoveDown @editor
+      'move-right': => new motions.MoveRight @editor
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
       'numeric-prefix': (e) => @numericPrefix(e)
-      'reset-command-mode': => @resetCommandMode()
-
-  bindCommandModeKeys: (bindings) ->
-    prefixedBindings = {}
-    for pattern, commandName of bindings
-      prefixedBindings[pattern] = "command-mode:#{commandName}"
-
-    window.keymap.bindKeys ".command-mode", prefixedBindings
 
   handleCommands: (commands) ->
     _.each commands, (fn, commandName) =>
-      eventName = "command-mode:#{commandName}"
-      @editor.on eventName, (e) =>
+      eventName = "vim-mode:#{commandName}"
+      @editor.command eventName, (e) =>
         possibleOperator = fn(e)
         @pushOperator(possibleOperator) if possibleOperator?.execute
 
   activateInsertMode: ->
+    @mode = 'insert'
     @editor.removeClass('command-mode')
     @editor.addClass('insert-mode')
 
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   activateCommandMode: ->
+    @mode = 'command'
     @editor.removeClass('insert-mode')
     @editor.addClass('command-mode')
 
