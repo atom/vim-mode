@@ -147,14 +147,14 @@ describe "VimState", ->
           editor.setText("abcd\n01234")
           editor.setCursorScreenPosition([1,1])
 
-          editor.trigger keydownEvent 'd'
-          editor.trigger keydownEvent 'h'
+          keydown('d', element: editor[0])
+          keydown('h', element: editor[0])
 
           expect(editor.getText()).toBe "abcd\n1234"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
-          editor.trigger keydownEvent 'd'
-          editor.trigger keydownEvent 'h'
+          keydown('d', element: editor[0])
+          keydown('h', element: editor[0])
 
           expect(editor.getText()).toBe "abcd\n1234"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])

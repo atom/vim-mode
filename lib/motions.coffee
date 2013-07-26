@@ -7,6 +7,15 @@ class MoveLeft extends Motion
     {column, row} = @editor.getCursorScreenPosition()
     @editor.moveCursorLeft() if column > 0
 
+  select: ->
+    {column, row} = @editor.getCursorScreenPosition()
+
+    if column > 0
+      @editor.selectLeft()
+      true
+    else
+      false
+
 class MoveRight extends Motion
   execute: ->
     # FIXME: Don't run off the end
@@ -27,6 +36,7 @@ class MoveToPreviousWord extends Motion
 
   select: ->
     @editor.selectToBeginningOfWord()
+    true
 
 class MoveToNextWord extends Motion
   execute: ->
@@ -34,6 +44,7 @@ class MoveToNextWord extends Motion
 
   select: ->
     @editor.selectToBeginningOfNextWord()
+    true
 
 class MoveToNextParagraph extends Motion
   execute: ->
@@ -41,6 +52,7 @@ class MoveToNextParagraph extends Motion
 
   select: ->
     @editor.selectToPosition(@nextPosition())
+    true
 
   nextPosition: ->
     @editor.getCurrentParagraphBufferRange().end

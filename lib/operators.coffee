@@ -40,8 +40,8 @@ class Delete
 
   execute: ->
     if @motion
-      @motion.select()
-      @editor.getSelection().delete()
+      if @motion.select()
+        @editor.getSelection().delete()
     else
       @editor.getBuffer().deleteRow(@editor.getCursor().getBufferRow())
       @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
