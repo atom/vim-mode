@@ -129,14 +129,15 @@ describe "VimState", ->
           expect(editor.getText()).toBe "12345\nabcde"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
+        # FIXME: This functionality wasn't implemented previously.
         xdescribe "when the second d is prefixed by a count", ->
           it "deletes n lines, starting from the current", ->
             editor.setText("12345\nabcde\nABCDE\nQWERT")
             editor.setCursorScreenPosition([1,1])
 
-            editor.trigger keydownEvent('d')
-            editor.trigger keydownEvent('2')
-            editor.trigger keydownEvent('d')
+            keydown('d', element: editor[0])
+            keydown('2', element: editor[0])
+            keydown('d', element: editor[0])
 
             expect(editor.getText()).toBe "12345\nQWERT"
             expect(editor.getCursorScreenPosition()).toEqual([1,0])
