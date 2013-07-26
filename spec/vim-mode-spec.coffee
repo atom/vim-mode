@@ -87,19 +87,19 @@ describe "VimState", ->
         expect(editor).not.toHaveClass 'command-mode'
 
     describe "the x keybinding", ->
-      it "deletes a charachter", ->
+      it "deletes a character", ->
         editor.setText("012345")
         editor.setCursorScreenPosition([0, 4])
 
-        editor.trigger keydownEvent('x')
+        keydown('x', element: editor[0])
         expect(editor.getText()).toBe '01235'
         expect(editor.getCursorScreenPosition()).toEqual([0, 4])
 
-        editor.trigger keydownEvent('x')
+        keydown('x', element: editor[0])
         expect(editor.getText()).toBe '0123'
         expect(editor.getCursorScreenPosition()).toEqual([0, 3])
 
-        editor.trigger keydownEvent('x')
+        keydown('x', element: editor[0])
         expect(editor.getText()).toBe '012'
         expect(editor.getCursorScreenPosition()).toEqual([0, 2])
 
