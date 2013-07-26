@@ -81,7 +81,7 @@ describe "VimState", ->
       it "puts the editor into insert mode", ->
         expect(editor).not.toHaveClass 'insert-mode'
 
-        editor.trigger keydownEvent('i')
+        keydown('i', element: editor[0])
 
         expect(editor).toHaveClass 'insert-mode'
         expect(editor).not.toHaveClass 'command-mode'
