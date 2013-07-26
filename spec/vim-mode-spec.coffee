@@ -107,7 +107,7 @@ describe "VimState", ->
         editor.getBuffer().setText "012345\n\nabcdef"
         editor.setCursorScreenPosition [1, 0]
 
-        editor.trigger keydownEvent 'x'
+        keydown('x', element: editor[0])
         expect(editor.getText()).toBe "012345\n\nabcdef"
 
     describe "the d keybinding", ->
