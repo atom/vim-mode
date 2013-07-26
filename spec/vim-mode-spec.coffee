@@ -71,10 +71,10 @@ describe "VimState", ->
 
     describe "the escape keybinding", ->
       it "clears the operator stack", ->
-        editor.trigger keydownEvent('d')
+        keydown('d', element: editor[0])
         expect(vimState.opStack.length).toBe 1
 
-        editor.trigger keydownEvent('escape')
+        keydown('escape', element: editor[0])
         expect(vimState.opStack.length).toBe 0
 
     describe "the i keybinding", ->
