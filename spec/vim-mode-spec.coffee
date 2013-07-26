@@ -116,8 +116,8 @@ describe "VimState", ->
           editor.setText("12345\nabcde\nABCDE")
           editor.setCursorScreenPosition([1,1])
 
-          editor.trigger keydownEvent('d')
-          editor.trigger keydownEvent('d')
+          keydown('d', element: editor[0])
+          keydown('d', element: editor[0])
           expect(editor.getText()).toBe "12345\nABCDE"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
