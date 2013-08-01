@@ -1,2 +1,3 @@
 'main': './lib/vim-mode'
+'description': 'Provides vim modal control of Atom.'
 'activationEvents': ['vim-mode:toggle']
