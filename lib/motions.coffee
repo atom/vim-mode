@@ -24,7 +24,8 @@ class MoveRight extends Motion
 
 class MoveUp extends Motion
   execute: ->
-    @editor.moveCursorUp()
+    {column, row} = @editor.getCursorScreenPosition()
+    @editor.moveCursorUp() if row > 0
 
 class MoveDown extends Motion
   execute: ->
