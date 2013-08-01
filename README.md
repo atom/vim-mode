@@ -1,6 +1,7 @@
 ## Vim-mode
 
-Provides vim support for Atom.
+Provides vim modal control to Atom and hopefully the successor to the
+[other vim plugin](https://github.com/atom/vim)
 
 ### Installing
 
@@ -33,4 +34,4 @@ them useful as no one person uses all of vim's functionality.
 
 ### Development
 
-See CONTRIBUTING.md
+See [the contribution guide](CONTRIBUTING.md).
