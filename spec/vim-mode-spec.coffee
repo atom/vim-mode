@@ -185,8 +185,8 @@ describe "VimState", ->
           editor.setText("abcd efg")
           editor.setCursorScreenPosition([0,2])
 
-          editor.trigger keydownEvent('d')
-          editor.trigger keydownEvent('b')
+          keydown('d', element: editor[0])
+          keydown('b', element: editor[0])
 
           expect(editor.getText()).toBe "cd efg"
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
@@ -194,9 +194,9 @@ describe "VimState", ->
           editor.setText("one two three four")
           editor.setCursorScreenPosition([0,11])
 
-          editor.trigger keydownEvent('d')
-          editor.trigger keydownEvent('3')
-          editor.trigger keydownEvent('b')
+          keydown('d', element: editor[0])
+          keydown('3', element: editor[0])
+          keydown('b', element: editor[0])
 
           expect(editor.getText()).toBe "ee four"
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
@@ -208,31 +208,31 @@ describe "VimState", ->
 
       describe "the h keybinding", ->
         it "moves the cursor left, but not to the previous line", ->
-          editor.trigger keydownEvent('h')
+          keydown('h', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
-          editor.trigger keydownEvent('h')
+          keydown('h', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
       describe "the j keybinding", ->
         it "moves the cursor down, but not to the end of the last line", ->
-          editor.trigger keydownEvent 'j'
+          keydown('j', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([2,1])
-          editor.trigger keydownEvent 'j'
+          keydown('j', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([2,1])
 
       describe "the k keybinding", ->
         it "moves the cursor up, but not to the beginning of the first line", ->
-          editor.trigger keydownEvent('k')
+          keydown('k', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([0,1])
-          editor.trigger keydownEvent('k')
+          keydown('k', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([0,1])
 
       describe "the l keybinding", ->
         it "moves the cursor right, but not to the next line", ->
           editor.setCursorScreenPosition([1,3])
-          editor.trigger keydownEvent('l')
+          keydown('l', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([1,4])
-          editor.trigger keydownEvent('l')
+          keydown('l', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([1,4])
 
       describe "the w keybinding", ->
