@@ -28,7 +28,8 @@ class MoveUp extends Motion
 
 class MoveDown extends Motion
   execute: ->
-    @editor.moveCursorDown()
+    {column, row} = @editor.getCursorScreenPosition()
+    @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
 
 class MoveToPreviousWord extends Motion
   execute: ->
