@@ -18,9 +18,10 @@ class MoveLeft extends Motion
 
 class MoveRight extends Motion
   execute: ->
-    # FIXME: Don't run off the end
     {column, row} = @editor.getCursorScreenPosition()
-    @editor.moveCursorRight()
+    lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
+    unless column >= lastCharIndex
+      @editor.moveCursorRight()
 
 class MoveUp extends Motion
   execute: ->
