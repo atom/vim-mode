@@ -69,7 +69,7 @@ class VimState
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
 
   numericPrefix: (e) ->
-    num = parseInt(e.keyEvent.keystroke)
+    num = parseInt(e.keyEvent.keystrokes)
     if @topOperator() instanceof operators.NumericPrefix
       @topOperator().addDigit(num)
     else

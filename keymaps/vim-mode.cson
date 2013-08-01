@@ -5,6 +5,16 @@
   'escape': 'vim-mode:activate-command-mode'
 
 '.vim-mode.command-mode':
+  '1': 'vim-mode:numeric-prefix'
+  '2': 'vim-mode:numeric-prefix'
+  '3': 'vim-mode:numeric-prefix'
+  '4': 'vim-mode:numeric-prefix'
+  '5': 'vim-mode:numeric-prefix'
+  '6': 'vim-mode:numeric-prefix'
+  '7': 'vim-mode:numeric-prefix'
+  '8': 'vim-mode:numeric-prefix'
+  '9': 'vim-mode:numeric-prefix'
+  '0': 'vim-mode:numeric-prefix'
   'i': 'vim-mode:insert'
   'd': 'vim-mode:delete'
   'x': 'vim-mode:delete-right'

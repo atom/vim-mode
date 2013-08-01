@@ -164,8 +164,8 @@ describe "VimState", ->
           editor.setText("abcd efg")
           editor.setCursorScreenPosition([0,2])
 
-          editor.trigger keydownEvent('d')
-          editor.trigger keydownEvent('w')
+          keydown('d', element: editor[0])
+          keydown('w', element: editor[0])
 
           expect(editor.getText()).toBe "abefg"
           expect(editor.getCursorScreenPosition()).toEqual([0,2])
@@ -173,9 +173,9 @@ describe "VimState", ->
           editor.setText("one two three four")
           editor.setCursorScreenPosition([0,0])
 
-          editor.trigger keydownEvent('d')
-          editor.trigger keydownEvent('3')
-          editor.trigger keydownEvent('w')
+          keydown('d', element: editor[0])
+          keydown('3', element: editor[0])
+          keydown('w', element: editor[0])
 
           expect(editor.getText()).toBe "four"
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
