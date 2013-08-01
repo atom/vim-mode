@@ -322,16 +322,16 @@ describe "VimState", ->
         editor.setText("12345")
         editor.setCursorScreenPosition([0,1])
 
-        editor.trigger keydownEvent('3')
-        editor.trigger keydownEvent('x')
+        keydown('3', element: editor[0])
+        keydown('x', element: editor[0])
 
         expect(editor.getText()).toBe '15'
 
         editor.setText("123456789abc")
         editor.setCursorScreenPosition([0,0])
-        editor.trigger keydownEvent('1')
-        editor.trigger keydownEvent('0')
-        editor.trigger keydownEvent('x')
+        keydown('1', element: editor[0])
+        keydown('0', element: editor[0])
+        keydown('x', element: editor[0])
 
         expect(editor.getText()).toBe 'bc'
 
