@@ -1,14 +1,16 @@
+Point = require 'point'
+
 class Motion
   constructor: (@editor) ->
   isComplete: -> true
 
 class MoveLeft extends Motion
   execute: ->
-    {column, row} = @editor.getCursorScreenPosition()
+    {row, column} = @editor.getCursorScreenPosition()
     @editor.moveCursorLeft() if column > 0
 
   select: ->
-    {column, row} = @editor.getCursorScreenPosition()
+    {row, column} = @editor.getCursorScreenPosition()
 
     if column > 0
       @editor.selectLeft()
@@ -18,19 +20,19 @@ class MoveLeft extends Motion
 
 class MoveRight extends Motion
   execute: ->
-    {column, row} = @editor.getCursorScreenPosition()
+    {row, column} = @editor.getCursorScreenPosition()
     lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
     unless column >= lastCharIndex
       @editor.moveCursorRight()
 
 class MoveUp extends Motion
   execute: ->
-    {column, row} = @editor.getCursorScreenPosition()
+    {row, column} = @editor.getCursorScreenPosition()
     @editor.moveCursorUp() if row > 0
 
 class MoveDown extends Motion
   execute: ->
-    {column, row} = @editor.getCursorScreenPosition()
+    {row, column} = @editor.getCursorScreenPosition()
     @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
 
 class MoveToPreviousWord extends Motion
@@ -57,7 +59,21 @@ class MoveToNextParagraph extends Motion
     @editor.selectToPosition(@nextPosition())
     true
 
+  # Finds the beginning of the next paragraph
+  #
+  # If no paragraph is found, the end of the buffer is returned.
   nextPosition: ->
-    @editor.getCurrentParagraphBufferRange().end
+    start = @editor.getCursorBufferPosition()
+    scanRange = [start, @editor.getEofPosition()]
+
+    {row, column} = @editor.getEofPosition()
+    position = new Point(row, column - 1)
+
+    @editor.scanInBufferRange /^$/g, scanRange, ({range, stop}) =>
+      if !range.start.isEqual(start)
+        position = range.start
+        stop()
+
+    position
 
 module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph }

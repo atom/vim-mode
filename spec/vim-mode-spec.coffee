@@ -265,21 +265,21 @@ describe "VimState", ->
           keydown('w', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([3,2])
 
-      describe "the { keybinding", ->
+      describe "the } keybinding", ->
         it "moves the cursor to the beginning of the paragraph", ->
           editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
           editor.setCursorScreenPosition([0,0])
 
-          editor.trigger keydownEvent('}')
+          keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [1,0]
 
-          editor.trigger keydownEvent('}')
+          keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [5,0]
 
-          editor.trigger keydownEvent('}')
+          keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [7,0]
 
-          editor.trigger keydownEvent('}')
+          keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [9,6]
 
       describe "the b keybinding", ->
