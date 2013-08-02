@@ -17,6 +17,7 @@ them useful as no one person uses all of vim's functionality.
 
 ### Future Work (in rough order)
 
+* Implement `D` operator.
 * Implement `O` operator.
 * Implement `J` operator.
 * Implement `a` command.
