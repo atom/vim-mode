@@ -29,6 +29,26 @@ class NumericPrefix
   select: ->
     _.times @count, => @operatorToRepeat.select()
 
+class RegisterPrefix
+  complete: null
+  operator: null
+  name: null
+
+  constructor: (@name) ->
+    @complete = false
+
+  isComplete: -> @complete
+
+  compose: (@operator) ->
+    @operator.register = @name if @operator.register?
+    @complete = true
+
+  execute: ->
+    @operator.execute()
+
+  select: ->
+    @operator.select()
+
 class Delete
   motion: null
   complete: null
@@ -53,4 +73,56 @@ class Delete
     @motion = motion
     @complete = true
 
-module.exports = { NumericPrefix, Delete, OperatorError }
+class Yank
+  motion: null
+  complete: null
+  register: null
+
+  constructor: (@editor, @vimState) ->
+    @complete = false
+    @register ?= '"'
+
+  isComplete: -> @complete
+
+  execute: ->
+    if @motion
+      if @motion.select()
+        text = @editor.getSelection().getText()
+    else
+      buffer = @editor.getBuffer()
+      text = buffer.lineForRow(@editor.getCursor().getBufferRow())
+      text += buffer.lineEndingForRow(@editor.getCursor().getBufferRow())
+      @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
+
+    @vimState.setRegister(@register, text)
+
+  compose: (motion) ->
+    if not motion.select
+      throw new OperatorError("Yank must compose with a motion")
+
+    @motion = motion
+    @complete = true
+
+class Put
+  motion: null
+  direction: null
+  register: null
+
+  constructor: (@editor, @vimState, {@direction}={}) ->
+    @direction ?= 'after'
+    @register ?= '"'
+
+  isComplete: -> true
+
+  execute: ->
+    text = @vimState.getRegister(@register)
+    switch @direction
+      when 'before'
+        throw new OperatorError("Not Implemented")
+      when 'after'
+        @editor.insertText(text)
+
+  compose: (register) ->
+    throw new OperatorError("Not Implemented")
+
+module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank, Put }
