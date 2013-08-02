@@ -31,9 +31,9 @@ class VimState
       'activate-command-mode': => @activateCommandMode()
       'reset-command-mode': => @resetCommandMode()
       'insert': => @activateInsertMode()
-      'delete': => @delete()
+      'delete': => @linewiseAliasedOperator(operators.Delete)
       'delete-right': => new commands.DeleteRight(@editor)
-      'yank': => @yank()
+      'yank': => @linewiseAliasedOperator(operators.Yank)
       'put-after': => new operators.Put(@editor, @)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
@@ -86,19 +86,13 @@ class VimState
     else
       @pushOperator(new operators.NumericPrefix(num))
 
-  delete: () ->
-    if deleteOperation = @isOperatorPending(operators.Delete)
-      deleteOperation.complete = true
-      @processOpStack()
+  linewiseAliasedOperator: (operator) ->
+    if @isOperatorPending(operator)
+      op = new motions.MoveToLine(@editor)
     else
-      @pushOperator(new operators.Delete(@editor))
+      op = new operator(@editor, @)
 
-  yank: () ->
-    if yankOperation = @isOperatorPending(operators.Yank)
-      yankOperation.complete = true
-      @processOpStack()
-    else
-      @pushOperator(new operators.Yank(@editor, @))
+    @pushOperator(op)
 
   isOperatorPending: (type) ->
     for op in @opStack
