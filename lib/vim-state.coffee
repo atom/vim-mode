@@ -42,6 +42,7 @@ class VimState
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
+      'register-prefix': (e) => @registerPrefix(e)
       'numeric-prefix': (e) => @numericPrefix(e)
 
   handleCommands: (commands) ->
@@ -71,6 +72,10 @@ class VimState
   moveCursorBeforeNewline: =>
     if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
+
+  registerPrefix: (e) ->
+    name = e.keyEvent.keystrokes.split(' ')[1]
+    @pushOperator(new operators.RegisterPrefix(name))
 
   numericPrefix: (e) ->
     num = parseInt(e.keyEvent.keystrokes)

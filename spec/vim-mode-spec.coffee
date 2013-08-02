@@ -212,6 +212,14 @@ describe "VimState", ->
 
         expect(vimState.getRegister('"')).toBe "012 345\n"
 
+      it "saves the line to the a register", ->
+        keydown('"', element: editor[0])
+        keydown('a', element: editor[0])
+        keydown('y', element: editor[0])
+        keydown('y', element: editor[0])
+
+        expect(vimState.getRegister('a')).toBe "012 345\n"
+
       it "saves the first word to the default register", ->
         keydown('y', element: editor[0])
         keydown('w', element: editor[0])
@@ -223,11 +231,19 @@ describe "VimState", ->
         editor.getBuffer().setText "012\n"
         editor.setCursorScreenPosition [0, 0]
         vimState.setRegister('"', "345\n")
+        vimState.setRegister('a', "a\n")
 
       it "inserts the contents of the default register", ->
         keydown('p', element: editor[0])
 
         expect(editor.getBuffer().getText()).toBe "345\n012\n"
+
+      it "inserts the contents of the 'a' register", ->
+        keydown('"', element: editor[0])
+        keydown('a', element: editor[0])
+        keydown('p', element: editor[0])
+
+        expect(editor.getBuffer().getText()).toBe "a\n012\n"
 
     describe "basic motion bindings", ->
       beforeEach ->
