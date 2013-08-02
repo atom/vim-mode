@@ -216,7 +216,7 @@ describe "VimState", ->
         keydown('y', element: editor[0])
         keydown('w', element: editor[0])
 
-        expect(vimState.getRegister('"')).toBe "012"
+        expect(vimState.getRegister('"')).toBe "012 "
 
     describe "basic motion bindings", ->
       beforeEach ->
@@ -377,7 +377,7 @@ describe "VimState", ->
           keydown('y', element: editor[0])
           keydown('b', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "  "
+          expect(vimState.getRegister('"')).toBe "ab  "
 
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
