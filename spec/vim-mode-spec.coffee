@@ -235,6 +235,7 @@ describe "VimState", ->
           keydown('h', element: editor[0])
 
           expect(vimState.getRegister('"')).toBe "a"
+          expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
       describe "the j keybinding", ->
         it "moves the cursor down, but not to the end of the last line", ->
@@ -372,6 +373,7 @@ describe "VimState", ->
           keydown('b', element: editor[0])
 
           expect(vimState.getRegister('"')).toBe "ab"
+          expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
           editor.setCursorScreenPosition([0,4])
 
@@ -379,6 +381,7 @@ describe "VimState", ->
           keydown('b', element: editor[0])
 
           expect(vimState.getRegister('"')).toBe "ab  "
+          expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
