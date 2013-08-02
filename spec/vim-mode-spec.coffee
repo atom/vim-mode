@@ -426,6 +426,24 @@ describe "VimState", ->
           expect(editor.getText()).toBe '  cde'
           expect(editor.getCursorScreenPosition()).toEqual [0,2]
 
+      describe "the $ keybinding", ->
+        beforeEach ->
+          editor.setText("  abcde\n")
+          editor.setCursorScreenPosition([0,4])
+
+        # FIXME: this is related to properly handling line endings
+        xit 'moves the cursor to the end of the line', ->
+          keydown('$', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0,6]
+
+        it 'selects to the beginning of the lines', ->
+          keydown('d', element: editor[0])
+          keydown('$', element: editor[0])
+
+          expect(editor.getText()).toBe "  ab\n"
+          # FIXME: this is related to properly handling line endings
+          #expect(editor.getCursorScreenPosition()).toEqual [0,3]
+
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
         editor.setText("12345")

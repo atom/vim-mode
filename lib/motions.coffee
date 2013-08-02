@@ -84,4 +84,12 @@ class MoveToFirstCharacterOfLine extends Motion
     @editor.selectToFirstCharacterOfLine()
     true
 
-module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine }
+class MoveToLastCharacterOfLine extends Motion
+  execute: ->
+    @editor.moveCursorToEndOfLine()
+
+  select: ->
+    @editor.selectToEndOfLine()
+    true
+
+module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine }

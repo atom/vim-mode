@@ -43,6 +43,7 @@ class VimState
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
       'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)
+      'move-to-last-character-of-line': => new motions.MoveToLastCharacterOfLine(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'numeric-prefix': (e) => @numericPrefix(e)
 
