@@ -410,6 +410,22 @@ describe "VimState", ->
           expect(vimState.getRegister('"')).toBe "ab  "
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
+      describe "the ^ keybinding", ->
+        beforeEach ->
+          editor.setText("  abcde")
+          editor.setCursorScreenPosition([0,4])
+
+        it 'moves the cursor to the beginning of the line', ->
+          keydown('^', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0,2]
+
+        it 'selects to the beginning of the lines', ->
+          keydown('d', element: editor[0])
+          keydown('^', element: editor[0])
+
+          expect(editor.getText()).toBe '  cde'
+          expect(editor.getCursorScreenPosition()).toEqual [0,2]
+
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
         editor.setText("12345")
