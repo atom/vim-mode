@@ -236,14 +236,14 @@ describe "VimState", ->
       it "inserts the contents of the default register", ->
         keydown('p', element: editor[0])
 
-        expect(editor.getBuffer().getText()).toBe "345\n012\n"
+        expect(editor.getText()).toBe "345\n012\n"
 
       it "inserts the contents of the 'a' register", ->
         keydown('"', element: editor[0])
         keydown('a', element: editor[0])
         keydown('p', element: editor[0])
 
-        expect(editor.getBuffer().getText()).toBe "a\n012\n"
+        expect(editor.getText()).toBe "a\n012\n"
 
     describe "basic motion bindings", ->
       beforeEach ->
