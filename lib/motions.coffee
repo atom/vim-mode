@@ -56,7 +56,7 @@ class MoveToNextParagraph extends Motion
     @editor.setCursorScreenPosition(@nextPosition())
 
   select: ->
-    @editor.selectToPosition(@nextPosition())
+    @editor.selectToScreenPosition(@nextPosition())
     true
 
   # Finds the beginning of the next paragraph
@@ -74,6 +74,6 @@ class MoveToNextParagraph extends Motion
         position = range.start
         stop()
 
-    position
+    @editor.screenPositionForBufferPosition(position)
 
 module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph }

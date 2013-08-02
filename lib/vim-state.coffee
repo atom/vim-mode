@@ -10,9 +10,11 @@ class VimState
   editor: null
   opStack: null
   mode: null
+  registers: null
 
   constructor: (@editor) ->
     @opStack = []
+    @registers = {}
     @mode = 'command'
     @activateCommandMode()
     @setupCommandMode()
@@ -31,6 +33,8 @@ class VimState
       'insert': => @activateInsertMode()
       'delete': => @delete()
       'delete-right': => new commands.DeleteRight(@editor)
+      'yank': => @yank()
+      'put-after': => new operators.Put(@editor, @)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
       'move-down': => new motions.MoveDown @editor
@@ -38,6 +42,7 @@ class VimState
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
+      'register-prefix': (e) => @registerPrefix(e)
       'numeric-prefix': (e) => @numericPrefix(e)
 
   handleCommands: (commands) ->
@@ -68,6 +73,10 @@ class VimState
     if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
 
+  registerPrefix: (e) ->
+    name = e.keyEvent.keystrokes.split(' ')[1]
+    @pushOperator(new operators.RegisterPrefix(name))
+
   numericPrefix: (e) ->
     num = parseInt(e.keyEvent.keystrokes)
     if @topOperator() instanceof operators.NumericPrefix
@@ -76,15 +85,22 @@ class VimState
       @pushOperator(new operators.NumericPrefix(num))
 
   delete: () ->
-    if deleteOperation = @isDeletePending()
+    if deleteOperation = @isOperatorPending(operators.Delete)
       deleteOperation.complete = true
       @processOpStack()
     else
       @pushOperator(new operators.Delete(@editor))
 
-  isDeletePending: () ->
+  yank: () ->
+    if yankOperation = @isOperatorPending(operators.Yank)
+      yankOperation.complete = true
+      @processOpStack()
+    else
+      @pushOperator(new operators.Yank(@editor, @))
+
+  isOperatorPending: (type) ->
     for op in @opStack
-      return op if op instanceof operators.Delete
+      return op if op instanceof type
     false
 
   pushOperator: (op) ->
@@ -106,3 +122,9 @@ class VimState
 
   topOperator: ->
     _.last @opStack
+
+  getRegister: (name) ->
+    @registers[name]
+
+  setRegister: (name, value) ->
+    @registers[name] = value

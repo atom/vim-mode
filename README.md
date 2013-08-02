@@ -15,22 +15,24 @@ current focus is to ensure that an appropriate model is in place so that
 operators and motions can be incrementally added by the users who find
 them useful as no one person uses all of vim's functionality.
 
-#### Implemented Motions
+### Future Work (in rough order)
 
-* w
-* b
-* h,j,k,l
-* }
+* Implement operator repeating.
+* Implement `^` and `$` motions.
+* Implement `O` operator.
+* Implement `J` operator.
+* Implement `a` command.
+* Implement `>>` and `<<` operators.
+* Implement `ctrl-u` and `ctrl-d`.
+* Undo/redo bindings.
+* Block backspace in command mode.
+* More advanced keymap to support `iw` motion.
 
-#### Implemented Operators
+### Documentation
 
-* d
-* i
-
-#### Other features
-
-* Insert and command mode.
-* Motions can be repeated like so, 'd3w' will delete three words.
+* [Overview](docs/overview.md)
+* [Motions](docs/motions.md)
+* [Operators](docs/operators.md)
 
 ### Development
 

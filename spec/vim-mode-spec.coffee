@@ -201,6 +201,50 @@ describe "VimState", ->
           expect(editor.getText()).toBe "ee four"
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
 
+    describe "the y keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012 345\n"
+        editor.setCursorScreenPosition [0, 0]
+
+      it "saves the line to the default register", ->
+        keydown('y', element: editor[0])
+        keydown('y', element: editor[0])
+
+        expect(vimState.getRegister('"')).toBe "012 345\n"
+
+      it "saves the line to the a register", ->
+        keydown('"', element: editor[0])
+        keydown('a', element: editor[0])
+        keydown('y', element: editor[0])
+        keydown('y', element: editor[0])
+
+        expect(vimState.getRegister('a')).toBe "012 345\n"
+
+      it "saves the first word to the default register", ->
+        keydown('y', element: editor[0])
+        keydown('w', element: editor[0])
+
+        expect(vimState.getRegister('"')).toBe "012 "
+
+    describe "the p keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+        editor.setCursorScreenPosition [0, 0]
+        vimState.setRegister('"', "345\n")
+        vimState.setRegister('a', "a\n")
+
+      it "inserts the contents of the default register", ->
+        keydown('p', element: editor[0])
+
+        expect(editor.getBuffer().getText()).toBe "345\n012\n"
+
+      it "inserts the contents of the 'a' register", ->
+        keydown('"', element: editor[0])
+        keydown('a', element: editor[0])
+        keydown('p', element: editor[0])
+
+        expect(editor.getBuffer().getText()).toBe "a\n012\n"
+
     describe "basic motion bindings", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE")
@@ -211,6 +255,13 @@ describe "VimState", ->
           keydown('h', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
           keydown('h', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual([1,0])
+
+        it 'selects the character to the left', ->
+          keydown('y', element: editor[0])
+          keydown('h', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "a"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
       describe "the j keybinding", ->
@@ -265,11 +316,29 @@ describe "VimState", ->
           keydown('w', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([3,2])
 
+        # FIXME: Waiting on github/atom#669 to be resolved.
+        xit 'selects to the end of the current word', ->
+          editor.setText("ab  cde1+- \n xyz\n\nzip")
+          editor.setCursorScreenPosition([0,1])
+
+          keydown('y', element: editor[0])
+          keydown('w', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "b  "
+
+          editor.setCursorScreenPosition([0,2])
+
+          keydown('y', element: editor[0])
+          keydown('w', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "  "
+
       describe "the } keybinding", ->
-        it "moves the cursor to the beginning of the paragraph", ->
+        beforeEach ->
           editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
           editor.setCursorScreenPosition([0,0])
 
+        it "moves the cursor to the beginning of the paragraph", ->
           keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [1,0]
 
@@ -281,6 +350,12 @@ describe "VimState", ->
 
           keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [9,6]
+
+        it 'selects to the end of the current word', ->
+          keydown('y', element: editor[0])
+          keydown('}', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "abcde\n"
 
       describe "the b keybinding", ->
         xit "moves the cursor to the beginning of the previous word", ->
@@ -315,6 +390,24 @@ describe "VimState", ->
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
           keydown('b', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0,0]
+
+        it 'selects to the beginning of the current word', ->
+          editor.setText("ab  cde1+- \n xyz\n\nzip")
+          editor.setCursorScreenPosition([0,2])
+
+          keydown('y', element: editor[0])
+          keydown('b', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "ab"
+          expect(editor.getCursorScreenPosition()).toEqual [0,0]
+
+          editor.setCursorScreenPosition([0,4])
+
+          keydown('y', element: editor[0])
+          keydown('b', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "ab  "
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
     describe "numeric prefix bindings", ->
