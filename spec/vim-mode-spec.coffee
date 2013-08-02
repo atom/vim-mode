@@ -305,10 +305,11 @@ describe "VimState", ->
           expect(vimState.getRegister('"')).toBe "  "
 
       describe "the } keybinding", ->
-        it "moves the cursor to the beginning of the paragraph", ->
+        beforeEach ->
           editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
           editor.setCursorScreenPosition([0,0])
 
+        it "moves the cursor to the beginning of the paragraph", ->
           keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [1,0]
 
@@ -320,6 +321,12 @@ describe "VimState", ->
 
           keydown('}', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [9,6]
+
+        it 'selects to the end of the current word', ->
+          keydown('y', element: editor[0])
+          keydown('}', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "abcde\n"
 
       describe "the b keybinding", ->
         xit "moves the cursor to the beginning of the previous word", ->
