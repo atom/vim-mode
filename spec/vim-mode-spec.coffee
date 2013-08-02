@@ -288,14 +288,15 @@ describe "VimState", ->
           keydown('w', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([3,2])
 
-        it 'selects to the end of the current word', ->
+        # FIXME: Waiting on github/atom#669 to be resolved.
+        xit 'selects to the end of the current word', ->
           editor.setText("ab  cde1+- \n xyz\n\nzip")
           editor.setCursorScreenPosition([0,1])
 
           keydown('y', element: editor[0])
           keydown('w', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "b"
+          expect(vimState.getRegister('"')).toBe "b  "
 
           editor.setCursorScreenPosition([0,2])
 
