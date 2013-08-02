@@ -230,6 +230,12 @@ describe "VimState", ->
           keydown('h', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
+        it 'selects the character to the left', ->
+          keydown('y', element: editor[0])
+          keydown('h', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "a"
+
       describe "the j keybinding", ->
         it "moves the cursor down, but not to the end of the last line", ->
           keydown('j', element: editor[0])
