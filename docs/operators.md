@@ -13,5 +13,3 @@
     advanced atom keymap support)
 * [Put](http://vimhelp.appspot.com/change.txt.html#p)
   * `p` - default register
-  * `"ap` - supports registers (only named a-h, pending more
-    advanced atom keymap support)
