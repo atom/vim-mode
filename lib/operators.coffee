@@ -53,4 +53,32 @@ class Delete
     @motion = motion
     @complete = true
 
-module.exports = { NumericPrefix, Delete, OperatorError }
+class Yank
+  motion: null
+  complete: null
+
+  constructor: (@editor, @vimState) ->
+    @complete = false
+
+  isComplete: -> @complete
+
+  execute: ->
+    if @motion
+      if @motion.select()
+        text = @editor.getSelection().getText()
+    else
+      buffer = @editor.getBuffer()
+      text = buffer.lineForRow(@editor.getCursor().getBufferRow())
+      text += buffer.lineEndingForRow(@editor.getCursor().getBufferRow())
+      @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
+
+    @vimState.setRegister('"', text)
+
+  compose: (motion) ->
+    if not motion.select
+      throw new OperatorError("Yank must compose with a motion")
+
+    @motion = motion
+    @complete = true
+
+module.exports = { NumericPrefix, Delete, OperatorError, Yank }

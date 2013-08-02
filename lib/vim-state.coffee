@@ -10,9 +10,11 @@ class VimState
   editor: null
   opStack: null
   mode: null
+  registers: null
 
   constructor: (@editor) ->
     @opStack = []
+    @registers = {}
     @mode = 'command'
     @activateCommandMode()
     @setupCommandMode()
@@ -31,6 +33,7 @@ class VimState
       'insert': => @activateInsertMode()
       'delete': => @delete()
       'delete-right': => new commands.DeleteRight(@editor)
+      'yank': => @yank()
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
       'move-down': => new motions.MoveDown @editor
@@ -76,15 +79,22 @@ class VimState
       @pushOperator(new operators.NumericPrefix(num))
 
   delete: () ->
-    if deleteOperation = @isDeletePending()
+    if deleteOperation = @isOperatorPending(operators.Delete)
       deleteOperation.complete = true
       @processOpStack()
     else
       @pushOperator(new operators.Delete(@editor))
 
-  isDeletePending: () ->
+  yank: () ->
+    if yankOperation = @isOperatorPending(operators.Yank)
+      yankOperation.complete = true
+      @processOpStack()
+    else
+      @pushOperator(new operators.Yank(@editor, @))
+
+  isOperatorPending: (type) ->
     for op in @opStack
-      return op if op instanceof operators.Delete
+      return op if op instanceof type
     false
 
   pushOperator: (op) ->
@@ -106,3 +116,9 @@ class VimState
 
   topOperator: ->
     _.last @opStack
+
+  getRegister: (name) ->
+    @registers[name]
+
+  setRegister: (name, value) ->
+    @registers[name] = value

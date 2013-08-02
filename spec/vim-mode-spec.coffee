@@ -201,6 +201,23 @@ describe "VimState", ->
           expect(editor.getText()).toBe "ee four"
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
 
+    describe "the y keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012 345\n"
+        editor.setCursorScreenPosition [0, 0]
+
+      it "saves the line to the default register", ->
+        keydown('y', element: editor[0])
+        keydown('y', element: editor[0])
+
+        expect(vimState.getRegister('"')).toBe "012 345\n"
+
+      it "saves the first word to the default register", ->
+        keydown('y', element: editor[0])
+        keydown('w', element: editor[0])
+
+        expect(vimState.getRegister('"')).toBe "012"
+
     describe "basic motion bindings", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE")
@@ -264,6 +281,22 @@ describe "VimState", ->
 
           keydown('w', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([3,2])
+
+        it 'selects to the end of the current word', ->
+          editor.setText("ab  cde1+- \n xyz\n\nzip")
+          editor.setCursorScreenPosition([0,1])
+
+          keydown('y', element: editor[0])
+          keydown('w', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "b"
+
+          editor.setCursorScreenPosition([0,2])
+
+          keydown('y', element: editor[0])
+          keydown('w', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "  "
 
       describe "the } keybinding", ->
         it "moves the cursor to the beginning of the paragraph", ->
