@@ -350,6 +350,22 @@ describe "VimState", ->
           keydown('b', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
+        it 'selects to the beginning of the current word', ->
+          editor.setText("ab  cde1+- \n xyz\n\nzip")
+          editor.setCursorScreenPosition([0,2])
+
+          keydown('y', element: editor[0])
+          keydown('b', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "ab"
+
+          editor.setCursorScreenPosition([0,4])
+
+          keydown('y', element: editor[0])
+          keydown('b', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "  "
+
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
         editor.setText("12345")

@@ -40,7 +40,7 @@ class MoveToPreviousWord extends Motion
     @editor.moveCursorToBeginningOfWord()
 
   select: ->
-    @editor.selectToBeginningOfWord()
+    @editor.selectToPreviousWordBoundary()
     true
 
 class MoveToNextWord extends Motion
