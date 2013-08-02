@@ -73,7 +73,7 @@ class MoveToNextParagraph extends Motion
       @editor.selectToScreenPosition(@nextPosition())
       true
 
-  # Finds the beginning of the next paragraph
+  # Private: Finds the beginning of the next paragraph
   #
   # If no paragraph is found, the end of the buffer is returned.
   nextPosition: ->
