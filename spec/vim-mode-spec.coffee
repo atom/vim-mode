@@ -428,6 +428,16 @@ describe "VimState", ->
 
         expect(editor.getText()).toBe 'bc'
 
+      it "repeats the following motion N times", ->
+        editor.setText("one two three")
+        editor.setCursorScreenPosition([0,0])
+
+        keydown('d', element: editor[0])
+        keydown('2', element: editor[0])
+        keydown('w', element: editor[0])
+
+        expect(editor.getText()).toBe 'three'
+
   describe "insert-mode", ->
     beforeEach ->
       editor.trigger keydownEvent('i')

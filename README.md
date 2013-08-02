@@ -17,7 +17,6 @@ them useful as no one person uses all of vim's functionality.
 
 ### Future Work (in rough order)
 
-* Implement operator repeating.
 * Implement `^` and `$` motions.
 * Implement `O` operator.
 * Implement `J` operator.
