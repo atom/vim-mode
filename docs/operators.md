@@ -2,6 +2,7 @@
 
 * [Delete](http://vimhelp.appspot.com/change.txt.html#deleting)
   * `dw` - with a motion
+  * `3d2w` - with repeating operator and motion
   * `dd` - linewise
 * [Yank](http://vimhelp.appspot.com/change.txt.html#yank)
   * `yw` - with a motion
