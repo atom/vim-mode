@@ -129,8 +129,7 @@ describe "VimState", ->
           expect(editor.getText()).toBe "12345\nabcde"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
-        # FIXME: This functionality wasn't implemented previously.
-        xdescribe "when the second d is prefixed by a count", ->
+        describe "when the second d is prefixed by a count", ->
           it "deletes n lines, starting from the current", ->
             editor.setText("12345\nabcde\nABCDE\nQWERT")
             editor.setCursorScreenPosition([1,1])
@@ -203,7 +202,7 @@ describe "VimState", ->
 
     describe "the y keybinding", ->
       beforeEach ->
-        editor.getBuffer().setText "012 345\n"
+        editor.getBuffer().setText "012 345\nabc\n"
         editor.setCursorScreenPosition [0, 0]
 
       it "saves the line to the default register", ->
@@ -211,6 +210,14 @@ describe "VimState", ->
         keydown('y', element: editor[0])
 
         expect(vimState.getRegister('"')).toBe "012 345\n"
+
+      describe "when the second y is prefixed by a count", ->
+        it "deletes n lines, starting from the current", ->
+          keydown('y', element: editor[0])
+          keydown('2', element: editor[0])
+          keydown('y', element: editor[0])
+
+          expect(vimState.getRegister('"')).toBe "012 345\nabc\n"
 
       it "saves the line to the a register", ->
         keydown('"', element: editor[0])
