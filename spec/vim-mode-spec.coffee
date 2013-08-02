@@ -46,7 +46,7 @@ describe "VimState", ->
       keydown('\\', element: editor[0])
       expect(editor.getText()).toEqual('')
 
-    # FIXME: Need to discuss this with probablycorey or nathansobo
+    # FIXME: See atom/vim-mode#2
     xit "does not allow the cursor to be placed on the \n character, unless the line is empty", ->
       editor.setText("012345\n\nabcdef")
       editor.setCursorScreenPosition([0, 5])
@@ -310,6 +310,8 @@ describe "VimState", ->
           # Therefore it picks the end of the next word here (which is [3,3])
           # to start looking for the next word, which is also the end of the
           # buffer so the cursor never advances.
+          #
+          # See atom/vim-mode#3
           keydown('w', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([3,0])
 
@@ -386,6 +388,8 @@ describe "VimState", ->
           # FIXME: The definition of Cursor#getMovePreviousWordBoundaryBufferPosition
           # will always stop on the last word in the buffer. The question is should
           # we change this behavior.
+          #
+          # See atom/vim-mode#3
           keydown('b', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
@@ -431,7 +435,7 @@ describe "VimState", ->
           editor.setText("  abcde\n")
           editor.setCursorScreenPosition([0,4])
 
-        # FIXME: this is related to properly handling line endings
+        # FIXME: See atom/vim-mode#2
         xit 'moves the cursor to the end of the line', ->
           keydown('$', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [0,6]
@@ -441,7 +445,7 @@ describe "VimState", ->
           keydown('$', element: editor[0])
 
           expect(editor.getText()).toBe "  ab\n"
-          # FIXME: this is related to properly handling line endings
+          # FIXME: See atom/vim-mode#2
           #expect(editor.getCursorScreenPosition()).toEqual [0,3]
 
     describe "numeric prefix bindings", ->
