@@ -76,4 +76,20 @@ class MoveToNextParagraph extends Motion
 
     @editor.screenPositionForBufferPosition(position)
 
-module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph }
+class MoveToFirstCharacterOfLine extends Motion
+  execute: ->
+    @editor.moveCursorToFirstCharacterOfLine()
+
+  select: ->
+    @editor.selectToFirstCharacterOfLine()
+    true
+
+class MoveToLastCharacterOfLine extends Motion
+  execute: ->
+    @editor.moveCursorToEndOfLine()
+
+  select: ->
+    @editor.selectToEndOfLine()
+    true
+
+module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine }
