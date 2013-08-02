@@ -34,6 +34,7 @@ class VimState
       'delete': => @delete()
       'delete-right': => new commands.DeleteRight(@editor)
       'yank': => @yank()
+      'put-after': => new operators.Put(@editor, @)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
       'move-down': => new motions.MoveDown @editor

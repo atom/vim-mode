@@ -19,6 +19,7 @@
   'd': 'vim-mode:delete'
   'x': 'vim-mode:delete-right'
   'y': 'vim-mode:yank'
+  'p': 'vim-mode:put-after'
   'h': 'vim-mode:move-left'
   'j': 'vim-mode:move-down'
   'k': 'vim-mode:move-up'

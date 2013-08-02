@@ -218,6 +218,17 @@ describe "VimState", ->
 
         expect(vimState.getRegister('"')).toBe "012 "
 
+    describe "the p keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+        editor.setCursorScreenPosition [0, 0]
+        vimState.setRegister('"', "345\n")
+
+      it "inserts the contents of the default register", ->
+        keydown('p', element: editor[0])
+
+        expect(editor.getBuffer().getText()).toBe "345\n012\n"
+
     describe "basic motion bindings", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE")

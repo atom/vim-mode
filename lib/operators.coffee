@@ -81,4 +81,24 @@ class Yank
     @motion = motion
     @complete = true
 
-module.exports = { NumericPrefix, Delete, OperatorError, Yank }
+class Put
+  motion: null
+  direction: null
+
+  constructor: (@editor, @vimState, {@direction}={}) ->
+    @direction ?= 'after'
+
+  isComplete: -> true
+
+  execute: ->
+    text = @vimState.getRegister('"')
+    switch @direction
+      when 'before'
+        throw new OperatorError("Not Implemented")
+      when 'after'
+        @editor.insertText(text)
+
+  compose: (register) ->
+    throw new OperatorError("Not Implemented")
+
+module.exports = { NumericPrefix, Delete, OperatorError, Yank, Put }
