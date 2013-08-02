@@ -24,10 +24,10 @@ class NumericPrefix
     @count = @count * 10 + digit
 
   execute: ->
-    _.times @count, => @operatorToRepeat.execute()
+    @operatorToRepeat.execute(@count)
 
   select: ->
-    _.times @count, => @operatorToRepeat.select()
+    @operatorToRepeat.select(@count)
 
 class RegisterPrefix
   complete: null
@@ -43,11 +43,11 @@ class RegisterPrefix
     @operator.register = @name if @operator.register?
     @complete = true
 
-  execute: ->
-    @operator.execute()
+  execute: (count=1) ->
+    @operator.execute(count)
 
-  select: ->
-    @operator.select()
+  select: (count=1) ->
+    @operator.select(count)
 
 class Delete
   motion: null
@@ -58,12 +58,12 @@ class Delete
 
   isComplete: -> @complete
 
-  execute: ->
-    if @motion
-      if @motion.select()
+  execute: (count=1) ->
+    _.times count, =>
+      if _.last(@motion.select())
         @editor.getSelection().delete()
-    else
-      @editor.getBuffer().deleteRow(@editor.getCursor().getBufferRow())
+
+    if @motion.isLinewise()
       @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
 
   compose: (motion) ->
@@ -84,15 +84,12 @@ class Yank
 
   isComplete: -> @complete
 
-  execute: ->
-    if @motion
-      if @motion.select()
-        text = @editor.getSelection().getText()
-    else
-      buffer = @editor.getBuffer()
-      text = buffer.lineForRow(@editor.getCursor().getBufferRow())
-      text += buffer.lineEndingForRow(@editor.getCursor().getBufferRow())
-      @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
+  execute: (count=1) ->
+    text = ""
+
+    _.times count, =>
+      if _.last(@motion.select())
+        text += @editor.getSelection().getText()
 
     @vimState.setRegister(@register, text)
 
@@ -114,13 +111,15 @@ class Put
 
   isComplete: -> true
 
-  execute: ->
+  execute: (count=1) ->
     text = @vimState.getRegister(@register)
-    switch @direction
-      when 'before'
-        throw new OperatorError("Not Implemented")
-      when 'after'
-        @editor.insertText(text)
+
+    _.times count, =>
+      switch @direction
+        when 'before'
+          throw new OperatorError("Not Implemented")
+        when 'after'
+          @editor.insertText(text)
 
   compose: (register) ->
     throw new OperatorError("Not Implemented")
