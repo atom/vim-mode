@@ -236,14 +236,14 @@ describe "VimState", ->
       it "inserts the contents of the default register", ->
         keydown('p', element: editor[0])
 
-        expect(editor.getBuffer().getText()).toBe "345\n012\n"
+        expect(editor.getText()).toBe "345\n012\n"
 
       it "inserts the contents of the 'a' register", ->
         keydown('"', element: editor[0])
         keydown('a', element: editor[0])
         keydown('p', element: editor[0])
 
-        expect(editor.getBuffer().getText()).toBe "a\n012\n"
+        expect(editor.getText()).toBe "a\n012\n"
 
     describe "basic motion bindings", ->
       beforeEach ->
@@ -409,6 +409,40 @@ describe "VimState", ->
 
           expect(vimState.getRegister('"')).toBe "ab  "
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
+
+      describe "the ^ keybinding", ->
+        beforeEach ->
+          editor.setText("  abcde")
+          editor.setCursorScreenPosition([0,4])
+
+        it 'moves the cursor to the beginning of the line', ->
+          keydown('^', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0,2]
+
+        it 'selects to the beginning of the lines', ->
+          keydown('d', element: editor[0])
+          keydown('^', element: editor[0])
+
+          expect(editor.getText()).toBe '  cde'
+          expect(editor.getCursorScreenPosition()).toEqual [0,2]
+
+      describe "the $ keybinding", ->
+        beforeEach ->
+          editor.setText("  abcde\n")
+          editor.setCursorScreenPosition([0,4])
+
+        # FIXME: this is related to properly handling line endings
+        xit 'moves the cursor to the end of the line', ->
+          keydown('$', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0,6]
+
+        it 'selects to the beginning of the lines', ->
+          keydown('d', element: editor[0])
+          keydown('$', element: editor[0])
+
+          expect(editor.getText()).toBe "  ab\n"
+          # FIXME: this is related to properly handling line endings
+          #expect(editor.getCursorScreenPosition()).toEqual [0,3]
 
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->

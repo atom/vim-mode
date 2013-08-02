@@ -17,12 +17,12 @@ them useful as no one person uses all of vim's functionality.
 
 ### Future Work (in rough order)
 
-* Implement `^` and `$` motions.
 * Implement `O` operator.
 * Implement `J` operator.
 * Implement `a` command.
 * Implement `>>` and `<<` operators.
 * Implement `ctrl-u` and `ctrl-d`.
+* Implement `0` motion.
 * Undo/redo bindings.
 * Block backspace in command mode.
 * More advanced keymap to support `iw` motion.
