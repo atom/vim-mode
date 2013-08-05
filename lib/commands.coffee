@@ -8,6 +8,11 @@ class Insert extends Command
   execute: (count=1) ->
     @vimState.activateInsertMode()
 
+class InsertAfter extends Command
+  execute: (count=1) ->
+    @vimState.activateInsertMode()
+    @editor.moveCursorRight() unless @editor.getCursor().isAtEndOfLine()
+
 class InsertAboveWithNewline extends Command
   execute: (count=1) ->
     @vimState.activateInsertMode()
@@ -15,4 +20,4 @@ class InsertAboveWithNewline extends Command
     @editor.moveCursorUp()
     @editor.moveCursorToBeginningOfLine()
 
-module.exports = { Insert, InsertAboveWithNewline }
+module.exports = { Insert, InsertAfter, InsertAboveWithNewline }

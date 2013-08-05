@@ -17,7 +17,6 @@ them useful as no one person uses all of vim's functionality.
 
 ### Future Work (in rough order)
 
-* Implement `a` command.
 * Implement `>>` and `<<` operators.
 * Implement `ctrl-u` and `ctrl-d`.
 * Implement `0` motion.

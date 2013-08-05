@@ -49,6 +49,7 @@ class VimState
       'activate-command-mode': => @activateCommandMode()
       'reset-command-mode': => @resetCommandMode()
       'insert': => new commands.Insert(@editor, @)
+      'insert-after': => new commands.InsertAfter(@editor, @)
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]

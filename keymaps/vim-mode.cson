@@ -29,6 +29,7 @@
   'd': 'vim-mode:delete'
   'D': 'vim-mode:delete-to-last-character-of-line'
   'O': 'vim-mode:insert-above-with-newline'
+  'a': 'vim-mode:insert-after'
   'J': 'vim-mode:join'
   'x': 'vim-mode:delete-right'
   'y': 'vim-mode:yank'

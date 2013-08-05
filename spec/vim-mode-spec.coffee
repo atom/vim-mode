@@ -275,6 +275,23 @@ describe "VimState", ->
         expect(editor.getCursorScreenPosition()).toEqual [0,0]
         expect(editor).toHaveClass 'insert-mode'
 
+    describe "the a keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+
+      it "switches to insert mode and shifts to the right", ->
+        editor.setCursorScreenPosition [0, 0]
+        keydown('a', element: editor[0])
+
+        expect(editor.getCursorScreenPosition()).toEqual [0,1]
+        expect(editor).toHaveClass 'insert-mode'
+
+      it "doesn't linewrap", ->
+        editor.setCursorScreenPosition [0, 3]
+        keydown('a', element: editor[0])
+
+        expect(editor.getCursorScreenPosition()).toEqual [0,3]
+
     describe "the J keybinding", ->
       beforeEach ->
         editor.getBuffer().setText "012\n    456\n"
