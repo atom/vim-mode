@@ -34,6 +34,8 @@
   'x': 'vim-mode:delete-right'
   'y': 'vim-mode:yank'
   'p': 'vim-mode:put-after'
+  'u': 'core:undo'
+  'ctrl-r': 'core:redo'
   'h': 'vim-mode:move-left'
   'j': 'vim-mode:move-down'
   'k': 'vim-mode:move-up'
