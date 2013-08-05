@@ -263,6 +263,18 @@ describe "VimState", ->
 
         expect(editor.getText()).toBe "0\n"
 
+    describe "the O keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+        editor.setCursorScreenPosition [0, 1]
+
+      it "deletes the contents until the end of the line", ->
+        keydown('O', shift: true, element: editor[0])
+
+        expect(editor.getText()).toBe "\n012\n"
+        expect(editor.getCursorScreenPosition()).toEqual [0,0]
+        expect(editor).toHaveClass 'insert-mode'
+
     describe "basic motion bindings", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE")
