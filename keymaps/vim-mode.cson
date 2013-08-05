@@ -43,4 +43,5 @@
   '}': 'vim-mode:move-to-next-paragraph'
   '^': 'vim-mode:move-to-first-character-of-line'
   '$': 'vim-mode:move-to-last-character-of-line'
+  '0': 'vim-mode:move-to-beginning-of-line'
   'escape': 'vim-mode:reset-command-mode'

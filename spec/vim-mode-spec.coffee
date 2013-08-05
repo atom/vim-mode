@@ -505,6 +505,15 @@ describe "VimState", ->
           # FIXME: See atom/vim-mode#2
           #expect(editor.getCursorScreenPosition()).toEqual [0,3]
 
+      describe "the 0 keybinding", ->
+        beforeEach ->
+          editor.setText("  a\n")
+          editor.setCursorScreenPosition([0,2])
+
+        it 'moves the cursor to the beginning of the line', ->
+          keydown('0', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0,0]
+
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
         editor.setText("12345")

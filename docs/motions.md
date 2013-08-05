@@ -9,3 +9,4 @@
 * [}](http://vimhelp.appspot.com/motion.txt.html#%7D)
 * [^](http://vimhelp.appspot.com/motion.txt.html#%5E)
 * [$](http://vimhelp.appspot.com/motion.txt.html#%24)
+* [0](http://vimhelp.appspot.com/motion.txt.html#0)

@@ -134,6 +134,16 @@ class MoveToLine extends Motion
 
       new Range(startPoint, endPoint)
 
+class MoveToBeginningOfLine extends Motion
+  execute: (count=1) ->
+    _.map [1..count], =>
+      @editor.moveCursorToBeginningOfLine()
+
+  select: (count=1) ->
+    _.map [1..count], =>
+      @editor.selectToBeginningOfLine()
+      true
+
 class MoveToFirstCharacterOfLine extends Motion
   execute: (count=1) ->
     _.map [1..count], =>
@@ -154,4 +164,6 @@ class MoveToLastCharacterOfLine extends Motion
       @editor.selectToEndOfLine()
       true
 
-module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord, MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToLine }
+module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord,
+  MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine,
+  MoveToLastCharacterOfLine, MoveToLine, MoveToBeginningOfLine }

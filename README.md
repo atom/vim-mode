@@ -19,7 +19,6 @@ them useful as no one person uses all of vim's functionality.
 
 * Implement `>>` and `<<` operators.
 * Implement `ctrl-u` and `ctrl-d`.
-* Implement `0` motion.
 * Undo/redo bindings.
 * Block backspace in command mode.
 * More advanced keymap to support `iw` motion.
