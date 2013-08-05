@@ -170,6 +170,84 @@ class Yank
     @complete = true
 
 #
+# It indents everything selected by the following motion.
+#
+class Indent
+  motion: null
+  complete: null
+
+  constructor: (@editor) ->
+    @complete = false
+
+  isComplete: -> @complete
+
+  # Public: Indents the text selected by the given motion.
+  #
+  # count - The number of times to execute.
+  #
+  # Returns nothing.
+  execute: (count=1) ->
+    row = @editor.getCursorScreenRow()
+
+    _.times count, =>
+      if _.last(@motion.select())
+        @editor.indentSelectedRows()
+
+    @editor.setCursorScreenPosition([row, 0])
+    @editor.moveCursorToFirstCharacterOfLine()
+
+  # Public: Marks this as complete and saves the motion.
+  #
+  # motion - The motion used to select what to delete.
+  #
+  # Returns nothing.
+  compose: (motion) ->
+    if not motion.select
+      throw new OperatorError("Indent must compose with a motion")
+
+    @motion = motion
+    @complete = true
+
+#
+# It indents everything selected by the following motion.
+#
+class Outdent
+  motion: null
+  complete: null
+
+  constructor: (@editor) ->
+    @complete = false
+
+  isComplete: -> @complete
+
+  # Public: Indents the text selected by the given motion.
+  #
+  # count - The number of times to execute.
+  #
+  # Returns nothing.
+  execute: (count=1) ->
+    row = @editor.getCursorScreenRow()
+
+    _.times count, =>
+      if _.last(@motion.select())
+        @editor.outdentSelectedRows()
+
+    @editor.setCursorScreenPosition([row, 0])
+    @editor.moveCursorToFirstCharacterOfLine()
+
+  # Public: Marks this as complete and saves the motion.
+  #
+  # motion - The motion used to select what to delete.
+  #
+  # Returns nothing.
+  compose: (motion) ->
+    if not motion.select
+      throw new OperatorError("Indent must compose with a motion")
+
+    @motion = motion
+    @complete = true
+
+#
 # It pastes everything contained within the specifed register
 #
 class Put
@@ -227,4 +305,5 @@ class Join
   compose: (register) ->
     throw new OperatorError("Not Implemented")
 
-module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank, Put, Join }
+module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank,
+  Put, Join, Indent, Outdent }

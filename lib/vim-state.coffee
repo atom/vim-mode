@@ -57,6 +57,8 @@ class VimState
       'yank': => @linewiseAliasedOperator(operators.Yank)
       'put-after': => new operators.Put(@editor, @)
       'join': => new operators.Join(@editor)
+      'indent': => @linewiseAliasedOperator(operators.Indent)
+      'outdent': => @linewiseAliasedOperator(operators.Outdent)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
       'move-down': => new motions.MoveDown @editor
