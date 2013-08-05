@@ -36,6 +36,8 @@
   'p': 'vim-mode:put-after'
   'u': 'core:undo'
   'ctrl-r': 'core:redo'
+  'ctrl-u': 'core:page-up'
+  'ctrl-d': 'core:page-down'
   'h': 'vim-mode:move-left'
   'j': 'vim-mode:move-down'
   'k': 'vim-mode:move-up'

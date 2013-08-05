@@ -18,7 +18,6 @@ them useful as no one person uses all of vim's functionality.
 ### Future Work (in rough order)
 
 * Implement `>>` and `<<` operators.
-* Implement `ctrl-u` and `ctrl-d`.
 * Proper undo/redo stack.
 * Statusbar integration.
 * Block backspace in command mode.
