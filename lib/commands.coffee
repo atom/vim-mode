@@ -1,7 +1,18 @@
 _ = require 'underscore'
 
 class Command
-  constructor: (@editor) ->
+  constructor: (@editor, @vimState) ->
   isComplete: -> true
 
-module.exports = { }
+class Insert extends Command
+  execute: (count=1) ->
+    @vimState.activateInsertMode()
+
+class InsertAboveWithNewline extends Command
+  execute: (count=1) ->
+    @vimState.activateInsertMode()
+    @editor.insertNewlineAbove()
+    @editor.moveCursorUp()
+    @editor.moveCursorToBeginningOfLine()
+
+module.exports = { Insert, InsertAboveWithNewline }
