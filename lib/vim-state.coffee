@@ -48,7 +48,8 @@ class VimState
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
       'reset-command-mode': => @resetCommandMode()
-      'insert': => @activateInsertMode()
+      'insert': => new commands.Insert(@editor, @)
+      'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
       'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
@@ -148,6 +149,16 @@ class VimState
   setRegister: (name, value) ->
     @registers[name] = value
 
+  # Private: Used to enable insert mode.
+  #
+  # Returns nothing.
+  activateInsertMode: ->
+    @mode = 'insert'
+    @editor.removeClass('command-mode')
+    @editor.addClass('insert-mode')
+
+    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
+
   ##############################################################################
   # Commands
   ##############################################################################
@@ -161,16 +172,6 @@ class VimState
     @editor.addClass('command-mode')
 
     @editor.on 'cursor:position-changed', @moveCursorBeforeNewline
-
-  # Private: Used to enable insert mode.
-  #
-  # Returns nothing.
-  activateInsertMode: ->
-    @mode = 'insert'
-    @editor.removeClass('command-mode')
-    @editor.addClass('insert-mode')
-
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Resets the command mode back to it's initial state.
   #
