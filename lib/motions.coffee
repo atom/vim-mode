@@ -31,6 +31,17 @@ class MoveRight extends Motion
       unless column >= lastCharIndex
         @editor.moveCursorRight()
 
+  select: (count=1) ->
+    _.map [1..count], =>
+      {start, end} = @editor.getSelectedBufferRange()
+      rowLength = @editor.getCursor().getCurrentBufferLine().length
+
+      if end.column < rowLength
+        @editor.selectRight()
+        true
+      else
+        false
+
 class MoveUp extends Motion
   execute: (count=1) ->
     _.map [1..count], =>

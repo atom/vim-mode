@@ -26,6 +26,7 @@ describe "VimState", ->
       e.initTextEvent eventArgs...
       target.dispatchEvent e
 
+    key = "U+#{key.charCodeAt(0).toString(16)}"
     element ||= document.activeElement
     eventArgs = [true, true, null, key, 0, ctrl, alt, shift, meta] # bubbles, cancelable, view, key, location
 
@@ -251,6 +252,16 @@ describe "VimState", ->
         keydown('p', element: editor[0])
 
         expect(editor.getText()).toBe "a\n012\n"
+
+    describe "the D keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+        editor.setCursorScreenPosition [0, 1]
+
+      it "deletes the contents until the end of the line", ->
+        keydown('D', shift: true, element: editor[0])
+
+        expect(editor.getText()).toBe "0\n"
 
     describe "basic motion bindings", ->
       beforeEach ->
