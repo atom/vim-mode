@@ -268,7 +268,7 @@ describe "VimState", ->
         editor.getBuffer().setText "012\n"
         editor.setCursorScreenPosition [0, 1]
 
-      it "deletes the contents until the end of the line", ->
+      it "switches to insert and adds a newline above the current one", ->
         keydown('O', shift: true, element: editor[0])
 
         expect(editor.getText()).toBe "\n012\n"
