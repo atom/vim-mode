@@ -51,6 +51,7 @@ class VimState
       'insert': => @activateInsertMode()
       'delete': => @linewiseAliasedOperator(operators.Delete)
       'delete-right': => new commands.DeleteRight(@editor)
+      'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
       'yank': => @linewiseAliasedOperator(operators.Yank)
       'put-after': => new operators.Put(@editor, @)
       'move-left': => new motions.MoveLeft(@editor)
@@ -77,8 +78,10 @@ class VimState
     _.each commands, (fn, commandName) =>
       eventName = "vim-mode:#{commandName}"
       @editor.command eventName, (e) =>
-        possibleOperator = fn(e)
-        @pushOperator(possibleOperator) if possibleOperator?.execute
+        possibleOperators = fn(e)
+        possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
+        for possibleOperator in possibleOperators
+          @pushOperator(possibleOperator) if possibleOperator?.execute
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.

@@ -108,7 +108,7 @@ class Delete
       if _.last(@motion.select())
         @editor.getSelection().delete()
 
-    if @motion.isLinewise()
+    if @motion.isLinewise?()
       @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
 
   # Public: Marks this as complete and saves the motion.
