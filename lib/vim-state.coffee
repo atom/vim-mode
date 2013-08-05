@@ -50,7 +50,7 @@ class VimState
       'reset-command-mode': => @resetCommandMode()
       'insert': => @activateInsertMode()
       'delete': => @linewiseAliasedOperator(operators.Delete)
-      'delete-right': => new commands.DeleteRight(@editor)
+      'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
       'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
       'yank': => @linewiseAliasedOperator(operators.Yank)
       'put-after': => new operators.Put(@editor, @)
