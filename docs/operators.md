@@ -16,3 +16,5 @@
   * `p` - default register
   * `"ap` - supports registers (only named a-h, pending more
     advanced atom keymap support)
+* [Join](http://vimhelp.appspot.com/change.txt.html#J)
+  * `J` - joins the current line with the immediately following line.

@@ -275,6 +275,16 @@ describe "VimState", ->
         expect(editor.getCursorScreenPosition()).toEqual [0,0]
         expect(editor).toHaveClass 'insert-mode'
 
+    describe "the J keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n    456\n"
+        editor.setCursorScreenPosition [0, 1]
+
+      it "deletes the contents until the end of the line", ->
+        keydown('J', shift: true, element: editor[0])
+
+        expect(editor.getText()).toBe "012 456\n"
+
     describe "basic motion bindings", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE")

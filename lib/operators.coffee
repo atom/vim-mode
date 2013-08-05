@@ -204,4 +204,27 @@ class Put
   compose: (register) ->
     throw new OperatorError("Not Implemented")
 
-module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank, Put }
+#
+# It combines the current line with the following line.
+#
+class Join
+  constructor: (@editor) ->
+
+  isComplete: -> true
+
+  # Public: Combines the current with the following lines
+  #
+  # count - The number of times to execute.
+  #
+  # Returns nothing.
+  execute: (count=1) ->
+    _.times count, =>
+      @editor.joinLine()
+
+  # Public: Not implemented.
+  #
+  # Returns nothing.
+  compose: (register) ->
+    throw new OperatorError("Not Implemented")
+
+module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank, Put, Join }
