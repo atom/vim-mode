@@ -274,7 +274,8 @@ class Put
   #
   # Returns nothing.
   execute: (count=1) ->
-    {text, type} = @vimState.getRegister(@register)
+    {text, type} = @vimState.getRegister(@register) || {}
+    return unless text
 
     _.times count, =>
       if type == 'linewise' and @location == 'after'
