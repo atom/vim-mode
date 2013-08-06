@@ -17,14 +17,19 @@ them useful as no one person uses all of vim's functionality.
 
 ### Future Work (in rough order)
 
+* Support for `cw`
+* Support for '" register
 * Support for 'f' and 't'
+* Statusbar integration
 * Visual mode
+* Support for marks (including \`.)
 * Differentiate between 0 for repetition and 0 for motion.
 * Proper undo/redo stack.
-* Statusbar integration.
 * Block backspace in command mode.
+  * Block `ctrl-d` in insert mode.
 * More advanced keymap to support `iw` motion.
-
+  * Handle `g{line}` and `gg`
+  
 ### Documentation
 
 * [Overview](docs/overview.md)
