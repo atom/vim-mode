@@ -364,4 +364,4 @@ class Join
     throw new OperatorError("Not Implemented")
 
 module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank,
-  Put, Join, Indent, Outdent }
+  Put, Join, Indent, Outdent, Change }
