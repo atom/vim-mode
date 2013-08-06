@@ -129,6 +129,51 @@ class Delete
     @complete = true
 
 #
+# It changes everything selected by the following motion.
+#
+class Change
+  motion: null
+  complete: null
+  vimState: null
+
+  constructor: (@editor, @vimState) ->
+    @complete = false
+
+  isComplete: -> @complete
+
+  # Public: Changes the text selected by the given motion.
+  #
+  # count - The number of times to execute.
+  #
+  # Returns nothing.
+  execute: (count=1) ->
+    _.times count, =>
+      if _.last(@motion.select())
+        @editor.getSelection().delete()
+
+      # FIXME: This should be fixed by atom/vim-mode#2
+      {row, column} = @editor.getCursorScreenPosition()
+      rowLength = @editor.getCursor().getCurrentBufferLine().length
+      @editor.moveCursorLeft() if column == rowLength
+
+    if @motion.isLinewise?()
+      @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
+
+    @vimState.activateInsertMode()
+
+  # Public: Marks this as complete and saves the motion.
+  #
+  # motion - The motion used to select what to change.
+  #
+  # Returns nothing.
+  compose: (motion) ->
+    if not motion.select
+      throw new OperatorError("Change must compose with a motion")
+
+    @motion = motion
+    @complete = true
+
+#
 # It copies everything selected by the following motion.
 #
 class Yank
