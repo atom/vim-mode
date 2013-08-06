@@ -34,6 +34,7 @@
   'J': 'vim-mode:join'
   'x': 'vim-mode:delete-right'
   'y': 'vim-mode:yank'
+  'P': 'vim-mode:put-before'
   'p': 'vim-mode:put-after'
   '>': 'vim-mode:indent'
   '<': 'vim-mode:outdent'

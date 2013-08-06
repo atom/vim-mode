@@ -150,13 +150,14 @@ class Yank
   # Returns nothing.
   execute: (count=1) ->
     text = ""
+    type = if @motion.isLinewise then 'linewise' else 'character'
 
     originalPosition = @editor.getCursorScreenPosition()
     _.times count, =>
       if _.last(@motion.select())
         text += @editor.getSelection().getText()
 
-    @vimState.setRegister(@register, text)
+    @vimState.setRegister(@register, {text, type})
 
     if @motion.isLinewise?()
       @editor.setCursorScreenPosition(originalPosition)
@@ -261,7 +262,7 @@ class Put
   direction: null
   register: null
 
-  constructor: (@editor, @vimState, {@direction}={}) ->
+  constructor: (@editor, @vimState, {@location}={}) ->
     @direction ?= 'after'
     @register ?= '"'
 
@@ -273,14 +274,20 @@ class Put
   #
   # Returns nothing.
   execute: (count=1) ->
-    text = @vimState.getRegister(@register)
+    {text, type} = @vimState.getRegister(@register)
 
     _.times count, =>
-      switch @direction
-        when 'before'
-          throw new OperatorError("Not Implemented")
-        when 'after'
-          @editor.insertText(text)
+      if type == 'linewise' and @location == 'after'
+        @editor.moveCursorDown()
+      else if @location == 'after'
+        @editor.moveCursorRight()
+
+      @editor.moveCursorToBeginningOfLine() if type == 'linewise'
+      @editor.insertText(text)
+
+      if type == 'linewise'
+        @editor.moveCursorUp()
+        @editor.moveCursorToFirstCharacterOfLine()
 
   # Public: Not implemented.
   #

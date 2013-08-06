@@ -210,7 +210,7 @@ describe "VimState", ->
         keydown('y', element: editor[0])
         keydown('y', element: editor[0])
 
-        expect(vimState.getRegister('"')).toBe "012 345\n"
+        expect(vimState.getRegister('"').text).toBe "012 345\n"
         expect(editor.getCursorScreenPosition()).toEqual([0,4])
 
       describe "when the second y is prefixed by a count", ->
@@ -219,7 +219,7 @@ describe "VimState", ->
           keydown('2', element: editor[0])
           keydown('y', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "012 345\nabc\n"
+          expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
       it "saves the line to the a register", ->
         keydown('"', element: editor[0])
@@ -227,32 +227,81 @@ describe "VimState", ->
         keydown('y', element: editor[0])
         keydown('y', element: editor[0])
 
-        expect(vimState.getRegister('a')).toBe "012 345\n"
+        expect(vimState.getRegister('a').text).toBe "012 345\n"
 
       it "saves the first word to the default register", ->
         keydown('y', element: editor[0])
         keydown('w', element: editor[0])
 
-        expect(vimState.getRegister('"')).toBe "345\n"
+        expect(vimState.getRegister('"').text).toBe "345\n"
 
     describe "the p keybinding", ->
-      beforeEach ->
-        editor.getBuffer().setText "012\n"
-        editor.setCursorScreenPosition [0, 0]
-        vimState.setRegister('"', "345\n")
-        vimState.setRegister('a', "a\n")
+      describe 'character', ->
+        beforeEach ->
+          editor.getBuffer().setText "012\n"
+          editor.setCursorScreenPosition [0, 0]
+          vimState.setRegister('"', text: "345")
+          vimState.setRegister('a', text: "a")
 
-      it "inserts the contents of the default register", ->
-        keydown('p', element: editor[0])
+        it "inserts the contents of the default register", ->
+          keydown('p', element: editor[0])
 
-        expect(editor.getText()).toBe "345\n012\n"
+          expect(editor.getText()).toBe "034512\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0,4]
 
-      it "inserts the contents of the 'a' register", ->
-        keydown('"', element: editor[0])
-        keydown('a', element: editor[0])
-        keydown('p', element: editor[0])
+        it "inserts the contents of the 'a' register", ->
+          keydown('"', element: editor[0])
+          keydown('a', element: editor[0])
+          keydown('p', element: editor[0])
 
-        expect(editor.getText()).toBe "a\n012\n"
+          expect(editor.getText()).toBe "0a12\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0,2]
+
+      describe 'linewise', ->
+        beforeEach ->
+          editor.getBuffer().setText "012\n"
+          editor.setCursorScreenPosition [0, 1]
+          vimState.setRegister('"', text: " 345\n", type: 'linewise')
+
+        it "inserts the contents of the default register", ->
+          keydown('p', element: editor[0])
+
+          expect(editor.getText()).toBe "012\n 345\n"
+          expect(editor.getCursorScreenPosition()).toEqual [1,1]
+
+    describe "the P keybinding", ->
+      describe 'character', ->
+        beforeEach ->
+          editor.getBuffer().setText "012\n"
+          editor.setCursorScreenPosition [0, 0]
+          vimState.setRegister('"', text: "345")
+          vimState.setRegister('a', text: "a")
+
+        it "inserts the contents of the default register", ->
+          keydown('P', shift: true, element: editor[0])
+
+          expect(editor.getText()).toBe "345012\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0,3]
+
+        it "inserts the contents of the 'a' register", ->
+          keydown('"', element: editor[0])
+          keydown('a', element: editor[0])
+          keydown('P', shift: true, element: editor[0])
+
+          expect(editor.getText()).toBe "a012\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0,1]
+
+      describe 'linewise', ->
+        beforeEach ->
+          editor.getBuffer().setText "012\n"
+          editor.setCursorScreenPosition [0, 1]
+          vimState.setRegister('"', text: " 345\n", type: 'linewise')
+
+        it "inserts the contents of the default register", ->
+          keydown('P', shift: true, element: editor[0])
+
+          expect(editor.getText()).toBe " 345\n012\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0,1]
 
     describe "the D keybinding", ->
       beforeEach ->
@@ -361,7 +410,7 @@ describe "VimState", ->
           keydown('y', element: editor[0])
           keydown('h', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "a"
+          expect(vimState.getRegister('"').text).toBe "a"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
       describe "the j keybinding", ->
@@ -425,14 +474,14 @@ describe "VimState", ->
           keydown('y', element: editor[0])
           keydown('w', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "b  "
+          expect(vimState.getRegister('"').text).toBe "b  "
 
           editor.setCursorScreenPosition([0,2])
 
           keydown('y', element: editor[0])
           keydown('w', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "  "
+          expect(vimState.getRegister('"').text).toBe "  "
 
       describe "the } keybinding", ->
         beforeEach ->
@@ -456,7 +505,7 @@ describe "VimState", ->
           keydown('y', element: editor[0])
           keydown('}', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "abcde\n"
+          expect(vimState.getRegister('"').text).toBe "abcde\n"
 
       describe "the b keybinding", ->
         xit "moves the cursor to the beginning of the previous word", ->
@@ -502,7 +551,7 @@ describe "VimState", ->
           keydown('y', element: editor[0])
           keydown('b', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "ab"
+          expect(vimState.getRegister('"').text).toBe "ab"
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
           editor.setCursorScreenPosition([0,4])
@@ -510,7 +559,7 @@ describe "VimState", ->
           keydown('y', element: editor[0])
           keydown('b', element: editor[0])
 
-          expect(vimState.getRegister('"')).toBe "ab  "
+          expect(vimState.getRegister('"').text).toBe "ab  "
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
       describe "the ^ keybinding", ->
