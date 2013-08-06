@@ -51,6 +51,7 @@ class VimState
       'insert': => new commands.Insert(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
+      'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
       'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
@@ -228,4 +229,3 @@ class VimState
     for op in @opStack
       return op if op instanceof constructor
     false
-

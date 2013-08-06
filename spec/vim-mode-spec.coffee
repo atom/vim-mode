@@ -275,6 +275,18 @@ describe "VimState", ->
         expect(editor.getCursorScreenPosition()).toEqual [1,0]
         expect(editor).toHaveClass 'insert-mode'
 
+    describe "the o keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "abc\n012\n"
+        editor.setCursorScreenPosition [1, 1]
+
+      it "switches to insert and adds a newline above the current one", ->
+        keydown('o', element: editor[0])
+
+        expect(editor.getText()).toBe "abc\n012\n\n"
+        expect(editor).toHaveClass 'insert-mode'
+        expect(editor.getCursorScreenPosition()).toEqual [2,0]
+
     describe "the a keybinding", ->
       beforeEach ->
         editor.getBuffer().setText "012\n"

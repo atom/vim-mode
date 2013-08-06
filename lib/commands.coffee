@@ -19,4 +19,10 @@ class InsertAboveWithNewline extends Command
     @editor.insertNewlineAbove()
     @editor.moveCursorToBeginningOfLine()
 
-module.exports = { Insert, InsertAfter, InsertAboveWithNewline }
+class InsertBelowWithNewline extends Command
+  execute: (count=1) ->
+    @vimState.activateInsertMode()
+    @editor.insertNewlineBelow()
+    @editor.moveCursorToBeginningOfLine()
+
+module.exports = { Insert, InsertAfter, InsertAboveWithNewline, InsertBelowWithNewline }
