@@ -214,7 +214,7 @@ describe "VimState", ->
         expect(editor.getCursorScreenPosition()).toEqual([0,4])
 
       describe "when the second y is prefixed by a count", ->
-        it "deletes n lines, starting from the current", ->
+        it "copies n lines, starting from the current", ->
           keydown('y', element: editor[0])
           keydown('2', element: editor[0])
           keydown('y', element: editor[0])
