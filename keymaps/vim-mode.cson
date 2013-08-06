@@ -48,6 +48,8 @@
   '^': 'vim-mode:move-to-first-character-of-line'
   '$': 'vim-mode:move-to-last-character-of-line'
   # '0': 'vim-mode:move-to-beginning-of-line'
+  'g g': 'vim-mode:move-to-start-of-file'
+  'G': 'vim-mode:move-to-end-of-file'
   'escape': 'vim-mode:reset-command-mode'
   'u': 'core:undo'
   'ctrl-r': 'core:redo'

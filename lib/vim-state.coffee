@@ -73,6 +73,8 @@ class VimState
       'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)
       'move-to-last-character-of-line': => new motions.MoveToLastCharacterOfLine(@editor)
       'move-to-beginning-of-line': => new motions.MoveToBeginningOfLine(@editor)
+      'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
+      'move-to-end-of-file': => new motions.MoveToEndOfFile(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'numeric-prefix': (e) => @numericPrefix(e)
 

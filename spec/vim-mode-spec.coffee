@@ -607,6 +607,27 @@ describe "VimState", ->
           keydown('0', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
+      describe "the gg keybinding", ->
+        beforeEach ->
+          editor.setText(" 1abc\n2\n3\n")
+          editor.setCursorScreenPosition([0,2])
+
+        it 'moves the cursor to the beginning of the first line', ->
+          keydown('g', element: editor[0])
+          keydown('g', element: editor[0])
+
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+      describe "the G keybinding", ->
+        beforeEach ->
+          editor.setText("1\n2\n 3abc\n")
+          editor.setCursorScreenPosition([0,2])
+
+        it 'moves the cursor to the beginning of the last line', ->
+          keydown('G', shift: true, element: editor[0])
+
+          expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
         editor.setText("12345")

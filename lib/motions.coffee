@@ -164,6 +164,29 @@ class MoveToLastCharacterOfLine extends Motion
       @editor.selectToEndOfLine()
       true
 
+class MoveToStartOfFile extends Motion
+  execute: (count=1) ->
+    _.map [1..count], =>
+      @editor.setCursorScreenPosition([0,0])
+      @editor.getCursor().skipLeadingWhitespace()
+
+  select: (count=1) ->
+    _.map [1..count], =>
+      @editor.selectToScreenPosition([0,0])
+
+class MoveToEndOfFile extends Motion
+  execute: (count=1) ->
+    _.map [1..count], =>
+      @editor.setCursorScreenPosition(@endOfFile())
+
+  select: (count=1) ->
+    _.map [1..count], =>
+      @editor.selectToScreenPosition(@endOfFile())
+
+  endOfFile: ->
+    @editor.screenPositionForBufferPosition @editor.getEofPosition()
+
 module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord,
   MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine,
-  MoveToLastCharacterOfLine, MoveToLine, MoveToBeginningOfLine }
+  MoveToLastCharacterOfLine, MoveToLine, MoveToBeginningOfLine, MoveToStartOfFile,
+  MoveToEndOfFile }
