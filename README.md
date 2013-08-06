@@ -33,4 +33,7 @@ them useful as no one person uses all of vim's functionality.
 
 ### Development
 
+**Important** you'll need to be running a locally built version of Atom to
+run tests.
+
 See [the contribution guide](CONTRIBUTING.md).
