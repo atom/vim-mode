@@ -397,8 +397,7 @@ describe "VimState", ->
           keydown('w', element: editor[0])
           expect(editor.getCursorScreenPosition()).toEqual([3,2])
 
-        # FIXME: Waiting on github/atom#669 to be resolved.
-        xit 'selects to the end of the current word', ->
+        it 'selects to the end of the current word', ->
           editor.setText("ab  cde1+- \n xyz\n\nzip")
           editor.setCursorScreenPosition([0,1])
 
