@@ -17,12 +17,12 @@ class InsertAboveWithNewline extends Command
   execute: (count=1) ->
     @vimState.activateInsertMode()
     @editor.insertNewlineAbove()
-    @editor.moveCursorToBeginningOfLine()
+    @editor.getCursor().skipLeadingWhitespace()
 
 class InsertBelowWithNewline extends Command
   execute: (count=1) ->
     @vimState.activateInsertMode()
     @editor.insertNewlineBelow()
-    @editor.moveCursorToBeginningOfLine()
+    @editor.getCursor().skipLeadingWhitespace()
 
 module.exports = { Insert, InsertAfter, InsertAboveWithNewline, InsertBelowWithNewline }

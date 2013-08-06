@@ -265,27 +265,35 @@ describe "VimState", ->
 
     describe "the O keybinding", ->
       beforeEach ->
-        editor.getBuffer().setText "abc\n012\n"
+        spyOn(editor.activeEditSession, 'shouldAutoIndent').andReturn(true)
+        spyOn(editor.activeEditSession, 'autoIndentBufferRow').andCallFake (line) ->
+          editor.indent()
+
+        editor.getBuffer().setText "  abc\n  012\n"
         editor.setCursorScreenPosition [1, 1]
 
       it "switches to insert and adds a newline above the current one", ->
         keydown('O', shift: true, element: editor[0])
 
-        expect(editor.getText()).toBe "abc\n\n012\n"
-        expect(editor.getCursorScreenPosition()).toEqual [1,0]
+        expect(editor.getText()).toBe "  abc\n  \n  012\n"
+        expect(editor.getCursorScreenPosition()).toEqual [1,2]
         expect(editor).toHaveClass 'insert-mode'
 
     describe "the o keybinding", ->
       beforeEach ->
-        editor.getBuffer().setText "abc\n012\n"
-        editor.setCursorScreenPosition [1, 1]
+        spyOn(editor.activeEditSession, 'shouldAutoIndent').andReturn(true)
+        spyOn(editor.activeEditSession, 'autoIndentBufferRow').andCallFake (line) ->
+          editor.indent()
+
+        editor.getBuffer().setText "abc\n  012\n"
+        editor.setCursorScreenPosition [1, 2]
 
       it "switches to insert and adds a newline above the current one", ->
         keydown('o', element: editor[0])
 
-        expect(editor.getText()).toBe "abc\n012\n\n"
+        expect(editor.getText()).toBe "abc\n  012\n  \n"
         expect(editor).toHaveClass 'insert-mode'
-        expect(editor.getCursorScreenPosition()).toEqual [2,0]
+        expect(editor.getCursorScreenPosition()).toEqual [2,2]
 
     describe "the a keybinding", ->
       beforeEach ->
