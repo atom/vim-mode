@@ -1,10 +1,10 @@
 'body':
   'meta-alt-ctrl-o': 'vim-mode:toggle'
 
-'.vim-mode.insert-mode':
+'.vim-mode.insert-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
 
-'.vim-mode.command-mode':
+'.vim-mode.command-mode:not(.mini)':
   '" a': 'vim-mode:register-prefix'
   '" b': 'vim-mode:register-prefix'
   '" c': 'vim-mode:register-prefix'
