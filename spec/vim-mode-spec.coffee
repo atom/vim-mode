@@ -265,14 +265,14 @@ describe "VimState", ->
 
     describe "the O keybinding", ->
       beforeEach ->
-        editor.getBuffer().setText "012\n"
-        editor.setCursorScreenPosition [0, 1]
+        editor.getBuffer().setText "abc\n012\n"
+        editor.setCursorScreenPosition [1, 1]
 
       it "switches to insert and adds a newline above the current one", ->
         keydown('O', shift: true, element: editor[0])
 
-        expect(editor.getText()).toBe "\n012\n"
-        expect(editor.getCursorScreenPosition()).toEqual [0,0]
+        expect(editor.getText()).toBe "abc\n\n012\n"
+        expect(editor.getCursorScreenPosition()).toEqual [1,0]
         expect(editor).toHaveClass 'insert-mode'
 
     describe "the a keybinding", ->

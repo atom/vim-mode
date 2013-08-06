@@ -17,7 +17,6 @@ class InsertAboveWithNewline extends Command
   execute: (count=1) ->
     @vimState.activateInsertMode()
     @editor.insertNewlineAbove()
-    @editor.moveCursorUp()
     @editor.moveCursorToBeginningOfLine()
 
 module.exports = { Insert, InsertAfter, InsertAboveWithNewline }
