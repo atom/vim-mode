@@ -35,6 +35,8 @@ class VimState
   # Returns nothing.
   registerInsertIntercept: ->
     @editor.preempt 'textInput', (e) =>
+      return if $(e.currentTarget).hasClass('mini')
+
       if @mode == 'insert'
         true
       else
