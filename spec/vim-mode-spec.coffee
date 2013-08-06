@@ -204,13 +204,14 @@ describe "VimState", ->
     describe "the y keybinding", ->
       beforeEach ->
         editor.getBuffer().setText "012 345\nabc\n"
-        editor.setCursorScreenPosition [0, 0]
+        editor.setCursorScreenPosition [0, 4]
 
       it "saves the line to the default register", ->
         keydown('y', element: editor[0])
         keydown('y', element: editor[0])
 
         expect(vimState.getRegister('"')).toBe "012 345\n"
+        expect(editor.getCursorScreenPosition()).toEqual([0,4])
 
       describe "when the second y is prefixed by a count", ->
         it "deletes n lines, starting from the current", ->
@@ -232,7 +233,7 @@ describe "VimState", ->
         keydown('y', element: editor[0])
         keydown('w', element: editor[0])
 
-        expect(vimState.getRegister('"')).toBe "012 "
+        expect(vimState.getRegister('"')).toBe "345\n"
 
     describe "the p keybinding", ->
       beforeEach ->

@@ -151,11 +151,17 @@ class Yank
   execute: (count=1) ->
     text = ""
 
+    originalPosition = @editor.getCursorScreenPosition()
     _.times count, =>
       if _.last(@motion.select())
         text += @editor.getSelection().getText()
 
     @vimState.setRegister(@register, text)
+
+    if @motion.isLinewise?()
+      @editor.setCursorScreenPosition(originalPosition)
+    else
+      @editor.clearSelections()
 
   # Public: Marks this as complete and saves the motion.
   #
