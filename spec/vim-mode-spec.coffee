@@ -202,6 +202,42 @@ describe "VimState", ->
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
 
     describe "the c keybinding", ->
+      describe "when followed by a c", ->
+        it "deletes the current line and enters insert mode", ->
+          editor.setText("12345\nabcde\nABCDE")
+          editor.setCursorScreenPosition([1,1])
+
+          keydown('c', element: editor[0])
+          keydown('c', element: editor[0])
+          expect(editor.getText()).toBe "12345\nABCDE"
+          expect(editor.getCursorScreenPosition()).toEqual([1,0])
+          expect(editor).not.toHaveClass 'command-mode'
+          expect(editor).toHaveClass 'insert-mode'
+
+        it "deletes the last line and enters insert mode", ->
+          editor.setText("12345\nabcde\nABCDE")
+          editor.setCursorScreenPosition([2,1])
+          keydown('c', element: editor[0])
+          keydown('c', element: editor[0])
+          expect(editor.getText()).toBe "12345\nabcde"
+          expect(editor.getCursorScreenPosition()).toEqual([1,0])
+          expect(editor).not.toHaveClass 'command-mode'
+          expect(editor).toHaveClass 'insert-mode'
+
+        describe "when the second c is prefixed by a count", ->
+          it "deletes n lines, starting from the current, and enters insert mode", ->
+            editor.setText("12345\nabcde\nABCDE\nQWERT")
+            editor.setCursorScreenPosition([1,1])
+
+            keydown('c', element: editor[0])
+            keydown('2', element: editor[0])
+            keydown('c', element: editor[0])
+
+            expect(editor.getText()).toBe "12345\nQWERT"
+            expect(editor.getCursorScreenPosition()).toEqual([1,0])
+            expect(editor).not.toHaveClass 'command-mode'
+            expect(editor).toHaveClass 'insert-mode'
+
       describe "when followed by an h", ->
         it "deletes the previous letter on the current line and enters insert mode", ->
           editor.setText("abcd\n01234")
