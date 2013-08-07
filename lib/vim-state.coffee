@@ -19,6 +19,7 @@ class VimState
 
     @setupCommandMode()
     @registerInsertIntercept()
+    @registerChangeHandler()
     @activateCommandMode()
 
   # Private: Creates a handle to block insertion while in command mode.
@@ -42,6 +43,19 @@ class VimState
       else
         @clearOpStack()
         false
+
+  # Private: Watches for any deletes on the current buffer and places it in the
+  # last deleted buffer.
+  #
+  # Returns nothing.
+  registerChangeHandler: ->
+    rootView.eachBuffer (buffer) =>
+      buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
+        return unless @setRegister?
+
+        if newText == ''
+          type = if oldText.lastIndexOf("\n") == oldText.length - 1 then 'linewise' else 'character'
+          @setRegister('"', text: oldText, type: type)
 
   # Private: Creates the plugin's commands
   #

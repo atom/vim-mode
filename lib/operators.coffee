@@ -108,6 +108,11 @@ class Delete
       if _.last(@motion.select())
         @editor.getSelection().delete()
 
+      # FIXME: This should be fixed by atom/vim-mode#2
+      {row, column} = @editor.getCursorScreenPosition()
+      rowLength = @editor.getCursor().getCurrentBufferLine().length
+      @editor.moveCursorLeft() if column == rowLength
+
     if @motion.isLinewise?()
       @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
 

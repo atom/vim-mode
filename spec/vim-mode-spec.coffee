@@ -102,14 +102,17 @@ describe "VimState", ->
         keydown('x', element: editor[0])
         expect(editor.getText()).toBe '01235'
         expect(editor.getCursorScreenPosition()).toEqual([0, 4])
+        expect(vimState.getRegister('"').text).toBe '4'
 
         keydown('x', element: editor[0])
         expect(editor.getText()).toBe '0123'
         expect(editor.getCursorScreenPosition()).toEqual([0, 3])
+        expect(vimState.getRegister('"').text).toBe '5'
 
         keydown('x', element: editor[0])
         expect(editor.getText()).toBe '012'
         expect(editor.getCursorScreenPosition()).toEqual([0, 2])
+        expect(vimState.getRegister('"').text).toBe '3'
 
       it "deletes nothing when cursor is on empty line", ->
         editor.getBuffer().setText "012345\n\nabcdef"
@@ -128,6 +131,7 @@ describe "VimState", ->
           keydown('d', element: editor[0])
           expect(editor.getText()).toBe "12345\nABCDE"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
+          expect(vimState.getRegister('"').text).toBe 'abcde\n'
 
         it "deletes the last line", ->
           editor.setText("12345\nabcde\nABCDE")
@@ -175,7 +179,7 @@ describe "VimState", ->
           keydown('w', element: editor[0])
 
           expect(editor.getText()).toBe "abcd \nabc"
-          expect(editor.getCursorScreenPosition()).toEqual([0,5])
+          expect(editor.getCursorScreenPosition()).toEqual([0,4])
 
         it "deletes to the beginning of the next word", ->
           editor.setText("abcd efg")
@@ -250,7 +254,7 @@ describe "VimState", ->
         keydown('y', element: editor[0])
         keydown('w', element: editor[0])
 
-        expect(vimState.getRegister('"').text).toBe "345\n"
+        expect(vimState.getRegister('"').text).toBe "345"
 
     describe "the p keybinding", ->
       describe 'character', ->

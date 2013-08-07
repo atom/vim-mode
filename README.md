@@ -18,7 +18,6 @@ them useful as no one person uses all of vim's functionality.
 ### Future Work (in rough order)
 
 * Support for `cw`
-* Support for '" register
 * Support for 'f' and 't'
 * Statusbar integration
 * Visual mode
