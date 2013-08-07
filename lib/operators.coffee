@@ -93,7 +93,7 @@ class Delete
   complete: null
   vimState: null
 
-  constructor: (@editor, @vimState) ->
+  constructor: (@editor, @vimState, @motion) ->
     @complete = false
 
   isComplete: -> @complete
@@ -124,6 +124,42 @@ class Delete
   compose: (motion) ->
     if not motion.select
       throw new OperatorError("Delete must compose with a motion")
+
+    @motion = motion
+    @complete = true
+
+#
+# It changes everything selected by the following motion.
+#
+class Change
+  motion: null
+  complete: null
+  vimState: null
+
+  constructor: (@editor, @vimState) ->
+    @complete = false
+
+  isComplete: -> @complete
+
+  # Public: Changes the text selected by the given motion.
+  #
+  # count - The number of times to execute.
+  #
+  # Returns nothing.
+  execute: (count=1) ->
+    operator = new Delete(@editor, @vimState, @motion)
+    operator.execute(count)
+
+    @vimState.activateInsertMode()
+
+  # Public: Marks this as complete and saves the motion.
+  #
+  # motion - The motion used to select what to change.
+  #
+  # Returns nothing.
+  compose: (motion) ->
+    if not motion.select
+      throw new OperatorError("Change must compose with a motion")
 
     @motion = motion
     @complete = true
@@ -320,4 +356,4 @@ class Join
     throw new OperatorError("Not Implemented")
 
 module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank,
-  Put, Join, Indent, Outdent }
+  Put, Join, Indent, Outdent, Change }
