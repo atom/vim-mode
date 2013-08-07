@@ -55,7 +55,7 @@ class VimState
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
-      'change': => new operators.Change(@editor, @)
+      'change': => @linewiseAliasedOperator(operators.Change)
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
       'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
       'yank': => @linewiseAliasedOperator(operators.Yank)
