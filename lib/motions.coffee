@@ -70,8 +70,17 @@ class MoveToNextWord extends Motion
       @editor.moveCursorToBeginningOfNextWord()
 
   select: (count=1) ->
+    cursor = @editor.getCursor()
+
     _.map [1..count], =>
-      @editor.selectToBeginningOfNextWord()
+      {row, column} = cursor.getBufferPosition()
+      word = cursor.getBeginningOfNextWordBufferPosition()
+
+      if row != word.row
+        @editor.selectToEndOfWord()
+      else
+        @editor.selectToBeginningOfNextWord()
+
       true
 
 class MoveToNextParagraph extends Motion

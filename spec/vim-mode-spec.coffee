@@ -167,6 +167,16 @@ describe "VimState", ->
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
       describe "when followed by a w", ->
+        it "deletes the next word until the end of the line", ->
+          editor.setText("abcd efg\nabc")
+          editor.setCursorScreenPosition([0,5])
+
+          keydown('d', element: editor[0])
+          keydown('w', element: editor[0])
+
+          expect(editor.getText()).toBe "abcd \nabc"
+          expect(editor.getCursorScreenPosition()).toEqual([0,5])
+
         it "deletes to the beginning of the next word", ->
           editor.setText("abcd efg")
           editor.setCursorScreenPosition([0,2])
