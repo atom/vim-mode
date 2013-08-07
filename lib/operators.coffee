@@ -93,8 +93,7 @@ class Delete
   complete: null
   vimState: null
 
-  constructor: (@editor, @vimState, motion) ->
-    @motion = motion
+  constructor: (@editor, @vimState, @motion) ->
     @complete = false
 
   isComplete: -> @complete
