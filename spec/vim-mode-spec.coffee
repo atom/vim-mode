@@ -1,11 +1,15 @@
 $ = require 'jquery'
 
 RootView = require 'root-view'
+Keymap = require 'keymap'
 
 describe "VimState", ->
-  [editor, vimState] = []
+  [editor, vimState, originalKeymap] = []
 
   beforeEach ->
+    originalKeymap = window.keymap
+    window.keymap = new Keymap
+
     window.rootView = new RootView
     rootView.open()
     rootView.simulateDomAttachment()
@@ -14,6 +18,9 @@ describe "VimState", ->
     editor = rootView.getActiveView()
     editor.enableKeymap()
     vimState = editor.vimState
+
+  afterEach ->
+    window.keymap = originalKeymap
 
   keydown = (key, {element, ctrl, shift, alt, meta}={}) ->
     dispatchKeyboardEvent = (target, eventArgs...) ->
