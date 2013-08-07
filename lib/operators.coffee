@@ -93,7 +93,8 @@ class Delete
   complete: null
   vimState: null
 
-  constructor: (@editor, @vimState) ->
+  constructor: (@editor, @vimState, motion) ->
+    @motion = motion
     @complete = false
 
   isComplete: -> @complete
@@ -147,17 +148,8 @@ class Change
   #
   # Returns nothing.
   execute: (count=1) ->
-    _.times count, =>
-      if _.last(@motion.select())
-        @editor.getSelection().delete()
-
-      # FIXME: This should be fixed by atom/vim-mode#2
-      {row, column} = @editor.getCursorScreenPosition()
-      rowLength = @editor.getCursor().getCurrentBufferLine().length
-      @editor.moveCursorLeft() if column == rowLength
-
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition([@editor.getCursor().getScreenRow(), 0])
+    operator = new Delete(@editor, @vimState, @motion)
+    operator.execute(count)
 
     @vimState.activateInsertMode()
 
