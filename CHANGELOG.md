@@ -1,3 +1,12 @@
+## 0.2.1
+
+* Added the `c` operator (thanks Yosef!)
+* Cursor appears as block in command mode and blinks when inserting (thanks Corey!)
+* Delete operations now save deleted text to the default buffer
+* Implement 'gg' and 'G' motions
+* Implement 'P' operator
+* Implement 'o' and 'O' commands
+
 ## 0.2.0
 
 * Added yank and put command with support for registers
