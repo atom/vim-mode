@@ -25,4 +25,10 @@ class InsertBelowWithNewline extends Command
     @editor.insertNewlineBelow()
     @editor.getCursor().skipLeadingWhitespace()
 
-module.exports = { Insert, InsertAfter, InsertAboveWithNewline, InsertBelowWithNewline }
+class Substitute extends Command
+  execute: (count=1) ->
+    @editor.delete()
+    @vimState.activateInsertMode()
+
+module.exports = { Insert, InsertAfter, InsertAboveWithNewline,
+  InsertBelowWithNewline, Substitute }

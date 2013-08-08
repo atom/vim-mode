@@ -34,6 +34,7 @@
   'a': 'vim-mode:insert-after'
   'J': 'vim-mode:join'
   'x': 'vim-mode:delete-right'
+  's': 'vim-mode:substitute'
   'y': 'vim-mode:yank'
   'P': 'vim-mode:put-before'
   'p': 'vim-mode:put-after'

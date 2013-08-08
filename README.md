@@ -17,7 +17,6 @@ them useful as no one person uses all of vim's functionality.
 
 ### Future Work (in rough order)
 
-* `s` operator
 * `e` motion
 * Visual mode
 * Support for marks (including \`.)

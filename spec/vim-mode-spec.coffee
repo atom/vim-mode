@@ -121,6 +121,17 @@ describe "VimState", ->
         keydown('x', element: editor[0])
         expect(editor.getText()).toBe "012345\n\nabcdef"
 
+    describe "the s keybinding", ->
+      it "deletes the character to the right and enters insert mode", ->
+        editor.setText("012345")
+        editor.setCursorScreenPosition([0, 0])
+
+        keydown('s', element: editor[0])
+        expect(editor).toHaveClass 'insert-mode'
+        expect(editor.getText()).toBe '12345'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        expect(vimState.getRegister('"').text).toBe '0'
+
     describe "the d keybinding", ->
       describe "when followed by a d", ->
         it "deletes the current line", ->
