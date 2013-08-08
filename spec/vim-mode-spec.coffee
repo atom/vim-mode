@@ -530,7 +530,7 @@ describe "VimState", ->
           expect(editor.getText()).toBe "12345\nabcde\nABCDE"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
-    describe "basic motion bindings", ->
+    describe "motion bindings", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([1,1])
@@ -618,6 +618,47 @@ describe "VimState", ->
           keydown('w', element: editor[0])
 
           expect(vimState.getRegister('"').text).toBe "  "
+
+      describe "the e keybinding", ->
+        it "moves the cursor to the end of the current word", ->
+          editor.setText("ab cde1+- \n xyz\n\nzip")
+          editor.setCursorScreenPosition([0, 0])
+
+          keydown('e', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+          keydown('e', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+          keydown('e', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+          keydown('e', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+          # INCOMPATIBILITY: vim doesn't stop at [2, 0] it advances immediately
+          # to [3, 2]
+          keydown('e', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+          keydown('e', element: editor[0])
+          expect(editor.getCursorScreenPosition()).toEqual [3, 2]
+
+        it 'selects to the end of the current word', ->
+          editor.setText("ab  cde1+- \n xyz\n\nzip")
+          editor.setCursorScreenPosition([0, 0])
+
+          keydown('y', element: editor[0])
+          keydown('e', element: editor[0])
+
+          expect(vimState.getRegister('"').text).toBe "ab"
+
+          editor.setCursorScreenPosition([0,2])
+
+          keydown('y', element: editor[0])
+          keydown('e', element: editor[0])
+
+          expect(vimState.getRegister('"').text).toBe "  cde1"
 
       describe "the } keybinding", ->
         beforeEach ->

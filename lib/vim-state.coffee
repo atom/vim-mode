@@ -84,6 +84,7 @@ class VimState
       'move-down': => new motions.MoveDown @editor
       'move-right': => new motions.MoveRight @editor
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
+      'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
       'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)

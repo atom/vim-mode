@@ -83,6 +83,34 @@ class MoveToNextWord extends Motion
 
       true
 
+class MoveToEndOfWord extends Motion
+  execute: (count=1) ->
+    cursor = @editor.getCursor()
+    _.map [1..count], =>
+      cursor.setBufferPosition(@nextBufferPosition(exclusive: true))
+
+  select: (count=1) ->
+    cursor = @editor.getCursor()
+
+    _.map [1..count], =>
+      bufferPosition = @nextBufferPosition()
+      screenPosition = @editor.screenPositionForBufferPosition(bufferPosition)
+      @editor.selectToScreenPosition(screenPosition)
+      true
+
+  nextBufferPosition: ({exclusive}={})->
+    cursor = @editor.getCursor()
+    current = cursor.getBufferPosition()
+    next = cursor.getEndOfCurrentWordBufferPosition()
+    next.column -= 1 if exclusive
+
+    if exclusive and current.row == next.row and current.column == next.column
+      cursor.moveRight()
+      next = cursor.getEndOfCurrentWordBufferPosition()
+      next.column -= 1
+
+    next
+
 class MoveToNextParagraph extends Motion
   execute: (count=1) ->
     _.map [1..count], =>
@@ -198,4 +226,4 @@ class MoveToEndOfFile extends Motion
 module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord,
   MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine,
   MoveToLastCharacterOfLine, MoveToLine, MoveToBeginningOfLine, MoveToStartOfFile,
-  MoveToEndOfFile }
+  MoveToEndOfFile, MoveToEndOfWord }
