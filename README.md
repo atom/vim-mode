@@ -17,8 +17,8 @@ them useful as no one person uses all of vim's functionality.
 
 ### Future Work (in rough order)
 
-* Support for 'f' and 't'
-* Statusbar integration
+* `s` operator
+* `e` motion
 * Visual mode
 * Support for marks (including \`.)
 * Differentiate between 0 for repetition and 0 for motion.
@@ -26,6 +26,7 @@ them useful as no one person uses all of vim's functionality.
 * Block backspace in command mode.
   * Block `ctrl-d` in insert mode.
 * More advanced keymap to support `iw` motion.
+  * Support for 'f' and 't'
   * Handle `g{line}` and `gg`
   
 ### Documentation
