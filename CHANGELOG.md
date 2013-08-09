@@ -1,3 +1,10 @@
+## 0.2.2
+
+* Added 's' command.
+* Added 'e' motion.
+* Fixed 'cw' removing trailing whitepsace
+* Fixed cursor position for 'dd' when deleting blank lines
+
 ## 0.2.1
 
 * Added the `c` operator (thanks Yosef!)
