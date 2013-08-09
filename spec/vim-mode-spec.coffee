@@ -135,12 +135,12 @@ describe "VimState", ->
     describe "the d keybinding", ->
       describe "when followed by a d", ->
         it "deletes the current line", ->
-          editor.setText("12345\nabcde\nABCDE")
+          editor.setText("12345\nabcde\n\nABCDE")
           editor.setCursorScreenPosition([1,1])
 
           keydown('d', element: editor[0])
           keydown('d', element: editor[0])
-          expect(editor.getText()).toBe "12345\nABCDE"
+          expect(editor.getText()).toBe "12345\n\nABCDE"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
           expect(vimState.getRegister('"').text).toBe 'abcde\n'
 
