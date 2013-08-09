@@ -92,8 +92,9 @@ class Delete
   motion: null
   complete: null
   vimState: null
+  selectOptions: null
 
-  constructor: (@editor, @vimState, @motion) ->
+  constructor: (@editor, @vimState, @motion, @selectOptions={}) ->
     @complete = false
 
   isComplete: -> @complete
@@ -107,7 +108,7 @@ class Delete
     cursor = @editor.getCursor()
 
     _.times count, =>
-      if _.last(@motion.select())
+      if _.last(@motion.select(1, @selectOptions))
         @editor.getSelection().delete()
 
       @editor.moveCursorLeft() if cursor.isAtEndOfLine() and !@motion.isLinewise?()
@@ -146,7 +147,7 @@ class Change
   #
   # Returns nothing.
   execute: (count=1) ->
-    operator = new Delete(@editor, @vimState, @motion)
+    operator = new Delete(@editor, @vimState, @motion, excludeWhitespace: true)
     operator.execute(count)
 
     @vimState.activateInsertMode()

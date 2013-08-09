@@ -291,7 +291,7 @@ describe "VimState", ->
           keydown('c', element: editor[0])
           keydown('w', element: editor[0])
 
-          expect(editor.getText()).toBe "abefg"
+          expect(editor.getText()).toBe "ab efg"
           expect(editor.getCursorScreenPosition()).toEqual([0,2])
           expect(editor).not.toHaveClass 'command-mode'
           expect(editor).toHaveClass 'insert-mode'

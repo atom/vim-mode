@@ -69,14 +69,16 @@ class MoveToNextWord extends Motion
     _.map [1..count], =>
       @editor.moveCursorToBeginningOfNextWord()
 
-  select: (count=1) ->
+  # Options
+  #  excludeWhitespace - if true, whitespace shouldn't be selected
+  select: (count=1, {excludeWhitespace}={}) ->
     cursor = @editor.getCursor()
 
     _.map [1..count], =>
-      {row, column} = cursor.getBufferPosition()
-      word = cursor.getBeginningOfNextWordBufferPosition()
+      current = cursor.getBufferPosition()
+      next = cursor.getBeginningOfNextWordBufferPosition()
 
-      if row != word.row
+      if current.row != next.row or excludeWhitespace
         @editor.selectToEndOfWord()
       else
         @editor.selectToBeginningOfNextWord()
