@@ -11,7 +11,7 @@
 
   * The jasmine tests must be run from within Atom, by running Atom in
     development mode and opening the spec window.
-  * Pro-top: place f in front of the test block you'd like to focus
+  * Pro-tip: place f in front of the test block you'd like to focus
     otherwise all of Atom's tests will run.
 
 ## Code
