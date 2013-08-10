@@ -345,6 +345,18 @@ describe "VimState", ->
           expect(editor).not.toHaveClass 'command-mode'
           expect(editor).toHaveClass 'insert-mode'
 
+    describe "the C keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+        editor.setCursorScreenPosition [0, 1]
+
+      it "deletes the contents until the end of the line and enters insert mode", ->
+        keydown('C', shift: true, element: editor[0])
+
+        expect(editor.getText()).toBe "0\n"
+        expect(editor).not.toHaveClass 'command-mode'
+        expect(editor).toHaveClass 'insert-mode'
+
     describe "the y keybinding", ->
       beforeEach ->
         editor.getBuffer().setText "012 345\nabc\n"
