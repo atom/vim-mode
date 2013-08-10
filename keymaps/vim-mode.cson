@@ -30,6 +30,7 @@
   'd': 'vim-mode:delete'
   'D': 'vim-mode:delete-to-last-character-of-line'
   'c': 'vim-mode:change'
+  'C': 'vim-mode:change-to-last-character-of-line'
   'O': 'vim-mode:insert-above-with-newline'
   'o': 'vim-mode:insert-below-with-newline'
   'a': 'vim-mode:insert-after'
