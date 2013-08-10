@@ -852,3 +852,11 @@ describe "VimState", ->
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
+
+    it "puts the editor into command mode when <ctrl-c> is pressed", ->
+      expect(editor).not.toHaveClass 'command-mode'
+
+      editor.trigger keydownEvent('ctrl-c')
+
+      expect(editor).toHaveClass 'command-mode'
+      expect(editor).not.toHaveClass 'insert-mode'
