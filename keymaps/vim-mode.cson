@@ -3,6 +3,7 @@
 
 '.vim-mode.insert-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
+  'ctrl-c': 'vim-mode:activate-command-mode'
 
 '.vim-mode.command-mode:not(.mini)':
   '" a': 'vim-mode:register-prefix'
