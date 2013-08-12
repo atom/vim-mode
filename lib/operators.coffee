@@ -241,7 +241,7 @@ class Indent
 
   # Public: Marks this as complete and saves the motion.
   #
-  # motion - The motion used to select what to delete.
+  # motion - The motion used to select what to indent.
   #
   # Returns nothing.
   compose: (motion) ->
