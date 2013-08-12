@@ -156,7 +156,7 @@ describe "VimState", ->
         editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([1,3])
 
-        keydown('S', element: editor[0])
+        keydown('S', shift: true, element: editor[0])
         expect(editor).toHaveClass 'insert-mode'
         expect(editor.getText()).toBe '12345\n\nABCDE'
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
