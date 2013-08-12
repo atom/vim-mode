@@ -58,3 +58,4 @@
   'ctrl-r': 'core:redo'
   'ctrl-u': 'core:page-up'
   'ctrl-d': 'core:page-down'
+  '/': 'command-panel:find-in-file'
