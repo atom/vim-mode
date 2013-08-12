@@ -30,5 +30,12 @@ class Substitute extends Command
     @editor.delete()
     @vimState.activateInsertMode()
 
+class SubstituteLine extends Command
+  execute: (count=1) ->
+    @editor.moveCursorToBeginningOfLine()
+    @editor.selectToEndOfLine()
+    @editor.getSelection().delete()
+    @vimState.activateInsertMode()
+
 module.exports = { Insert, InsertAfter, InsertAboveWithNewline,
-  InsertBelowWithNewline, Substitute }
+  InsertBelowWithNewline, Substitute, SubstituteLine }
