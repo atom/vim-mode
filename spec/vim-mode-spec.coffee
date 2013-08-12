@@ -212,6 +212,15 @@ describe "VimState", ->
           expect(editor.getText()).toBe "four"
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
 
+          editor.setText("abc   more")
+          editor.setCursorScreenPosition([0,3])
+
+          keydown('d', element: editor[0])
+          keydown('w', element: editor[0])
+
+          expect(editor.getText()).toBe "abcmore"
+          expect(editor.getCursorScreenPosition()).toEqual([0,3])
+
       describe "when followed by a b", ->
         it "deletes to the beginning of the previous word", ->
           editor.setText("abcd efg")
