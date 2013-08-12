@@ -58,3 +58,6 @@
   'ctrl-r': 'core:redo'
   'ctrl-u': 'core:page-up'
   'ctrl-d': 'core:page-down'
+  '/': 'command-panel:find-in-file'
+  'n': 'command-panel:repeat-relative-address'
+  'N': 'command-panel:repeat-relative-address-in-reverse'
