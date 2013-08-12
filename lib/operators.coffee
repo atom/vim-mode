@@ -252,7 +252,7 @@ class Indent
     @complete = true
 
 #
-# It indents everything selected by the following motion.
+# It outdents everything selected by the following motion.
 #
 class Outdent
   motion: null
@@ -263,7 +263,7 @@ class Outdent
 
   isComplete: -> @complete
 
-  # Public: Indents the text selected by the given motion.
+  # Public: Outdents the text selected by the given motion.
   #
   # count - The number of times to execute.
   #
@@ -280,12 +280,12 @@ class Outdent
 
   # Public: Marks this as complete and saves the motion.
   #
-  # motion - The motion used to select what to delete.
+  # motion - The motion used to select what to outdent.
   #
   # Returns nothing.
   compose: (motion) ->
     if not motion.select
-      throw new OperatorError("Indent must compose with a motion")
+      throw new OperatorError("Outdent must compose with a motion")
 
     @motion = motion
     @complete = true
