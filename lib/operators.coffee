@@ -153,6 +153,7 @@ class Change
     operator.execute(count)
 
     @vimState.activateInsertMode()
+    @editor.moveCursorRight() if @motion.constructor.name == 'MoveToLastCharacterOfLine'
 
   # Public: Marks this as complete and saves the motion.
   #
