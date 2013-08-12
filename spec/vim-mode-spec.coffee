@@ -141,6 +141,17 @@ describe "VimState", ->
         expect(vimState.getRegister('"').text).toBe '0'
 
     describe "the S keybinding", ->
+      it "deletes count characters to the right and enters insert mode", ->
+        editor.setText("012345")
+        editor.setCursorScreenPosition([0, 0])
+
+        keydown('3', element: editor[0])
+        keydown('s', element: editor[0])
+        expect(editor).toHaveClass 'insert-mode'
+        expect(editor.getText()).toBe '345'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        expect(vimState.getRegister('"').text).toBe '012'
+
       it "deletes the entire line and enters insert mode", ->
         editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([1,3])
