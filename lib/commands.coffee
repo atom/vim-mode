@@ -27,7 +27,8 @@ class InsertBelowWithNewline extends Command
 
 class Substitute extends Command
   execute: (count=1) ->
-    @editor.delete()
+    _.times count, =>
+      @editor.delete()
     @vimState.activateInsertMode()
 
 class SubstituteLine extends Command
