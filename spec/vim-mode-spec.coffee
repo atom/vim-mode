@@ -90,7 +90,7 @@ describe "VimState", ->
         keydown('d', element: editor[0])
         expect(vimState.opStack.length).toBe 1
 
-        editor.trigger keydownEvent('ctrl-c')
+        keydown('c', ctrl: true, element: editor[0])
         expect(vimState.opStack.length).toBe 0
 
     describe "the i keybinding", ->
@@ -864,7 +864,7 @@ describe "VimState", ->
     it "puts the editor into command mode when <ctrl-c> is pressed", ->
       expect(editor).not.toHaveClass 'command-mode'
 
-      editor.trigger keydownEvent('ctrl-c')
+      keydown('c', ctrl: true, element: editor[0])
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
