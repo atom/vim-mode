@@ -160,7 +160,7 @@ describe "VimState", ->
         expect(editor).toHaveClass 'insert-mode'
         expect(editor.getText()).toBe '12345\n\nABCDE'
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
-        expect(vimState.getRegister('"').text).toBe 'abcde'
+        expect(vimState.getRegister('"').text).toBe "abcde\n"
 
     describe "the d keybinding", ->
       describe "when followed by a d", ->
