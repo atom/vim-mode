@@ -385,7 +385,7 @@ describe "VimState", ->
         editor.setCursorScreenPosition [0, 4]
 
       it "saves the line to the default register", ->
-        keydown('Y', element: editor[0])
+        keydown('Y', shift: true, element: editor[0])
 
         expect(vimState.getRegister('"').text).toBe "012 345\n"
         expect(editor.getCursorScreenPosition()).toEqual([0,4])
@@ -393,14 +393,14 @@ describe "VimState", ->
       describe "when prefixed by a count", ->
         it "copies n lines, starting from the current", ->
           keydown('2', element: editor[0])
-          keydown('Y', element: editor[0])
+          keydown('Y', shift: true, element: editor[0])
 
           expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
       it "saves the line to the a register", ->
         keydown('"', element: editor[0])
         keydown('a', element: editor[0])
-        keydown('Y', element: editor[0])
+        keydown('Y', shift: true, element: editor[0])
 
         expect(vimState.getRegister('a').text).toBe "012 345\n"
 
