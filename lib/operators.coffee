@@ -232,9 +232,8 @@ class Indent
   execute: (count=1) ->
     row = @editor.getCursorScreenRow()
 
-    _.times count, =>
-      if _.last(@motion.select())
-        @editor.indentSelectedRows()
+    @motion.select(count)
+    @editor.indentSelectedRows()
 
     @editor.setCursorScreenPosition([row, 0])
     @editor.moveCursorToFirstCharacterOfLine()
@@ -271,9 +270,8 @@ class Outdent
   execute: (count=1) ->
     row = @editor.getCursorScreenRow()
 
-    _.times count, =>
-      if _.last(@motion.select())
-        @editor.outdentSelectedRows()
+    @motion.select(count)
+    @editor.outdentSelectedRows()
 
     @editor.setCursorScreenPosition([row, 0])
     @editor.moveCursorToFirstCharacterOfLine()
