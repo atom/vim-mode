@@ -33,7 +33,7 @@ describe "VimState", ->
       e.initTextEvent eventArgs...
       target.dispatchEvent e
 
-    key = "U+#{key.charCodeAt(0).toString(16)}"
+    key = "U+#{key.charCodeAt(0).toString(16)}" unless key == "escape"
     element ||= document.activeElement
     eventArgs = [true, true, null, key, 0, ctrl, alt, shift, meta] # bubbles, cancelable, view, key, location
 
@@ -304,7 +304,7 @@ describe "VimState", ->
           expect(editor).not.toHaveClass 'command-mode'
           expect(editor).toHaveClass 'insert-mode'
 
-          editor.trigger keydownEvent('escape')
+          keydown('escape', element: editor[0])
 
           editor.setText("one two three four")
           editor.setCursorScreenPosition([0,0])
@@ -331,7 +331,7 @@ describe "VimState", ->
           expect(editor).not.toHaveClass 'command-mode'
           expect(editor).toHaveClass 'insert-mode'
 
-          editor.trigger keydownEvent('escape')
+          keydown('escape', element: editor[0])
 
           editor.setText("one two three four")
           editor.setCursorScreenPosition([0,11])
@@ -874,7 +874,7 @@ describe "VimState", ->
 
   describe "insert-mode", ->
     beforeEach ->
-      editor.trigger keydownEvent('i')
+      keydown('i', element: editor[0])
 
     it "allows the cursor to reach the end of the line", ->
       editor.setText("012345\n\nabcdef")
@@ -887,7 +887,7 @@ describe "VimState", ->
     it "puts the editor into command mode when <escape> is pressed", ->
       expect(editor).not.toHaveClass 'command-mode'
 
-      editor.trigger keydownEvent('escape')
+      keydown('escape', element: editor[0])
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
