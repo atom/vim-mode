@@ -552,6 +552,20 @@ describe "VimState", ->
           expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
           expect(editor.getCursorScreenPosition()).toEqual([1,2])
 
+        it "indents multiple lines at once", ->
+          editor.setText("12345\nabcde\nABCDE")
+          editor.setCursorScreenPosition([0,0])
+
+          keydown('3', element: editor[0])
+          keydown('>', element: editor[0])
+          keydown('>', element: editor[0])
+          expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
+          expect(editor.getCursorScreenPosition()).toEqual([0,2])
+
+          keydown('u', element: editor[0])
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+
+
     describe "the < keybinding", ->
       describe "when followed by a <", ->
         it "indents the current line", ->
@@ -562,6 +576,19 @@ describe "VimState", ->
           keydown('<', element: editor[0])
           expect(editor.getText()).toBe "12345\nabcde\nABCDE"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
+
+        it "indents multiple lines at once", ->
+          editor.setText("  12345\n  abcde\n  ABCDE")
+          editor.setCursorScreenPosition([0,0])
+
+          keydown('3', element: editor[0])
+          keydown('<', element: editor[0])
+          keydown('<', element: editor[0])
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+          expect(editor.getCursorScreenPosition()).toEqual([0,0])
+
+          keydown('u', element: editor[0])
+          expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
 
     describe "motion bindings", ->
       beforeEach ->
