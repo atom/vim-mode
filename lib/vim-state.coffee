@@ -74,6 +74,7 @@ class VimState
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
       'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
       'yank': => @linewiseAliasedOperator(operators.Yank)
+      'yank-line': => [new operators.Yank(@editor, @), new motions.MoveToLine(@editor)]
       'put-before': => new operators.Put(@editor, @, location: 'before')
       'put-after': => new operators.Put(@editor, @, location: 'after')
       'join': => new operators.Join(@editor)
@@ -91,7 +92,7 @@ class VimState
       'move-to-last-character-of-line': => new motions.MoveToLastCharacterOfLine(@editor)
       'move-to-beginning-of-line': => new motions.MoveToBeginningOfLine(@editor)
       'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
-      'move-to-end-of-file': => new motions.MoveToEndOfFile(@editor)
+      'move-to-line': => new motions.MoveToLine(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'numeric-prefix': (e) => @numericPrefix(e)
 

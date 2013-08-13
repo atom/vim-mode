@@ -33,7 +33,7 @@ describe "VimState", ->
       e.initTextEvent eventArgs...
       target.dispatchEvent e
 
-    key = "U+#{key.charCodeAt(0).toString(16)}"
+    key = "U+#{key.charCodeAt(0).toString(16)}" unless key == "escape"
     element ||= document.activeElement
     eventArgs = [true, true, null, key, 0, ctrl, alt, shift, meta] # bubbles, cancelable, view, key, location
 
@@ -83,6 +83,14 @@ describe "VimState", ->
         expect(vimState.opStack.length).toBe 1
 
         keydown('escape', element: editor[0])
+        expect(vimState.opStack.length).toBe 0
+
+    describe "the ctrl-c keybinding", ->
+      it "clears the operator stack", ->
+        keydown('d', element: editor[0])
+        expect(vimState.opStack.length).toBe 1
+
+        keydown('c', ctrl: true, element: editor[0])
         expect(vimState.opStack.length).toBe 0
 
     describe "the i keybinding", ->
@@ -296,7 +304,7 @@ describe "VimState", ->
           expect(editor).not.toHaveClass 'command-mode'
           expect(editor).toHaveClass 'insert-mode'
 
-          editor.trigger keydownEvent('escape')
+          keydown('escape', element: editor[0])
 
           editor.setText("one two three four")
           editor.setCursorScreenPosition([0,0])
@@ -323,7 +331,7 @@ describe "VimState", ->
           expect(editor).not.toHaveClass 'command-mode'
           expect(editor).toHaveClass 'insert-mode'
 
-          editor.trigger keydownEvent('escape')
+          keydown('escape', element: editor[0])
 
           editor.setText("one two three four")
           editor.setCursorScreenPosition([0,11])
@@ -370,6 +378,31 @@ describe "VimState", ->
         keydown('w', element: editor[0])
 
         expect(vimState.getRegister('"').text).toBe "345"
+
+    describe "the Y keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012 345\nabc\n"
+        editor.setCursorScreenPosition [0, 4]
+
+      it "saves the line to the default register", ->
+        keydown('Y', shift: true, element: editor[0])
+
+        expect(vimState.getRegister('"').text).toBe "012 345\n"
+        expect(editor.getCursorScreenPosition()).toEqual([0,4])
+
+      describe "when prefixed by a count", ->
+        it "copies n lines, starting from the current", ->
+          keydown('2', element: editor[0])
+          keydown('Y', shift: true, element: editor[0])
+
+          expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
+
+      it "saves the line to the a register", ->
+        keydown('"', element: editor[0])
+        keydown('a', element: editor[0])
+        keydown('Y', shift: true, element: editor[0])
+
+        expect(vimState.getRegister('a').text).toBe "012 345\n"
 
     describe "the p keybinding", ->
       describe 'character', ->
@@ -824,13 +857,19 @@ describe "VimState", ->
 
       describe "the G keybinding", ->
         beforeEach ->
-          editor.setText("1\n2\n 3abc\n")
+          editor.setText("1\n    2\n 3abc\n ")
           editor.setCursorScreenPosition([0,2])
 
-        it 'moves the cursor to the beginning of the last line', ->
+        it 'moves the cursor to the last line after whitespace', ->
           keydown('G', shift: true, element: editor[0])
 
-          expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+          expect(editor.getCursorScreenPosition()).toEqual [3, 1]
+
+        it 'moves the cursor to a specified line', ->
+          keydown('2', element: editor[0])
+          keydown('G', shift: true, element: editor[0])
+
+          expect(editor.getCursorScreenPosition()).toEqual [1, 4]
 
     describe "numeric prefix bindings", ->
       it "repeats the following operation N times", ->
@@ -862,7 +901,7 @@ describe "VimState", ->
 
   describe "insert-mode", ->
     beforeEach ->
-      editor.trigger keydownEvent('i')
+      keydown('i', element: editor[0])
 
     it "allows the cursor to reach the end of the line", ->
       editor.setText("012345\n\nabcdef")
@@ -875,7 +914,15 @@ describe "VimState", ->
     it "puts the editor into command mode when <escape> is pressed", ->
       expect(editor).not.toHaveClass 'command-mode'
 
-      editor.trigger keydownEvent('escape')
+      keydown('escape', element: editor[0])
+
+      expect(editor).toHaveClass 'command-mode'
+      expect(editor).not.toHaveClass 'insert-mode'
+
+    it "puts the editor into command mode when <ctrl-c> is pressed", ->
+      expect(editor).not.toHaveClass 'command-mode'
+
+      keydown('c', ctrl: true, element: editor[0])
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
