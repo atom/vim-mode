@@ -3,6 +3,7 @@
 
 '.vim-mode.insert-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
+  'ctrl-c': 'vim-mode:activate-command-mode'
 
 '.vim-mode.command-mode:not(.mini)':
   '" a': 'vim-mode:register-prefix'
@@ -61,3 +62,4 @@
   '/': 'command-panel:find-in-file'
   'n': 'command-panel:repeat-relative-address'
   'N': 'command-panel:repeat-relative-address-in-reverse'
+  'ctrl-c': 'vim-mode:reset-command-mode'
