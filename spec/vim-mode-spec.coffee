@@ -85,6 +85,14 @@ describe "VimState", ->
         keydown('escape', element: editor[0])
         expect(vimState.opStack.length).toBe 0
 
+    describe "the ctrl-c keybinding", ->
+      it "clears the operator stack", ->
+        keydown('d', element: editor[0])
+        expect(vimState.opStack.length).toBe 1
+
+        keydown('c', ctrl: true, element: editor[0])
+        expect(vimState.opStack.length).toBe 0
+
     describe "the i keybinding", ->
       it "puts the editor into insert mode", ->
         expect(editor).not.toHaveClass 'insert-mode'
@@ -849,6 +857,14 @@ describe "VimState", ->
       expect(editor).not.toHaveClass 'command-mode'
 
       editor.trigger keydownEvent('escape')
+
+      expect(editor).toHaveClass 'command-mode'
+      expect(editor).not.toHaveClass 'insert-mode'
+
+    it "puts the editor into command mode when <ctrl-c> is pressed", ->
+      expect(editor).not.toHaveClass 'command-mode'
+
+      keydown('c', ctrl: true, element: editor[0])
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
