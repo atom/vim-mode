@@ -3,7 +3,7 @@ $ = require 'jquery'
 RootView = require 'root-view'
 Keymap = require 'keymap'
 
-fdescribe "VimState", ->
+describe "VimState", ->
   [editor, vimState, originalKeymap] = []
 
   beforeEach ->
