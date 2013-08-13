@@ -379,6 +379,31 @@ describe "VimState", ->
 
         expect(vimState.getRegister('"').text).toBe "345"
 
+    describe "the Y keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012 345\nabc\n"
+        editor.setCursorScreenPosition [0, 4]
+
+      it "saves the line to the default register", ->
+        keydown('Y', shift: true, element: editor[0])
+
+        expect(vimState.getRegister('"').text).toBe "012 345\n"
+        expect(editor.getCursorScreenPosition()).toEqual([0,4])
+
+      describe "when prefixed by a count", ->
+        it "copies n lines, starting from the current", ->
+          keydown('2', element: editor[0])
+          keydown('Y', shift: true, element: editor[0])
+
+          expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
+
+      it "saves the line to the a register", ->
+        keydown('"', element: editor[0])
+        keydown('a', element: editor[0])
+        keydown('Y', shift: true, element: editor[0])
+
+        expect(vimState.getRegister('a').text).toBe "012 345\n"
+
     describe "the p keybinding", ->
       describe 'character', ->
         beforeEach ->
