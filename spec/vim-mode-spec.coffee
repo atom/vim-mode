@@ -33,7 +33,7 @@ describe "VimState", ->
       e.initTextEvent eventArgs...
       target.dispatchEvent e
 
-    key = "U+#{key.charCodeAt(0).toString(16)}"
+    key = "U+#{key.charCodeAt(0).toString(16)}" unless key == "escape"
     element ||= document.activeElement
     eventArgs = [true, true, null, key, 0, ctrl, alt, shift, meta] # bubbles, cancelable, view, key, location
 
