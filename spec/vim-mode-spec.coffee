@@ -830,13 +830,13 @@ describe "VimState", ->
 
       describe "the G keybinding", ->
         beforeEach ->
-          editor.setText("1\n    2\n 3abc\n")
+          editor.setText("1\n    2\n 3abc\n ")
           editor.setCursorScreenPosition([0,2])
 
         it 'moves the cursor to the last line after whitespace', ->
           keydown('G', shift: true, element: editor[0])
 
-          expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+          expect(editor.getCursorScreenPosition()).toEqual [3, 1]
 
         it 'moves the cursor to a specified line', ->
           keydown('2', element: editor[0])
