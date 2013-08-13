@@ -143,8 +143,12 @@ class MoveToNextParagraph extends Motion
 class MoveToLine extends Motion
   isLinewise: -> true
 
-  execute: (count=1) ->
-    # noop
+  execute: (count) ->
+    if count?
+      @editor.setCursorBufferPosition([count - 1, 0])
+    else
+      @editor.setCursorBufferPosition([@editor.getLineCount() - 1, 0])
+    @editor.getCursor().skipLeadingWhitespace()
 
   select: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
