@@ -65,6 +65,13 @@ class MoveToPreviousWord extends Motion
       true
 
 class MoveToNextWord extends Motion
+  cursorOverWhitespace: ->
+    window.editor = @editor
+    start = @editor.getCursor().getBufferPosition()
+    range = Range.fromPointWithDelta(start, 0, 1)
+    currentText = @editor.getBuffer().getTextInRange(range)
+    currentText.match(/\s/)?
+
   execute: (count=1) ->
     _.map [1..count], =>
       @editor.moveCursorToBeginningOfNextWord()
@@ -81,7 +88,10 @@ class MoveToNextWord extends Motion
       if current.row != next.row or excludeWhitespace
         @editor.selectToEndOfWord()
       else
-        @editor.selectToBeginningOfNextWord()
+        if @cursorOverWhitespace()
+          @editor.selectToNextWordBoundary()
+        else
+          @editor.selectToBeginningOfNextWord()
 
       true
 

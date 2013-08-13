@@ -86,49 +86,6 @@ class RegisterPrefix
     @composedOperator.select(count)
 
 #
-# It deletes everything selected by the following motion.
-#
-class Delete
-  motion: null
-  complete: null
-  vimState: null
-  selectOptions: null
-
-  constructor: (@editor, @vimState, @motion, @selectOptions={}) ->
-    @complete = false
-
-  isComplete: -> @complete
-
-  # Public: Deletes the text selected by the given motion.
-  #
-  # count - The number of times to execute.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    cursor = @editor.getCursor()
-
-    _.times count, =>
-      if _.last(@motion.select(1, @selectOptions))
-        @editor.getSelection().delete()
-
-      @editor.moveCursorLeft() if cursor.isAtEndOfLine() and !@motion.isLinewise?()
-
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
-
-  # Public: Marks this as complete and saves the motion.
-  #
-  # motion - The motion used to select what to delete.
-  #
-  # Returns nothing.
-  compose: (motion) ->
-    if not motion.select
-      throw new OperatorError("Delete must compose with a motion")
-
-    @motion = motion
-    @complete = true
-
-#
 # It changes everything selected by the following motion.
 #
 class Change
@@ -173,11 +130,26 @@ class Yank
   register: null
   vimState: null
 
-  constructor: (@editor, @vimState) ->
+  constructor: (@editor, @vimState, @motion, @selectOptions) ->
     @complete = false
     @register ?= '"'
 
   isComplete: -> @complete
+
+  copy: (count) ->
+    type = if @motion.isLinewise then 'linewise' else 'character'
+
+    @originalPosition = @editor.getCursorScreenPosition()
+    @motion.select(count, @selectOptions)
+    text = @editor.getSelection().getText()
+
+    @vimState.setRegister(@register, {text, type})
+
+  unselect: ->
+    if @motion.isLinewise?()
+      @editor.setCursorScreenPosition(@originalPosition)
+    else
+      @editor.clearSelections()
 
   # Public: Copies the text selected by the given motion.
   #
@@ -185,20 +157,8 @@ class Yank
   #
   # Returns nothing.
   execute: (count=1) ->
-    text = ""
-    type = if @motion.isLinewise then 'linewise' else 'character'
-
-    originalPosition = @editor.getCursorScreenPosition()
-    _.times count, =>
-      if _.last(@motion.select())
-        text += @editor.getSelection().getText()
-
-    @vimState.setRegister(@register, {text, type})
-
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition(originalPosition)
-    else
-      @editor.clearSelections()
+    @copy(count)
+    @unselect()
 
   # Public: Marks this as complete and saves the motion.
   #
@@ -211,6 +171,29 @@ class Yank
 
     @motion = motion
     @complete = true
+
+#
+# It deletes everything selected by the following motion
+#
+class Delete extends Yank
+  # Public: Deletes the text selected by the given motion.
+  #
+  # count - The number of times to execute.
+  #
+  # Returns nothing.
+  execute: (count=1) ->
+    # non-linewise delete has a special case: don't do anything for empty lines.
+    cursor = @editor.getCursor()
+    if !@motion.isLinewise?() && cursor.getCurrentBufferLine().length == 0
+      return
+
+    @copy(count)
+    @editor.getSelection().delete() if @editor.getSelectedText().length > 0
+
+    @editor.moveCursorLeft() if cursor.isAtEndOfLine() and !@motion.isLinewise?()
+
+    if @motion.isLinewise?()
+      @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
 #
 # It indents everything selected by the following motion.
