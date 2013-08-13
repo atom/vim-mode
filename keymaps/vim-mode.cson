@@ -3,6 +3,7 @@
 
 '.vim-mode.insert-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
+  'ctrl-c': 'vim-mode:activate-command-mode'
 
 '.vim-mode.command-mode:not(.mini)':
   '" a': 'vim-mode:register-prefix'
@@ -36,6 +37,7 @@
   'x': 'vim-mode:delete-right'
   's': 'vim-mode:substitute'
   'y': 'vim-mode:yank'
+  'Y': 'vim-mode:yank-line'
   'P': 'vim-mode:put-before'
   'p': 'vim-mode:put-after'
   '>': 'vim-mode:indent'
@@ -52,7 +54,7 @@
   '$': 'vim-mode:move-to-last-character-of-line'
   # '0': 'vim-mode:move-to-beginning-of-line'
   'g g': 'vim-mode:move-to-start-of-file'
-  'G': 'vim-mode:move-to-end-of-file'
+  'G': 'vim-mode:move-to-line'
   'escape': 'vim-mode:reset-command-mode'
   'u': 'core:undo'
   'ctrl-r': 'core:redo'
@@ -61,3 +63,4 @@
   '/': 'command-panel:find-in-file'
   'n': 'command-panel:repeat-relative-address'
   'N': 'command-panel:repeat-relative-address-in-reverse'
+  'ctrl-c': 'vim-mode:reset-command-mode'

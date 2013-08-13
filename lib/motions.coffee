@@ -153,8 +153,12 @@ class MoveToNextParagraph extends Motion
 class MoveToLine extends Motion
   isLinewise: -> true
 
-  execute: (count=1) ->
-    # noop
+  execute: (count) ->
+    if count?
+      @editor.setCursorBufferPosition([count - 1, 0])
+    else
+      @editor.setCursorBufferPosition([@editor.getLineCount() - 1, 0])
+    @editor.getCursor().skipLeadingWhitespace()
 
   select: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
@@ -213,29 +217,11 @@ class MoveToLastCharacterOfLine extends Motion
       @editor.selectToEndOfLine()
       true
 
-class MoveToStartOfFile extends Motion
+class MoveToStartOfFile extends MoveToLine
   execute: (count=1) ->
-    _.map [1..count], =>
-      @editor.setCursorScreenPosition([0,0])
-      @editor.getCursor().skipLeadingWhitespace()
-
-  select: (count=1) ->
-    _.map [1..count], =>
-      @editor.selectToScreenPosition([0,0])
-
-class MoveToEndOfFile extends Motion
-  execute: (count=1) ->
-    _.map [1..count], =>
-      @editor.setCursorScreenPosition(@endOfFile())
-
-  select: (count=1) ->
-    _.map [1..count], =>
-      @editor.selectToScreenPosition(@endOfFile())
-
-  endOfFile: ->
-    @editor.screenPositionForBufferPosition @editor.getEofPosition()
+    super(count)
 
 module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord,
   MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine,
   MoveToLastCharacterOfLine, MoveToLine, MoveToBeginningOfLine, MoveToStartOfFile,
-  MoveToEndOfFile, MoveToEndOfWord }
+  MoveToEndOfWord }
