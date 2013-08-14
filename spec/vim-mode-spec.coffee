@@ -140,6 +140,29 @@ describe "VimState", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
         expect(vimState.getRegister('"').text).toBe '0'
 
+      it "deletes count characters to the right and enters insert mode", ->
+        editor.setText("012345")
+        editor.setCursorScreenPosition([0, 1])
+
+        keydown('3', element: editor[0])
+        keydown('s', element: editor[0])
+        expect(editor).toHaveClass 'insert-mode'
+        expect(editor.getText()).toBe '045'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        expect(vimState.getRegister('"').text).toBe '123'
+
+    describe "the S keybinding", ->
+      it "deletes the entire line and enters insert mode", ->
+        editor.setText("12345\nabcde\nABCDE")
+        editor.setCursorScreenPosition([1,3])
+
+        keydown('S', shift: true, element: editor[0])
+        expect(editor).toHaveClass 'insert-mode'
+        expect(editor.getText()).toBe "12345\n\nABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+        expect(vimState.getRegister('"').text).toBe "abcde\n"
+        expect(vimState.getRegister('"').type).toBe "linewise"
+
     describe "the d keybinding", ->
       describe "when followed by a d", ->
         it "deletes the current line", ->
@@ -150,7 +173,7 @@ describe "VimState", ->
           keydown('d', element: editor[0])
           expect(editor.getText()).toBe "12345\n\nABCDE"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
-          expect(vimState.getRegister('"').text).toBe 'abcde\n'
+          expect(vimState.getRegister('"').text).toBe "abcde\n"
 
         it "deletes the last line", ->
           editor.setText("12345\nabcde\nABCDE")
