@@ -37,6 +37,7 @@
   'J': 'vim-mode:join'
   'x': 'vim-mode:delete-right'
   's': 'vim-mode:substitute'
+  'S': 'vim-mode:substitute-line'
   'y': 'vim-mode:yank'
   'Y': 'vim-mode:yank-line'
   'P': 'vim-mode:put-before'

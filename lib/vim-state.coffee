@@ -65,6 +65,7 @@ class VimState
       'activate-command-mode': => @activateCommandMode()
       'reset-command-mode': => @resetCommandMode()
       'substitute': => new commands.Substitute(@editor, @)
+      'substitute-line': => new commands.SubstituteLine(@editor, @)
       'insert': => new commands.Insert(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
