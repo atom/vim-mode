@@ -172,6 +172,45 @@ describe "VimState", ->
             expect(editor.getText()).toBe "12345\nQWERT"
             expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
+          it "pastes n lines back when pressing p", ->
+            editor.setText("12345\nabcde\nABCDE\nQWERT")
+            editor.setCursorScreenPosition([1,1])
+
+            keydown('d', element: editor[0])
+            keydown('2', element: editor[0])
+            keydown('d', element: editor[0])
+
+            editor.setCursorScreenPosition([1,1])
+            keydown('p', element: editor[0])
+
+            expect(editor.getText()).toBe "12345\nQWERT\nabcde\nABCDE"
+            expect(editor.getCursorScreenPosition()).toEqual([1,0])
+
+        describe "when preceeded by numbers", ->
+          beforeEach ->
+            editor.setText("111\n222\n333\n444")
+            editor.setCursorScreenPosition([1,1])
+
+          it "deletes n lines, starting from the current", ->
+            keydown('2', element: editor[0])
+            keydown('d', element: editor[0])
+            keydown('d', element: editor[0])
+
+            expect(editor.getText()).toBe "111\n444"
+            expect(editor.getCursorScreenPosition()).toEqual([1,0])
+
+          it "pastes deleted lines", ->
+            keydown('2', element: editor[0])
+            keydown('d', element: editor[0])
+            keydown('d', element: editor[0])
+
+            editor.setCursorScreenPosition([1,1])
+            keydown('p', element: editor[0])
+
+            expect(editor.getText()).toBe "111\n444\n222\n333"
+            expect(editor.getCursorScreenPosition()).toEqual([2,0])
+
+
       describe "when followed by an h", ->
         it "deletes the previous letter on the current line", ->
           editor.setText("abcd\n01234")
