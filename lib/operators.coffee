@@ -4,20 +4,52 @@ class OperatorError
   constructor: (@message) ->
     @name = "Operator Error"
 
+class Operator
+  vimState: null
+  motion: null
+  complete: null
+  selectOptions: null
+
+  # selectOptions - The options object to pass through to the motion when
+  #                 selecting.
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @complete = false
+
+  # Public: Determines when the command can be executed.
+  #
+  # Returns true if ready to execute and false otherwise.
+  isComplete: -> @complete
+
+  # Public: Marks this as ready to execute and saves the motion.
+  #
+  # motion - The motion used to select what to operate on.
+  #
+  # Returns nothing.
+  compose: (motion) ->
+    if not motion.select
+      throw new OperatorError("Must compose with a motion")
+
+    @motion = motion
+    @complete = true
+
+
+  # Protected: Wraps the function within an single undo step.
+  #
+  # fn - The function to wrap.
+  #
+  # Returns nothing.
+  undoTransaction: (fn) ->
+    @editor.getBuffer().transact(fn)
 #
 # It deletes everything selected by the following motion.
 #
-class Delete
-  motion: null
-  complete: null
-  vimState: null
+class Delete extends Operator
   allowEOL: null
-  selectOptions: null
 
-  constructor: (@editor, @vimState, {@motion, @allowEOL, @selectOptions}={}) ->
+  # allowEOL - Determines whether the cursor should be allowed to rest on the
+  #            end of line character or not.
+  constructor: (@editor, @vimState, {@allowEOL, @selectOptions}={}) ->
     @complete = false
-
-  isComplete: -> @complete
 
   # Public: Deletes the text selected by the given motion.
   #
@@ -26,9 +58,8 @@ class Delete
   # Returns nothing.
   execute: (count=1) ->
     cursor = @editor.getCursor()
-    buffer = @editor.getBuffer()
 
-    buffer.transact =>
+    @undoTransaction =>
       _.times count, =>
         if _.last(@motion.select(1, @selectOptions))
           @editor.getSelection().delete()
@@ -38,69 +69,27 @@ class Delete
       if @motion.isLinewise?()
         @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
-  # Public: Marks this as complete and saves the motion.
-  #
-  # motion - The motion used to select what to delete.
-  #
-  # Returns nothing.
-  compose: (motion) ->
-    if not motion.select
-      throw new OperatorError("Delete must compose with a motion")
-
-    @motion = motion
-    @complete = true
-
 #
 # It changes everything selected by the following motion.
 #
-class Change
-  motion: null
-  complete: null
-  vimState: null
-
-  constructor: (@editor, @vimState) ->
-    @complete = false
-
-  isComplete: -> @complete
-
+class Change extends Operator
   # Public: Changes the text selected by the given motion.
   #
   # count - The number of times to execute.
   #
   # Returns nothing.
   execute: (count=1) ->
-    operator = new Delete(@editor, @vimState,
-      motion: @motion, allowEOL: true, selectOptions: {excludeWhitespace: true})
+    operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
+    operator.compose(@motion)
     operator.execute(count)
 
     @vimState.activateInsertMode()
 
-  # Public: Marks this as complete and saves the motion.
-  #
-  # motion - The motion used to select what to change.
-  #
-  # Returns nothing.
-  compose: (motion) ->
-    if not motion.select
-      throw new OperatorError("Change must compose with a motion")
-
-    @motion = motion
-    @complete = true
-
 #
 # It copies everything selected by the following motion.
 #
-class Yank
-  motion: null
-  complete: null
-  register: null
-  vimState: null
-
-  constructor: (@editor, @vimState) ->
-    @complete = false
-    @register ?= '"'
-
-  isComplete: -> @complete
+class Yank extends Operator
+  register: '"'
 
   # Public: Copies the text selected by the given motion.
   #
@@ -110,8 +99,8 @@ class Yank
   execute: (count=1) ->
     text = ""
     type = if @motion.isLinewise then 'linewise' else 'character'
-
     originalPosition = @editor.getCursorScreenPosition()
+
     _.times count, =>
       if _.last(@motion.select())
         text += @editor.getSelection().getText()
@@ -123,107 +112,57 @@ class Yank
     else
       @editor.clearSelections()
 
-  # Public: Marks this as complete and saves the motion.
-  #
-  # motion - The motion used to select what to copy.
-  #
-  # Returns nothing.
-  compose: (motion) ->
-    if not motion.select
-      throw new OperatorError("Yank must compose with a motion")
-
-    @motion = motion
-    @complete = true
-
 #
 # It indents everything selected by the following motion.
 #
-class Indent
-  motion: null
-  complete: null
-
-  constructor: (@editor) ->
-    @complete = false
-
-  isComplete: -> @complete
-
+class Indent extends Operator
   # Public: Indents the text selected by the given motion.
   #
   # count - The number of times to execute.
   #
   # Returns nothing.
   execute: (count=1) ->
+    @indent(count)
+
+  # Protected: Indents or outdents the text selected by the given motion.
+  #
+  # count  - The number of times to execute.
+  # direction - Either 'indent' or 'outdent'
+  #
+  # Returns nothing.
+  indent: (count, direction='indent') ->
     row = @editor.getCursorScreenRow()
 
     @motion.select(count)
-    @editor.indentSelectedRows()
+    if direction == 'indent'
+      @editor.indentSelectedRows()
+    else if direction == 'outdent'
+      @editor.outdentSelectedRows()
 
     @editor.setCursorScreenPosition([row, 0])
     @editor.moveCursorToFirstCharacterOfLine()
 
-  # Public: Marks this as complete and saves the motion.
-  #
-  # motion - The motion used to select what to indent.
-  #
-  # Returns nothing.
-  compose: (motion) ->
-    if not motion.select
-      throw new OperatorError("Indent must compose with a motion")
-
-    @motion = motion
-    @complete = true
-
 #
 # It outdents everything selected by the following motion.
 #
-class Outdent
-  motion: null
-  complete: null
-
-  constructor: (@editor) ->
-    @complete = false
-
-  isComplete: -> @complete
-
-  # Public: Outdents the text selected by the given motion.
+class Outdent extends Indent
+  # Public: Indents the text selected by the given motion.
   #
   # count - The number of times to execute.
   #
   # Returns nothing.
   execute: (count=1) ->
-    row = @editor.getCursorScreenRow()
-
-    @motion.select(count)
-    @editor.outdentSelectedRows()
-
-    @editor.setCursorScreenPosition([row, 0])
-    @editor.moveCursorToFirstCharacterOfLine()
-
-  # Public: Marks this as complete and saves the motion.
-  #
-  # motion - The motion used to select what to outdent.
-  #
-  # Returns nothing.
-  compose: (motion) ->
-    if not motion.select
-      throw new OperatorError("Outdent must compose with a motion")
-
-    @motion = motion
-    @complete = true
+    @indent(count, 'outdent')
 
 #
 # It pastes everything contained within the specifed register
 #
-class Put
-  motion: null
-  direction: null
-  register: null
+class Put extends Operator
+  direction: 'after'
+  register: '"'
+  location: null
 
-  constructor: (@editor, @vimState, {@location}={}) ->
-    @direction ?= 'after'
-    @register ?= '"'
-
-  isComplete: -> true
+  constructor: (@editor, @vimState, {@location, @selectOptions}={}) -> @complete = true
 
   # Public: Pastes the text in the given register.
   #
@@ -233,9 +172,8 @@ class Put
   execute: (count=1) ->
     {text, type} = @vimState.getRegister(@register) || {}
     return unless text
-    buffer = @editor.getBuffer()
 
-    buffer.transact =>
+    @undoTransaction =>
       _.times count, =>
         if type == 'linewise' and @location == 'after'
           @editor.moveCursorDown()
@@ -249,19 +187,11 @@ class Put
           @editor.moveCursorUp()
           @editor.moveCursorToFirstCharacterOfLine()
 
-  # Public: Not implemented.
-  #
-  # Returns nothing.
-  compose: (register) ->
-    throw new OperatorError("Not Implemented")
-
 #
 # It combines the current line with the following line.
 #
-class Join
-  constructor: (@editor) ->
-
-  isComplete: -> true
+class Join extends Operator
+  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
 
   # Public: Combines the current with the following lines
   #
@@ -269,16 +199,8 @@ class Join
   #
   # Returns nothing.
   execute: (count=1) ->
-    buffer = @editor.getBuffer()
-
-    buffer.transact =>
+    @undoTransaction =>
       _.times count, =>
         @editor.joinLine()
-
-  # Public: Not implemented.
-  #
-  # Returns nothing.
-  compose: (register) ->
-    throw new OperatorError("Not Implemented")
 
 module.exports = { OperatorError, Delete, Yank, Put, Join, Indent, Outdent, Change }
