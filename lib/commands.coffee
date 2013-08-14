@@ -33,9 +33,9 @@ class Substitute extends Command
 
 class SubstituteLine extends Command
   execute: (count=1) ->
-    @editor.moveCursorToBeginningOfLine()
-    @editor.selectToEndOfLine()
-    @editor.getSelection().delete()
+    @editor.deleteLine()
+    @editor.insertNewline()
+    @editor.moveCursorUp()
     @vimState.activateInsertMode()
 
 module.exports = { Insert, InsertAfter, InsertAboveWithNewline,
