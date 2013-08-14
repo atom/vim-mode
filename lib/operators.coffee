@@ -95,7 +95,7 @@ class Delete
   allowEOL: null
   selectOptions: null
 
-  constructor: (@editor, @vimState, {@motion, @allowEOL, @selectOptions}) ->
+  constructor: (@editor, @vimState, {@motion, @allowEOL, @selectOptions}={}) ->
     @complete = false
 
   isComplete: -> @complete
