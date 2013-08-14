@@ -149,8 +149,7 @@ describe "VimState", ->
         expect(editor).toHaveClass 'insert-mode'
         expect(editor.getText()).toBe '045'
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-        # FIXME: See atom/vim-mode#11
-        #expect(vimState.getRegister('"').text).toBe '123'
+        expect(vimState.getRegister('"').text).toBe '123'
 
     describe "the S keybinding", ->
       it "deletes the entire line and enters insert mode", ->
