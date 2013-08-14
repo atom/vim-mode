@@ -106,15 +106,17 @@ class Delete
   # Returns nothing.
   execute: (count=1) ->
     cursor = @editor.getCursor()
+    buffer = @editor.getBuffer()
 
-    _.times count, =>
-      if _.last(@motion.select(1, @selectOptions))
-        @editor.getSelection().delete()
+    buffer.transact =>
+      _.times count, =>
+        if _.last(@motion.select(1, @selectOptions))
+          @editor.getSelection().delete()
 
-      @editor.moveCursorLeft() if cursor.isAtEndOfLine() and !@motion.isLinewise?()
+        @editor.moveCursorLeft() if cursor.isAtEndOfLine() and !@motion.isLinewise?()
 
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
+      if @motion.isLinewise?()
+        @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
   # Public: Marks this as complete and saves the motion.
   #
@@ -310,19 +312,21 @@ class Put
   execute: (count=1) ->
     {text, type} = @vimState.getRegister(@register) || {}
     return unless text
+    buffer = @editor.getBuffer()
 
-    _.times count, =>
-      if type == 'linewise' and @location == 'after'
-        @editor.moveCursorDown()
-      else if @location == 'after'
-        @editor.moveCursorRight()
+    buffer.transact =>
+      _.times count, =>
+        if type == 'linewise' and @location == 'after'
+          @editor.moveCursorDown()
+        else if @location == 'after'
+          @editor.moveCursorRight()
 
-      @editor.moveCursorToBeginningOfLine() if type == 'linewise'
-      @editor.insertText(text)
+        @editor.moveCursorToBeginningOfLine() if type == 'linewise'
+        @editor.insertText(text)
 
-      if type == 'linewise'
-        @editor.moveCursorUp()
-        @editor.moveCursorToFirstCharacterOfLine()
+        if type == 'linewise'
+          @editor.moveCursorUp()
+          @editor.moveCursorToFirstCharacterOfLine()
 
   # Public: Not implemented.
   #
@@ -344,8 +348,11 @@ class Join
   #
   # Returns nothing.
   execute: (count=1) ->
-    _.times count, =>
-      @editor.joinLine()
+    buffer = @editor.getBuffer()
+
+    buffer.transact =>
+      _.times count, =>
+        @editor.joinLine()
 
   # Public: Not implemented.
   #
