@@ -8,6 +8,9 @@
   * `D` - delete to the end of the line
 * [Change](http://vimhelp.appspot.com/change.txt.html#c)
   * `cw` - deletes the next word and switches to insert mode.
+  * `cc` - linewise
+  * `c2c` - repeated linewise
+  * `C` - change to the end of the line
 * [Yank](http://vimhelp.appspot.com/change.txt.html#yank)
   * `yw` - with a motion
   * `yy` - linewise
