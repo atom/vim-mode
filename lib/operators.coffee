@@ -5,87 +5,6 @@ class OperatorError
     @name = "Operator Error"
 
 #
-# Used to track the number of times either a motion or operator should
-# be repeated.
-#
-class NumericPrefix
-  count: null
-  complete: null
-  composedOperator: null
-
-  constructor: (@count) ->
-    @complete = false
-
-  isComplete: -> @complete
-
-  # Public: Marks this as complete as soon as another operator is available.
-  #
-  # operatorToRepeat - The next motion or operator.
-  #
-  # Returns nothing.
-  compose: (@composedOperator) ->
-    @complete = true
-
-  # Public: Tracks an additional digit for this NumericPrefix.
-  #
-  # digit - A single digit, 0-9
-  #
-  # Returns nothing.
-  addDigit: (digit) ->
-    @count = @count * 10 + digit
-
-  # Public: Executes the composed operator or motion.
-  #
-  # Returns nothing.
-  execute: ->
-    @composedOperator.execute(@count)
-
-  # Public: Selects using the composed operator or motion.
-  #
-  # Returns an array of whether the selections were successful.
-  select: ->
-    @composedOperator.select(@count)
-
-#
-# Used to track which register the following operator should operate on.
-#
-class RegisterPrefix
-  complete: null
-  composedOperator: null
-  name: null
-
-  constructor: (@name) ->
-    @complete = false
-
-  isComplete: -> @complete
-
-  # Public: Marks this as complete and sets the operator's register if
-  # it accepts it.
-  #
-  # composedOperator - The next operator.
-  #
-  # Returns nothing.
-  compose: (@composedOperator) ->
-    @composedOperator.register = @name if @composedOperator.register?
-    @complete = true
-
-  # Public: Executes the composed operator.
-  #
-  # count - The number of times to repeat.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    @composedOperator.execute(count)
-
-  # Public: Selects using the composed operator.
-  #
-  # count - The number of times to repeat.
-  #
-  # Returns an array of whether the selections were successful.
-  select: (count=1) ->
-    @composedOperator.select(count)
-
-#
 # It deletes everything selected by the following motion.
 #
 class Delete
@@ -362,5 +281,4 @@ class Join
   compose: (register) ->
     throw new OperatorError("Not Implemented")
 
-module.exports = { NumericPrefix, RegisterPrefix, Delete, OperatorError, Yank,
-  Put, Join, Indent, Outdent, Change }
+module.exports = { OperatorError, Delete, Yank, Put, Join, Indent, Outdent, Change }
