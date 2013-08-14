@@ -2,6 +2,7 @@ $ = require 'jquery'
 
 RootView = require 'root-view'
 Keymap = require 'keymap'
+DisplayBuffer = require 'display-buffer'
 
 describe "VimState", ->
   [editor, vimState, originalKeymap] = []
@@ -355,6 +356,18 @@ describe "VimState", ->
         keydown('y', element: editor[0])
 
         expect(vimState.getRegister('"').text).toBe "012 345\n"
+        expect(editor.getCursorScreenPosition()).toEqual([0,4])
+
+      it "treats a fold like a single line", ->
+        text = "def something\n  true\nend\n"
+        editor.getBuffer().setText text
+        displayBuffer = new DisplayBuffer(editor.getBuffer())
+        displayBuffer.createFold(0,2)
+
+        keydown('y', element: editor[0])
+        keydown('y', element: editor[0])
+
+        expect(vimState.getRegister('"').text).toBe text
         expect(editor.getCursorScreenPosition()).toEqual([0,4])
 
       describe "when the second y is prefixed by a count", ->
