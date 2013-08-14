@@ -241,6 +241,16 @@ describe "VimState", ->
           expect(editor.getText()).toBe "ee four"
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
 
+    describe "the D keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+        editor.setCursorScreenPosition [0, 1]
+
+      it "deletes the contents until the end of the line", ->
+        keydown('D', shift: true, element: editor[0])
+
+        expect(editor.getText()).toBe "0\n"
+
     describe "the c keybinding", ->
       describe "when followed by a c", ->
         it "deletes the current line and enters insert mode", ->
@@ -344,6 +354,19 @@ describe "VimState", ->
           expect(editor.getCursorScreenPosition()).toEqual([0,0])
           expect(editor).not.toHaveClass 'command-mode'
           expect(editor).toHaveClass 'insert-mode'
+
+    describe "the C keybinding", ->
+      beforeEach ->
+        editor.getBuffer().setText "012\n"
+        editor.setCursorScreenPosition [0, 1]
+
+      it "deletes the contents until the end of the line and enters insert mode", ->
+        keydown('C', shift: true, element: editor[0])
+
+        expect(editor.getText()).toBe "0\n"
+        expect(editor.getCursorScreenPosition()).toEqual([0,1])
+        expect(editor).not.toHaveClass 'command-mode'
+        expect(editor).toHaveClass 'insert-mode'
 
     describe "the y keybinding", ->
       beforeEach ->
@@ -471,16 +494,6 @@ describe "VimState", ->
 
           expect(editor.getText()).toBe " 345\n012\n"
           expect(editor.getCursorScreenPosition()).toEqual [0,1]
-
-    describe "the D keybinding", ->
-      beforeEach ->
-        editor.getBuffer().setText "012\n"
-        editor.setCursorScreenPosition [0, 1]
-
-      it "deletes the contents until the end of the line", ->
-        keydown('D', shift: true, element: editor[0])
-
-        expect(editor.getText()).toBe "0\n"
 
     describe "the O keybinding", ->
       beforeEach ->
