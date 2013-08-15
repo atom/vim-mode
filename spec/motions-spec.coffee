@@ -1,17 +1,9 @@
-$ = require 'jquery'
-
-Keymap = require 'keymap'
-
 helpers = require './spec-helper'
 
 describe "Motions", ->
-  [editor, vimState, originalKeymap] = []
-  keydown = helpers.keydown
+  [editor, vimState] = []
 
   beforeEach ->
-    originalKeymap = window.keymap
-    window.keymap = new Keymap
-
     vimMode = atom.loadPackage('vim-mode')
     vimMode.activateResources()
 
@@ -23,9 +15,6 @@ describe "Motions", ->
 
     editor.setText("12345\nabcde\nABCDE")
     editor.setCursorScreenPosition([1,1])
-
-  afterEach ->
-    window.keymap = originalKeymap
 
   keydown = (key, options={}) ->
     options.element ?= editor[0]

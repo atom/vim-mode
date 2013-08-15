@@ -1,6 +1,15 @@
 Editor = require 'editor'
+Keymap = require 'keymap'
 
 VimState = require '../lib/vim-state'
+
+originalKeymap = null
+beforeEach ->
+  originalKeymap = window.keymap
+  window.keymap = new Keymap
+
+afterEach ->
+  window.keymap = originalKeymap
 
 cacheEditor = (existingEditor) ->
   if existingEditor?

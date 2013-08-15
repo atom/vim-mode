@@ -1,17 +1,9 @@
-$ = require 'jquery'
-
-Keymap = require 'keymap'
-
 helpers = require './spec-helper'
 
 describe "VimState", ->
-  [editor, vimState, originalKeymap] = []
-  keydown = helpers.keydown
+  [editor, vimState] = []
 
   beforeEach ->
-    originalKeymap = window.keymap
-    window.keymap = new Keymap
-
     vimMode = atom.loadPackage('vim-mode')
     vimMode.activateResources()
 
@@ -20,9 +12,6 @@ describe "VimState", ->
     vimState = editor.vimState
     vimState.activateCommandMode()
     vimState.resetCommandMode()
-
-  afterEach ->
-    window.keymap = originalKeymap
 
   keydown = (key, options={}) ->
     options.element ?= editor[0]
@@ -36,19 +25,19 @@ describe "VimState", ->
   describe "command-mode", ->
     it "stops propagation on key events would otherwise insert a character", ->
       keydown('\\')
-      expect(editor.getText()).toEqual('')
+      expect(editor.getText()).toEqual ''
 
     # FIXME: See atom/vim-mode#2
     xit "does not allow the cursor to be placed on the \n character, unless the line is empty", ->
       editor.setText("012345\n\nabcdef")
       editor.setCursorScreenPosition([0, 5])
-      expect(editor.getCursorScreenPosition()).toEqual [0,5]
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
       editor.setCursorScreenPosition([0, 6])
-      expect(editor.getCursorScreenPosition()).toEqual [0,5]
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
       editor.setCursorScreenPosition([1, 0])
-      expect(editor.getCursorScreenPosition()).toEqual [1,0]
+      expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
     it "clears the operator stack when commands can't be composed", ->
       keydown('d')
@@ -93,10 +82,10 @@ describe "VimState", ->
     it "allows the cursor to reach the end of the line", ->
       editor.setText("012345\n\nabcdef")
       editor.setCursorScreenPosition([0, 5])
-      expect(editor.getCursorScreenPosition()).toEqual [0,5]
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
       editor.setCursorScreenPosition([0, 6])
-      expect(editor.getCursorScreenPosition()).toEqual [0,6]
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "puts the editor into command mode when <escape> is pressed", ->
       expect(editor).not.toHaveClass 'command-mode'

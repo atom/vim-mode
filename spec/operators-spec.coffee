@@ -1,16 +1,9 @@
-$ = require 'jquery'
-
-Keymap = require 'keymap'
-
 helpers = require './spec-helper'
 
 describe "Operators", ->
-  [editor, vimState, originalKeymap] = []
+  [editor, vimState] = []
 
   beforeEach ->
-    originalKeymap = window.keymap
-    window.keymap = new Keymap
-
     vimMode = atom.loadPackage('vim-mode')
     vimMode.activateResources()
 
@@ -19,9 +12,6 @@ describe "Operators", ->
     vimState = editor.vimState
     vimState.activateCommandMode()
     vimState.resetCommandMode()
-
-  afterEach ->
-    window.keymap = originalKeymap
 
   keydown = (key, options={}) ->
     options.element ?= editor[0]

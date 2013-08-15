@@ -1,15 +1,9 @@
-Keymap = require 'keymap'
-
 helpers = require './spec-helper'
 
 describe "Prefixes", ->
-  [editor, vimState, originalKeymap] = []
-  keydown = helpers.keydown
+  [editor, vimState] = []
 
   beforeEach ->
-    originalKeymap = window.keymap
-    window.keymap = new Keymap
-
     vimMode = atom.loadPackage('vim-mode')
     vimMode.activateResources()
 
@@ -18,9 +12,6 @@ describe "Prefixes", ->
     vimState = editor.vimState
     vimState.activateCommandMode()
     vimState.resetCommandMode()
-
-  afterEach ->
-    window.keymap = originalKeymap
 
   keydown = (key, options={}) ->
     options.element ?= editor[0]

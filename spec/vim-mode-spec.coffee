@@ -1,13 +1,9 @@
 RootView = require 'root-view'
-Keymap = require 'keymap'
 
 describe "VimMode", ->
-  [editor, originalKeymap] = []
+  [editor] = []
 
   beforeEach ->
-    originalKeymap = window.keymap
-    window.keymap = new Keymap
-
     window.rootView = new RootView
     rootView.open()
     rootView.simulateDomAttachment()
@@ -15,9 +11,6 @@ describe "VimMode", ->
 
     editor = rootView.getActiveView()
     editor.enableKeymap()
-
-  afterEach ->
-    window.keymap = originalKeymap
 
   describe "initialize", ->
     it "puts the editor in command-mode initially", ->
