@@ -361,14 +361,15 @@ describe "VimState", ->
       it "treats a fold like a single line", ->
         text = "def something\n  true\nend\n"
         editor.getBuffer().setText text
-        displayBuffer = new DisplayBuffer(editor.getBuffer())
-        displayBuffer.createFold(0,2)
+        editor.setCursorScreenPosition [0, 4]
+        editor.activeEditSession.foldCurrentRow()
 
         keydown('y', element: editor[0])
         keydown('y', element: editor[0])
 
         expect(vimState.getRegister('"').text).toBe text
         expect(editor.getCursorScreenPosition()).toEqual([0,4])
+        expect(editor.activeEditSession.isFoldedAtBufferRow()).toBe true
 
       describe "when the second y is prefixed by a count", ->
         it "copies n lines, starting from the current", ->
