@@ -6,7 +6,6 @@ helpers = require './spec-helper'
 
 describe "Operators", ->
   [editor, vimState, originalKeymap] = []
-  keydown = helpers.keydown
 
   beforeEach ->
     originalKeymap = window.keymap
@@ -24,22 +23,26 @@ describe "Operators", ->
   afterEach ->
     window.keymap = originalKeymap
 
+  keydown = (key, options={}) ->
+    options.element ?= editor[0]
+    helpers.keydown(key, options)
+
   describe "the x keybinding", ->
     it "deletes a character", ->
       editor.setText("012345")
       editor.setCursorScreenPosition([0, 4])
 
-      keydown('x', element: editor[0])
+      keydown('x')
       expect(editor.getText()).toBe '01235'
       expect(editor.getCursorScreenPosition()).toEqual([0, 4])
       expect(vimState.getRegister('"').text).toBe '4'
 
-      keydown('x', element: editor[0])
+      keydown('x')
       expect(editor.getText()).toBe '0123'
       expect(editor.getCursorScreenPosition()).toEqual([0, 3])
       expect(vimState.getRegister('"').text).toBe '5'
 
-      keydown('x', element: editor[0])
+      keydown('x')
       expect(editor.getText()).toBe '012'
       expect(editor.getCursorScreenPosition()).toEqual([0, 2])
       expect(vimState.getRegister('"').text).toBe '3'
@@ -48,7 +51,7 @@ describe "Operators", ->
       editor.getBuffer().setText "012345\n\nabcdef"
       editor.setCursorScreenPosition [1, 0]
 
-      keydown('x', element: editor[0])
+      keydown('x')
       expect(editor.getText()).toBe "012345\n\nabcdef"
 
   describe "the s keybinding", ->
@@ -57,7 +60,7 @@ describe "Operators", ->
       editor.setCursorScreenPosition([0, 1])
 
     it "deletes the character to the right and enters insert mode", ->
-      keydown('s', element: editor[0])
+      keydown('s')
 
       expect(editor).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe '02345'
@@ -65,8 +68,8 @@ describe "Operators", ->
       expect(vimState.getRegister('"').text).toBe '1'
 
     it "deletes count characters to the right and enters insert mode", ->
-      keydown('3', element: editor[0])
-      keydown('s', element: editor[0])
+      keydown('3')
+      keydown('s')
 
       expect(editor).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe '045'
@@ -78,7 +81,7 @@ describe "Operators", ->
       editor.setText("12345\nabcde\nABCDE")
       editor.setCursorScreenPosition([1,3])
 
-      keydown('S', shift: true, element: editor[0])
+      keydown('S', shift: true)
       expect(editor).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe "12345\n\nABCDE"
       expect(editor.getCursorScreenPosition()).toEqual [1, 0]
@@ -91,8 +94,8 @@ describe "Operators", ->
         editor.setText("12345\nabcde\n\nABCDE")
         editor.setCursorScreenPosition([1,1])
 
-        keydown('d', element: editor[0])
-        keydown('d', element: editor[0])
+        keydown('d')
+        keydown('d')
 
         expect(editor.getText()).toBe "12345\n\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
@@ -102,8 +105,8 @@ describe "Operators", ->
         editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([2,1])
 
-        keydown('d', element: editor[0])
-        keydown('d', element: editor[0])
+        keydown('d')
+        keydown('d')
 
         expect(editor.getText()).toBe "12345\nabcde"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
@@ -113,9 +116,9 @@ describe "Operators", ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1,1])
 
-        keydown('d', element: editor[0])
-        keydown('2', element: editor[0])
-        keydown('d', element: editor[0])
+        keydown('d')
+        keydown('2')
+        keydown('d')
 
       it "deletes n lines, starting from the current", ->
         expect(editor.getText()).toBe "12345\nQWERT"
@@ -123,7 +126,7 @@ describe "Operators", ->
 
       describe "with undo", ->
         beforeEach ->
-          keydown('u', element: editor[0])
+          keydown('u')
 
         it "undoes both lines", ->
           expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
@@ -133,14 +136,14 @@ describe "Operators", ->
         editor.setText("abcd\n01234")
         editor.setCursorScreenPosition([1,1])
 
-        keydown('d', element: editor[0])
-        keydown('h', element: editor[0])
+        keydown('d')
+        keydown('h')
 
         expect(editor.getText()).toBe "abcd\n1234"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
-        keydown('d', element: editor[0])
-        keydown('h', element: editor[0])
+        keydown('d')
+        keydown('h')
 
         expect(editor.getText()).toBe "abcd\n1234"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
@@ -150,8 +153,8 @@ describe "Operators", ->
         editor.setText("abcd efg\nabc")
         editor.setCursorScreenPosition([0,5])
 
-        keydown('d', element: editor[0])
-        keydown('w', element: editor[0])
+        keydown('d')
+        keydown('w')
 
         expect(editor.getText()).toBe "abcd \nabc"
         expect(editor.getCursorScreenPosition()).toEqual([0,4])
@@ -160,8 +163,8 @@ describe "Operators", ->
         editor.setText("abcd efg")
         editor.setCursorScreenPosition([0,2])
 
-        keydown('d', element: editor[0])
-        keydown('w', element: editor[0])
+        keydown('d')
+        keydown('w')
 
         expect(editor.getText()).toBe "abefg"
         expect(editor.getCursorScreenPosition()).toEqual([0,2])
@@ -169,9 +172,9 @@ describe "Operators", ->
         editor.setText("one two three four")
         editor.setCursorScreenPosition([0,0])
 
-        keydown('d', element: editor[0])
-        keydown('3', element: editor[0])
-        keydown('w', element: editor[0])
+        keydown('d')
+        keydown('3')
+        keydown('w')
 
         expect(editor.getText()).toBe "four"
         expect(editor.getCursorScreenPosition()).toEqual([0,0])
@@ -181,8 +184,8 @@ describe "Operators", ->
         editor.setText("abcd efg")
         editor.setCursorScreenPosition([0,2])
 
-        keydown('d', element: editor[0])
-        keydown('b', element: editor[0])
+        keydown('d')
+        keydown('b')
 
         expect(editor.getText()).toBe "cd efg"
         expect(editor.getCursorScreenPosition()).toEqual([0,0])
@@ -190,9 +193,9 @@ describe "Operators", ->
         editor.setText("one two three four")
         editor.setCursorScreenPosition([0,11])
 
-        keydown('d', element: editor[0])
-        keydown('3', element: editor[0])
-        keydown('b', element: editor[0])
+        keydown('d')
+        keydown('3')
+        keydown('b')
 
         expect(editor.getText()).toBe "ee four"
         expect(editor.getCursorScreenPosition()).toEqual([0,0])
@@ -203,7 +206,7 @@ describe "Operators", ->
       editor.setCursorScreenPosition [0, 1]
 
     it "deletes the contents until the end of the line", ->
-      keydown('D', shift: true, element: editor[0])
+      keydown('D', shift: true)
 
       expect(editor.getText()).toBe "0\n"
 
@@ -215,8 +218,8 @@ describe "Operators", ->
       it "deletes the current line and enters insert mode", ->
         editor.setCursorScreenPosition([1,1])
 
-        keydown('c', element: editor[0])
-        keydown('c', element: editor[0])
+        keydown('c')
+        keydown('c')
 
         expect(editor.getText()).toBe "12345\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
@@ -226,8 +229,8 @@ describe "Operators", ->
       it "deletes the last line and enters insert mode", ->
         editor.setCursorScreenPosition([2,1])
 
-        keydown('c', element: editor[0])
-        keydown('c', element: editor[0])
+        keydown('c')
+        keydown('c')
 
         expect(editor.getText()).toBe "12345\nabcde"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
@@ -239,9 +242,9 @@ describe "Operators", ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1,1])
 
-        keydown('c', element: editor[0])
-        keydown('2', element: editor[0])
-        keydown('c', element: editor[0])
+        keydown('c')
+        keydown('2')
+        keydown('c')
 
         expect(editor.getText()).toBe "12345\nQWERT"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
@@ -253,8 +256,8 @@ describe "Operators", ->
         editor.setText("abcd\n01234")
         editor.setCursorScreenPosition([1,1])
 
-        keydown('c', element: editor[0])
-        keydown('h', element: editor[0])
+        keydown('c')
+        keydown('h')
 
         expect(editor.getText()).toBe "abcd\n1234"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
@@ -266,22 +269,22 @@ describe "Operators", ->
         editor.setText("abcd efg")
         editor.setCursorScreenPosition([0,2])
 
-        keydown('c', element: editor[0])
-        keydown('w', element: editor[0])
+        keydown('c')
+        keydown('w')
 
         expect(editor.getText()).toBe "ab efg"
         expect(editor.getCursorScreenPosition()).toEqual([0,2])
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
-        keydown('escape', element: editor[0])
+        keydown('escape')
 
         editor.setText("one two three four")
         editor.setCursorScreenPosition([0,0])
 
-        keydown('c', element: editor[0])
-        keydown('3', element: editor[0])
-        keydown('w', element: editor[0])
+        keydown('c')
+        keydown('3')
+        keydown('w')
 
         expect(editor.getText()).toBe "four"
         expect(editor.getCursorScreenPosition()).toEqual([0,0])
@@ -293,22 +296,22 @@ describe "Operators", ->
         editor.setText("abcd efg")
         editor.setCursorScreenPosition([0,2])
 
-        keydown('c', element: editor[0])
-        keydown('b', element: editor[0])
+        keydown('c')
+        keydown('b')
 
         expect(editor.getText()).toBe "cd efg"
         expect(editor.getCursorScreenPosition()).toEqual([0,0])
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
-        keydown('escape', element: editor[0])
+        keydown('escape')
 
         editor.setText("one two three four")
         editor.setCursorScreenPosition([0,11])
 
-        keydown('c', element: editor[0])
-        keydown('3', element: editor[0])
-        keydown('b', element: editor[0])
+        keydown('c')
+        keydown('3')
+        keydown('b')
 
         expect(editor.getText()).toBe "ee four"
         expect(editor.getCursorScreenPosition()).toEqual([0,0])
@@ -321,7 +324,7 @@ describe "Operators", ->
       editor.setCursorScreenPosition [0, 1]
 
     it "deletes the contents until the end of the line and enters insert mode", ->
-      keydown('C', shift: true, element: editor[0])
+      keydown('C', shift: true)
 
       expect(editor.getText()).toBe "0\n"
       expect(editor.getCursorScreenPosition()).toEqual([0,1])
@@ -334,31 +337,31 @@ describe "Operators", ->
       editor.setCursorScreenPosition [0, 4]
 
     it "saves the line to the default register", ->
-      keydown('y', element: editor[0])
-      keydown('y', element: editor[0])
+      keydown('y')
+      keydown('y')
 
       expect(vimState.getRegister('"').text).toBe "012 345\n"
       expect(editor.getCursorScreenPosition()).toEqual([0,4])
 
     describe "when the second y is prefixed by a count", ->
       it "copies n lines, starting from the current", ->
-        keydown('y', element: editor[0])
-        keydown('2', element: editor[0])
-        keydown('y', element: editor[0])
+        keydown('y')
+        keydown('2')
+        keydown('y')
 
         expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
     it "saves the line to the a register", ->
-      keydown('"', element: editor[0])
-      keydown('a', element: editor[0])
-      keydown('y', element: editor[0])
-      keydown('y', element: editor[0])
+      keydown('"')
+      keydown('a')
+      keydown('y')
+      keydown('y')
 
       expect(vimState.getRegister('a').text).toBe "012 345\n"
 
     it "saves the first word to the default register", ->
-      keydown('y', element: editor[0])
-      keydown('w', element: editor[0])
+      keydown('y')
+      keydown('w')
 
       expect(vimState.getRegister('"').text).toBe "345"
 
@@ -368,22 +371,22 @@ describe "Operators", ->
       editor.setCursorScreenPosition [0, 4]
 
     it "saves the line to the default register", ->
-      keydown('Y', shift: true, element: editor[0])
+      keydown('Y', shift: true)
 
       expect(vimState.getRegister('"').text).toBe "012 345\n"
       expect(editor.getCursorScreenPosition()).toEqual([0,4])
 
     describe "when prefixed by a count", ->
       it "copies n lines, starting from the current", ->
-        keydown('2', element: editor[0])
-        keydown('Y', shift: true, element: editor[0])
+        keydown('2')
+        keydown('Y', shift: true)
 
         expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
     it "saves the line to the a register", ->
-      keydown('"', element: editor[0])
-      keydown('a', element: editor[0])
-      keydown('Y', shift: true, element: editor[0])
+      keydown('"')
+      keydown('a')
+      keydown('Y', shift: true)
 
       expect(vimState.getRegister('a').text).toBe "012 345\n"
 
@@ -396,15 +399,15 @@ describe "Operators", ->
         vimState.setRegister('a', text: "a")
 
       it "inserts the contents of the default register", ->
-        keydown('p', element: editor[0])
+        keydown('p')
 
         expect(editor.getText()).toBe "034512\n"
         expect(editor.getCursorScreenPosition()).toEqual [0,4]
 
       it "inserts the contents of the 'a' register", ->
-        keydown('"', element: editor[0])
-        keydown('a', element: editor[0])
-        keydown('p', element: editor[0])
+        keydown('"')
+        keydown('a')
+        keydown('p')
 
         expect(editor.getText()).toBe "0a12\n"
         expect(editor.getCursorScreenPosition()).toEqual [0,2]
@@ -416,7 +419,7 @@ describe "Operators", ->
         vimState.setRegister('"', text: " 345\n", type: 'linewise')
 
       it "inserts the contents of the default register", ->
-        keydown('p', element: editor[0])
+        keydown('p')
 
         expect(editor.getText()).toBe "012\n 345\n"
         expect(editor.getCursorScreenPosition()).toEqual [1,1]
@@ -427,10 +430,10 @@ describe "Operators", ->
         editor.setCursorScreenPosition([1,1])
         vimState.setRegister('"', text: "123")
 
-        keydown('2', element: editor[0])
-        keydown('p', element: editor[0])
+        keydown('2')
+        keydown('p')
 
-        keydown('u', element: editor[0])
+        keydown('u')
 
         expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
@@ -443,15 +446,15 @@ describe "Operators", ->
         vimState.setRegister('a', text: "a")
 
       it "inserts the contents of the default register", ->
-        keydown('P', shift: true, element: editor[0])
+        keydown('P', shift: true)
 
         expect(editor.getText()).toBe "345012\n"
         expect(editor.getCursorScreenPosition()).toEqual [0,3]
 
       it "inserts the contents of the 'a' register", ->
-        keydown('"', element: editor[0])
-        keydown('a', element: editor[0])
-        keydown('P', shift: true, element: editor[0])
+        keydown('"')
+        keydown('a')
+        keydown('P', shift: true)
 
         expect(editor.getText()).toBe "a012\n"
         expect(editor.getCursorScreenPosition()).toEqual [0,1]
@@ -463,7 +466,7 @@ describe "Operators", ->
         vimState.setRegister('"', text: " 345\n", type: 'linewise')
 
       it "inserts the contents of the default register", ->
-        keydown('P', shift: true, element: editor[0])
+        keydown('P', shift: true)
 
         expect(editor.getText()).toBe " 345\n012\n"
         expect(editor.getCursorScreenPosition()).toEqual [0,1]
@@ -478,7 +481,7 @@ describe "Operators", ->
       editor.setCursorScreenPosition [1, 1]
 
     it "switches to insert and adds a newline above the current one", ->
-      keydown('O', shift: true, element: editor[0])
+      keydown('O', shift: true)
 
       expect(editor.getText()).toBe "  abc\n  \n  012\n"
       expect(editor.getCursorScreenPosition()).toEqual [1,2]
@@ -494,7 +497,7 @@ describe "Operators", ->
       editor.setCursorScreenPosition [1, 2]
 
     it "switches to insert and adds a newline above the current one", ->
-      keydown('o', element: editor[0])
+      keydown('o')
 
       expect(editor.getText()).toBe "abc\n  012\n  \n"
       expect(editor).toHaveClass 'insert-mode'
@@ -507,7 +510,7 @@ describe "Operators", ->
     it "switches to insert mode and shifts to the right", ->
       editor.setCursorScreenPosition [0, 0]
 
-      keydown('a', element: editor[0])
+      keydown('a')
 
       expect(editor.getCursorScreenPosition()).toEqual [0,1]
       expect(editor).toHaveClass 'insert-mode'
@@ -515,7 +518,7 @@ describe "Operators", ->
     it "doesn't linewrap", ->
       editor.setCursorScreenPosition [0, 3]
 
-      keydown('a', element: editor[0])
+      keydown('a')
 
       expect(editor.getCursorScreenPosition()).toEqual [0,3]
 
@@ -525,7 +528,7 @@ describe "Operators", ->
       editor.setCursorScreenPosition [0, 1]
 
     it "deletes the contents until the end of the line", ->
-      keydown('J', shift: true, element: editor[0])
+      keydown('J', shift: true)
 
       expect(editor.getText()).toBe "012 456\n"
 
@@ -534,10 +537,10 @@ describe "Operators", ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1,1])
 
-        keydown('2', element: editor[0])
-        keydown('J', shift: true, element: editor[0])
+        keydown('2')
+        keydown('J', shift: true)
 
-        keydown('u', element: editor[0])
+        keydown('u')
 
         expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
@@ -547,8 +550,8 @@ describe "Operators", ->
         editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([1,1])
 
-        keydown('>', element: editor[0])
-        keydown('>', element: editor[0])
+        keydown('>')
+        keydown('>')
         expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([1,2])
 
@@ -556,13 +559,13 @@ describe "Operators", ->
         editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([0,0])
 
-        keydown('3', element: editor[0])
-        keydown('>', element: editor[0])
-        keydown('>', element: editor[0])
+        keydown('3')
+        keydown('>')
+        keydown('>')
         expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([0,2])
 
-        keydown('u', element: editor[0])
+        keydown('u')
         expect(editor.getText()).toBe "12345\nabcde\nABCDE"
 
 
@@ -572,8 +575,8 @@ describe "Operators", ->
         expect(editor.setText("12345\n  abcde\nABCDE"))
         editor.setCursorScreenPosition([1,2])
 
-        keydown('<', element: editor[0])
-        keydown('<', element: editor[0])
+        keydown('<')
+        keydown('<')
         expect(editor.getText()).toBe "12345\nabcde\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
@@ -581,11 +584,11 @@ describe "Operators", ->
         editor.setText("  12345\n  abcde\n  ABCDE")
         editor.setCursorScreenPosition([0,0])
 
-        keydown('3', element: editor[0])
-        keydown('<', element: editor[0])
-        keydown('<', element: editor[0])
+        keydown('3')
+        keydown('<')
+        keydown('<')
         expect(editor.getText()).toBe "12345\nabcde\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([0,0])
 
-        keydown('u', element: editor[0])
+        keydown('u')
         expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"

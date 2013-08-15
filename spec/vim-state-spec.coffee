@@ -24,6 +24,10 @@ describe "VimState", ->
   afterEach ->
     window.keymap = originalKeymap
 
+  keydown = (key, options={}) ->
+    options.element ?= editor[0]
+    helpers.keydown(key, options)
+
   describe "initialize", ->
     it "puts the editor in command-mode initially", ->
       expect(editor).toHaveClass 'vim-mode'
@@ -31,7 +35,7 @@ describe "VimState", ->
 
   describe "command-mode", ->
     it "stops propagation on key events would otherwise insert a character", ->
-      keydown('\\', element: editor[0])
+      keydown('\\')
       expect(editor.getText()).toEqual('')
 
     # FIXME: See atom/vim-mode#2
@@ -47,44 +51,44 @@ describe "VimState", ->
       expect(editor.getCursorScreenPosition()).toEqual [1,0]
 
     it "clears the operator stack when commands can't be composed", ->
-      keydown('d', element: editor[0])
+      keydown('d')
       expect(vimState.opStack.length).toBe 1
-      keydown('x', element: editor[0])
+      keydown('x')
       expect(vimState.opStack.length).toBe 0
 
-      keydown('d', element: editor[0])
+      keydown('d')
       expect(vimState.opStack.length).toBe 1
-      keydown('\\', element: editor[0])
+      keydown('\\')
       expect(vimState.opStack.length).toBe 0
 
     describe "the escape keybinding", ->
       it "clears the operator stack", ->
-        keydown('d', element: editor[0])
+        keydown('d')
         expect(vimState.opStack.length).toBe 1
 
-        keydown('escape', element: editor[0])
+        keydown('escape')
         expect(vimState.opStack.length).toBe 0
 
     describe "the ctrl-c keybinding", ->
       it "clears the operator stack", ->
-        keydown('d', element: editor[0])
+        keydown('d')
         expect(vimState.opStack.length).toBe 1
 
-        keydown('c', ctrl: true, element: editor[0])
+        keydown('c', ctrl: true)
         expect(vimState.opStack.length).toBe 0
 
     describe "the i keybinding", ->
       it "puts the editor into insert mode", ->
         expect(editor).not.toHaveClass 'insert-mode'
 
-        keydown('i', element: editor[0])
+        keydown('i')
 
         expect(editor).toHaveClass 'insert-mode'
         expect(editor).not.toHaveClass 'command-mode'
 
   describe "insert-mode", ->
     beforeEach ->
-      keydown('i', element: editor[0])
+      keydown('i')
 
     it "allows the cursor to reach the end of the line", ->
       editor.setText("012345\n\nabcdef")
@@ -97,7 +101,7 @@ describe "VimState", ->
     it "puts the editor into command mode when <escape> is pressed", ->
       expect(editor).not.toHaveClass 'command-mode'
 
-      keydown('escape', element: editor[0])
+      keydown('escape')
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
@@ -105,7 +109,7 @@ describe "VimState", ->
     it "puts the editor into command mode when <ctrl-c> is pressed", ->
       expect(editor).not.toHaveClass 'command-mode'
 
-      keydown('c', ctrl: true, element: editor[0])
+      keydown('c', ctrl: true)
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
