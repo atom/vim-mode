@@ -159,7 +159,7 @@ class MoveToLine extends Motion
 
   select: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
-    @editor.setSelectedBufferRange(@selectRows(row, row+(count-1)))
+    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1)))
 
     _.times count, ->
       true
