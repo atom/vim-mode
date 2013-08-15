@@ -1,7 +1,7 @@
 RootView = require 'root-view'
 Keymap = require 'keymap'
 
-fdescribe "VimMode", ->
+describe "VimMode", ->
   [editor, originalKeymap] = []
 
   beforeEach ->
