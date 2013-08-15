@@ -381,7 +381,7 @@ describe "Operators", ->
       expect(vimState.getRegister('a').text).toBe "012 345\n"
 
   describe "the p keybinding", ->
-    describe 'character', ->
+    describe "character", ->
       beforeEach ->
         editor.getBuffer().setText "012\n"
         editor.setCursorScreenPosition [0, 0]
@@ -402,7 +402,7 @@ describe "Operators", ->
         expect(editor.getText()).toBe "0a12\n"
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
-    describe 'linewise', ->
+    describe "linewise", ->
       beforeEach ->
         editor.getBuffer().setText("012\n")
         editor.setCursorScreenPosition([0, 1])
@@ -428,7 +428,7 @@ describe "Operators", ->
         expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
   describe "the P keybinding", ->
-    describe 'character', ->
+    describe "character", ->
       beforeEach ->
         editor.getBuffer().setText("012\n")
         editor.setCursorScreenPosition([0, 0])
@@ -449,7 +449,7 @@ describe "Operators", ->
         expect(editor.getText()).toBe "a012\n"
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
-    describe 'linewise', ->
+    describe "linewise", ->
       beforeEach ->
         editor.getBuffer().setText("012\n")
         editor.setCursorScreenPosition([0, 1])
