@@ -32,6 +32,7 @@ them useful as no one person uses all of vim's functionality.
 * [Overview](docs/overview.md)
 * [Motions](docs/motions.md)
 * [Operators](docs/operators.md)
+* [Commands](docs/commands.md)
 
 ### Development
 
