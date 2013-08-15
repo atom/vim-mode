@@ -17,87 +17,81 @@ describe "VimState", ->
     options.element ?= editor[0]
     helpers.keydown(key, options)
 
-  describe "initialize", ->
+  describe "initialization", ->
     it "puts the editor in command-mode initially", ->
       expect(editor).toHaveClass 'vim-mode'
       expect(editor).toHaveClass 'command-mode'
 
   describe "command-mode", ->
-    it "stops propagation on key events would otherwise insert a character", ->
-      keydown('\\')
-      expect(editor.getText()).toEqual ''
+    describe "when entering an insertable character", ->
+      beforeEach -> keydown('\\')
 
-    # FIXME: See atom/vim-mode#2
-    xit "does not allow the cursor to be placed on the \n character, unless the line is empty", ->
-      editor.setText("012345\n\nabcdef")
-      editor.setCursorScreenPosition([0, 5])
-      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      it "stops propagation", ->
+        expect(editor.getText()).toEqual ''
 
-      editor.setCursorScreenPosition([0, 6])
-      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+    describe "when entering an operator", ->
+      beforeEach -> keydown('d')
 
-      editor.setCursorScreenPosition([1, 0])
-      expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+      describe "with an operator that can't be composed", ->
+        beforeEach -> keydown('x')
 
-    it "clears the operator stack when commands can't be composed", ->
-      keydown('d')
-      expect(vimState.opStack.length).toBe 1
-      keydown('x')
-      expect(vimState.opStack.length).toBe 0
+        it "clears the operator stack", ->
+          expect(vimState.opStack.length).toBe 0
 
-      keydown('d')
-      expect(vimState.opStack.length).toBe 1
-      keydown('\\')
-      expect(vimState.opStack.length).toBe 0
+      describe "the escape keybinding", ->
+        beforeEach -> keydown('escape')
 
-    describe "the escape keybinding", ->
-      it "clears the operator stack", ->
-        keydown('d')
-        expect(vimState.opStack.length).toBe 1
+        it "clears the operator stack", ->
+          expect(vimState.opStack.length).toBe 0
 
-        keydown('escape')
-        expect(vimState.opStack.length).toBe 0
+      describe "the ctrl-c keybinding", ->
+        beforeEach -> keydown('c', ctrl: true)
 
-    describe "the ctrl-c keybinding", ->
-      it "clears the operator stack", ->
-        keydown('d')
-        expect(vimState.opStack.length).toBe 1
-
-        keydown('c', ctrl: true)
-        expect(vimState.opStack.length).toBe 0
+        it "clears the operator stack", ->
+          expect(vimState.opStack.length).toBe 0
 
     describe "the i keybinding", ->
+      beforeEach -> keydown('i')
+
       it "puts the editor into insert mode", ->
-        expect(editor).not.toHaveClass 'insert-mode'
-
-        keydown('i')
-
         expect(editor).toHaveClass 'insert-mode'
         expect(editor).not.toHaveClass 'command-mode'
 
+    describe "with content", ->
+      beforeEach -> editor.setText("012345\n\nabcdef")
+
+      # FIXME: See atom/vim-mode#2
+      xdescribe "on a line with content", ->
+        beforeEach -> editor.setCursorScreenPosition([0, 6])
+
+        it "does not allow the cursor to be placed on the \n character", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
+      describe "on an empty line", ->
+        beforeEach -> editor.setCursorScreenPosition([1, 0])
+
+        it "allows the cursor to be placed on the \n character", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
   describe "insert-mode", ->
-    beforeEach ->
-      keydown('i')
+    beforeEach -> keydown('i')
 
-    it "allows the cursor to reach the end of the line", ->
-      editor.setText("012345\n\nabcdef")
-      editor.setCursorScreenPosition([0, 5])
-      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+    describe "with content", ->
+      beforeEach -> editor.setText("012345\n\nabcdef")
 
-      editor.setCursorScreenPosition([0, 6])
-      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+      describe "on a line with content", ->
+        beforeEach -> editor.setCursorScreenPosition([0, 6])
+
+        it "allows the cursor to be placed on the \n character", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "puts the editor into command mode when <escape> is pressed", ->
-      expect(editor).not.toHaveClass 'command-mode'
-
       keydown('escape')
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
 
     it "puts the editor into command mode when <ctrl-c> is pressed", ->
-      expect(editor).not.toHaveClass 'command-mode'
-
       keydown('c', ctrl: true)
 
       expect(editor).toHaveClass 'command-mode'
