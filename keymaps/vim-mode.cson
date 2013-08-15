@@ -1,6 +1,3 @@
-'body':
-  'meta-alt-ctrl-o': 'vim-mode:toggle'
-
 '.vim-mode.insert-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
