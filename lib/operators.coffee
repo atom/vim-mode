@@ -2,7 +2,7 @@ _ = require 'underscore'
 
 class OperatorError
   constructor: (@message) ->
-    @name = "Operator Error"
+    @name = 'Operator Error'
 
 class Operator
   vimState: null
@@ -27,7 +27,7 @@ class Operator
   # Returns nothing.
   compose: (motion) ->
     if not motion.select
-      throw new OperatorError("Must compose with a motion")
+      throw new OperatorError('Must compose with a motion')
 
     @motion = motion
     @complete = true
@@ -97,7 +97,7 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
-    text = ""
+    text = ''
     type = if @motion.isLinewise then 'linewise' else 'character'
     originalPosition = @editor.getCursorScreenPosition()
 

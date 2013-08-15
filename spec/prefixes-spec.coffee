@@ -19,7 +19,7 @@ describe "Prefixes", ->
 
   describe "the Repeat prefix", ->
     it "repeats the following operation N times", ->
-      editor.setText("12345")
+      editor.setText('12345')
       editor.setCursorScreenPosition([0, 1])
 
       keydown('3')
@@ -27,7 +27,7 @@ describe "Prefixes", ->
 
       expect(editor.getText()).toBe '15'
 
-      editor.setText("123456789abc")
+      editor.setText('123456789abc')
       editor.setCursorScreenPosition([0, 0])
       keydown('1')
       keydown('0')
@@ -36,7 +36,7 @@ describe "Prefixes", ->
       expect(editor.getText()).toBe 'bc'
 
     it "repeats the following motion N times", ->
-      editor.setText("one two three")
+      editor.setText('one two three')
       editor.setCursorScreenPosition([0, 0])
 
       keydown('d')

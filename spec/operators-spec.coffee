@@ -46,7 +46,7 @@ describe "Operators", ->
 
   describe "the s keybinding", ->
     beforeEach ->
-      editor.setText("012345")
+      editor.setText('012345')
       editor.setCursorScreenPosition([0, 1])
 
     it "deletes the character to the right and enters insert mode", ->
@@ -76,7 +76,7 @@ describe "Operators", ->
       expect(editor.getText()).toBe "12345\n\nABCDE"
       expect(editor.getCursorScreenPosition()).toEqual [1, 0]
       expect(vimState.getRegister('"').text).toBe "abcde\n"
-      expect(vimState.getRegister('"').type).toBe "linewise"
+      expect(vimState.getRegister('"').type).toBe 'linewise'
 
   describe "the d keybinding", ->
     describe "when followed by a d", ->
@@ -150,23 +150,23 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
       it "deletes to the beginning of the next word", ->
-        editor.setText("abcd efg")
+        editor.setText('abcd efg')
         editor.setCursorScreenPosition([0, 2])
 
         keydown('d')
         keydown('w')
 
-        expect(editor.getText()).toBe "abefg"
+        expect(editor.getText()).toBe 'abefg'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
-        editor.setText("one two three four")
+        editor.setText('one two three four')
         editor.setCursorScreenPosition([0, 0])
 
         keydown('d')
         keydown('3')
         keydown('w')
 
-        expect(editor.getText()).toBe "four"
+        expect(editor.getText()).toBe 'four'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "when followed by a b", ->
@@ -177,17 +177,17 @@ describe "Operators", ->
         keydown('d')
         keydown('b')
 
-        expect(editor.getText()).toBe "cd efg"
+        expect(editor.getText()).toBe 'cd efg'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-        editor.setText("one two three four")
+        editor.setText('one two three four')
         editor.setCursorScreenPosition([0, 11])
 
         keydown('d')
         keydown('3')
         keydown('b')
 
-        expect(editor.getText()).toBe "ee four"
+        expect(editor.getText()).toBe 'ee four'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
   describe "the D keybinding", ->
@@ -256,54 +256,54 @@ describe "Operators", ->
 
     describe "when followed by a w", ->
       it "deletes to the beginning of the next word and enters insert mode", ->
-        editor.setText("abcd efg")
+        editor.setText('abcd efg')
         editor.setCursorScreenPosition([0, 2])
 
         keydown('c')
         keydown('w')
 
-        expect(editor.getText()).toBe "ab efg"
+        expect(editor.getText()).toBe 'ab efg'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
         keydown('escape')
 
-        editor.setText("one two three four")
+        editor.setText('one two three four')
         editor.setCursorScreenPosition([0, 0])
 
         keydown('c')
         keydown('3')
         keydown('w')
 
-        expect(editor.getText()).toBe "four"
+        expect(editor.getText()).toBe 'four'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
     describe "when followed by a b", ->
       it "deletes to the beginning of the previous word and enters insert mode", ->
-        editor.setText("abcd efg")
+        editor.setText('abcd efg')
         editor.setCursorScreenPosition [0, 2]
 
         keydown('c')
         keydown('b')
 
-        expect(editor.getText()).toBe "cd efg"
+        expect(editor.getText()).toBe 'cd efg'
         expect(editor.getCursorScreenPosition()).toEqual [0,0]
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
         keydown('escape')
 
-        editor.setText("one two three four")
+        editor.setText('one two three four')
         editor.setCursorScreenPosition([0, 11])
 
         keydown('c')
         keydown('3')
         keydown('b')
 
-        expect(editor.getText()).toBe "ee four"
+        expect(editor.getText()).toBe 'ee four'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
@@ -353,7 +353,7 @@ describe "Operators", ->
       keydown('y')
       keydown('w')
 
-      expect(vimState.getRegister('"').text).toBe "345"
+      expect(vimState.getRegister('"').text).toBe '345'
 
   describe "the Y keybinding", ->
     beforeEach ->
@@ -385,8 +385,8 @@ describe "Operators", ->
       beforeEach ->
         editor.getBuffer().setText "012\n"
         editor.setCursorScreenPosition [0, 0]
-        vimState.setRegister('"', text: "345")
-        vimState.setRegister('a', text: "a")
+        vimState.setRegister('"', text: '345')
+        vimState.setRegister('a', text: 'a')
 
       it "inserts the contents of the default register", ->
         keydown('p')
@@ -418,7 +418,7 @@ describe "Operators", ->
       it "handles repeats", ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1, 1])
-        vimState.setRegister('"', text: "123")
+        vimState.setRegister('"', text: '123')
 
         keydown('2')
         keydown('p')
@@ -432,8 +432,8 @@ describe "Operators", ->
       beforeEach ->
         editor.getBuffer().setText("012\n")
         editor.setCursorScreenPosition([0, 0])
-        vimState.setRegister('"', text: "345")
-        vimState.setRegister('a', text: "a")
+        vimState.setRegister('"', text: '345')
+        vimState.setRegister('a', text: 'a')
 
       it "inserts the contents of the default register", ->
         keydown('P', shift: true)

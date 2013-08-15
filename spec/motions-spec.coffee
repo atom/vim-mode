@@ -31,7 +31,7 @@ describe "Motions", ->
       keydown('y')
       keydown('h')
 
-      expect(vimState.getRegister('"').text).toBe "a"
+      expect(vimState.getRegister('"').text).toBe 'a'
       expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the j keybinding", ->
@@ -95,14 +95,14 @@ describe "Motions", ->
       keydown('y')
       keydown('w')
 
-      expect(vimState.getRegister('"').text).toBe "b  "
+      expect(vimState.getRegister('"').text).toBe 'b  '
 
       editor.setCursorScreenPosition([0, 2])
 
       keydown('y')
       keydown('w')
 
-      expect(vimState.getRegister('"').text).toBe "  "
+      expect(vimState.getRegister('"').text).toBe '  '
 
   describe "the e keybinding", ->
     it "moves the cursor to the end of the current word", ->
@@ -136,14 +136,14 @@ describe "Motions", ->
       keydown('y')
       keydown('e')
 
-      expect(vimState.getRegister('"').text).toBe "ab"
+      expect(vimState.getRegister('"').text).toBe 'ab'
 
       editor.setCursorScreenPosition([0, 2])
 
       keydown('y')
       keydown('e')
 
-      expect(vimState.getRegister('"').text).toBe "  cde1"
+      expect(vimState.getRegister('"').text).toBe '  cde1'
 
   describe "the } keybinding", ->
     beforeEach ->
@@ -213,7 +213,7 @@ describe "Motions", ->
       keydown('y')
       keydown('b')
 
-      expect(vimState.getRegister('"').text).toBe "ab"
+      expect(vimState.getRegister('"').text).toBe 'ab'
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
       editor.setCursorScreenPosition([0, 4])
@@ -221,7 +221,7 @@ describe "Motions", ->
       keydown('y')
       keydown('b')
 
-      expect(vimState.getRegister('"').text).toBe "ab  "
+      expect(vimState.getRegister('"').text).toBe 'ab  '
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
   describe "the ^ keybinding", ->
