@@ -106,7 +106,7 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
       describe "when the second d is prefixed by a count", ->
-        it "deletes n lines, starting from the current", ->
+        beforeEach ->
           editor.setText("12345\nabcde\nABCDE\nQWERT")
           editor.setCursorScreenPosition([1,1])
 
@@ -114,8 +114,16 @@ describe "Operators", ->
           keydown('2', element: editor[0])
           keydown('d', element: editor[0])
 
+        it "deletes n lines, starting from the current", ->
           expect(editor.getText()).toBe "12345\nQWERT"
           expect(editor.getCursorScreenPosition()).toEqual([1,0])
+
+        describe "with undo", ->
+          beforeEach ->
+            keydown('u', element: editor[0])
+
+          it "undoes both lines", ->
+            expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
     describe "when followed by an h", ->
       it "deletes the previous letter on the current line", ->
@@ -406,6 +414,19 @@ describe "Operators", ->
         expect(editor.getText()).toBe "012\n 345\n"
         expect(editor.getCursorScreenPosition()).toEqual [1,1]
 
+    describe "undo behavior", ->
+      it "handles repeats", ->
+        editor.setText("12345\nabcde\nABCDE\nQWERT")
+        editor.setCursorScreenPosition([1,1])
+        vimState.setRegister('"', text: "123")
+
+        keydown('2', element: editor[0])
+        keydown('p', element: editor[0])
+
+        keydown('u', element: editor[0])
+
+        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
+
   describe "the P keybinding", ->
     describe 'character', ->
       beforeEach ->
@@ -498,6 +519,18 @@ describe "Operators", ->
       keydown('J', shift: true, element: editor[0])
 
       expect(editor.getText()).toBe "012 456\n"
+
+    describe "undo behavior", ->
+      it "handles repeats", ->
+        editor.setText("12345\nabcde\nABCDE\nQWERT")
+        editor.setCursorScreenPosition([1,1])
+
+        keydown('2', element: editor[0])
+        keydown('J', shift: true, element: editor[0])
+
+        keydown('u', element: editor[0])
+
+        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
   describe "the > keybinding", ->
     describe "when followed by a >", ->

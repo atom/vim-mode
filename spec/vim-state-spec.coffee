@@ -82,45 +82,6 @@ describe "VimState", ->
         expect(editor).toHaveClass 'insert-mode'
         expect(editor).not.toHaveClass 'command-mode'
 
-  describe "undo", ->
-    describe "delete operator", ->
-      it "handles repeats", ->
-        editor.setText("12345\nabcde\nABCDE\nQWERT")
-        editor.setCursorScreenPosition([1,1])
-
-        keydown('d', element: editor[0])
-        keydown('2', element: editor[0])
-        keydown('d', element: editor[0])
-
-        keydown('u', element: editor[0])
-
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
-
-    describe "put operator", ->
-      it "handles repeats", ->
-        editor.setText("12345\nabcde\nABCDE\nQWERT")
-        editor.setCursorScreenPosition([1,1])
-        vimState.setRegister('"', text: "123")
-
-        keydown('2', element: editor[0])
-        keydown('p', element: editor[0])
-
-        keydown('u', element: editor[0])
-
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
-
-    describe "join operator", ->
-      it "handles repeats", ->
-        editor.setText("12345\nabcde\nABCDE\nQWERT")
-        editor.setCursorScreenPosition([1,1])
-
-        keydown('2', element: editor[0])
-        keydown('J', shift: true, element: editor[0])
-
-        keydown('u', element: editor[0])
-
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
-
   describe "insert-mode", ->
     beforeEach ->
       keydown('i', element: editor[0])
