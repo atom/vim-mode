@@ -368,7 +368,7 @@ describe "VimState", ->
         keydown('y', element: editor[0])
 
         expect(vimState.getRegister('"').text).toBe text
-        expect(editor.getCursorScreenPosition()).toEqual([0,4])
+        expect(editor.getCursorScreenPosition()).toEqual([0,0])
         expect(editor.activeEditSession.isFoldedAtBufferRow()).toBe true
 
       describe "when the second y is prefixed by a count", ->
