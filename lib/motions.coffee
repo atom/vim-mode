@@ -100,6 +100,13 @@ class MoveToEndOfWord extends Motion
       @editor.selectToScreenPosition(screenPosition)
       true
 
+  # Private: Finds the end of the current word and stops on the last character
+  #
+  # exclusive - If true will stop on the last character of the word rather than
+  #             the next character after the word.
+  #
+  # The reason this is implemented here is that Atom always stops on the
+  # character after the word which is only sometimes what vim means.
   nextBufferPosition: ({exclusive}={})->
     cursor = @editor.getCursor()
     current = cursor.getBufferPosition()
