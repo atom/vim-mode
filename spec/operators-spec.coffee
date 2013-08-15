@@ -52,22 +52,22 @@ describe "Operators", ->
       expect(editor.getText()).toBe "012345\n\nabcdef"
 
   describe "the s keybinding", ->
-    it "deletes the character to the right and enters insert mode", ->
-      editor.setText("012345")
-      editor.setCursorScreenPosition([0, 0])
-
-      keydown('s', element: editor[0])
-      expect(editor).toHaveClass 'insert-mode'
-      expect(editor.getText()).toBe '12345'
-      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-      expect(vimState.getRegister('"').text).toBe '0'
-
-    it "deletes count characters to the right and enters insert mode", ->
+    beforeEach ->
       editor.setText("012345")
       editor.setCursorScreenPosition([0, 1])
 
+    it "deletes the character to the right and enters insert mode", ->
+      keydown('s', element: editor[0])
+
+      expect(editor).toHaveClass 'insert-mode'
+      expect(editor.getText()).toBe '02345'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+      expect(vimState.getRegister('"').text).toBe '1'
+
+    it "deletes count characters to the right and enters insert mode", ->
       keydown('3', element: editor[0])
       keydown('s', element: editor[0])
+
       expect(editor).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe '045'
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
@@ -93,6 +93,7 @@ describe "Operators", ->
 
         keydown('d', element: editor[0])
         keydown('d', element: editor[0])
+
         expect(editor.getText()).toBe "12345\n\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
         expect(vimState.getRegister('"').text).toBe "abcde\n"
@@ -100,30 +101,32 @@ describe "Operators", ->
       it "deletes the last line", ->
         editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([2,1])
+
         keydown('d', element: editor[0])
         keydown('d', element: editor[0])
+
         expect(editor.getText()).toBe "12345\nabcde"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
 
-      describe "when the second d is prefixed by a count", ->
+    describe "when the second d is prefixed by a count", ->
+      beforeEach ->
+        editor.setText("12345\nabcde\nABCDE\nQWERT")
+        editor.setCursorScreenPosition([1,1])
+
+        keydown('d', element: editor[0])
+        keydown('2', element: editor[0])
+        keydown('d', element: editor[0])
+
+      it "deletes n lines, starting from the current", ->
+        expect(editor.getText()).toBe "12345\nQWERT"
+        expect(editor.getCursorScreenPosition()).toEqual([1,0])
+
+      describe "with undo", ->
         beforeEach ->
-          editor.setText("12345\nabcde\nABCDE\nQWERT")
-          editor.setCursorScreenPosition([1,1])
+          keydown('u', element: editor[0])
 
-          keydown('d', element: editor[0])
-          keydown('2', element: editor[0])
-          keydown('d', element: editor[0])
-
-        it "deletes n lines, starting from the current", ->
-          expect(editor.getText()).toBe "12345\nQWERT"
-          expect(editor.getCursorScreenPosition()).toEqual([1,0])
-
-        describe "with undo", ->
-          beforeEach ->
-            keydown('u', element: editor[0])
-
-          it "undoes both lines", ->
-            expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
+        it "undoes both lines", ->
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
     describe "when followed by an h", ->
       it "deletes the previous letter on the current line", ->
@@ -206,40 +209,44 @@ describe "Operators", ->
 
   describe "the c keybinding", ->
     describe "when followed by a c", ->
-      it "deletes the current line and enters insert mode", ->
+      beforeEach ->
         editor.setText("12345\nabcde\nABCDE")
+
+      it "deletes the current line and enters insert mode", ->
         editor.setCursorScreenPosition([1,1])
 
         keydown('c', element: editor[0])
         keydown('c', element: editor[0])
+
         expect(editor.getText()).toBe "12345\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
       it "deletes the last line and enters insert mode", ->
-        editor.setText("12345\nabcde\nABCDE")
         editor.setCursorScreenPosition([2,1])
+
         keydown('c', element: editor[0])
         keydown('c', element: editor[0])
+
         expect(editor.getText()).toBe "12345\nabcde"
         expect(editor.getCursorScreenPosition()).toEqual([1,0])
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
-      describe "when the second c is prefixed by a count", ->
-        it "deletes n lines, starting from the current, and enters insert mode", ->
-          editor.setText("12345\nabcde\nABCDE\nQWERT")
-          editor.setCursorScreenPosition([1,1])
+    describe "when the second c is prefixed by a count", ->
+      it "deletes n lines, starting from the current, and enters insert mode", ->
+        editor.setText("12345\nabcde\nABCDE\nQWERT")
+        editor.setCursorScreenPosition([1,1])
 
-          keydown('c', element: editor[0])
-          keydown('2', element: editor[0])
-          keydown('c', element: editor[0])
+        keydown('c', element: editor[0])
+        keydown('2', element: editor[0])
+        keydown('c', element: editor[0])
 
-          expect(editor.getText()).toBe "12345\nQWERT"
-          expect(editor.getCursorScreenPosition()).toEqual([1,0])
-          expect(editor).not.toHaveClass 'command-mode'
-          expect(editor).toHaveClass 'insert-mode'
+        expect(editor.getText()).toBe "12345\nQWERT"
+        expect(editor.getCursorScreenPosition()).toEqual([1,0])
+        expect(editor).not.toHaveClass 'command-mode'
+        expect(editor).toHaveClass 'insert-mode'
 
     describe "when followed by an h", ->
       it "deletes the previous letter on the current line and enters insert mode", ->
@@ -499,6 +506,7 @@ describe "Operators", ->
 
     it "switches to insert mode and shifts to the right", ->
       editor.setCursorScreenPosition [0, 0]
+
       keydown('a', element: editor[0])
 
       expect(editor.getCursorScreenPosition()).toEqual [0,1]
@@ -506,6 +514,7 @@ describe "Operators", ->
 
     it "doesn't linewrap", ->
       editor.setCursorScreenPosition [0, 3]
+
       keydown('a', element: editor[0])
 
       expect(editor.getCursorScreenPosition()).toEqual [0,3]
