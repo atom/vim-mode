@@ -211,7 +211,7 @@ class MoveToStartOfFile extends MoveToLine
   execute: (count=1) ->
     super(count)
 
-module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord,
-  MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine,
-  MoveToLastCharacterOfLine, MoveToLine, MoveToBeginningOfLine, MoveToStartOfFile,
-  MoveToEndOfWord }
+module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown,
+  MoveToPreviousWord, MoveToNextWord, MoveToEndOfWord, MoveToNextParagraph,
+  MoveToLine, MoveToBeginningOfLine, MoveToFirstCharacterOfLine,
+  MoveToLastCharacterOfLine, MoveToStartOfFile }
