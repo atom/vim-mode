@@ -56,7 +56,7 @@ class MoveDown extends Motion
 
 class MoveToPreviousWord extends Motion
   execute: (count=1) ->
-    _.time count, =>
+    _.times count, =>
       @editor.moveCursorToBeginningOfWord()
 
   select: (count=1) ->
