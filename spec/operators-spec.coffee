@@ -18,60 +18,55 @@ describe "Operators", ->
     helpers.keydown(key, options)
 
   describe "the x keybinding", ->
-    it "deletes a character", ->
-      editor.setText("012345")
-      editor.setCursorScreenPosition([0, 4])
+    describe "on a line with content", ->
+      beforeEach ->
+        editor.setText("012345")
+        editor.setCursorScreenPosition([0, 4])
 
-      keydown('x')
-      expect(editor.getText()).toBe '01235'
-      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
-      expect(vimState.getRegister('"').text).toBe '4'
+      it "deletes a character", ->
+        keydown('x')
+        expect(editor.getText()).toBe '01235'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+        expect(vimState.getRegister('"').text).toBe '4'
 
-      keydown('x')
-      expect(editor.getText()).toBe '0123'
-      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
-      expect(vimState.getRegister('"').text).toBe '5'
+        keydown('x')
+        expect(editor.getText()).toBe '0123'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+        expect(vimState.getRegister('"').text).toBe '5'
 
-      keydown('x')
-      expect(editor.getText()).toBe '012'
-      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
-      expect(vimState.getRegister('"').text).toBe '3'
+        keydown('x')
+        expect(editor.getText()).toBe '012'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+        expect(vimState.getRegister('"').text).toBe '3'
 
-    it "deletes nothing when cursor is on empty line", ->
-      editor.getBuffer().setText "012345\n\nabcdef"
-      editor.setCursorScreenPosition [1, 0]
+    describe "on an empty line", ->
+      beforeEach ->
+        editor.setText("012345\n\nabcdef")
+        editor.setCursorScreenPosition([1, 0])
+        keydown('x')
 
-      keydown('x')
-      expect(editor.getText()).toBe "012345\n\nabcdef"
+      it "deletes nothing when cursor is on empty line", ->
+        expect(editor.getText()).toBe "012345\n\nabcdef"
 
   describe "the s keybinding", ->
     beforeEach ->
       editor.setText('012345')
       editor.setCursorScreenPosition([0, 1])
-
-    it "deletes the character to the right and enters insert mode", ->
       keydown('s')
 
+    it "deletes the character to the right and enters insert mode", ->
       expect(editor).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe '02345'
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
       expect(vimState.getRegister('"').text).toBe '1'
 
-    it "deletes count characters to the right and enters insert mode", ->
-      keydown('3')
-      keydown('s')
-
-      expect(editor).toHaveClass 'insert-mode'
-      expect(editor.getText()).toBe '045'
-      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-      expect(vimState.getRegister('"').text).toBe '123'
-
   describe "the S keybinding", ->
-    it "deletes the entire line and enters insert mode", ->
+    beforeEach ->
       editor.setText("12345\nabcde\nABCDE")
       editor.setCursorScreenPosition([1, 3])
-
       keydown('S', shift: true)
+
+    it "deletes the entire line and enters insert mode", ->
       expect(editor).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe "12345\n\nABCDE"
       expect(editor.getCursorScreenPosition()).toEqual [1, 0]
@@ -101,7 +96,7 @@ describe "Operators", ->
         expect(editor.getText()).toBe "12345\nabcde"
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
-    describe "when the second d is prefixed by a count", ->
+    describe "undo behavior", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1,1])
@@ -110,33 +105,10 @@ describe "Operators", ->
         keydown('2')
         keydown('d')
 
-      it "deletes n lines, starting from the current", ->
-        expect(editor.getText()).toBe "12345\nQWERT"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+        keydown('u')
 
-      describe "with undo", ->
-        beforeEach ->
-          keydown('u')
-
-        it "undoes both lines", ->
-          expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
-
-    describe "when followed by an h", ->
-      it "deletes the previous letter on the current line", ->
-        editor.setText("abcd\n01234")
-        editor.setCursorScreenPosition([1, 1])
-
-        keydown('d')
-        keydown('h')
-
-        expect(editor.getText()).toBe "abcd\n1234"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
-
-        keydown('d')
-        keydown('h')
-
-        expect(editor.getText()).toBe "abcd\n1234"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+      it "undoes both lines", ->
+        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
     describe "when followed by a w", ->
       it "deletes the next word until the end of the line", ->
@@ -169,35 +141,13 @@ describe "Operators", ->
         expect(editor.getText()).toBe 'four'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-    describe "when followed by a b", ->
-      it "deletes to the beginning of the previous word", ->
-        editor.setText("abcd efg")
-        editor.setCursorScreenPosition [0, 2]
-
-        keydown('d')
-        keydown('b')
-
-        expect(editor.getText()).toBe 'cd efg'
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-
-        editor.setText('one two three four')
-        editor.setCursorScreenPosition([0, 11])
-
-        keydown('d')
-        keydown('3')
-        keydown('b')
-
-        expect(editor.getText()).toBe 'ee four'
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-
   describe "the D keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n")
       editor.setCursorScreenPosition([0, 1])
-
-    it "deletes the contents until the end of the line", ->
       keydown('D', shift: true)
 
+    it "deletes the contents until the end of the line", ->
       expect(editor.getText()).toBe "0\n"
 
   describe "the c keybinding", ->
@@ -227,95 +177,13 @@ describe "Operators", ->
         expect(editor).not.toHaveClass 'command-mode'
         expect(editor).toHaveClass 'insert-mode'
 
-    describe "when the second c is prefixed by a count", ->
-      it "deletes n lines, starting from the current, and enters insert mode", ->
-        editor.setText("12345\nabcde\nABCDE\nQWERT")
-        editor.setCursorScreenPosition([1, 1])
-
-        keydown('c')
-        keydown('2')
-        keydown('c')
-
-        expect(editor.getText()).toBe "12345\nQWERT"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
-        expect(editor).not.toHaveClass 'command-mode'
-        expect(editor).toHaveClass 'insert-mode'
-
-    describe "when followed by an h", ->
-      it "deletes the previous letter on the current line and enters insert mode", ->
-        editor.setText("abcd\n01234")
-        editor.setCursorScreenPosition([1, 1])
-
-        keydown('c')
-        keydown('h')
-
-        expect(editor.getText()).toBe "abcd\n1234"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
-        expect(editor).not.toHaveClass 'command-mode'
-        expect(editor).toHaveClass 'insert-mode'
-
-    describe "when followed by a w", ->
-      it "deletes to the beginning of the next word and enters insert mode", ->
-        editor.setText('abcd efg')
-        editor.setCursorScreenPosition([0, 2])
-
-        keydown('c')
-        keydown('w')
-
-        expect(editor.getText()).toBe 'ab efg'
-        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
-        expect(editor).not.toHaveClass 'command-mode'
-        expect(editor).toHaveClass 'insert-mode'
-
-        keydown('escape')
-
-        editor.setText('one two three four')
-        editor.setCursorScreenPosition([0, 0])
-
-        keydown('c')
-        keydown('3')
-        keydown('w')
-
-        expect(editor.getText()).toBe 'four'
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-        expect(editor).not.toHaveClass 'command-mode'
-        expect(editor).toHaveClass 'insert-mode'
-
-    describe "when followed by a b", ->
-      it "deletes to the beginning of the previous word and enters insert mode", ->
-        editor.setText('abcd efg')
-        editor.setCursorScreenPosition [0, 2]
-
-        keydown('c')
-        keydown('b')
-
-        expect(editor.getText()).toBe 'cd efg'
-        expect(editor.getCursorScreenPosition()).toEqual [0,0]
-        expect(editor).not.toHaveClass 'command-mode'
-        expect(editor).toHaveClass 'insert-mode'
-
-        keydown('escape')
-
-        editor.setText('one two three four')
-        editor.setCursorScreenPosition([0, 11])
-
-        keydown('c')
-        keydown('3')
-        keydown('b')
-
-        expect(editor.getText()).toBe 'ee four'
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-        expect(editor).not.toHaveClass 'command-mode'
-        expect(editor).toHaveClass 'insert-mode'
-
   describe "the C keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n")
       editor.setCursorScreenPosition([0, 1])
-
-    it "deletes the contents until the end of the line and enters insert mode", ->
       keydown('C', shift: true)
 
+    it "deletes the contents until the end of the line and enters insert mode", ->
       expect(editor.getText()).toBe "0\n"
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
       expect(editor).not.toHaveClass 'command-mode'
@@ -326,34 +194,41 @@ describe "Operators", ->
       editor.getBuffer().setText("012 345\nabc\n")
       editor.setCursorScreenPosition([0, 4])
 
-    it "saves the line to the default register", ->
-      keydown('y')
-      keydown('y')
+    describe "when followed by a second y ", ->
+      beforeEach ->
+        keydown('y')
+        keydown('y')
 
-      expect(vimState.getRegister('"').text).toBe "012 345\n"
-      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+      it "saves the line to the default register", ->
+        expect(vimState.getRegister('"').text).toBe "012 345\n"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
-    describe "when the second y is prefixed by a count", ->
-      it "copies n lines, starting from the current", ->
+    describe "when followed with a repeated y", ->
+      beforeEach ->
         keydown('y')
         keydown('2')
         keydown('y')
 
+      it "copies n lines, starting from the current", ->
         expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
-    it "saves the line to the a register", ->
-      keydown('"')
-      keydown('a')
-      keydown('y')
-      keydown('y')
+    describe "with a register", ->
+      beforeEach ->
+        keydown('"')
+        keydown('a')
+        keydown('y')
+        keydown('y')
 
-      expect(vimState.getRegister('a').text).toBe "012 345\n"
+      it "saves the line to the a register", ->
+        expect(vimState.getRegister('a').text).toBe "012 345\n"
 
-    it "saves the first word to the default register", ->
-      keydown('y')
-      keydown('w')
+    describe "with a motion", ->
+      beforeEach ->
+        keydown('y')
+        keydown('w')
 
-      expect(vimState.getRegister('"').text).toBe '345'
+      it "saves the first word to the default register", ->
+        expect(vimState.getRegister('"').text).toBe '345'
 
   describe "the Y keybinding", ->
     beforeEach ->
@@ -366,100 +241,66 @@ describe "Operators", ->
       expect(vimState.getRegister('"').text).toBe "012 345\n"
       expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
-    describe "when prefixed by a count", ->
-      it "copies n lines, starting from the current", ->
-        keydown('2')
-        keydown('Y', shift: true)
-
-        expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
-
-    it "saves the line to the a register", ->
-      keydown('"')
-      keydown('a')
-      keydown('Y', shift: true)
-
-      expect(vimState.getRegister('a').text).toBe "012 345\n"
-
   describe "the p keybinding", ->
-    describe "character", ->
+    describe "with character contents", ->
       beforeEach ->
         editor.getBuffer().setText "012\n"
         editor.setCursorScreenPosition [0, 0]
         vimState.setRegister('"', text: '345')
         vimState.setRegister('a', text: 'a')
 
-      it "inserts the contents of the default register", ->
-        keydown('p')
+      describe "from the default register", ->
+        beforeEach -> keydown('p')
 
-        expect(editor.getText()).toBe "034512\n"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+        it "inserts the contents", ->
+          expect(editor.getText()).toBe "034512\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
-      it "inserts the contents of the 'a' register", ->
-        keydown('"')
-        keydown('a')
-        keydown('p')
+      describe "from a specified register", ->
+        beforeEach ->
+          keydown('"')
+          keydown('a')
+          keydown('p')
 
-        expect(editor.getText()).toBe "0a12\n"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+        it "inserts the contents of the 'a' register", ->
+          expect(editor.getText()).toBe "0a12\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
-    describe "linewise", ->
+    describe "with linewise contents", ->
       beforeEach ->
         editor.getBuffer().setText("012\n")
         editor.setCursorScreenPosition([0, 1])
         vimState.setRegister('"', text: " 345\n", type: 'linewise')
-
-      it "inserts the contents of the default register", ->
         keydown('p')
 
+      it "inserts the contents of the default register", ->
         expect(editor.getText()).toBe "012\n 345\n"
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
     describe "undo behavior", ->
-      it "handles repeats", ->
+      beforeEach ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1, 1])
         vimState.setRegister('"', text: '123')
-
         keydown('2')
         keydown('p')
-
         keydown('u')
 
+      it "handles repeats", ->
         expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
   describe "the P keybinding", ->
-    describe "character", ->
+    describe "with character contents", ->
       beforeEach ->
         editor.getBuffer().setText("012\n")
         editor.setCursorScreenPosition([0, 0])
         vimState.setRegister('"', text: '345')
         vimState.setRegister('a', text: 'a')
-
-      it "inserts the contents of the default register", ->
         keydown('P', shift: true)
 
+      it "inserts the contents of the default register above", ->
         expect(editor.getText()).toBe "345012\n"
         expect(editor.getCursorScreenPosition()).toEqual [0, 3]
-
-      it "inserts the contents of the 'a' register", ->
-        keydown('"')
-        keydown('a')
-        keydown('P', shift: true)
-
-        expect(editor.getText()).toBe "a012\n"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-
-    describe "linewise", ->
-      beforeEach ->
-        editor.getBuffer().setText("012\n")
-        editor.setCursorScreenPosition([0, 1])
-        vimState.setRegister('"', text: " 345\n", type: 'linewise')
-
-      it "inserts the contents of the default register", ->
-        keydown('P', shift: true)
-
-        expect(editor.getText()).toBe " 345\n012\n"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
   describe "the O keybinding", ->
     beforeEach ->
@@ -469,10 +310,9 @@ describe "Operators", ->
 
       editor.getBuffer().setText("  abc\n  012\n")
       editor.setCursorScreenPosition([1, 1])
-
-    it "switches to insert and adds a newline above the current one", ->
       keydown('O', shift: true)
 
+    it "switches to insert and adds a newline above the current one", ->
       expect(editor.getText()).toBe "  abc\n  \n  012\n"
       expect(editor.getCursorScreenPosition()).toEqual [1, 2]
       expect(editor).toHaveClass 'insert-mode'
@@ -485,10 +325,9 @@ describe "Operators", ->
 
       editor.getBuffer().setText("abc\n  012\n")
       editor.setCursorScreenPosition([1, 2])
-
-    it "switches to insert and adds a newline above the current one", ->
       keydown('o')
 
+    it "switches to insert and adds a newline above the current one", ->
       expect(editor.getText()).toBe "abc\n  012\n  \n"
       expect(editor).toHaveClass 'insert-mode'
       expect(editor.getCursorScreenPosition()).toEqual [2, 2]
@@ -497,89 +336,103 @@ describe "Operators", ->
     beforeEach ->
       editor.getBuffer().setText("012\n")
 
-    it "switches to insert mode and shifts to the right", ->
-      editor.setCursorScreenPosition([0, 0])
+    describe "at the beginning of the line", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([0, 0])
+        keydown('a')
 
-      keydown('a')
+      it "switches to insert mode and shifts to the right", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        expect(editor).toHaveClass 'insert-mode'
 
-      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-      expect(editor).toHaveClass 'insert-mode'
+    describe "at the end of the line", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([0, 3])
+        keydown('a')
 
-    it "doesn't linewrap", ->
-      editor.setCursorScreenPosition([0, 3])
-
-      keydown('a')
-
-      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      it "doesn't linewrap", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
   describe "the J keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n    456\n")
       editor.setCursorScreenPosition([0, 1])
 
-    it "deletes the contents until the end of the line", ->
-      keydown('J', shift: true)
+    describe "without repeating", ->
+      beforeEach -> keydown('J', shift: true)
 
-      expect(editor.getText()).toBe "012 456\n"
+      it "joins the contents of the current line with the one below it", ->
+        expect(editor.getText()).toBe "012 456\n"
 
-    describe "undo behavior", ->
-      it "handles repeats", ->
+    describe "with repeating", ->
+      beforeEach ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1, 1])
-
         keydown('2')
         keydown('J', shift: true)
 
-        keydown('u')
+      describe "undo behavior", ->
+        beforeEach -> keydown('u')
 
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
+        it "handles repeats", ->
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
   describe "the > keybinding", ->
+    beforeEach ->
+      editor.setText("12345\nabcde\nABCDE")
+      editor.setCursorScreenPosition([0, 0])
+
     describe "when followed by a >", ->
+      beforeEach ->
+        keydown('>')
+        keydown('>')
+
       it "indents the current line", ->
-        editor.setText("12345\nabcde\nABCDE")
-        editor.setCursorScreenPosition([1, 1])
+        expect(editor.getText()).toBe "  12345\nabcde\nABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
-        keydown('>')
-        keydown('>')
-
-        expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 2]
-
-      it "indents multiple lines at once", ->
-        editor.setText("12345\nabcde\nABCDE")
-        editor.setCursorScreenPosition([0, 0])
-
+    describe "when followed by a repeating >", ->
+      beforeEach ->
         keydown('3')
         keydown('>')
         keydown('>')
 
+      it "indents multiple lines at once", ->
         expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
-        keydown('u')
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+      describe "undo behavior", ->
+        beforeEach -> keydown('u')
+
+        it "outdents all three lines", ->
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE"
 
   describe "the < keybinding", ->
-    describe "when followed by a <", ->
-      it "indents the current line", ->
-        expect(editor.setText("12345\n  abcde\nABCDE"))
-        editor.setCursorScreenPosition([1, 2])
+    beforeEach ->
+      editor.setText("  12345\n  abcde\nABCDE")
+      editor.setCursorScreenPosition([0, 0])
 
+    describe "when followed by a <", ->
+      beforeEach ->
         keydown('<')
         keydown('<')
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+      it "indents the current line", ->
+        expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "when followed by a repeating <", ->
+      beforeEach ->
+        keydown('2')
+        keydown('<')
+        keydown('<')
 
       it "indents multiple lines at once", ->
-        editor.setText("  12345\n  abcde\n  ABCDE")
-        editor.setCursorScreenPosition([0, 0])
-
-        keydown('3')
-        keydown('<')
-        keydown('<')
         expect(editor.getText()).toBe "12345\nabcde\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-        keydown('u')
-        expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
+      describe "undo behavior", ->
+        beforeEach -> keydown('u')
+
+        it "indents both lines", ->
+          expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
