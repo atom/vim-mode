@@ -9,12 +9,12 @@ class Motion
 
 class MoveLeft extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorLeft() if column > 0
 
   select: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
 
       if column > 0
@@ -25,14 +25,14 @@ class MoveLeft extends Motion
 
 class MoveRight extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
       unless column >= lastCharIndex
         @editor.moveCursorRight()
 
   select: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       {start, end} = @editor.getSelectedBufferRange()
       rowLength = @editor.getCursor().getCurrentBufferLine().length
 
@@ -44,29 +44,29 @@ class MoveRight extends Motion
 
 class MoveUp extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorUp() if row > 0
 
 class MoveDown extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
 
 class MoveToPreviousWord extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.time count, =>
       @editor.moveCursorToBeginningOfWord()
 
   select: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.selectToBeginningOfWord()
       true
 
 class MoveToNextWord extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.moveCursorToBeginningOfNextWord()
 
   # Options
@@ -74,7 +74,7 @@ class MoveToNextWord extends Motion
   select: (count=1, {excludeWhitespace}={}) ->
     cursor = @editor.getCursor()
 
-    _.map [1..count], =>
+    _.times count, =>
       current = cursor.getBufferPosition()
       next = cursor.getBeginningOfNextWordBufferPosition()
 
@@ -88,18 +88,25 @@ class MoveToNextWord extends Motion
 class MoveToEndOfWord extends Motion
   execute: (count=1) ->
     cursor = @editor.getCursor()
-    _.map [1..count], =>
+    _.times count, =>
       cursor.setBufferPosition(@nextBufferPosition(exclusive: true))
 
   select: (count=1) ->
     cursor = @editor.getCursor()
 
-    _.map [1..count], =>
+    _.times count, =>
       bufferPosition = @nextBufferPosition()
       screenPosition = @editor.screenPositionForBufferPosition(bufferPosition)
       @editor.selectToScreenPosition(screenPosition)
       true
 
+  # Private: Finds the end of the current word and stops on the last character
+  #
+  # exclusive - If true will stop on the last character of the word rather than
+  #             the next character after the word.
+  #
+  # The reason this is implemented here is that Atom always stops on the
+  # character after the word which is only sometimes what vim means.
   nextBufferPosition: ({exclusive}={})->
     cursor = @editor.getCursor()
     current = cursor.getBufferPosition()
@@ -115,11 +122,11 @@ class MoveToEndOfWord extends Motion
 
 class MoveToNextParagraph extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.setCursorScreenPosition(@nextPosition())
 
   select: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.selectToScreenPosition(@nextPosition())
       true
 
@@ -152,9 +159,9 @@ class MoveToLine extends Motion
 
   select: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
-    @editor.setSelectedBufferRange(@selectRows(row, row+(count-1)))
+    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1)))
 
-    _.map [1..count], (i) =>
+    _.times count, ->
       true
 
    # TODO: This is extracted from TextBuffer#deleteRows. Unfortunately
@@ -179,31 +186,31 @@ class MoveToLine extends Motion
 
 class MoveToBeginningOfLine extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.moveCursorToBeginningOfLine()
 
   select: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.selectToBeginningOfLine()
       true
 
 class MoveToFirstCharacterOfLine extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.moveCursorToFirstCharacterOfLine()
 
   select: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.selectToFirstCharacterOfLine()
       true
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.moveCursorToEndOfLine()
 
   select: (count=1) ->
-    _.map [1..count], =>
+    _.times count, =>
       @editor.selectToEndOfLine()
       true
 
@@ -211,7 +218,7 @@ class MoveToStartOfFile extends MoveToLine
   execute: (count=1) ->
     super(count)
 
-module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToNextWord,
-  MoveToPreviousWord, MoveToNextParagraph, MoveToFirstCharacterOfLine,
-  MoveToLastCharacterOfLine, MoveToLine, MoveToBeginningOfLine, MoveToStartOfFile,
-  MoveToEndOfWord }
+module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown,
+  MoveToPreviousWord, MoveToNextWord, MoveToEndOfWord, MoveToNextParagraph,
+  MoveToLine, MoveToBeginningOfLine, MoveToFirstCharacterOfLine,
+  MoveToLastCharacterOfLine, MoveToStartOfFile }
