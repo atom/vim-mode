@@ -268,25 +268,25 @@ describe "Operators", ->
 
     describe "with linewise contents", ->
       beforeEach ->
-        editor.getBuffer().setText("012\n")
+        editor.getBuffer().setText("012")
         editor.setCursorScreenPosition([0, 1])
         vimState.setRegister('"', text: " 345\n", type: 'linewise')
         keydown('p')
 
       it "inserts the contents of the default register", ->
-        expect(editor.getText()).toBe "012\n 345\n"
+        expect(editor.getText()).toBe "012\n 345"
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
     describe "with multiple linewise contents", ->
       beforeEach ->
-        editor.getBuffer().setText("012\n")
-        editor.setCursorScreenPosition([0, 1])
+        editor.getBuffer().setText("012\nabc")
+        editor.setCursorScreenPosition([1, 0])
         vimState.setRegister('"', text: " 345\n 678\n", type: 'linewise')
         keydown('p')
 
       it "inserts the contents of the default register", ->
-        expect(editor.getText()).toBe "012\n 345\n 678\n"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+        expect(editor.getText()).toBe "012\nabc\n 345\n 678"
+        expect(editor.getCursorScreenPosition()).toEqual [2, 1]
 
     describe "pasting twice", ->
       beforeEach ->
