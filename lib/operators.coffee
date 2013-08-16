@@ -174,19 +174,21 @@ class Put extends Operator
     {text, type} = @vimState.getRegister(@register) || {}
     return unless text
 
-    @undoTransaction =>
-      _.times count, =>
-        if type == 'linewise' and @location == 'after'
-          @editor.moveCursorDown()
-        else if @location == 'after'
-          @editor.moveCursorRight()
+    if @location == 'after'
+      if type == 'linewise'
+        @editor.moveCursorDown()
+      else
+        @editor.moveCursorRight()
 
-        @editor.moveCursorToBeginningOfLine() if type == 'linewise'
-        @editor.insertText(text)
+    if type == 'linewise'
+      @editor.moveCursorToBeginningOfLine()
 
-        if type == 'linewise'
-          @editor.moveCursorUp()
-          @editor.moveCursorToFirstCharacterOfLine()
+    textToInsert = _.times(count, -> text).join('')
+    @editor.insertText(textToInsert)
+
+    if type == 'linewise'
+      @editor.moveCursorUp()
+      @editor.moveCursorToFirstCharacterOfLine()
 
 #
 # It combines the current line with the following line.
