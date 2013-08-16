@@ -59,15 +59,16 @@ class Delete extends Operator
   execute: (count=1) ->
     cursor = @editor.getCursor()
 
-    @undoTransaction =>
-      _.times count, =>
-        if _.last(@motion.select(1, @selectOptions))
-          @editor.getSelection().delete()
+    if _.contains(@motion.select(count, @selectOptions), true)
+      validSelection = true
 
-        @editor.moveCursorLeft() if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
+    if validSelection?
+      @editor.delete()
+      if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
+        @editor.moveCursorLeft()
 
-      if @motion.isLinewise?()
-        @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
+    if @motion.isLinewise?()
+      @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
 #
 # It changes everything selected by the following motion.
