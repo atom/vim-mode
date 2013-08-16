@@ -98,13 +98,13 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
-    text = ''
-    type = if @motion.isLinewise then 'linewise' else 'character'
     originalPosition = @editor.getCursorScreenPosition()
 
-    _.times count, =>
-      if _.last(@motion.select())
-        text += @editor.getSelection().getText()
+    if _.contains(@motion.select(count), true)
+      text = @editor.getSelection().getText()
+    else
+      text = ''
+    type = if @motion.isLinewise?() then 'linewise' else 'character'
 
     @vimState.setRegister(@register, {text, type})
 
