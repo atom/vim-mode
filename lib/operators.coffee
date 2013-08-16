@@ -159,11 +159,11 @@ class Outdent extends Indent
 # It pastes everything contained within the specifed register
 #
 class Put extends Operator
-  direction: 'after'
   register: '"'
-  location: null
 
-  constructor: (@editor, @vimState, {@location, @selectOptions}={}) -> @complete = true
+  constructor: (@editor, @vimState, {@location, @selectOptions}={}) ->
+    @location ?= 'after'
+    @complete = true
 
   # Public: Pastes the text in the given register.
   #
@@ -182,12 +182,13 @@ class Put extends Operator
 
     if type == 'linewise'
       @editor.moveCursorToBeginningOfLine()
+      originalPosition = @editor.getCursorScreenPosition()
 
     textToInsert = _.times(count, -> text).join('')
     @editor.insertText(textToInsert)
 
-    if type == 'linewise'
-      @editor.moveCursorUp()
+    if originalPosition?
+      @editor.setCursorScreenPosition(originalPosition)
       @editor.moveCursorToFirstCharacterOfLine()
 
 #
