@@ -1,3 +1,13 @@
+## 0.2.3 - Not solo anymore
+
+* Major refactoring/cleanup/test speedup.
+* Added 'S' command.
+* Added 'C' operator.
+* Proper undo/redo transactions for repeated commands.
+* Enhance 'G' to take line numbers.
+* Added 'Y' operator.
+* Added 'ctrl-c' to enter command mode.
+
 ## 0.2.2
 
 * Added 's' command.
