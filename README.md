@@ -19,8 +19,8 @@ them useful as no one person uses all of vim's functionality.
 
 * Visual mode
 * Support for marks (including \`.)
+* Support for `q` and `.`
 * Differentiate between 0 for repetition and 0 for motion.
-* Proper undo/redo stack.
 * Block backspace in command mode.
   * Block `ctrl-d` in insert mode.
 * More advanced keymap to support `iw` motion.
@@ -32,6 +32,7 @@ them useful as no one person uses all of vim's functionality.
 * [Overview](docs/overview.md)
 * [Motions](docs/motions.md)
 * [Operators](docs/operators.md)
+* [Commands](docs/commands.md)
 
 ### Development
 

@@ -18,6 +18,9 @@
   * `"ayy` - supports registers (only named a-h, pending more
     advanced atom keymap support)
   * `Y` - linewise
+* Indent/Outdent
+  * `>>` - indent current line one level
+  * `<<` - outdent current line one level
 * [Put](http://vimhelp.appspot.com/change.txt.html#p)
   * `p` - default register
   * `P` - pastes the default register before the current cursor.

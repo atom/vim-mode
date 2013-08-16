@@ -2,6 +2,7 @@ $ = require 'jquery'
 _ = require 'underscore'
 
 operators = require './operators'
+prefixes = require './prefixes'
 commands = require './commands'
 motions = require './motions'
 
@@ -19,8 +20,10 @@ class VimState
 
     @setupCommandMode()
     @registerInsertIntercept()
-    @registerChangeHandler()
     @activateCommandMode()
+
+    project.eachBuffer (buffer) =>
+      @registerChangeHandler(buffer)
 
   # Private: Creates a handle to block insertion while in command mode.
   #
@@ -48,14 +51,13 @@ class VimState
   # last deleted buffer.
   #
   # Returns nothing.
-  registerChangeHandler: ->
-    rootView.eachBuffer (buffer) =>
-      buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
-        return unless @setRegister?
+  registerChangeHandler: (buffer) ->
+    buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
+      return unless @setRegister?
 
-        if newText == ''
-          type = if oldText.lastIndexOf("\n") == oldText.length - 1 then 'linewise' else 'character'
-          @setRegister('"', text: oldText, type: type)
+      if newText == ''
+        type = if oldText.lastIndexOf("\n") == oldText.length - 1 then 'linewise' else 'character'
+        @setRegister('"', text: oldText, type: type)
 
   # Private: Creates the plugin's commands
   #
@@ -96,7 +98,7 @@ class VimState
       'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
       'move-to-line': => new motions.MoveToLine(@editor)
       'register-prefix': (e) => @registerPrefix(e)
-      'numeric-prefix': (e) => @numericPrefix(e)
+      'repeat-prefix': (e) => @repeatPrefix(e)
 
   # Private: A helper to actually register the given commands with the
   # editor.
@@ -210,26 +212,26 @@ class VimState
   resetCommandMode: ->
     @clearOpStack()
 
-  # Private: A generic way to create RegisterPrefix operations based on the event.
+  # Private: A generic way to create a Register prefix based on the event.
   #
-  # e - The event that triggered the RegisterPrefix operation.
+  # e - The event that triggered the Register prefix.
   #
   # Returns nothing.
   registerPrefix: (e) ->
     name = e.keyEvent.keystrokes.split(' ')[1]
-    @pushOperator(new operators.RegisterPrefix(name))
+    @pushOperator(new prefixes.Register(name))
 
-  # Private: A generic way to create NumberPrefix operations based on the event.
+  # Private: A generic way to create a Number prefix based on the event.
   #
-  # e - The event that triggered the NumberPrefix operation.
+  # e - The event that triggered the Number prefix.
   #
   # Returns nothing.
-  numericPrefix: (e) ->
+  repeatPrefix: (e) ->
     num = parseInt(e.keyEvent.keystrokes)
-    if @topOperator() instanceof operators.NumericPrefix
+    if @topOperator() instanceof prefixes.Repeat
       @topOperator().addDigit(num)
     else
-      @pushOperator(new operators.NumericPrefix(num))
+      @pushOperator(new prefixes.Repeat(num))
 
   # Private: A generic way to handle operators that can be repeated for
   # their linewise form.

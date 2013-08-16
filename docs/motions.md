@@ -1,6 +1,7 @@
 ## Implemented Motions
 
 * [w](http://vimhelp.appspot.com/motion.txt.html#w)
+* [e](http://vimhelp.appspot.com/motion.txt.html#e)
 * [b](http://vimhelp.appspot.com/motion.txt.html#b)
 * [h](http://vimhelp.appspot.com/motion.txt.html#h)
 * [j](http://vimhelp.appspot.com/motion.txt.html#j)
