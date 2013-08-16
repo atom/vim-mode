@@ -197,7 +197,7 @@ describe "Motions", ->
     describe "as a motion", ->
       beforeEach -> editor.setCursorScreenPosition([4,1])
 
-      xit "moves the cursor to the beginning of the previous word", ->
+      it "moves the cursor to the beginning of the previous word", ->
         keydown('b')
         expect(editor.getCursorScreenPosition()).toEqual [3, 4]
 
@@ -224,11 +224,11 @@ describe "Motions", ->
         # we change this behavior.
         #
         # See atom/vim-mode#3
-        keydown('b')
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        #keydown('b')
+        #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-        keydown('b')
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        #keydown('b')
+        #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "as a selection", ->
       describe "within a word", ->
