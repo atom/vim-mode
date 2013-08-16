@@ -277,17 +277,23 @@ describe "Operators", ->
         expect(editor.getText()).toBe "012\n 345\n"
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-    describe "undo behavior", ->
+    describe "pasting twice", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1, 1])
         vimState.setRegister('"', text: '123')
         keydown('2')
         keydown('p')
-        keydown('u')
 
-      it "handles repeats", ->
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
+      it "inserts the same line twice", ->
+        expect(editor.getText()).toBe "12345\nab123123cde\nABCDE\nQWERT"
+
+      describe "when undone", ->
+        beforeEach ->
+          keydown('u')
+
+        it "removes both lines", ->
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
   describe "the P keybinding", ->
     describe "with character contents", ->
