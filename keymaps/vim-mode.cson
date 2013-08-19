@@ -31,6 +31,7 @@
   'O': 'vim-mode:insert-above-with-newline'
   'o': 'vim-mode:insert-below-with-newline'
   'a': 'vim-mode:insert-after'
+  'A': 'vim-mode:insert-after-eol'
   'J': 'vim-mode:join'
   'x': 'vim-mode:delete-right'
   's': 'vim-mode:substitute'

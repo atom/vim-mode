@@ -370,6 +370,18 @@ describe "Operators", ->
       it "doesn't linewrap", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
+  describe "the A keybinding", ->
+    beforeEach ->
+      editor.getBuffer().setText("11\n22\n")
+
+    describe "at the beginning of a line", ->
+      it "switches to insert mode at the end of the line", ->
+        editor.setCursorScreenPosition([0,0])
+        keydown('A', shift: true)
+
+        expect(editor).toHaveClass 'insert-mode'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
   describe "the J keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n    456\n")
