@@ -70,6 +70,7 @@ class VimState
       'substitute-line': => new commands.SubstituteLine(@editor, @)
       'insert': => new commands.Insert(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
+      'insert-after-eol': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
