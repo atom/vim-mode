@@ -159,11 +159,11 @@ class Outdent extends Indent
 # It pastes everything contained within the specifed register
 #
 class Put extends Operator
-  direction: 'after'
   register: '"'
-  location: null
 
-  constructor: (@editor, @vimState, {@location, @selectOptions}={}) -> @complete = true
+  constructor: (@editor, @vimState, {@location, @selectOptions}={}) ->
+    @location ?= 'after'
+    @complete = true
 
   # Public: Pastes the text in the given register.
   #
@@ -176,19 +176,35 @@ class Put extends Operator
 
     if @location == 'after'
       if type == 'linewise'
-        @editor.moveCursorDown()
+        if @onLastRow()
+          @editor.moveCursorToEndOfLine()
+
+          originalPosition = @editor.getCursorScreenPosition()
+          originalPosition.row += 1
+        else
+          @editor.moveCursorDown()
       else
         @editor.moveCursorRight()
 
-    if type == 'linewise'
+    if type == 'linewise' and !originalPosition?
       @editor.moveCursorToBeginningOfLine()
+      originalPosition = @editor.getCursorScreenPosition()
 
     textToInsert = _.times(count, -> text).join('')
+    if @location == 'after' and type == 'linewise' and @onLastRow()
+      textToInsert = "\n#{textToInsert.substring(0, textToInsert.length - 1)}"
     @editor.insertText(textToInsert)
 
-    if type == 'linewise'
-      @editor.moveCursorUp()
+    if originalPosition?
+      @editor.setCursorScreenPosition(originalPosition)
       @editor.moveCursorToFirstCharacterOfLine()
+
+  # Private: Helper to determine if the editor is currently on the last row.
+  #
+  # Returns true on the last row and false otherwise.
+  onLastRow: ->
+    {row, column} = @editor.getCursorBufferPosition()
+    row == @editor.getBuffer().getLastRow()
 
 #
 # It combines the current line with the following line.
