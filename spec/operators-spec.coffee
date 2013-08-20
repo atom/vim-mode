@@ -409,32 +409,48 @@ describe "Operators", ->
   describe "the > keybinding", ->
     beforeEach ->
       editor.setText("12345\nabcde\nABCDE")
-      editor.setCursorScreenPosition([0, 0])
 
-    describe "when followed by a >", ->
+    describe "on the last line", ->
       beforeEach ->
-        keydown('>')
-        keydown('>')
+        editor.setCursorScreenPosition([2, 0])
 
-      it "indents the current line", ->
-        expect(editor.getText()).toBe "  12345\nabcde\nABCDE"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      describe "when followed by a >", ->
+        beforeEach ->
+          keydown('>')
+          keydown('>')
 
-    describe "when followed by a repeating >", ->
+        it "indents the current line", ->
+          expect(editor.getText()).toBe "12345\nabcde\n  ABCDE"
+          expect(editor.getCursorScreenPosition()).toEqual [2, 2]
+
+    describe "on the first line", ->
       beforeEach ->
-        keydown('3')
-        keydown('>')
-        keydown('>')
+        editor.setCursorScreenPosition([0, 0])
 
-      it "indents multiple lines at once", ->
-        expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      describe "when followed by a >", ->
+        beforeEach ->
+          keydown('>')
+          keydown('>')
 
-      describe "undo behavior", ->
-        beforeEach -> keydown('u')
+        it "indents the current line", ->
+          expect(editor.getText()).toBe "  12345\nabcde\nABCDE"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
-        it "outdents all three lines", ->
-          expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+      describe "when followed by a repeating >", ->
+        beforeEach ->
+          keydown('3')
+          keydown('>')
+          keydown('>')
+
+        it "indents multiple lines at once", ->
+          expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+        describe "undo behavior", ->
+          beforeEach -> keydown('u')
+
+          it "outdents all three lines", ->
+            expect(editor.getText()).toBe "12345\nabcde\nABCDE"
 
   describe "the < keybinding", ->
     beforeEach ->

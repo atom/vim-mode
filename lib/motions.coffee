@@ -157,9 +157,11 @@ class MoveToLine extends Motion
       @editor.setCursorBufferPosition([@editor.getLineCount() - 1, 0])
     @editor.getCursor().skipLeadingWhitespace()
 
-  select: (count=1) ->
+  # Options
+  #  requireEOL - if true, ensure an end of line character is always selected
+  select: (count=1, {requireEOL}={}) ->
     {row, column} = @editor.getCursorBufferPosition()
-    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1)))
+    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
 
     _.times count, ->
       true
@@ -168,12 +170,12 @@ class MoveToLine extends Motion
    # there isn't a way to call this functionality without actually
    # deleting at the same time. This should be extracted out within atom
    # and the removed here.
-   selectRows: (start, end) =>
+   selectRows: (start, end, {requireEOL}={}) =>
      startPoint = null
      endPoint = null
      buffer = @editor.getBuffer()
      if end == buffer.getLastRow()
-       if start > 0
+       if start > 0 and requireEOL
          startPoint = [start - 1, buffer.lineLengthForRow(start - 1)]
        else
          startPoint = [start, 0]

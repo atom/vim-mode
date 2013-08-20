@@ -50,6 +50,8 @@ class Delete extends Operator
   #            end of line character or not.
   constructor: (@editor, @vimState, {@allowEOL, @selectOptions}={}) ->
     @complete = false
+    @selectOptions ?= {}
+    @selectOptions.requireEOL ?= true
 
   # Public: Deletes the text selected by the given motion.
   #
