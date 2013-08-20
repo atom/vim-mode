@@ -5,6 +5,7 @@ operators = require './operators'
 prefixes = require './prefixes'
 commands = require './commands'
 motions = require './motions'
+utils = require './utils'
 
 module.exports =
 class VimState
@@ -56,8 +57,7 @@ class VimState
       return unless @setRegister?
 
       if newText == ''
-        type = if oldText.lastIndexOf("\n") == oldText.length - 1 then 'linewise' else 'character'
-        @setRegister('"', text: oldText, type: type)
+        @setRegister('"', text: oldText, type: utils.copyType(oldText))
 
   # Private: Creates the plugin's commands
   #
@@ -174,7 +174,7 @@ class VimState
   getRegister: (name) ->
     if name == '*'
       text = pasteboard.read()[0]
-      type = if text[text.length - 1] == "\n" then 'linewise' else 'character'
+      type = utils.copyType(text)
       {text, type}
     else
       @registers[name]
