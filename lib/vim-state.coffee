@@ -172,7 +172,12 @@ class VimState
   # Returns the value of the given register or undefined if it hasn't
   # been set.
   getRegister: (name) ->
-    @registers[name]
+    if name == '*'
+      text = pasteboard.read()[0]
+      type = if text[text.length - 1] == "\n" then 'linewise' else 'character'
+      {text, type}
+    else
+      @registers[name]
 
   # Private: Sets the value of a given register.
   #
@@ -181,7 +186,10 @@ class VimState
   #
   # Returns nothing.
   setRegister: (name, value) ->
-    @registers[name] = value
+    if name == '*'
+      pasteboard.write(value.text)
+    else
+      @registers[name] = value
 
   # Private: Used to enable insert mode.
   #
