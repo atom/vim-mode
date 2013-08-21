@@ -5,6 +5,7 @@ operators = require './operators'
 prefixes = require './prefixes'
 commands = require './commands'
 motions = require './motions'
+utils = require './utils'
 
 module.exports =
 class VimState
@@ -56,8 +57,7 @@ class VimState
       return unless @setRegister?
 
       if newText == ''
-        type = if oldText.lastIndexOf("\n") == oldText.length - 1 then 'linewise' else 'character'
-        @setRegister('"', text: oldText, type: type)
+        @setRegister('"', text: oldText, type: utils.copyType(oldText))
 
   # Private: Creates the plugin's commands
   #
@@ -172,7 +172,12 @@ class VimState
   # Returns the value of the given register or undefined if it hasn't
   # been set.
   getRegister: (name) ->
-    @registers[name]
+    if name == '*'
+      text = pasteboard.read()[0]
+      type = utils.copyType(text)
+      {text, type}
+    else
+      @registers[name]
 
   # Private: Sets the value of a given register.
   #
@@ -181,7 +186,10 @@ class VimState
   #
   # Returns nothing.
   setRegister: (name, value) ->
-    @registers[name] = value
+    if name == '*'
+      pasteboard.write(value.text)
+    else
+      @registers[name] = value
 
   # Private: Used to enable insert mode.
   #

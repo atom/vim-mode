@@ -47,3 +47,17 @@ describe "Prefixes", ->
         keydown('w')
 
         expect(editor.getText()).toBe 'three'
+
+  describe "Register", ->
+    describe "the * register", ->
+      describe "reading", ->
+        it "is the same the system clipboard", ->
+          expect(vimState.getRegister('*').text).toEqual 'initial pasteboard content'
+          expect(vimState.getRegister('*').type).toEqual 'character'
+
+      describe "writing", ->
+        beforeEach ->
+          vimState.setRegister('*', text: 'new content')
+
+        it "overwrites the contents of the system clipboard", ->
+          expect(pasteboard.read()[0]).toEqual 'new content'
