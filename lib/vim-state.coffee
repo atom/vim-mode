@@ -91,8 +91,8 @@ class VimState
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
-      'move-down': => new motions.MoveDown @editor
-      'move-right': => new motions.MoveRight @editor
+      'move-down': => new motions.MoveDown(@editor)
+      'move-right': => new motions.MoveRight(@editor)
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
       'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
