@@ -12,6 +12,7 @@ class VimState
   editor: null
   opStack: null
   mode: null
+  submode: null
   registers: null
 
   constructor: (@editor) ->
@@ -65,6 +66,9 @@ class VimState
   setupCommandMode: ->
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
+      'activate-linewise-visual-mode': => @activateVisualMode('linewise')
+      'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
+      'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
       'reset-command-mode': => @resetCommandMode()
       'substitute': => new commands.Substitute(@editor, @)
       'substitute-line': => new commands.SubstituteLine(@editor, @)
@@ -196,6 +200,7 @@ class VimState
   # Returns nothing.
   activateInsertMode: ->
     @mode = 'insert'
+    @submode = null
     @editor.removeClass('command-mode')
     @editor.addClass('insert-mode')
 
@@ -210,10 +215,24 @@ class VimState
   # Returns nothing.
   activateCommandMode: ->
     @mode = 'command'
-    @editor.removeClass('insert-mode')
+    @submode = null
+    @editor.removeClass('insert-mode visual-mode')
     @editor.addClass('command-mode')
 
     @editor.on 'cursor:position-changed', @moveCursorBeforeNewline
+
+  # Private: Used to enable visual mode.
+  #
+  # type - One of 'characterwise', 'linewise' or 'blockwise'
+  #
+  # Returns nothing.
+  activateVisualMode: (type) ->
+    @mode = 'visual'
+    @submode = type
+    @editor.removeClass('command-mode')
+    @editor.addClass('visual-mode')
+
+    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Resets the command mode back to it's initial state.
   #

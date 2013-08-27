@@ -50,6 +50,30 @@ describe "VimState", ->
         it "clears the operator stack", ->
           expect(vimState.opStack.length).toBe 0
 
+    describe "the v keybinding", ->
+      beforeEach -> keydown('v')
+
+      it "puts the editor into visual characterwise mode", ->
+        expect(editor).toHaveClass 'visual-mode'
+        expect(vimState.submode).toEqual 'characterwise'
+        expect(editor).not.toHaveClass 'command-mode'
+
+    describe "the V keybinding", ->
+      beforeEach -> keydown('V', shift: true)
+
+      it "puts the editor into visual characterwise mode", ->
+        expect(editor).toHaveClass 'visual-mode'
+        expect(vimState.submode).toEqual 'linewise'
+        expect(editor).not.toHaveClass 'command-mode'
+
+    describe "the ctrl-v keybinding", ->
+      beforeEach -> keydown('v', ctrl: true)
+
+      it "puts the editor into visual characterwise mode", ->
+        expect(editor).toHaveClass 'visual-mode'
+        expect(vimState.submode).toEqual 'blockwise'
+        expect(editor).not.toHaveClass 'command-mode'
+
     describe "the i keybinding", ->
       beforeEach -> keydown('i')
 
@@ -96,3 +120,12 @@ describe "VimState", ->
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'insert-mode'
+
+  describe "visual-mode", ->
+    beforeEach -> keydown('v')
+
+    it "puts the editor into command mode when <escape> is pressed", ->
+      keydown('escape')
+
+      expect(editor).toHaveClass 'command-mode'
+      expect(editor).not.toHaveClass 'visual-mode'

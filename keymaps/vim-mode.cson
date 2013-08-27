@@ -2,7 +2,14 @@
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
 
+'.vim-mode.visual-mode:not(.mini)':
+  'escape': 'vim-mode:activate-command-mode'
+  'ctrl-c': 'vim-mode:activate-command-mode'
+
 '.vim-mode.command-mode:not(.mini)':
+  'v': 'vim-mode:activate-characterwise-visual-mode'
+  'V': 'vim-mode:activate-linewise-visual-mode'
+  'ctrl-v': 'vim-mode:activate-blockwise-visual-mode'
   '" a': 'vim-mode:register-prefix'
   '" b': 'vim-mode:register-prefix'
   '" c': 'vim-mode:register-prefix'
