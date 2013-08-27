@@ -66,13 +66,13 @@ class VimState
   setupCommandMode: ->
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
+      'activate-insert-mode': => @activateInsertMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
       'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
       'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
       'reset-command-mode': => @resetCommandMode()
       'substitute': => new commands.Substitute(@editor, @)
       'substitute-line': => new commands.SubstituteLine(@editor, @)
-      'insert': => new commands.Insert(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
       'insert-after-eol': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
@@ -195,17 +195,6 @@ class VimState
     else
       @registers[name] = value
 
-  # Private: Used to enable insert mode.
-  #
-  # Returns nothing.
-  activateInsertMode: ->
-    @mode = 'insert'
-    @submode = null
-    @editor.removeClass('command-mode')
-    @editor.addClass('insert-mode')
-
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
-
   ##############################################################################
   # Commands
   ##############################################################################
@@ -220,6 +209,17 @@ class VimState
     @editor.addClass('command-mode')
 
     @editor.on 'cursor:position-changed', @moveCursorBeforeNewline
+
+  # Private: Used to enable insert mode.
+  #
+  # Returns nothing.
+  activateInsertMode: ->
+    @mode = 'insert'
+    @submode = null
+    @editor.removeClass('command-mode')
+    @editor.addClass('insert-mode')
+
+    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Used to enable visual mode.
   #
