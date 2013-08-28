@@ -5,6 +5,18 @@
 '.vim-mode.visual-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
+  'h': 'vim-mode:select-left'
+  'l': 'vim-mode:select-right'
+  'j': 'vim-mode:move-down'
+  'k': 'vim-mode:move-up'
+  'w': 'vim-mode:move-to-next-word'
+  'e': 'vim-mode:move-to-end-of-word'
+  'b': 'vim-mode:move-to-previous-word'
+  'd': 'vim-mode:delete'
+  'c': 'vim-mode:change'
+  'y': 'vim-mode:yank'
+  '>': 'vim-mode:indent'
+  '<': 'vim-mode:outdent'
 
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
