@@ -12,6 +12,7 @@ class VimState
   editor: null
   opStack: null
   mode: null
+  submode: null
   registers: null
 
   constructor: (@editor) ->
@@ -65,10 +66,13 @@ class VimState
   setupCommandMode: ->
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
+      'activate-insert-mode': => @activateInsertMode()
+      'activate-linewise-visual-mode': => @activateVisualMode('linewise')
+      'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
+      'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
       'reset-command-mode': => @resetCommandMode()
       'substitute': => new commands.Substitute(@editor, @)
       'substitute-line': => new commands.SubstituteLine(@editor, @)
-      'insert': => new commands.Insert(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
       'insert-after-eol': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
@@ -85,10 +89,12 @@ class VimState
       'join': => new operators.Join(@editor)
       'indent': => @linewiseAliasedOperator(operators.Indent)
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
+      'select-left': => new motions.SelectLeft(@editor)
+      'select-right': => new motions.SelectRight(@editor)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
-      'move-down': => new motions.MoveDown @editor
-      'move-right': => new motions.MoveRight @editor
+      'move-down': => new motions.MoveDown(@editor)
+      'move-right': => new motions.MoveRight(@editor)
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
       'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
@@ -116,7 +122,18 @@ class VimState
         possibleOperators = fn(e)
         possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
         for possibleOperator in possibleOperators
+          # Motions in visual mode perform their selections.
+          if @mode == 'visual' and possibleOperator instanceof motions.Motion
+            possibleOperator.origExecute = possibleOperator.execute
+            possibleOperator.execute = possibleOperator.select
+
           @pushOperator(possibleOperator) if possibleOperator?.execute
+
+          # If we've received an operator in visual mode, mark the current
+          # selection as the motion to operate on.
+          if @mode == 'visual' and possibleOperator instanceof operators.Operator
+            @pushOperator(new motions.CurrentSelection(@))
+            @activateCommandMode() if @mode == 'visual'
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
@@ -191,16 +208,6 @@ class VimState
     else
       @registers[name] = value
 
-  # Private: Used to enable insert mode.
-  #
-  # Returns nothing.
-  activateInsertMode: ->
-    @mode = 'insert'
-    @editor.removeClass('command-mode')
-    @editor.addClass('insert-mode')
-
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
-
   ##############################################################################
   # Commands
   ##############################################################################
@@ -210,10 +217,35 @@ class VimState
   # Returns nothing.
   activateCommandMode: ->
     @mode = 'command'
-    @editor.removeClass('insert-mode')
+    @submode = null
+    @editor.removeClass('insert-mode visual-mode')
     @editor.addClass('command-mode')
 
     @editor.on 'cursor:position-changed', @moveCursorBeforeNewline
+
+  # Private: Used to enable insert mode.
+  #
+  # Returns nothing.
+  activateInsertMode: ->
+    @mode = 'insert'
+    @submode = null
+    @editor.removeClass('command-mode visual-mode')
+    @editor.addClass('insert-mode')
+
+    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
+
+  # Private: Used to enable visual mode.
+  #
+  # type - One of 'characterwise', 'linewise' or 'blockwise'
+  #
+  # Returns nothing.
+  activateVisualMode: (type) ->
+    @mode = 'visual'
+    @submode = type
+    @editor.removeClass('command-mode insert-mode')
+    @editor.addClass('visual-mode')
+
+    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Resets the command mode back to it's initial state.
   #
@@ -250,11 +282,9 @@ class VimState
   # Returns nothing.
   linewiseAliasedOperator: (constructor) ->
     if @isOperatorPending(constructor)
-      op = new motions.MoveToLine(@editor)
+      new motions.MoveToLine(@editor)
     else
-      op = new constructor(@editor, @)
-
-    @pushOperator(op)
+      new constructor(@editor, @)
 
   # Private: Check if there is a pending operation of a certain type
   #

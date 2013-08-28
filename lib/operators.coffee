@@ -224,5 +224,5 @@ class Join extends Operator
       _.times count, =>
         @editor.joinLine()
 
-module.exports = { OperatorError, Delete, Change, Yank, Indent, Outdent, Put,
-  Join }
+module.exports = { Operator, OperatorError, Delete, Change, Yank, Indent,
+  Outdent, Put, Join }
