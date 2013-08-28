@@ -6,6 +6,31 @@ class Motion
   constructor: (@editor) ->
   isComplete: -> true
 
+class CurrentSelection extends Motion
+  execute: (count=1) ->
+    _.times(count, -> true)
+
+  select: (count=1) ->
+    _.times(count, -> true)
+
+class SelectLeft extends Motion
+  execute: (count=1) ->
+    @select(count)
+
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectLeft()
+      true
+
+class SelectRight extends Motion
+  execute: (count=1) ->
+    @select(count)
+
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectRight()
+      true
+
 class MoveLeft extends Motion
   execute: (count=1) ->
     _.times count, =>
@@ -47,11 +72,21 @@ class MoveUp extends Motion
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorUp() if row > 0
 
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectUp()
+      true
+
 class MoveDown extends Motion
   execute: (count=1) ->
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
+
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectDown()
+      true
 
 class MoveToPreviousWord extends Motion
   execute: (count=1) ->
@@ -217,7 +252,7 @@ class MoveToStartOfFile extends MoveToLine
   execute: (count=1) ->
     super(count)
 
-module.exports = { Motion, MoveLeft, MoveRight, MoveUp, MoveDown,
-  MoveToPreviousWord, MoveToNextWord, MoveToEndOfWord, MoveToNextParagraph,
-  MoveToLine, MoveToBeginningOfLine, MoveToFirstCharacterOfLine,
-  MoveToLastCharacterOfLine, MoveToStartOfFile }
+module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
+  MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
+  MoveToEndOfWord, MoveToNextParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile }
