@@ -89,6 +89,8 @@ class VimState
       'join': => new operators.Join(@editor)
       'indent': => @linewiseAliasedOperator(operators.Indent)
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
+      'select-left': => new motions.SelectLeft(@editor)
+      'select-right': => new motions.SelectRight(@editor)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
       'move-down': => new motions.MoveDown(@editor)
@@ -120,7 +122,18 @@ class VimState
         possibleOperators = fn(e)
         possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
         for possibleOperator in possibleOperators
+          # Motions in visual mode perform their selections.
+          if @mode == 'visual' and possibleOperator instanceof motions.Motion
+            possibleOperator.origExecute = possibleOperator.execute
+            possibleOperator.execute = possibleOperator.select
+
           @pushOperator(possibleOperator) if possibleOperator?.execute
+
+          # If we've received an operator in visual mode, mark the current
+          # selection as the motion to operate on.
+          if @mode == 'visual' and possibleOperator instanceof operators.Operator
+            @pushOperator(new motions.CurrentSelection(@))
+            @activateCommandMode() if @mode == 'visual'
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
@@ -216,7 +229,7 @@ class VimState
   activateInsertMode: ->
     @mode = 'insert'
     @submode = null
-    @editor.removeClass('command-mode')
+    @editor.removeClass('command-mode visual-mode')
     @editor.addClass('insert-mode')
 
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
@@ -229,7 +242,7 @@ class VimState
   activateVisualMode: (type) ->
     @mode = 'visual'
     @submode = type
-    @editor.removeClass('command-mode')
+    @editor.removeClass('command-mode insert-mode')
     @editor.addClass('visual-mode')
 
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
@@ -269,11 +282,9 @@ class VimState
   # Returns nothing.
   linewiseAliasedOperator: (constructor) ->
     if @isOperatorPending(constructor)
-      op = new motions.MoveToLine(@editor)
+      new motions.MoveToLine(@editor)
     else
-      op = new constructor(@editor, @)
-
-    @pushOperator(op)
+      new constructor(@editor, @)
 
   # Private: Check if there is a pending operation of a certain type
   #

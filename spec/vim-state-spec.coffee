@@ -129,3 +129,22 @@ describe "VimState", ->
 
       expect(editor).toHaveClass 'command-mode'
       expect(editor).not.toHaveClass 'visual-mode'
+
+    describe "motions", ->
+      beforeEach ->
+        editor.setText("012345\n\nabcdef")
+        editor.setCursorScreenPosition([0, 0])
+        keydown('w')
+
+      it "execute instead of select", ->
+        expect(editor.getSelection().getText()).toEqual '012345'
+
+    describe "operators", ->
+      beforeEach ->
+        editor.setText("012345\n\nabcdef")
+        editor.setCursorScreenPosition([0, 0])
+        editor.selectLine()
+        keydown('d')
+
+      it "operate on the current selection", ->
+        expect(editor.getText()).toEqual "\nabcdef"
