@@ -1,7 +1,7 @@
 {
   "name": "vim-mode",
   "main": "./lib/vim-mode",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Provides vim modal control of Atom, currently INCOMPLETE.",
   "repository": {
     "type": "git",
