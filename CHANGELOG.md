@@ -1,3 +1,10 @@
+## 0.3.0 - Visual and Collaborative
+* Compatiblity with atom 0.21
+* Characterwise visual-mode!
+* System copy and paste are now linked to the `*`
+* Implement `A` operator
+* Bugfixes concerning `b` and `P`
+
 ## 0.2.3 - Not solo anymore
 
 * Major refactoring/cleanup/test speedup.
