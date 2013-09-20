@@ -11,7 +11,7 @@
     "url": "https://github.com/atom/vim-mode/issues"
   },
   "engines": {
-    "atom": ">20.0"
+    "atom": ">26.0"
   },
   "publishConfig": {
     "registry": "https://atom.iriscouch.com/registry/_design/app/_rewrite"
