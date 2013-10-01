@@ -1,4 +1,4 @@
-_ = require 'underscore'
+{_} = require 'atom'
 
 class Command
   constructor: (@editor, @vimState) ->

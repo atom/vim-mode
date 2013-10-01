@@ -1,5 +1,4 @@
-$ = require 'jquery'
-_ = require 'underscore'
+{$, _} = require 'atom'
 
 operators = require './operators'
 prefixes = require './prefixes'

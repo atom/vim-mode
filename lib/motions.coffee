@@ -1,6 +1,4 @@
-_ = require 'underscore'
-
-{Point, Range} = require 'telepath'
+{_, Point, Range} = require 'atom'
 
 class Motion
   constructor: (@editor) ->
