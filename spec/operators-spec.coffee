@@ -481,3 +481,24 @@ describe "Operators", ->
 
         it "indents both lines", ->
           expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
+
+  describe "the . keybinding", ->
+    beforeEach ->
+      editor.setText("12\n34\n56\n78")
+      editor.setCursorScreenPosition([0,0])
+
+    it "repeats the last operation", ->
+      keydown '2'
+      keydown 'd'
+      keydown 'd'
+      keydown '.'
+
+      expect(editor.getText()).toBe ""
+
+    it "composes with motions", ->
+      keydown 'd'
+      keydown 'd'
+      keydown '2'
+      keydown '.'
+
+      expect(editor.getText()).toBe "78"

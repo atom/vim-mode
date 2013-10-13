@@ -3,6 +3,7 @@
 class Command
   constructor: (@editor, @vimState) ->
   isComplete: -> true
+  isRecordable: -> false
 
 class InsertAfter extends Command
   execute: (count=1) ->
