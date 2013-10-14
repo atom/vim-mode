@@ -266,6 +266,20 @@ describe "Operators", ->
           expect(editor.getText()).toBe "0a12\n"
           expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+      describe "at the end of a line", ->
+        it "inserts before the current line's newline", ->
+          editor.setText("abcde\none two three")
+          editor.setCursorScreenPosition([1, 4])
+
+          keydown 'd'
+          keydown '$'
+          keydown 'k'
+          keydown '$'
+          keydown 'p'
+
+          expect(editor.getText()).toBe "abcdetwo three\none "
+
+
     describe "with linewise contents", ->
       beforeEach ->
         editor.getBuffer().setText("012")

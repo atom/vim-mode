@@ -186,7 +186,8 @@ class Put extends Operator
         else
           @editor.moveCursorDown()
       else
-        @editor.moveCursorRight()
+        unless @onLastColumn()
+          @editor.moveCursorRight()
 
     if type == 'linewise' and !originalPosition?
       @editor.moveCursorToBeginningOfLine()
@@ -208,6 +209,8 @@ class Put extends Operator
     {row, column} = @editor.getCursorBufferPosition()
     row == @editor.getBuffer().getLastRow()
 
+  onLastColumn: ->
+    @editor.getCursor().isAtEndOfLine()
 #
 # It combines the current line with the following line.
 #
