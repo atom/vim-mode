@@ -80,7 +80,7 @@
   'ctrl-r': 'core:redo'
   'ctrl-u': 'core:page-up'
   'ctrl-d': 'core:page-down'
-  '/': 'command-panel:find-in-file'
+  '/': 'vim-mode:search'
   'n': 'command-panel:repeat-relative-address'
   'N': 'command-panel:repeat-relative-address-in-reverse'
   'ctrl-c': 'vim-mode:reset-command-mode'

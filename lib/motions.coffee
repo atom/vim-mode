@@ -1,4 +1,5 @@
-{_, Point, Range} = require 'atom'
+{_, $$, Point, Range} = require 'atom'
+VimCommandModeInputView = require './vim-command-input-view'
 
 class Motion
   constructor: (@editor) ->
@@ -252,7 +253,17 @@ class MoveToStartOfFile extends MoveToLine
   execute: (count=1) ->
     super(count)
 
+class Search extends Motion
+  execute: (count=1) ->
+    console.log "executing search"
+    @view = new VimCommandModeInputView
+    rootView.vertical.append(@view)
+    window.vcmv = @view
+
+  select: (count=1) ->
+
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToLine, MoveToBeginningOfLine,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile }
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  Search}

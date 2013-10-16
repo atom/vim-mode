@@ -105,6 +105,7 @@ class VimState
       'move-to-line': => new motions.MoveToLine(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
+      'search': (e) => new motions.Search(@editor, @)
 
   # Private: A helper to actually register the given commands with the
   # editor.
