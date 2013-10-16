@@ -3,6 +3,7 @@
 class Motion
   constructor: (@editor) ->
   isComplete: -> true
+  isRecordable: -> false
 
 class CurrentSelection extends Motion
   execute: (count=1) ->
