@@ -18,6 +18,9 @@
   '>': 'vim-mode:indent'
   '<': 'vim-mode:outdent'
 
+'.command-mode-input-field':
+  'enter': 'vim-mode:command-mode-input-confirm'
+
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'

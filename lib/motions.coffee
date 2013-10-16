@@ -257,7 +257,6 @@ class Search extends Motion
   execute: (count=1) ->
     console.log "executing search"
     @view = new VimCommandModeInputView
-    rootView.vertical.append(@view)
     window.vcmv = @view
 
   select: (count=1) ->
