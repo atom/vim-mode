@@ -23,6 +23,7 @@ them useful as no one person uses all of vim's functionality.
   * Blockwise
 * Support for marks (including \`.)
 * Support for `q` and `.`
+  * There is now partial support for `.`, full support is pending atom/atom#962
 * Differentiate between 0 for repetition and 0 for motion.
 * Block backspace in command mode.
   * Block `ctrl-d` in insert mode.
