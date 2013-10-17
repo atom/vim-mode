@@ -11,7 +11,7 @@ class VimCommandModeInputView extends View
     @div class: 'command-mode-input', =>
       @input outlet: "input", class: 'command-mode-input-field'
 
-  initialize: ->
+  initialize: (@motion)->
     pane = rootView.getActivePane()
     statusBar = pane.find('.status-bar')
 
@@ -24,6 +24,17 @@ class VimCommandModeInputView extends View
     @handleEvents()
 
   handleEvents: ->
-    console.log "handling events"
-    @on 'vim-mode:command-mode-input-confirm', =>
-      console.log "someone pressed enter!"
+    @on 'vim-mode:command-mode-input-confirm', @confirm
+    @on 'core:cancel', @remove
+    @on 'core:focus-next', @remove
+    @on 'core:focus-previous', @remove
+
+  confirm: =>
+    window.inp = @input
+    @value = @input[0].value
+    @motion.confirm(@)
+    @remove()
+
+  remove: =>
+    rootView.focus()
+    super()

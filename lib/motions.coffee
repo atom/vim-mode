@@ -255,11 +255,32 @@ class MoveToStartOfFile extends MoveToLine
 
 class Search extends Motion
   execute: (count=1) ->
-    console.log "executing search"
-    @view = new VimCommandModeInputView
-    window.vcmv = @view
+    @count = count
+    @view = new VimCommandModeInputView(@)
+
+  confirm: (view) =>
+    regexp = new RegExp(view.value, 'g')
+    console.log "search completed: #{view.value}"
+    _.times @count, =>
+
+      pos = @editor.getCursorBufferPosition()
+
+      iterator = (item) =>
+        console.log item.range.start
+        console.log pos
+        if (start = item.range.start) > pos
+          @editor.setCursorBufferPosition(start)
+          item.stop()
+
+      @editor.scanInBufferRange(regexp
+                                [[0,0],[Infinity,Infinity]],
+                                iterator)
 
   select: (count=1) ->
+    @count = count
+    @select = true
+    @view = new VimCommandModeInputView(@)
+
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
