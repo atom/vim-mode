@@ -20,6 +20,12 @@ class Operator
   # Returns true if ready to execute and false otherwise.
   isComplete: -> @complete
 
+  # Public: Determines if this command should be recorded in the command
+  # history for repeats.
+  #
+  # Returns true if this command should be recorded.
+  isRecordable: -> true
+
   # Public: Marks this as ready to execute and saves the motion.
   #
   # motion - The motion used to select what to operate on.
@@ -227,5 +233,19 @@ class Join extends Operator
       _.times count, =>
         @editor.joinLine()
 
+#
+# Repeat the last operation
+#
+class Repeat extends Operator
+  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
+
+  isRecordable: -> false
+
+  execute: (count=1) ->
+    @undoTransaction =>
+      _.times count, =>
+        cmd = @vimState.history[0]
+        cmd?.execute()
+
 module.exports = { Operator, OperatorError, Delete, Change, Yank, Indent,
-  Outdent, Put, Join }
+  Outdent, Put, Join, Repeat }

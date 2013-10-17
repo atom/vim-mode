@@ -16,6 +16,7 @@ class VimState
 
   constructor: (@editor) ->
     @opStack = []
+    @history = []
     @registers = {}
     @mode = 'command'
 
@@ -105,6 +106,7 @@ class VimState
       'move-to-line': => new motions.MoveToLine(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
+      'repeat': (e) => new operators.Repeat(@editor, @)
       'search': (e) => new motions.Search(@editor, @)
 
   # Private: A helper to actually register the given commands with the
@@ -174,6 +176,7 @@ class VimState
       catch e
         (e instanceof operators.OperatorError) and @resetCommandMode() or throw e
     else
+      @history.unshift(poppedOperator) if poppedOperator.isRecordable()
       poppedOperator.execute()
 
   # Private: Fetches the last operation.

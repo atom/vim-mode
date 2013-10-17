@@ -1,3 +1,13 @@
+## 0.6.0 - (Pending)
+* Implemented '.' operator, thanks to @bhuga
+* Fix putting at the end of lines, thanks to @bhuga
+
+## 0.5.0 - Updates
+* Switches apm db to cloudant from iriscouch
+
+## 0.4.0 - Updates
+* Compatibilty with Atom 26
+
 ## 0.3.0 - Visual and Collaborative
 * Compatiblity with atom 0.21
 * Characterwise visual-mode!

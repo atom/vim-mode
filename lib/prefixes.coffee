@@ -4,6 +4,8 @@ class Prefix
 
   isComplete: -> @complete
 
+  isRecordable: -> @composedObject.isRecordable()
+
   # Public: Marks this as complete upon receiving an object to compose with.
   #
   # composedObject - The next motion or operator.
