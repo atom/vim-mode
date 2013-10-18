@@ -263,25 +263,26 @@ class Search extends Motion
 
   execute: (count=1) ->
     _.times count, =>
-      pos = @findNext(@view.value)
-      if pos?
+      @findOrBeep (pos) =>
         @editor.setCursorBufferPosition(pos)
-      else
-        shell.beep()
 
   select: (count=1) ->
     _.times count, =>
-      pos = @findNext(@view.value)
-      if pos?
+      @findOrBeep (pos) =>
         cur = @editor.getCursorBufferPosition()
         @editor.setSelectedBufferRange([cur, pos])
         true
-      else
-        shell.beep()
 
   confirm: (view) =>
     window.motion = @
     @editor.trigger 'vim-mode:search-complete'
+
+  findOrBeep: (callback)->
+      pos = @findNext(@view.value)
+      if pos?
+        callback(pos)
+      else
+        shell.beep()
 
   findNext: (term) ->
     regexp = new RegExp(term, 'g')
