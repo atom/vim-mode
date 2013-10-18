@@ -3,7 +3,7 @@ shell = require 'shell'
 VimCommandModeInputView = require './vim-command-input-view'
 
 class Motion
-  constructor: (@editor) ->
+  constructor: (@editor, @state) ->
   isComplete: -> true
   isRecordable: -> false
 
@@ -260,35 +260,46 @@ class Search extends Motion
     @count = count
     @view = new VimCommandModeInputView(@)
 
-  confirm: (view) =>
-    regexp = new RegExp(view.value, 'g')
-    console.log "search completed: #{view.value}"
-    _.times @count, =>
-
-      pos = @editor.getCursorBufferPosition()
-      matchPoints = []
-
-      iterator = (item) =>
-        matchPoints.push(item.range.start)
-
-      @editor.activeEditSession.scan(regexp, iterator)
-
-      previous = (p for p in matchPoints when p < pos)
-      after = (p for p in matchPoints when p >= pos)
-      if after.length > 0
-        @editor.setCursorBufferPosition(after[0])
-      else if previous.length > 0
-        @editor.setCursorBufferPosition(previous[0])
-      else
-
-      window.matchPoints = matchPoints
-      window.pos = pos
-
   select: (count=1) ->
+    console.log "why is this a select? its just a motion."
     @count = count
-    @select = true
+    @selecting = true
     @view = new VimCommandModeInputView(@)
 
+  confirm: (view) =>
+    @state.searchHistory ||= []
+    @state.searchHistory.unshift(view.value)
+    _.times @count, =>
+      pos = @findNext(view.value)
+      if pos?
+        if @selecting
+          cur = @editor.getCursorBufferPosition()
+          @editor.setSelectedBufferRange([cur, pos])
+        else
+          @editor.setCursorBufferPosition(pos)
+
+  findNext: (term) ->
+    regexp = new RegExp(term, 'g')
+    result = null
+
+    pos = @editor.getCursorBufferPosition()
+    matchPoints = []
+
+    iterator = (item) =>
+      matchPoints.push(item.range.start)
+
+    @editor.activeEditSession.scan(regexp, iterator)
+
+    previous = (p for p in matchPoints when p.compare(pos) <= 0)
+    after = (p for p in matchPoints when p.compare(pos) == 1)
+
+    if after.length > 0
+      return after[0]
+    else if previous.length > 0
+      return previous[0]
+    else
+      shell.beep()
+      return null
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,

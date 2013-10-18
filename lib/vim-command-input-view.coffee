@@ -3,11 +3,7 @@
 module.exports =
 
 class VimCommandModeInputView extends View
-  activate: ->
-    console.log "activating"
-
   @content: ->
-    console.log "contenting"
     @div class: 'command-mode-input', =>
       @input outlet: "input", class: 'command-mode-input-field'
 
