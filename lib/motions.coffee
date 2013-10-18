@@ -1,5 +1,4 @@
 {_, $$, Point, Range} = require 'atom'
-shell = require 'shell'
 VimCommandModeInputView = require './vim-command-input-view'
 
 class Motion
@@ -280,7 +279,7 @@ class Search extends Motion
     if pos?
       callback(pos)
     else
-      shell.beep()
+      atom.beep()
 
   scan: (term) ->
     regexp = new RegExp(term, 'g')
