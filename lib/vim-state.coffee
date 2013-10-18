@@ -64,6 +64,9 @@ class VimState
   #
   # Returns nothing.
   setupCommandMode: ->
+    @editor.command 'vim-mode:search', =>
+      @currentSearch = new motions.Search(@editor, @)
+
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
       'activate-insert-mode': => @activateInsertMode()
@@ -107,7 +110,7 @@ class VimState
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
-      'search': (e) => new motions.Search(@editor, @)
+      'search-complete': (e) => @currentSearch
 
   # Private: A helper to actually register the given commands with the
   # editor.

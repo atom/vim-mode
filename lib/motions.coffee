@@ -4,6 +4,8 @@ VimCommandModeInputView = require './vim-command-input-view'
 
 class Motion
   constructor: (@editor, @state) ->
+    @initialize?()
+
   isComplete: -> true
   isRecordable: -> false
 
@@ -256,27 +258,30 @@ class MoveToStartOfFile extends MoveToLine
     super(count)
 
 class Search extends Motion
-  execute: (count=1) ->
-    @count = count
+  initialize: =>
     @view = new VimCommandModeInputView(@)
+
+  execute: (count=1) ->
+    _.times count, =>
+      pos = @findNext(@view.value)
+      if pos?
+        @editor.setCursorBufferPosition(pos)
+      else
+        shell.beep()
 
   select: (count=1) ->
-    console.log "why is this a select? its just a motion."
-    @count = count
-    @selecting = true
-    @view = new VimCommandModeInputView(@)
+    _.times count, =>
+      pos = @findNext(@view.value)
+      if pos?
+        cur = @editor.getCursorBufferPosition()
+        @editor.setSelectedBufferRange([cur, pos])
+        true
+      else
+        shell.beep()
 
   confirm: (view) =>
-    @state.searchHistory ||= []
-    @state.searchHistory.unshift(view.value)
-    _.times @count, =>
-      pos = @findNext(view.value)
-      if pos?
-        if @selecting
-          cur = @editor.getCursorBufferPosition()
-          @editor.setSelectedBufferRange([cur, pos])
-        else
-          @editor.setCursorBufferPosition(pos)
+    window.motion = @
+    @editor.trigger 'vim-mode:search-complete'
 
   findNext: (term) ->
     regexp = new RegExp(term, 'g')
