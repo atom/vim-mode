@@ -276,9 +276,6 @@ class Search extends Motion
     @editor.trigger 'vim-mode:search-complete'
 
   match: (count, callback) ->
-    window.matches = @matches
-    window.count = count
-
     pos = @matches[(count - 1) % @matches.length]
     if pos?
       callback(pos)
