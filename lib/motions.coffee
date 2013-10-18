@@ -262,49 +262,43 @@ class Search extends Motion
     @view = new VimCommandModeInputView(@)
 
   execute: (count=1) ->
-    _.times count, =>
-      @findOrBeep (pos) =>
-        @editor.setCursorBufferPosition(pos)
+    @match count, (pos) =>
+      @editor.setCursorBufferPosition(pos)
 
   select: (count=1) ->
     cur = @editor.getCursorBufferPosition()
-    _.times count, =>
-      @findOrBeep (pos) =>
-        @editor.setSelectedBufferRange([cur, pos])
-        true
+    @match count, (pos) =>
+      @editor.setSelectedBufferRange([cur, pos])
+    [true]
 
   confirm: (view) =>
+    @scan(view.value)
     @editor.trigger 'vim-mode:search-complete'
 
-  findOrBeep: (callback)->
-    pos = @findNext(@view.value)
+  match: (count, callback) ->
+    window.matches = @matches
+    window.count = count
+
+    pos = @matches[(count - 1) % @matches.length]
     if pos?
       callback(pos)
     else
       shell.beep()
 
-  findNext: (term) ->
+  scan: (term) ->
     regexp = new RegExp(term, 'g')
-    result = null
-
-    pos = @editor.getCursorBufferPosition()
+    cur = @editor.getCursorBufferPosition()
     matchPoints = []
-
     iterator = (item) =>
       matchPoints.push(item.range.start)
 
     @editor.activeEditSession.scan(regexp, iterator)
 
-    previous = (p for p in matchPoints when p.compare(pos) <= 0)
-    after = (p for p in matchPoints when p.compare(pos) == 1)
-
-    if after.length > 0
-      return after[0]
-    else if previous.length > 0
-      return previous[0]
-    else
-      shell.beep()
-      return null
+    previous = _.filter matchPoints, (point) ->
+      point.compare(cur) <= 0
+    after = _.difference(matchPoints, previous)
+    after.push(previous...)
+    @matches = after
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
