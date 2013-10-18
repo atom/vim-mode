@@ -1,4 +1,5 @@
 {_, $$, Point, Range} = require 'atom'
+shell = require 'shell'
 VimCommandModeInputView = require './vim-command-input-view'
 
 class Motion
@@ -265,17 +266,23 @@ class Search extends Motion
     _.times @count, =>
 
       pos = @editor.getCursorBufferPosition()
+      matchPoints = []
 
       iterator = (item) =>
-        console.log item.range.start
-        console.log pos
-        if (start = item.range.start) > pos
-          @editor.setCursorBufferPosition(start)
-          item.stop()
+        matchPoints.push(item.range.start)
 
-      @editor.scanInBufferRange(regexp
-                                [[0,0],[Infinity,Infinity]],
-                                iterator)
+      @editor.activeEditSession.scan(regexp, iterator)
+
+      previous = (p for p in matchPoints when p < pos)
+      after = (p for p in matchPoints when p >= pos)
+      if after.length > 0
+        @editor.setCursorBufferPosition(after[0])
+      else if previous.length > 0
+        @editor.setCursorBufferPosition(previous[0])
+      else
+
+      window.matchPoints = matchPoints
+      window.pos = pos
 
   select: (count=1) ->
     @count = count
