@@ -267,9 +267,9 @@ class Search extends Motion
         @editor.setCursorBufferPosition(pos)
 
   select: (count=1) ->
+    cur = @editor.getCursorBufferPosition()
     _.times count, =>
       @findOrBeep (pos) =>
-        cur = @editor.getCursorBufferPosition()
         @editor.setSelectedBufferRange([cur, pos])
         true
 
