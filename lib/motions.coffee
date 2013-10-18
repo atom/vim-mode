@@ -274,15 +274,14 @@ class Search extends Motion
         true
 
   confirm: (view) =>
-    window.motion = @
     @editor.trigger 'vim-mode:search-complete'
 
   findOrBeep: (callback)->
-      pos = @findNext(@view.value)
-      if pos?
-        callback(pos)
-      else
-        shell.beep()
+    pos = @findNext(@view.value)
+    if pos?
+      callback(pos)
+    else
+      shell.beep()
 
   findNext: (term) ->
     regexp = new RegExp(term, 'g')
