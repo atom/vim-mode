@@ -13,7 +13,5 @@
   "engines": {
     "atom": ">26.0"
   },
-  "publishConfig": {
-    "registry": "https://atom.cloudant.com/registry/_design/app/_rewrite"
-  }
+  "private": true
 }
