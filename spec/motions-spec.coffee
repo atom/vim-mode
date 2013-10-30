@@ -354,12 +354,27 @@ describe "Motions", ->
 
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-    describe "the n keybinding", ->
+      it "loops back around", ->
+        editor.setCursorBufferPosition([3, 0])
+        keydown '/'
+        editor.commandModeInputView.input[0].value = 'def'
+        editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
+
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+    describe "repeating", ->
       beforeEach ->
         keydown '/'
         editor.commandModeInputView.input[0].value = 'def'
         editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
 
-      it "repeats the last search", ->
-        keydown 'n'
-        expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+      describe "the n keybinding", ->
+        it "repeats the last search", ->
+          keydown 'n'
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
+      describe "the N keybinding", ->
+        it "repeats the last search backwards", ->
+          editor.setCursorBufferPosition([0, 0])
+          keydown 'N', shift: true
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]

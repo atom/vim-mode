@@ -276,8 +276,8 @@ class Search extends Motion
     @scan()
     @editor.trigger 'vim-mode:search-complete'
 
-  repeat: =>
-    @scan()
+  repeat: (opts = {}) =>
+    @scan(opts.backwards)
     return @
 
   # Private
@@ -289,7 +289,7 @@ class Search extends Motion
       atom.beep()
 
   # Private
-  scan: () ->
+  scan: (reverse = false) ->
     term = @searchTerm
     regexp = new RegExp(term, 'g')
     cur = @editor.getCursorBufferPosition()
@@ -300,9 +300,15 @@ class Search extends Motion
     @editor.activeEditSession.scan(regexp, iterator)
 
     previous = _.filter matchPoints, (point) ->
-      point.compare(cur) <= 0
+      if reverse
+        point.compare(cur) < 0
+      else
+        point.compare(cur) <= 0
+
     after = _.difference(matchPoints, previous)
     after.push(previous...)
+    after = after.reverse() if reverse
+
     @matches = after
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,

@@ -112,6 +112,7 @@ class VimState
       'repeat': (e) => new operators.Repeat(@editor, @)
       'search-complete': (e) => @currentSearch
       'repeat-search': (e) => @currentSearch.repeat()
+      'repeat-search-backwards': (e) => @currentSearch.repeat backwards: true
 
 
   # Private: A helper to actually register the given commands with the
