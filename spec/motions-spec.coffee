@@ -353,3 +353,13 @@ describe "Motions", ->
         editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
 
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+    describe "the n keybinding", ->
+      beforeEach ->
+        keydown '/'
+        editor.commandModeInputView.input[0].value = 'def'
+        editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
+
+      it "repeats the last search", ->
+        keydown 'n'
+        expect(editor.getCursorBufferPosition()).toEqual [3, 0]

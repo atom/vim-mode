@@ -88,6 +88,4 @@
   '?': 'vim-mode:reverse-search'
   'n': 'vim-mode:repeat-search'
   'N': 'vim-mode:repeat-search-backwards'
-  'n': 'command-panel:repeat-relative-address'
-  'N': 'command-panel:repeat-relative-address-in-reverse'
   'ctrl-c': 'vim-mode:reset-command-mode'

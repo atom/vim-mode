@@ -272,9 +272,15 @@ class Search extends Motion
     [true]
 
   confirm: (view) =>
-    @scan(view.value)
+    @searchTerm = view.value
+    @scan()
     @editor.trigger 'vim-mode:search-complete'
 
+  repeat: =>
+    @scan()
+    return @
+
+  # Private
   match: (count, callback) ->
     pos = @matches[(count - 1) % @matches.length]
     if pos?
@@ -282,7 +288,9 @@ class Search extends Motion
     else
       atom.beep()
 
-  scan: (term) ->
+  # Private
+  scan: () ->
+    term = @searchTerm
     regexp = new RegExp(term, 'g')
     cur = @editor.getCursorBufferPosition()
     matchPoints = []
