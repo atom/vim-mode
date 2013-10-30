@@ -337,3 +337,19 @@ describe "Motions", ->
 
       it "moves the cursor to a specified line", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+
+  describe "the / keybinding", ->
+    beforeEach ->
+      editor.setText("abc\ndef\nabc\ndef\n")
+      editor.setCursorBufferPosition([0, 0])
+
+    describe "as a motion", ->
+      it "moves the cursor to the specified search pattern", ->
+        keydown '/'
+
+        # How to simulate typing?
+        editor.commandModeInputView.input[0].value = 'def'
+        # How do I tell the view to simulate'enter'?
+        editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
+
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]

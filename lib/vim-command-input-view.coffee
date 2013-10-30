@@ -8,6 +8,12 @@ class VimCommandModeInputView extends View
       @input outlet: "input", class: 'command-mode-input-field'
 
   initialize: (@motion)->
+    unless rootView?
+      # We're in test mode. Don't append to anything, just initialize.
+      @input.focus()
+      @handleEvents()
+      return
+
     pane = rootView.getActivePane()
     statusBar = pane.find('.status-bar')
 
@@ -26,11 +32,10 @@ class VimCommandModeInputView extends View
     @on 'core:focus-previous', @remove
 
   confirm: =>
-    window.inp = @input
     @value = @input[0].value
     @motion.confirm(@)
     @remove()
 
   remove: =>
-    rootView.focus()
+    rootView.focus() if rootView?
     super()
