@@ -261,6 +261,9 @@ class Search extends Motion
     @view = new VimCommandModeInputView(@)
     @editor.commandModeInputView = @view
 
+  reversed: =>
+    @reverse = true
+
   execute: (count=1) ->
     @match count, (pos) =>
       @editor.setCursorBufferPosition(pos)
@@ -290,6 +293,11 @@ class Search extends Motion
 
   # Private
   scan: (reverse = false) ->
+    if @reverse and reverse
+      reverse = false
+    else
+      reverse = reverse or @reverse
+
     term = @searchTerm
     regexp = new RegExp(term, 'g')
     cur = @editor.getCursorBufferPosition()

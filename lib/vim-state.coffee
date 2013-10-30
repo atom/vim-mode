@@ -66,6 +66,9 @@ class VimState
   setupCommandMode: ->
     @editor.command 'vim-mode:search', =>
       @currentSearch = new motions.Search(@editor, @)
+    @editor.command 'vim-mode:reverse-search', =>
+      @currentSearch = new motions.Search(@editor, @)
+      @currentSearch.reversed()
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
