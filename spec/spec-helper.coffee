@@ -5,11 +5,12 @@ VimState = require '../lib/vim-state'
 originalKeymap = null
 
 cacheEditor = (existingEditor) ->
+  session = window.project.openSync()
   if existingEditor?
-    existingEditor.edit(window.project.open())
+    existingEditor.edit(session)
     existingEditor.vimState.registerChangeHandler(existingEditor.getBuffer())
   else
-    editor = new Editor(project.open())
+    editor = new Editor(session)
     editor.simulateDomAttachment()
     editor.enableKeymap()
 

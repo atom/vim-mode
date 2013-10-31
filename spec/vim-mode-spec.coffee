@@ -5,7 +5,7 @@ describe "VimMode", ->
 
   beforeEach ->
     window.rootView = new RootView
-    rootView.open()
+    rootView.openSync()
     rootView.simulateDomAttachment()
     atom.activatePackage('vim-mode', immediate: true)
 
