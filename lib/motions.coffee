@@ -262,13 +262,15 @@ class Search extends Motion
     @editor.commandModeInputView = @view
 
   reversed: =>
-    @reverse = true
+    @initiallyReversed = @reverse = true
 
   execute: (count=1) ->
+    @scan()
     @match count, (pos) =>
       @editor.setCursorBufferPosition(pos)
 
   select: (count=1) ->
+    @scan()
     cur = @editor.getCursorBufferPosition()
     @match count, (pos) =>
       @editor.setSelectedBufferRange([cur, pos])
@@ -276,11 +278,15 @@ class Search extends Motion
 
   confirm: (view) =>
     @searchTerm = view.value
-    @scan()
     @editor.trigger 'vim-mode:search-complete'
 
   repeat: (opts = {}) =>
-    @scan(opts.backwards)
+    reverse = opts.backwards
+    if @initiallyReversed and reverse
+      @reverse = false
+    else
+      @reverse = reverse or @initiallyReversed
+
     return @
 
   # Private
@@ -292,12 +298,7 @@ class Search extends Motion
       atom.beep()
 
   # Private
-  scan: (reverse = false) ->
-    if @reverse and reverse
-      reverse = false
-    else
-      reverse = reverse or @reverse
-
+  scan: ->
     term = @searchTerm
     regexp = new RegExp(term, 'g')
     cur = @editor.getCursorBufferPosition()
@@ -308,14 +309,14 @@ class Search extends Motion
     @editor.activeEditSession.scan(regexp, iterator)
 
     previous = _.filter matchPoints, (point) ->
-      if reverse
+      if @reverse
         point.compare(cur) < 0
       else
         point.compare(cur) <= 0
 
     after = _.difference(matchPoints, previous)
     after.push(previous...)
-    after = after.reverse() if reverse
+    after = after.reverse() if @reverse
 
     @matches = after
 

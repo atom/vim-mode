@@ -379,7 +379,24 @@ describe "Motions", ->
             keydown 'N', shift: true
             expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
-    fdescribe "when reversed", ->
+      describe "composing", ->
+        it "composes with operators", ->
+          keydown 'd'
+          keydown '/'
+          editor.commandModeInputView.input[0].value = 'def'
+          editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
+          expect(editor.getText()).toEqual "def\nabc\ndef\n"
+
+        it "repeats correctly with operators", ->
+          keydown 'd'
+          keydown '/'
+          editor.commandModeInputView.input[0].value = 'def'
+          editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
+
+          keydown '.'
+          expect(editor.getText()).toEqual "def\n"
+
+    describe "when reversed as ?", ->
       it "moves the cursor backwards to the specified search pattern", ->
         keydown '?'
         editor.commandModeInputView.input[0].value = 'def'
