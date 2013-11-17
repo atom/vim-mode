@@ -1,6 +1,6 @@
 helpers = require './spec-helper'
 
-describe "Motions", ->
+fdescribe "Motions", ->
   [editor, vimState] = []
 
   beforeEach ->

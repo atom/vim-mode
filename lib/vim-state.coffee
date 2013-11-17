@@ -69,6 +69,8 @@ class VimState
     @editor.command 'vim-mode:reverse-search', =>
       @currentSearch = new motions.Search(@editor, @)
       @currentSearch.reversed()
+    @editor.command 'vim-mode:search-history:previous', =>
+      console.log "previous!"
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
@@ -219,6 +221,14 @@ class VimState
       pasteboard.write(value.text)
     else
       @registers[name] = value
+
+  # Public: Append a search to the search history.
+  #
+  # motions.Search - The confirmed search motion to append
+  #
+  # Returns nothing
+  pushSearchHistory: (search) ->
+    @history.push search
 
   ##############################################################################
   # Commands

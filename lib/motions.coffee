@@ -258,7 +258,7 @@ class MoveToStartOfFile extends MoveToLine
 
 class Search extends Motion
   initialize: =>
-    @view = new VimCommandModeInputView(@)
+    @view = new VimCommandModeInputView(@, class: 'search')
     @editor.commandModeInputView = @view
 
   reversed: =>

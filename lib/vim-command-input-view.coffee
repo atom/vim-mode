@@ -7,7 +7,10 @@ class VimCommandModeInputView extends View
     @div class: 'command-mode-input', =>
       @input outlet: "input", class: 'command-mode-input-field'
 
-  initialize: (@motion)->
+  initialize: (@motion, opts = {})->
+    if opts.class?
+      @input.addClass opts.class
+
     unless rootView?
       # We're in test mode. Don't append to anything, just initialize.
       @input.focus()

@@ -20,6 +20,11 @@
 
 '.command-mode-input-field':
   'enter': 'vim-mode:command-mode-input-confirm'
+  'up':    'vim-mode:search-history:previous'
+  'down':  'vim-mode:search-history:next'
+'.command-mode-input-field.search':
+  'up':    'vim-mode:search-history:previous'
+  'down':  'vim-mode:search-history:next'
 
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
