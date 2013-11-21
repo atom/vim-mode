@@ -60,4 +60,4 @@ describe "Prefixes", ->
           vimState.setRegister('*', text: 'new content')
 
         it "overwrites the contents of the system clipboard", ->
-          expect(pasteboard.read()[0]).toEqual 'new content'
+          expect(atom.pasteboard.read()[0]).toEqual 'new content'

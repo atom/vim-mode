@@ -7,7 +7,7 @@ describe "VimMode", ->
     atom.rootView = new RootView
     atom.rootView.openSync()
     atom.rootView.simulateDomAttachment()
-    atom.activatePackage('vim-mode', immediate: true)
+    atom.packages.activatePackage('vim-mode', immediate: true)
 
     editor = atom.rootView.getActiveView()
     editor.enableKeymap()
