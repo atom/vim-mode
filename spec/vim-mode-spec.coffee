@@ -4,12 +4,12 @@ describe "VimMode", ->
   [editor] = []
 
   beforeEach ->
-    window.rootView = new RootView
-    rootView.openSync()
-    rootView.simulateDomAttachment()
+    atom.rootView = new RootView
+    atom.rootView.openSync()
+    atom.rootView.simulateDomAttachment()
     atom.activatePackage('vim-mode', immediate: true)
 
-    editor = rootView.getActiveView()
+    editor = atom.rootView.getActiveView()
     editor.enableKeymap()
 
   describe "initialize", ->

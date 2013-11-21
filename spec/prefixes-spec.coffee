@@ -4,7 +4,7 @@ describe "Prefixes", ->
   [editor, vimState] = []
 
   beforeEach ->
-    vimMode = atom.loadPackage('vim-mode')
+    vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
     editor = helpers.cacheEditor(editor)

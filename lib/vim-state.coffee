@@ -24,7 +24,7 @@ class VimState
     @registerInsertIntercept()
     @activateCommandMode()
 
-    project.eachBuffer (buffer) =>
+    atom.project.eachBuffer (buffer) =>
       @registerChangeHandler(buffer)
 
   # Private: Creates a handle to block insertion while in command mode.
