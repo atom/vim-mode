@@ -261,7 +261,7 @@ class VimState
   #
   # Returns nothing.
   registerPrefix: (e) ->
-    name = e.keyEvent.keystrokes.split(' ')[1]
+    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
     @pushOperator(new prefixes.Register(name))
 
   # Private: A generic way to create a Number prefix based on the event.
@@ -270,7 +270,7 @@ class VimState
   #
   # Returns nothing.
   repeatPrefix: (e) ->
-    num = parseInt(e.keyEvent.keystrokes)
+    num = parseInt(atom.keymap.keystrokeStringForEvent(e.originalEvent))
     if @topOperator() instanceof prefixes.Repeat
       @topOperator().addDigit(num)
     else
