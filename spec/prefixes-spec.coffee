@@ -4,7 +4,7 @@ describe "Prefixes", ->
   [editor, vimState] = []
 
   beforeEach ->
-    vimMode = atom.loadPackage('vim-mode')
+    vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
     editor = helpers.cacheEditor(editor)
@@ -60,4 +60,4 @@ describe "Prefixes", ->
           vimState.setRegister('*', text: 'new content')
 
         it "overwrites the contents of the system clipboard", ->
-          expect(pasteboard.read()[0]).toEqual 'new content'
+          expect(atom.pasteboard.read()[0]).toEqual 'new content'
