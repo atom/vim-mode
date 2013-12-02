@@ -3,8 +3,8 @@ VimState = require './vim-state'
 module.exports =
 
   activate: (state) ->
-    atom.rootView.eachEditor (editor) =>
-      return unless editor.attached
+    atom.workspaceView.eachEditorView (editorView) =>
+      return unless editorView.attached
 
-      editor.addClass('vim-mode')
-      editor.vimState = new VimState(editor)
+      editorView.addClass('vim-mode')
+      editorView.vimState = new VimState(editorView)
