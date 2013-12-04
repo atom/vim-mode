@@ -335,8 +335,8 @@ describe "Operators", ->
 
   describe "the O keybinding", ->
     beforeEach ->
-      spyOn(editor.activeEditSession, 'shouldAutoIndent').andReturn(true)
-      spyOn(editor.activeEditSession, 'autoIndentBufferRow').andCallFake (line) ->
+      spyOn(editor.editor, 'shouldAutoIndent').andReturn(true)
+      spyOn(editor.editor, 'autoIndentBufferRow').andCallFake (line) ->
         editor.indent()
 
       editor.getBuffer().setText("  abc\n  012\n")
@@ -350,8 +350,8 @@ describe "Operators", ->
 
   describe "the o keybinding", ->
     beforeEach ->
-      spyOn(editor.activeEditSession, 'shouldAutoIndent').andReturn(true)
-      spyOn(editor.activeEditSession, 'autoIndentBufferRow').andCallFake (line) ->
+      spyOn(editor.editor, 'shouldAutoIndent').andReturn(true)
+      spyOn(editor.editor, 'autoIndentBufferRow').andCallFake (line) ->
         editor.indent()
 
       editor.getBuffer().setText("abc\n  012\n")
