@@ -1,16 +1,16 @@
-{Editor} = require 'atom'
+{EditorView} = require 'atom'
 
 VimState = require '../lib/vim-state'
 
 originalKeymap = null
 
 cacheEditor = (existingEditor) ->
-  session = window.project.openSync()
+  session = atom.project.openSync()
   if existingEditor?
     existingEditor.edit(session)
     existingEditor.vimState.registerChangeHandler(existingEditor.getBuffer())
   else
-    editor = new Editor(session)
+    editor = new EditorView(session)
     editor.simulateDomAttachment()
     editor.enableKeymap()
 

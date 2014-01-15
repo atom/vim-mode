@@ -1,15 +1,15 @@
-{RootView} = require 'atom'
+{WorkspaceView} = require 'atom'
 
 describe "VimMode", ->
   [editor] = []
 
   beforeEach ->
-    window.rootView = new RootView
-    rootView.openSync()
-    rootView.simulateDomAttachment()
-    atom.activatePackage('vim-mode', immediate: true)
+    atom.workspaceView = new WorkspaceView
+    atom.workspaceView.openSync()
+    atom.workspaceView.simulateDomAttachment()
+    atom.packages.activatePackage('vim-mode', immediate: true)
 
-    editor = rootView.getActiveView()
+    editor = atom.workspaceView.getActiveView()
     editor.enableKeymap()
 
   describe "initialize", ->
