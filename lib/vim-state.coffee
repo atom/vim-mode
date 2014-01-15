@@ -17,6 +17,7 @@ class VimState
   constructor: (@editor) ->
     @opStack = []
     @history = []
+    @searchHistory = []
     @registers = {}
     @mode = 'command'
 
@@ -228,7 +229,7 @@ class VimState
   #
   # Returns nothing
   pushSearchHistory: (search) ->
-    @history.push search
+    @searchHistory.push search
 
   ##############################################################################
   # Commands
