@@ -1,20 +1,21 @@
 helpers = require './spec-helper'
 
 describe "Prefixes", ->
-  [editor, vimState] = []
+  [editor, editorView, vimState] = []
 
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    editor = helpers.cacheEditor(editor)
+    editorView = helpers.cacheEditor(editorView)
+    editor = editorView.editor
 
-    vimState = editor.vimState
+    vimState = editorView.vimState
     vimState.activateCommandMode()
     vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
-    options.element ?= editor[0]
+    options.element ?= editorView[0]
     helpers.keydown(key, options)
 
   describe "Repeat", ->
@@ -52,7 +53,7 @@ describe "Prefixes", ->
     describe "the * register", ->
       describe "reading", ->
         it "is the same the system clipboard", ->
-          expect(vimState.getRegister('*').text).toEqual 'initial pasteboard content'
+          expect(vimState.getRegister('*').text).toEqual 'initial clipboard content'
           expect(vimState.getRegister('*').type).toEqual 'character'
 
       describe "writing", ->
@@ -60,4 +61,4 @@ describe "Prefixes", ->
           vimState.setRegister('*', text: 'new content')
 
         it "overwrites the contents of the system clipboard", ->
-          expect(atom.pasteboard.read()[0]).toEqual 'new content'
+          expect(atom.clipboard.read()).toEqual 'new content'

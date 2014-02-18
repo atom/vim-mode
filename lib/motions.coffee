@@ -168,9 +168,9 @@ class MoveToNextParagraph extends Motion
   # If no paragraph is found, the end of the buffer is returned.
   nextPosition: ->
     start = @editor.getCursorBufferPosition()
-    scanRange = [start, @editor.getEofPosition()]
+    scanRange = [start, @editor.getEofBufferPosition()]
 
-    {row, column} = @editor.getEofPosition()
+    {row, column} = @editor.getEofBufferPosition()
     position = new Point(row, column - 1)
 
     @editor.scanInBufferRange /^$/g, scanRange, ({range, stop}) =>

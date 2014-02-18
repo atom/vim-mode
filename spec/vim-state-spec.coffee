@@ -1,26 +1,27 @@
 helpers = require './spec-helper'
 
 describe "VimState", ->
-  [editor, vimState] = []
+  [editor, editorView, vimState] = []
 
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    editor = helpers.cacheEditor(editor)
+    editorView = helpers.cacheEditor(editorView)
+    editor = editorView.editor
 
-    vimState = editor.vimState
+    vimState = editorView.vimState
     vimState.activateCommandMode()
     vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
-    options.element ?= editor[0]
+    options.element ?= editorView[0]
     helpers.keydown(key, options)
 
   describe "initialization", ->
     it "puts the editor in command-mode initially", ->
-      expect(editor).toHaveClass 'vim-mode'
-      expect(editor).toHaveClass 'command-mode'
+      expect(editorView).toHaveClass 'vim-mode'
+      expect(editorView).toHaveClass 'command-mode'
 
   describe "command-mode", ->
     describe "when entering an insertable character", ->
@@ -54,32 +55,32 @@ describe "VimState", ->
       beforeEach -> keydown('v')
 
       it "puts the editor into visual characterwise mode", ->
-        expect(editor).toHaveClass 'visual-mode'
+        expect(editorView).toHaveClass 'visual-mode'
         expect(vimState.submode).toEqual 'characterwise'
-        expect(editor).not.toHaveClass 'command-mode'
+        expect(editorView).not.toHaveClass 'command-mode'
 
     describe "the V keybinding", ->
       beforeEach -> keydown('V', shift: true)
 
       it "puts the editor into visual characterwise mode", ->
-        expect(editor).toHaveClass 'visual-mode'
+        expect(editorView).toHaveClass 'visual-mode'
         expect(vimState.submode).toEqual 'linewise'
-        expect(editor).not.toHaveClass 'command-mode'
+        expect(editorView).not.toHaveClass 'command-mode'
 
     describe "the ctrl-v keybinding", ->
       beforeEach -> keydown('v', ctrl: true)
 
       it "puts the editor into visual characterwise mode", ->
-        expect(editor).toHaveClass 'visual-mode'
+        expect(editorView).toHaveClass 'visual-mode'
         expect(vimState.submode).toEqual 'blockwise'
-        expect(editor).not.toHaveClass 'command-mode'
+        expect(editorView).not.toHaveClass 'command-mode'
 
     describe "the i keybinding", ->
       beforeEach -> keydown('i')
 
       it "puts the editor into insert mode", ->
-        expect(editor).toHaveClass 'insert-mode'
-        expect(editor).not.toHaveClass 'command-mode'
+        expect(editorView).toHaveClass 'insert-mode'
+        expect(editorView).not.toHaveClass 'command-mode'
 
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
@@ -112,14 +113,14 @@ describe "VimState", ->
     it "puts the editor into command mode when <escape> is pressed", ->
       keydown('escape')
 
-      expect(editor).toHaveClass 'command-mode'
-      expect(editor).not.toHaveClass 'insert-mode'
+      expect(editorView).toHaveClass 'command-mode'
+      expect(editorView).not.toHaveClass 'insert-mode'
 
     it "puts the editor into command mode when <ctrl-c> is pressed", ->
       keydown('c', ctrl: true)
 
-      expect(editor).toHaveClass 'command-mode'
-      expect(editor).not.toHaveClass 'insert-mode'
+      expect(editorView).toHaveClass 'command-mode'
+      expect(editorView).not.toHaveClass 'insert-mode'
 
   describe "visual-mode", ->
     beforeEach -> keydown('v')
@@ -127,8 +128,8 @@ describe "VimState", ->
     it "puts the editor into command mode when <escape> is pressed", ->
       keydown('escape')
 
-      expect(editor).toHaveClass 'command-mode'
-      expect(editor).not.toHaveClass 'visual-mode'
+      expect(editorView).toHaveClass 'command-mode'
+      expect(editorView).not.toHaveClass 'visual-mode'
 
     describe "motions", ->
       beforeEach ->
