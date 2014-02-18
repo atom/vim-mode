@@ -1,20 +1,21 @@
 helpers = require './spec-helper'
 
 describe "Motions", ->
-  [editor, vimState] = []
+  [editor, editorView, vimState] = []
 
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    editor = helpers.cacheEditor(editor)
+    editorView = helpers.cacheEditor(editorView)
+    editor = editorView.editor
 
-    vimState = editor.vimState
+    vimState = editorView.vimState
     vimState.activateCommandMode()
     vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
-    options.element ?= editor[0]
+    options.element ?= editorView[0]
     helpers.keydown(key, options)
 
   describe "simple motions", ->

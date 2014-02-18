@@ -4,20 +4,22 @@ VimState = require '../lib/vim-state'
 
 originalKeymap = null
 
-cacheEditor = (existingEditor) ->
+cacheEditor = (existingEditorView) ->
   session = atom.project.openSync()
-  if existingEditor?
-    existingEditor.edit(session)
-    existingEditor.vimState.registerChangeHandler(existingEditor.getBuffer())
+  if existingEditorView?
+    existingEditorView.edit(session)
+    existingEditorView.vimState = new VimState(existingEditorView)
+    existingEditorView.bindKeys()
+    existingEditorView.enableKeymap()
   else
-    editor = new EditorView(session)
-    editor.simulateDomAttachment()
-    editor.enableKeymap()
+    editorView = new EditorView(session)
+    editorView.simulateDomAttachment()
+    editorView.enableKeymap()
 
-    editor.addClass('vim-mode')
-    editor.vimState = new VimState(editor)
+    editorView.addClass('vim-mode')
+    editorView.vimState = new VimState(editorView)
 
-  existingEditor or editor
+  existingEditorView or editorView
 
 keydown = (key, {element, ctrl, shift, alt, meta}={}) ->
   dispatchKeyboardEvent = (target, eventArgs...) ->

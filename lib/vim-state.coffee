@@ -14,7 +14,8 @@ class VimState
   submode: null
   registers: null
 
-  constructor: (@editor) ->
+  constructor: (@editorView) ->
+    @editor = @editorView.editor
     @opStack = []
     @history = []
     @registers = {}
@@ -40,7 +41,7 @@ class VimState
   #
   # Returns nothing.
   registerInsertIntercept: ->
-    @editor.preempt 'textInput', (e) =>
+    @editorView.preempt 'textInput', (e) =>
       return if $(e.currentTarget).hasClass('mini')
 
       if @mode == 'insert'
@@ -119,7 +120,7 @@ class VimState
   handleCommands: (commands) ->
     _.each commands, (fn, commandName) =>
       eventName = "vim-mode:#{commandName}"
-      @editor.command eventName, (e) =>
+      @editorView.command eventName, (e) =>
         possibleOperators = fn(e)
         possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
         for possibleOperator in possibleOperators
@@ -220,10 +221,10 @@ class VimState
   activateCommandMode: ->
     @mode = 'command'
     @submode = null
-    @editor.removeClass('insert-mode visual-mode')
-    @editor.addClass('command-mode')
+    @editorView.removeClass('insert-mode visual-mode')
+    @editorView.addClass('command-mode')
 
-    @editor.on 'cursor:position-changed', @moveCursorBeforeNewline
+    @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Used to enable insert mode.
   #
@@ -231,10 +232,10 @@ class VimState
   activateInsertMode: ->
     @mode = 'insert'
     @submode = null
-    @editor.removeClass('command-mode visual-mode')
-    @editor.addClass('insert-mode')
+    @editorView.removeClass('command-mode visual-mode')
+    @editorView.addClass('insert-mode')
 
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Used to enable visual mode.
   #
@@ -244,8 +245,8 @@ class VimState
   activateVisualMode: (type) ->
     @mode = 'visual'
     @submode = type
-    @editor.removeClass('command-mode insert-mode')
-    @editor.addClass('visual-mode')
+    @editorView.removeClass('command-mode insert-mode')
+    @editorView.addClass('visual-mode')
 
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
