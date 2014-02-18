@@ -1,6 +1,7 @@
-## 0.6.0 - (Pending)
+## 0.6.0 - Updates
 * Implemented '.' operator, thanks to @bhuga
 * Fix putting at the end of lines, thanks to @bhuga
+* Compatibility with Atom 0.50.0
 
 ## 0.5.0 - Updates
 * Switches apm db to cloudant from iriscouch
