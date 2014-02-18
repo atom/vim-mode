@@ -52,7 +52,7 @@ describe "Prefixes", ->
     describe "the * register", ->
       describe "reading", ->
         it "is the same the system clipboard", ->
-          expect(vimState.getRegister('*').text).toEqual 'initial pasteboard content'
+          expect(vimState.getRegister('*').text).toEqual 'initial clipboard content'
           expect(vimState.getRegister('*').type).toEqual 'character'
 
       describe "writing", ->
@@ -60,4 +60,4 @@ describe "Prefixes", ->
           vimState.setRegister('*', text: 'new content')
 
         it "overwrites the contents of the system clipboard", ->
-          expect(atom.pasteboard.read()[0]).toEqual 'new content'
+          expect(atom.clipboard.read()).toEqual 'new content'

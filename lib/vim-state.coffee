@@ -192,7 +192,7 @@ class VimState
   # been set.
   getRegister: (name) ->
     if name == '*'
-      text = atom.pasteboard.read()[0]
+      text = atom.clipboard.read()
       type = utils.copyType(text)
       {text, type}
     else
@@ -206,7 +206,7 @@ class VimState
   # Returns nothing.
   setRegister: (name, value) ->
     if name == '*'
-      atom.pasteboard.write(value.text)
+      atom.clipboard.write(value.text)
     else
       @registers[name] = value
 
