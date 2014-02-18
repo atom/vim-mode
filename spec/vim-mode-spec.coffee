@@ -1,18 +1,21 @@
 {WorkspaceView} = require 'atom'
 
 describe "VimMode", ->
-  [editor] = []
+  [editorView] = []
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView
     atom.workspaceView.openSync()
     atom.workspaceView.simulateDomAttachment()
-    atom.packages.activatePackage('vim-mode', immediate: true)
 
-    editor = atom.workspaceView.getActiveView()
-    editor.enableKeymap()
+    waitsForPromise ->
+      atom.packages.activatePackage('vim-mode')
+
+    runs ->
+      editorView = atom.workspaceView.getActiveView()
+      editorView.enableKeymap()
 
   describe "initialize", ->
     it "puts the editor in command-mode initially", ->
-      expect(editor).toHaveClass 'vim-mode'
-      expect(editor).toHaveClass 'command-mode'
+      expect(editorView).toHaveClass 'vim-mode'
+      expect(editorView).toHaveClass 'command-mode'
