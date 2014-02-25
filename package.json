@@ -6,7 +6,7 @@
   "private": true,
   "repository": "https://github.com/atom/vim-mode",
   "engines": {
-    "atom": ">26.0"
+    "atom": ">0.50.0"
   },
   "dependencies": {
     "underscore-plus": "1.x"
