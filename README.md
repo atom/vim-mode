@@ -1,5 +1,7 @@
 ## Vim Mode package
 
+:rotating_light: Package is experimental :rotating_light:
+
 Provides vim modal control to Atom.
 
 ### Installing
