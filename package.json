@@ -3,6 +3,7 @@
   "main": "./lib/vim-mode",
   "version": "0.6.0",
   "description": "Provides vim modal control of Atom, currently INCOMPLETE.",
+  "license": "MIT",
   "private": true,
   "repository": "https://github.com/atom/vim-mode",
   "engines": {
