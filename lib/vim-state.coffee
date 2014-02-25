@@ -1,4 +1,5 @@
-{$, _} = require 'atom'
+_ = require 'underscore-plus'
+{$} = require 'atom'
 
 operators = require './operators'
 prefixes = require './prefixes'

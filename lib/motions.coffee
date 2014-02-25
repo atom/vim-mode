@@ -1,4 +1,5 @@
-{_, Point, Range} = require 'atom'
+_ = require 'underscore-plus'
+{Point, Range} = require 'atom'
 
 class Motion
   constructor: (@editor) ->
