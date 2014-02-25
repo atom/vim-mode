@@ -1,12 +1,11 @@
-## Vim-mode
+## Vim Mode package
 
-Provides vim modal control to Atom and hopefully the successor to the
-[other vim plugin](https://github.com/atom/vim)
+Provides vim modal control to Atom.
 
 ### Installing
 
-Use the Atom package manager, which can be found in the preferences
-dialog.
+Use the Atom package manager, which can be found in the Settings view or
+run `apm install vim-mode` from the command line.
 
 ### Current Status
 
@@ -30,7 +29,7 @@ them useful as no one person uses all of vim's functionality.
 * More advanced keymap to support `iw` motion.
   * Support for 'f' and 't'
   * Handle `g{line}` and `gg`
-  
+
 ### Documentation
 
 * [Overview](docs/overview.md)
