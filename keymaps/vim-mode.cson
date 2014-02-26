@@ -1,6 +1,7 @@
 '.vim-mode.insert-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
+  'ctrl-[': 'vim-mode:activate-command-mode'
 
 '.vim-mode.visual-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
