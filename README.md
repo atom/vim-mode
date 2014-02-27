@@ -34,14 +34,14 @@ them useful as no one person uses all of vim's functionality.
 
 ### Documentation
 
-* [Overview](docs/overview.md)
-* [Motions](docs/motions.md)
-* [Operators](docs/operators.md)
-* [Commands](docs/commands.md)
+* [Overview](https://github.com/atom/vim-mode/blob/master/docs/overview.md)
+* [Motions](https://github.com/atom/vim-mode/blob/master/docs/motions.md)
+* [Operators](https://github.com/atom/vim-mode/blob/master/docs/operators.md)
+* [Commands](https://github.com/atom/vim-mode/blob/master/docs/commands.md)
 
 ### Development
 
 **Important** you'll need to be running a locally built version of Atom to
 run tests.
 
-See [the contribution guide](CONTRIBUTING.md).
+See [the contribution guide](https://github.com/atom/vim-mode/blob/master/CONTRIBUTING.md).
