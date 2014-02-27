@@ -76,6 +76,7 @@
   '.': 'vim-mode:repeat'
   # '0': 'vim-mode:move-to-beginning-of-line'
   'g g': 'vim-mode:move-to-start-of-file'
+  'enter': 'vim-mode:move-down'
   'G': 'vim-mode:move-to-line'
   'escape': 'vim-mode:reset-command-mode'
   'u': 'core:undo'
