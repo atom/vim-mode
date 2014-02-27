@@ -1,8 +1,14 @@
-.vim-mode.command-mode {
-  .cursor, .cursor.blink-off {
+.block-cursor() {
     border: 0;
     background-color: white;
     visibility: visible;
     opacity: 0.5;
+}
+
+.editor.vim-mode {
+  &.visual-mode, &.command-mode {
+    .cursor, .cursor.blink-off {
+      .block-cursor();
+    }
   }
 }
