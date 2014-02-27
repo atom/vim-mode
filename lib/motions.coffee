@@ -329,8 +329,40 @@ class MoveToStartOfFile extends MoveToLine
   execute: (count=1) ->
     super(count)
 
+class MoveToTopOfScreen extends MoveToLine
+  constructor: (@editor, @editorView) ->
+    super
+
+  execute: (count) ->
+    firstScreenRow = @editorView.getFirstVisibleScreenRow()
+    destRow = if firstScreenRow != 0 then firstScreenRow + 3 else 0
+    super(destRow)
+
+class MoveToBottomOfScreen extends MoveToLine
+  constructor: (@editor, @editorView) ->
+    super
+
+  execute: (count) ->
+    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    console.log(lastScreenRow)
+    lastRow = @editor.getBuffer().getLastRow()
+    destRow = if lastRow != lastScreenRow then lastScreenRow - 1 else lastRow + 1
+    super(destRow)
+
+class MoveToMiddleOfScreen extends MoveToLine
+  constructor: (@editor, @editorView) ->
+    super
+
+  execute: (count) ->
+    firstScreenRow = @editorView.getFirstVisibleScreenRow()
+    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    height = lastScreenRow - firstScreenRow
+    middleScreenRow = Math.floor(firstScreenRow + (height / 2))
+    super(middleScreenRow)
+
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
   MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
   MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile }
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen }
