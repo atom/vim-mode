@@ -86,3 +86,4 @@
   'n': 'command-panel:repeat-relative-address'
   'N': 'command-panel:repeat-relative-address-in-reverse'
   'ctrl-c': 'vim-mode:reset-command-mode'
+  'backspace': 'core:move-left'
