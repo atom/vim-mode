@@ -104,6 +104,13 @@ describe "VimState", ->
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
 
+      describe "when cursor is in the middle of the line", ->
+        beforeEach -> editor.setCursorScreenPosition([0,3])
+
+        it "moves the cursor to the left when exiting insert mode", ->
+          keydown('escape')
+          expect(editor.getCursorScreenPosition()).toEqual [0,2]
+
       describe "on a line with content", ->
         beforeEach -> editor.setCursorScreenPosition([0, 6])
 

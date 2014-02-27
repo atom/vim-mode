@@ -222,6 +222,10 @@ class VimState
   activateCommandMode: ->
     @mode = 'command'
     @submode = null
+
+    if @editorView.is(".insert-mode")
+      @editor.getCursor().moveLeft()
+
     @editorView.removeClass('insert-mode visual-mode')
     @editorView.addClass('command-mode')
 
