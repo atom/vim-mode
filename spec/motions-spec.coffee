@@ -272,6 +272,26 @@ describe "Motions", ->
         expect(editor.getText()).toBe '  cde'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+  describe "the 0 keybinding", ->
+    beforeEach ->
+      editor.setText("  abcde")
+      editor.setCursorScreenPosition([0, 4])
+
+    describe "as a motion", ->
+      beforeEach -> keydown('0')
+
+      it "moves the cursor to the first column", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a selection", ->
+      beforeEach ->
+        keydown('d')
+        keydown('0')
+
+      it 'selects to the first column of the line', ->
+        expect(editor.getText()).toBe 'cde'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
   describe "the $ keybinding", ->
     beforeEach ->
       editor.setText("  abcde\n")
