@@ -254,7 +254,41 @@ class MoveToStartOfFile extends MoveToLine
   execute: (count=1) ->
     super(count)
 
+# abstract class, requires getTargetRow to be implemented in subclasses
+class ScreenRelativeMotion extends Motion
+  constructor: (@editorView)->
+    @editor = @editorView.editor
+
+  execute: (count=1) ->
+    row = @getTargetRow(count)
+    position = @editor.screenPositionForBufferPosition(new Point(row, 0))
+    @editor.setCursorBufferPosition(position)
+
+  select: (count=1) ->
+    row = @getTargetRow(count)
+    position = @editor.screenPositionForBufferPosition(new Point(row, 0))
+    @editor.selectToScreenPosition(position)
+    true
+
+class MoveToTopOfScreen extends ScreenRelativeMotion
+  getTargetRow: (count=1)->
+    @editorView.getFirstVisibleScreenRow() + count - 1
+
+class MoveToMiddleOfScreen extends ScreenRelativeMotion
+  getTargetRow: (count=1) ->
+    # count is ignored by this command
+    @editorView.getFirstVisibleScreenRow() + Math.floor(
+      ( @editorView.getLastVisibleScreenRow() -
+        @editorView.getFirstVisibleScreenRow()
+      )/2
+    )
+
+class MoveToBottomOfScreen extends ScreenRelativeMotion
+  getTargetRow: (count=1) ->
+    @editorView.getLastVisibleScreenRow() - (count - 1)
+
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToLine, MoveToBeginningOfLine,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile }
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  MoveToTopOfScreen, MoveToMiddleOfScreen, MoveToBottomOfScreen }
