@@ -6,6 +6,7 @@
 '.vim-mode.visual-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
+  'ctrl-[': 'vim-mode:activate-command-mode'
   'h': 'vim-mode:select-left'
   'l': 'vim-mode:select-right'
   'j': 'vim-mode:move-down'
