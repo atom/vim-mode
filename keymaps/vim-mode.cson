@@ -76,6 +76,7 @@
   '^': 'vim-mode:move-to-first-character-of-line'
   '$': 'vim-mode:move-to-last-character-of-line'
   '.': 'vim-mode:repeat'
+  ':': 'command-palette:toggle'
   # '0': 'vim-mode:move-to-beginning-of-line'
   'g g': 'vim-mode:move-to-start-of-file'
   'enter': 'vim-mode:move-down'
