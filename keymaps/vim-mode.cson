@@ -21,13 +21,6 @@
   '>': 'vim-mode:indent'
   '<': 'vim-mode:outdent'
 
-'.command-mode-input-field':
-  'up':    'vim-mode:search-history:previous'
-  'down':  'vim-mode:search-history:next'
-'.command-mode-input-field.search':
-  'up':    'vim-mode:search-history:previous'
-  'down':  'vim-mode:search-history:next'
-
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
   'I': 'vim-mode:insert-at-bol'

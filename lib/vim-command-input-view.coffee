@@ -6,7 +6,7 @@ class VimCommandModeInputView extends View
   @content: ->
     @div class: 'command-mode-input', =>
       @div class: 'editor-container', outlet: 'editorContainer', =>
-        @subview 'commandModeInputEditor', new EditorView(mini: true)
+        @subview 'editor', new EditorView(mini: true)
 
   initialize: (@motion, opts = {})->
     if opts.class?
@@ -29,12 +29,12 @@ class VimCommandModeInputView extends View
     @handleEvents()
 
   handleEvents: ->
-    @commandModeInputEditor.on 'core:confirm', @confirm
-    @commandModeInputEditor.on 'core:cancel', @remove
-    @commandModeInputEditor.find('input').on 'blur', @remove
+    @editor.on 'core:confirm', @confirm
+    @editor.on 'core:cancel', @remove
+    @editor.find('input').on 'blur', @remove
 
   confirm: =>
-    @value = @commandModeInputEditor.getText()
+    @value = @editor.getText()
     @motion.confirm(@)
     @remove()
 

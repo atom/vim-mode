@@ -261,8 +261,31 @@ class Search extends Motion
     super(@editorView.editor, @state)
 
   initialize: =>
+    @historyLocation = -1
     @view = new VimCommandModeInputView(@, class: 'search')
     @editor.commandModeInputView = @view
+    @view.editor.on 'core:move-up', @increaseHistorySearch
+    @view.editor.on 'core:move-down', @decreaseHistorySearch
+
+  restoreHistory: (location) ->
+    @view.editor.setText(@history(location).searchTerm)
+
+  history: (location) ->
+    @state.searchHistory[location]
+
+  increaseHistorySearch: =>
+    if @history(@historyLocation + 1)?
+      @historyLocation += 1
+      @restoreHistory(@historyLocation)
+
+  decreaseHistorySearch: =>
+    if @historyLocation <= 0
+      # get us back to a clean slate
+      @historyLocation = -1
+      @view.editor.setText('')
+    else
+      @historyLocation -= 1
+      @restoreHistory(@historyLocation)
 
   reversed: =>
     @initiallyReversed = @reverse = true
@@ -281,6 +304,7 @@ class Search extends Motion
 
   confirm: (view) =>
     @searchTerm = view.value
+    @state.pushSearchHistory @
     @editorView.trigger 'vim-mode:search-complete'
 
   repeat: (opts = {}) =>

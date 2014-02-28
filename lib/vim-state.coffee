@@ -232,7 +232,7 @@ class VimState
   #
   # Returns nothing
   pushSearchHistory: (search) ->
-    @searchHistory.push search
+    @searchHistory.unshift search
 
   ##############################################################################
   # Commands
