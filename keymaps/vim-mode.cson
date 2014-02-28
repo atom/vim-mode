@@ -23,6 +23,7 @@
 
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
+  'I': 'vim-mode:insert-at-bol'
   'v': 'vim-mode:activate-characterwise-visual-mode'
   'V': 'vim-mode:activate-linewise-visual-mode'
   'ctrl-v': 'vim-mode:activate-blockwise-visual-mode'
