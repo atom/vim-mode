@@ -111,7 +111,8 @@ class MoveToPreviousWholeWord extends Motion
       true
 
   isWholeWord: ->
-    @editor.getCursor().getCurrentWordPrefix().slice(-1) is ' '
+    char = @editor.getCursor().getCurrentWordPrefix().slice(-1)
+    char is ' ' or char is '\n'
 
   isBeginningOfFile: ->
     cur = @editor.getCursorBufferPosition();
@@ -160,7 +161,8 @@ class MoveToNextWholeWord extends Motion
       true
 
   isWholeWord: ->
-    @editor.getCursor().getCurrentWordPrefix().slice(-1) is ' '
+    char = @editor.getCursor().getCurrentWordPrefix().slice(-1)
+    char is ' ' or char is '\n'
 
   isEndOfFile: ->
     last = @editor.getEofBufferPosition()
