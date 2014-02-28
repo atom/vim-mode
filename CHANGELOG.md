@@ -1,3 +1,6 @@
+## HEAD
+* Leaving insert mode always moves cursor left @joefiorini
+
 ## 0.7.1 - User improvements
 * ctrl-[ now activates command mode @ctbarna
 * enter now moves down a line in command mode @ctbarna
