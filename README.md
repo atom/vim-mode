@@ -2,7 +2,8 @@
 
 :rotating_light: Package is experimental :rotating_light:
 
-Provides vim modal control to Atom.
+Provides vim modal control for Atom, ideally blending the best of vim
+and Atom.
 
 ### Installing
 
@@ -41,7 +42,13 @@ them useful as no one person uses all of vim's functionality.
 
 ### Development
 
-**Important** you'll need to be running a locally built version of Atom to
-run tests.
+* Create a branch with your feature/fix.
+* Add a spec (take inspiration from the ones that are already there).
+* If you're adding a command be sure to update the appropriate file in
+  `docs/`
+* Create a PR.
+
+When in doubt, open a PR earlier rather than later so that you can
+receive feedback from the community.
 
 See [the contribution guide](https://github.com/atom/vim-mode/blob/master/CONTRIBUTING.md).
