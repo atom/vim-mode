@@ -14,3 +14,5 @@
 * [0](http://vimhelp.appspot.com/motion.txt.html#0)
 * [gg](http://vimhelp.appspot.com/motion.txt.html#gg)
 * [G](http://vimhelp.appspot.com/motion.txt.html#G)
+* [gt](http://vimhelp.appspot.com/tabpage.txt.html#gt)
+* [gT](http://vimhelp.appspot.com/tabpage.txt.html#gT)

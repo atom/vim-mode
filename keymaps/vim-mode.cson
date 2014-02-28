@@ -94,3 +94,5 @@
   'N': 'command-panel:repeat-relative-address-in-reverse'
   'ctrl-c': 'vim-mode:reset-command-mode'
   'backspace': 'core:move-left'
+  'g t': 'pane:show-next-item'
+  'g T': 'pane:show-previous-item'
