@@ -2,6 +2,7 @@
   
 * Insert
   * `i` - switch to insert mode
+  * `I` - switch to insert mode at the first character of the line
   * `o` - create blank line below and switch to insert mode
   * `O` - create blank line above and switch to insert mode
   * `a` - switch to insert mode after current character
