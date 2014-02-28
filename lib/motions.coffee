@@ -98,6 +98,25 @@ class MoveToPreviousWord extends Motion
       @editor.selectToBeginningOfWord()
       true
 
+class MoveToPreviousWholeWord extends Motion
+  execute: (count=1) ->
+    _.times count, =>
+      @editor.moveCursorToBeginningOfWord()
+      @editor.moveCursorToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
+
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectToBeginningOfWord()
+      @editor.selectToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
+      true
+
+  isWholeWord: ->
+    @editor.getCursor().getCurrentWordPrefix().slice(-1) is ' '
+
+  isBeginningOfFile: ->
+    cur = @editor.getCursorBufferPosition();
+    not cur.row and not cur.column
+
 class MoveToNextWord extends Motion
   execute: (count=1) ->
     _.times count, =>
@@ -118,6 +137,35 @@ class MoveToNextWord extends Motion
         @editor.selectToBeginningOfNextWord()
 
       true
+
+class MoveToNextWholeWord extends Motion
+  execute: (count=1) ->
+    _.times count, =>
+      @editor.moveCursorToBeginningOfNextWord()
+      @editor.moveCursorToBeginningOfNextWord() while not @isWholeWord() and not @isEndOfFile()
+
+  select: (count=1, {excludeWhitespace}={}) ->
+    cursor = @editor.getCursor()
+
+    _.times count, =>
+      current = cursor.getBufferPosition()
+      next = cursor.getBeginningOfNextWordBufferPosition(/[^\s]/)
+
+      if current.row != next.row or excludeWhitespace
+        @editor.selectToEndOfWord()
+      else
+        @editor.selectToBeginningOfNextWord()
+        @editor.selectToBeginningOfNextWord() while not @isWholeWord() and not @isEndOfFile()
+
+      true
+
+  isWholeWord: ->
+    @editor.getCursor().getCurrentWordPrefix().slice(-1) is ' '
+
+  isEndOfFile: ->
+    last = @editor.getEofBufferPosition()
+    cur = @editor.getCursorBufferPosition()
+    last.row is cur.row and last.column is cur.column
 
 class MoveToEndOfWord extends Motion
   execute: (count=1) ->
@@ -278,6 +326,7 @@ class MoveToStartOfFile extends MoveToLine
     super(count)
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
-  MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
-  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
+  MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
+  MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile }
