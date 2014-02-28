@@ -1,6 +1,7 @@
 ## HEAD
 * Leaving insert mode always moves cursor left @joefiorini
 * Implemented 'I' command @dysfunction
+* Restored '0' motion @jroes
 
 ## 0.7.1 - User improvements
 * ctrl-[ now activates command mode @ctbarna
