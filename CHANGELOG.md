@@ -4,6 +4,8 @@
 * Restored '0' motion @jroes
 * Implemented '}' motion to move to previous paragraph @zenhob
 * Implement 'gt' and 'gT' to cycle through tabs @JosephKu
+* Implement visual linewise mode @eoinkelly
+* Properly clear selection when return to command mode @chadkouse
 
 ## 0.7.1 - User improvements
 * ctrl-[ now activates command mode @ctbarna

@@ -21,7 +21,7 @@ them useful as no one person uses all of vim's functionality.
 
 * Visual mode
   * ~~Characterwise~~
-  * Linewise
+  * ~~Linewise~~
   * Blockwise
 * Support for marks (including \`.)
 * Support for `q` and `.`
