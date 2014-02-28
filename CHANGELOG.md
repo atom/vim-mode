@@ -1,3 +1,15 @@
+## 0.7.1 - User improvements
+* ctrl-[ now activates command mode @ctbarna
+* enter now moves down a line in command mode @ctbarna
+* Documentation links now work on atom.io @michaeltwofish
+* Backspace now moves back a space in command mode @Tarrant
+* Fixed an issue where cursors wouldn't appear in the settings view.
+
+## 0.7.0 - Updates for release
+* Update contributing guide
+* Update package.json
+* Require underscore-plus directly
+
 ## 0.6.0 - Updates
 * Implemented '.' operator, thanks to @bhuga
 * Fix putting at the end of lines, thanks to @bhuga
