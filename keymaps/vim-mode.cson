@@ -1,10 +1,12 @@
 '.vim-mode.insert-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
+  'ctrl-[': 'vim-mode:activate-command-mode'
 
 '.vim-mode.visual-mode:not(.mini)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
+  'ctrl-[': 'vim-mode:activate-command-mode'
   'h': 'vim-mode:select-left'
   'l': 'vim-mode:select-right'
   'j': 'vim-mode:move-down'
@@ -12,6 +14,7 @@
   'w': 'vim-mode:move-to-next-word'
   'e': 'vim-mode:move-to-end-of-word'
   'b': 'vim-mode:move-to-previous-word'
+  'x': 'vim-mode:delete'
   'd': 'vim-mode:delete'
   'c': 'vim-mode:change'
   'y': 'vim-mode:yank'
@@ -28,6 +31,7 @@
 
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
+  'I': 'vim-mode:insert-at-bol'
   'v': 'vim-mode:activate-characterwise-visual-mode'
   'V': 'vim-mode:activate-linewise-visual-mode'
   'ctrl-v': 'vim-mode:activate-blockwise-visual-mode'
@@ -81,8 +85,9 @@
   '^': 'vim-mode:move-to-first-character-of-line'
   '$': 'vim-mode:move-to-last-character-of-line'
   '.': 'vim-mode:repeat'
-  # '0': 'vim-mode:move-to-beginning-of-line'
+  '0': 'vim-mode:move-to-beginning-of-line'
   'g g': 'vim-mode:move-to-start-of-file'
+  'enter': 'vim-mode:move-down'
   'G': 'vim-mode:move-to-line'
   'escape': 'vim-mode:reset-command-mode'
   'u': 'core:undo'
@@ -94,3 +99,4 @@
   'n': 'vim-mode:repeat-search'
   'N': 'vim-mode:repeat-search-backwards'
   'ctrl-c': 'vim-mode:reset-command-mode'
+  'backspace': 'core:move-left'

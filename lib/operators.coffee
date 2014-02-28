@@ -1,4 +1,4 @@
-{_} = require 'atom'
+_ = require 'underscore-plus'
 
 class OperatorError
   constructor: (@message) ->

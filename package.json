@@ -1,17 +1,15 @@
 {
   "name": "vim-mode",
   "main": "./lib/vim-mode",
-  "version": "0.5.0",
-  "description": "Provides vim modal control of Atom, currently INCOMPLETE.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/vim-mode.git"
-  },
-  "bugs": {
-    "url": "https://github.com/atom/vim-mode/issues"
-  },
+  "version": "0.7.1",
+  "description": "Add vim modal control, currently experimental",
+  "license": "MIT",
+  "private": true,
+  "repository": "https://github.com/atom/vim-mode",
   "engines": {
-    "atom": ">26.0"
+    "atom": ">0.50.0"
   },
-  "private": true
+  "dependencies": {
+    "underscore-plus": "1.x"
+  }
 }

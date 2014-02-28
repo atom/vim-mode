@@ -1,4 +1,5 @@
-{$, _} = require 'atom'
+_ = require 'underscore-plus'
+{$} = require 'atom'
 
 operators = require './operators'
 prefixes = require './prefixes'
@@ -14,7 +15,8 @@ class VimState
   submode: null
   registers: null
 
-  constructor: (@editor) ->
+  constructor: (@editorView) ->
+    @editor = @editorView.editor
     @opStack = []
     @history = []
     @searchHistory = []
@@ -41,7 +43,7 @@ class VimState
   #
   # Returns nothing.
   registerInsertIntercept: ->
-    @editor.preempt 'textInput', (e) =>
+    @editorView.preempt 'textInput', (e) =>
       return if $(e.currentTarget).hasClass('mini')
 
       if @mode == 'insert'
@@ -84,6 +86,7 @@ class VimState
       'substitute-line': => new commands.SubstituteLine(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
       'insert-after-eol': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
+      'insert-at-bol': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
@@ -110,7 +113,7 @@ class VimState
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
       'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)
       'move-to-last-character-of-line': => new motions.MoveToLastCharacterOfLine(@editor)
-      'move-to-beginning-of-line': => new motions.MoveToBeginningOfLine(@editor)
+      'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
       'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
       'move-to-line': => new motions.MoveToLine(@editor)
       'register-prefix': (e) => @registerPrefix(e)
@@ -132,7 +135,7 @@ class VimState
   handleCommands: (commands) ->
     _.each commands, (fn, commandName) =>
       eventName = "vim-mode:#{commandName}"
-      @editor.command eventName, (e) =>
+      @editorView.command eventName, (e) =>
         possibleOperators = fn(e)
         possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
         for possibleOperator in possibleOperators
@@ -205,7 +208,7 @@ class VimState
   # been set.
   getRegister: (name) ->
     if name == '*'
-      text = atom.pasteboard.read()[0]
+      text = atom.clipboard.read()
       type = utils.copyType(text)
       {text, type}
     else
@@ -219,7 +222,7 @@ class VimState
   # Returns nothing.
   setRegister: (name, value) ->
     if name == '*'
-      atom.pasteboard.write(value.text)
+      atom.clipboard.write(value.text)
     else
       @registers[name] = value
 
@@ -241,10 +244,14 @@ class VimState
   activateCommandMode: ->
     @mode = 'command'
     @submode = null
-    @editor.removeClass('insert-mode visual-mode')
-    @editor.addClass('command-mode')
 
-    @editor.on 'cursor:position-changed', @moveCursorBeforeNewline
+    if @editorView.is(".insert-mode")
+      @editor.getCursor().moveLeft()
+
+    @editorView.removeClass('insert-mode visual-mode')
+    @editorView.addClass('command-mode')
+
+    @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Used to enable insert mode.
   #
@@ -252,10 +259,10 @@ class VimState
   activateInsertMode: ->
     @mode = 'insert'
     @submode = null
-    @editor.removeClass('command-mode visual-mode')
-    @editor.addClass('insert-mode')
+    @editorView.removeClass('command-mode visual-mode')
+    @editorView.addClass('insert-mode')
 
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Used to enable visual mode.
   #
@@ -265,8 +272,8 @@ class VimState
   activateVisualMode: (type) ->
     @mode = 'visual'
     @submode = type
-    @editor.removeClass('command-mode insert-mode')
-    @editor.addClass('visual-mode')
+    @editorView.removeClass('command-mode insert-mode')
+    @editorView.addClass('visual-mode')
 
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
@@ -296,6 +303,19 @@ class VimState
       @topOperator().addDigit(num)
     else
       @pushOperator(new prefixes.Repeat(num))
+
+  # Private: Figure out whether or not we are in a repeat sequence or we just
+  # want to move to the beginning of the line. If we are within a repeat
+  # sequence, we pass control over to @repeatPrefix.
+  #
+  # e - The triggered event.
+  #
+  # Returns nothing.
+  moveOrRepeat: (e) ->
+    if @topOperator() instanceof prefixes.Repeat
+      @repeatPrefix(e)
+    else
+      new motions.MoveToBeginningOfLine(@editor)
 
   # Private: A generic way to handle operators that can be repeated for
   # their linewise form.

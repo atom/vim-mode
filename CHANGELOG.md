@@ -1,6 +1,24 @@
-## 0.6.0 - (Pending)
+## HEAD
+* Leaving insert mode always moves cursor left @joefiorini
+* Implemented 'I' command @dysfunction
+* Restored '0' motion @jroes
+
+## 0.7.1 - User improvements
+* ctrl-[ now activates command mode @ctbarna
+* enter now moves down a line in command mode @ctbarna
+* Documentation links now work on atom.io @michaeltwofish
+* Backspace now moves back a space in command mode @Tarrant
+* Fixed an issue where cursors wouldn't appear in the settings view.
+
+## 0.7.0 - Updates for release
+* Update contributing guide
+* Update package.json
+* Require underscore-plus directly
+
+## 0.6.0 - Updates
 * Implemented '.' operator, thanks to @bhuga
 * Fix putting at the end of lines, thanks to @bhuga
+* Compatibility with Atom 0.50.0
 
 ## 0.5.0 - Updates
 * Switches apm db to cloudant from iriscouch

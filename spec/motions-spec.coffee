@@ -1,20 +1,21 @@
 helpers = require './spec-helper'
 
-fdescribe "Motions", ->
-  [editor, vimState] = []
+describe "Motions", ->
+  [editor, editorView, vimState] = []
 
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    editor = helpers.cacheEditor(editor)
+    editorView = helpers.cacheEditor(editorView)
+    editor = editorView.editor
 
-    vimState = editor.vimState
+    vimState = editorView.vimState
     vimState.activateCommandMode()
     vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
-    options.element ?= editor[0]
+    options.element ?= editorView[0]
     helpers.keydown(key, options)
 
   describe "simple motions", ->
@@ -270,6 +271,26 @@ fdescribe "Motions", ->
       it 'selects to the beginning of the lines', ->
         expect(editor.getText()).toBe '  cde'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+  describe "the 0 keybinding", ->
+    beforeEach ->
+      editor.setText("  abcde")
+      editor.setCursorScreenPosition([0, 4])
+
+    describe "as a motion", ->
+      beforeEach -> keydown('0')
+
+      it "moves the cursor to the first column", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a selection", ->
+      beforeEach ->
+        keydown('d')
+        keydown('0')
+
+      it 'selects to the first column of the line', ->
+        expect(editor.getText()).toBe 'cde'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
   describe "the $ keybinding", ->
     beforeEach ->
