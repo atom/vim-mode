@@ -120,6 +120,8 @@ class Yank extends Operator
     else
       @editor.clearSelections()
 
+    @vimState.activateCommandMode()
+
 #
 # It indents everything selected by the following motion.
 #
