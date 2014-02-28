@@ -1,19 +1,20 @@
-{View} = require 'atom'
+{View, EditorView} = require 'atom'
 
 module.exports =
 
 class VimCommandModeInputView extends View
   @content: ->
     @div class: 'command-mode-input', =>
-      @input outlet: "input", class: 'command-mode-input-field'
+      @div class: 'editor-container', outlet: 'editorContainer', =>
+        @subview 'commandModeInputEditor', new EditorView(mini: true)
 
   initialize: (@motion, opts = {})->
     if opts.class?
-      @input.addClass opts.class
+      @editorContainer.addClass opts.class
 
     unless atom.workspaceView?
       # We're in test mode. Don't append to anything, just initialize.
-      @input.focus()
+      @focus()
       @handleEvents()
       return
 
@@ -22,21 +23,23 @@ class VimCommandModeInputView extends View
     if statusBar.length > 0
       @.insertBefore(statusBar)
     else
-      pane.append(@)
+      atom.workspace.getActivePane().append(@)
 
-    @input.focus()
+    @focus()
     @handleEvents()
 
   handleEvents: ->
-    @on 'vim-mode:command-mode-input-confirm', @confirm
-    @on 'core:cancel', @remove
-    @on 'core:focus-next', @remove
-    @on 'core:focus-previous', @remove
+    @commandModeInputEditor.on 'core:confirm', @confirm
+    @commandModeInputEditor.on 'core:cancel', @remove
+    @commandModeInputEditor.find('input').on 'blur', @remove
 
   confirm: =>
-    @value = @input[0].value
+    @value = @commandModeInputEditor.getText()
     @motion.confirm(@)
     @remove()
+
+  focus: =>
+    @editorContainer.find('.editor').focus()
 
   remove: =>
     atom.workspaceView.focus() if atom.workspaceView?
