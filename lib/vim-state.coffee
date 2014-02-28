@@ -104,7 +104,7 @@ class VimState
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
       'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)
       'move-to-last-character-of-line': => new motions.MoveToLastCharacterOfLine(@editor)
-      'move-to-beginning-of-line': => new motions.MoveToBeginningOfLine(@editor)
+      'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
       'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
       'move-to-line': => new motions.MoveToLine(@editor)
       'register-prefix': (e) => @registerPrefix(e)
@@ -282,6 +282,19 @@ class VimState
       @topOperator().addDigit(num)
     else
       @pushOperator(new prefixes.Repeat(num))
+
+  # Private: Figure out whether or not we are in a repeat sequence or we just
+  # want to move to the beginning of the line. If we are within a repeat
+  # sequence, we pass control over to @repeatPrefix.
+  #
+  # e - The triggered event.
+  #
+  # Returns nothing.
+  moveOrRepeat: (e) ->
+    if @topOperator() instanceof prefixes.Repeat
+      @repeatPrefix(e)
+    else
+      new motions.MoveToBeginningOfLine(@editor)
 
   # Private: A generic way to handle operators that can be repeated for
   # their linewise form.

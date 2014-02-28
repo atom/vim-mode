@@ -222,8 +222,7 @@ class MoveToLine extends Motion
 
 class MoveToBeginningOfLine extends Motion
   execute: (count=1) ->
-    _.times count, =>
-      @editor.moveCursorToBeginningOfLine()
+    @editor.moveCursorToBeginningOfLine()
 
   select: (count=1) ->
     _.times count, =>
