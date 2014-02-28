@@ -231,7 +231,7 @@ class Join extends Operator
   execute: (count=1) ->
     @undoTransaction =>
       _.times count, =>
-        @editor.joinLines()
+        @editor.joinLine()
 
 #
 # Repeat the last operation
