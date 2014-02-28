@@ -257,6 +257,9 @@ class MoveToStartOfFile extends MoveToLine
     super(count)
 
 class Search extends Motion
+  constructor: (@editorView, @state) ->
+    super(@editorView.editor, @state)
+
   initialize: =>
     @view = new VimCommandModeInputView(@, class: 'search')
     @editor.commandModeInputView = @view
@@ -278,7 +281,7 @@ class Search extends Motion
 
   confirm: (view) =>
     @searchTerm = view.value
-    @editor.trigger 'vim-mode:search-complete'
+    @editorView.trigger 'vim-mode:search-complete'
 
   repeat: (opts = {}) =>
     reverse = opts.backwards
@@ -306,7 +309,7 @@ class Search extends Motion
     iterator = (item) =>
       matchPoints.push(item.range.start)
 
-    @editor.activeEditSession.scan(regexp, iterator)
+    @editor.scan(regexp, iterator)
 
     previous = _.filter matchPoints, (point) ->
       if @reverse

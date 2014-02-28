@@ -11,14 +11,13 @@ class VimCommandModeInputView extends View
     if opts.class?
       @input.addClass opts.class
 
-    unless rootView?
+    unless atom.workspaceView?
       # We're in test mode. Don't append to anything, just initialize.
       @input.focus()
       @handleEvents()
       return
 
-    pane = rootView.getActivePane()
-    statusBar = pane.find('.status-bar')
+    statusBar = atom.workspaceView.find('.status-bar')
 
     if statusBar.length > 0
       @.insertBefore(statusBar)
@@ -40,5 +39,5 @@ class VimCommandModeInputView extends View
     @remove()
 
   remove: =>
-    rootView.focus() if rootView?
+    atom.workspaceView.focus() if atom.workspaceView?
     super()
