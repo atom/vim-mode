@@ -334,7 +334,7 @@ class MoveToStartOfFile extends MoveToLine
 
 class MoveToTopOfScreen extends MoveToLine
   constructor: (@editor, @editorView, @scrolloff) ->
-    super
+    super(@editor)
 
   getDestinationRow: (count=0) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow()
