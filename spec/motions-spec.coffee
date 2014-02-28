@@ -397,7 +397,7 @@ describe "Motions", ->
         keydown '/'
 
         # How to simulate typing?
-        editor.commandModeInputView.input[0].value = 'def'
+        editor.commandModeInputView.editor.setText 'def'
         # How do I tell the view to simulate'enter'?
         editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
 
@@ -406,7 +406,7 @@ describe "Motions", ->
       it "loops back around", ->
         editor.setCursorBufferPosition([3, 0])
         keydown '/'
-        editor.commandModeInputView.input[0].value = 'def'
+        editor.commandModeInputView.editor.setText 'def'
         editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
 
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
@@ -414,7 +414,7 @@ describe "Motions", ->
       describe "repeating", ->
         beforeEach ->
           keydown '/'
-          editor.commandModeInputView.input[0].value = 'def'
+          editor.commandModeInputView.editor.setText 'def'
           editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
 
         describe "the n keybinding", ->
@@ -432,14 +432,14 @@ describe "Motions", ->
         it "composes with operators", ->
           keydown 'd'
           keydown '/'
-          editor.commandModeInputView.input[0].value = 'def'
+          editor.commandModeInputView.editor.setText 'def'
           editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
           expect(editor.getText()).toEqual "def\nabc\ndef\n"
 
         it "repeats correctly with operators", ->
           keydown 'd'
           keydown '/'
-          editor.commandModeInputView.input[0].value = 'def'
+          editor.commandModeInputView.editor.setText 'def'
           editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
 
           keydown '.'
@@ -448,14 +448,14 @@ describe "Motions", ->
     describe "when reversed as ?", ->
       it "moves the cursor backwards to the specified search pattern", ->
         keydown '?'
-        editor.commandModeInputView.input[0].value = 'def'
+        editor.commandModeInputView.editor.setText 'def'
         editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
         expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
       describe "repeating", ->
         beforeEach ->
           keydown '?'
-          editor.commandModeInputView.input[0].value = 'def'
+          editor.commandModeInputView.editor.setText 'def'
           editor.commandModeInputView.trigger 'vim-mode:command-mode-input-confirm'
 
         describe 'the n keybinding', ->
