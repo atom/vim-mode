@@ -174,11 +174,35 @@ class MoveToNextParagraph extends Motion
     {row, column} = @editor.getEofBufferPosition()
     position = new Point(row, column - 1)
 
-    @editor.scanInBufferRange /^$/g, scanRange, ({range, stop}) =>
+    @editor.scanInBufferRange /^\n*$/g, scanRange, ({range, stop}) =>
       if !range.start.isEqual(start)
         position = range.start
         stop()
 
+    @editor.screenPositionForBufferPosition(position)
+
+class MoveToPreviousParagraph extends Motion
+  execute: (count=1) ->
+    _.times count, =>
+      @editor.setCursorScreenPosition(@previousPosition())
+
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectToScreenPosition(@previousPosition())
+      true
+
+  # Private: Finds the beginning of the previous paragraph
+  #
+  # If no paragraph is found, the beginning of the buffer is returned.
+  previousPosition: ->
+    start = @editor.getCursorBufferPosition()
+    {row, column} = start
+    scanRange = [[row-1, column], [0,0]]
+    position = new Point(0, 0)
+    @editor.backwardsScanInBufferRange /^\n*$/g, scanRange, ({range, stop}) =>
+      if !range.start.isEqual(new Point(0,0))
+        position = range.start
+        stop()
     @editor.screenPositionForBufferPosition(position)
 
 class MoveToLine extends Motion
@@ -255,5 +279,5 @@ class MoveToStartOfFile extends MoveToLine
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
-  MoveToEndOfWord, MoveToNextParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile }

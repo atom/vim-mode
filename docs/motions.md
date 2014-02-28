@@ -7,6 +7,7 @@
 * [j](http://vimhelp.appspot.com/motion.txt.html#j)
 * [k](http://vimhelp.appspot.com/motion.txt.html#k)
 * [l](http://vimhelp.appspot.com/motion.txt.html#l)
+* [{](http://vimhelp.appspot.com/motion.txt.html#%7B)
 * [}](http://vimhelp.appspot.com/motion.txt.html#%7D)
 * [^](http://vimhelp.appspot.com/motion.txt.html#%5E)
 * [$](http://vimhelp.appspot.com/motion.txt.html#%24)

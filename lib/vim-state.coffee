@@ -102,6 +102,7 @@ class VimState
       'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
+      'move-to-previous-paragraph': => new motions.MoveToPreviousParagraph(@editor)
       'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)
       'move-to-last-character-of-line': => new motions.MoveToLastCharacterOfLine(@editor)
       'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
