@@ -344,7 +344,6 @@ class MoveToBottomOfScreen extends MoveToLine
 
   execute: (count) ->
     lastScreenRow = @editorView.getLastVisibleScreenRow()
-    console.log(lastScreenRow)
     lastRow = @editor.getBuffer().getLastRow()
     destRow = if lastRow != lastScreenRow then lastScreenRow - 1 else lastRow + 1
     super(destRow)
