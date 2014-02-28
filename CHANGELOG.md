@@ -3,6 +3,7 @@
 * Implemented 'I' command @dysfunction
 * Restored '0' motion @jroes
 * Implemented '}' motion to move to previous paragraph @zenhob
+* Implement 'gt' and 'gT' to cycle through tabs @JosephKu
 
 ## 0.7.1 - User improvements
 * ctrl-[ now activates command mode @ctbarna
