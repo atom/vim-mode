@@ -230,6 +230,7 @@ class VimState
 
     @editorView.removeClass('insert-mode visual-mode')
     @editorView.addClass('command-mode')
+    @editor.clearSelections()
 
     @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
 
