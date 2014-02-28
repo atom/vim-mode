@@ -162,3 +162,12 @@ describe "VimState", ->
 
       it "operate on the current selection", ->
         expect(editor.getText()).toEqual "\nabcdef"
+
+    describe "returning to command-mode", ->
+      beforeEach ->
+        editor.setText("012345\n\nabcdef")
+        editor.selectLine()
+        keydown('escape')
+
+      it "operate on the current selection", ->
+        expect(editor.getSelection().getText()).toEqual ''
