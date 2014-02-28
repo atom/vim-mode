@@ -60,7 +60,7 @@ describe "VimState", ->
         expect(editorView).not.toHaveClass 'command-mode'
 
     describe "the V keybinding", ->
-      beforeEach -> 
+      beforeEach ->
         editor.setText("012345\nabcdef")
         editor.setCursorScreenPosition([0, 0])
         keydown('V', shift: true)
