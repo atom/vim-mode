@@ -18,3 +18,6 @@
 * [G](http://vimhelp.appspot.com/motion.txt.html#G)
 * [gt](http://vimhelp.appspot.com/tabpage.txt.html#gt)
 * [gT](http://vimhelp.appspot.com/tabpage.txt.html#gT)
+* [H](http://vimhelp.appspot.com/motion.txt.html#H)
+* [L](http://vimhelp.appspot.com/motion.txt.html#L)
+* [M](http://vimhelp.appspot.com/motion.txt.html#M)
