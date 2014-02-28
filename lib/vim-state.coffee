@@ -252,7 +252,6 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLine()
-      
 
   # Private: Resets the command mode back to it's initial state.
   #
