@@ -261,10 +261,7 @@ class MoveToLine extends Motion
   isLinewise: -> true
 
   execute: (count) ->
-    if count?
-      @editor.setCursorBufferPosition([count - 1, 0])
-    else
-      @editor.setCursorBufferPosition([@editor.getLineCount() - 1, 0])
+    @editor.setCursorBufferPosition([@getDestinationRow(count), 0])
     @editor.getCursor().skipLeadingWhitespace()
 
   # Options
@@ -296,6 +293,12 @@ class MoveToLine extends Motion
 
       new Range(startPoint, endPoint)
 
+    getDestinationRow: (count) ->
+      if count?
+        count - 1
+      else
+        (@editor.getLineCount() - 1)
+
 class MoveToBeginningOfLine extends Motion
   execute: (count=1) ->
     @editor.moveCursorToBeginningOfLine()
@@ -326,38 +329,43 @@ class MoveToLastCharacterOfLine extends Motion
       true
 
 class MoveToStartOfFile extends MoveToLine
-  execute: (count=1) ->
-    super(count)
+  getDestinationRow: (count=0) ->
+    count
 
 class MoveToTopOfScreen extends MoveToLine
-  constructor: (@editor, @editorView) ->
+  constructor: (@editor, @editorView, @scrolloff) ->
     super
 
-  execute: (count) ->
+  getDestinationRow: (count=0) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow()
-    destRow = if firstScreenRow != 0 then firstScreenRow + 3 else 0
-    super(destRow)
+    if firstScreenRow > 0
+      offset = Math.max(count - 1, @scrolloff)
+    else
+      offset = count - 1
+    firstScreenRow + offset
 
 class MoveToBottomOfScreen extends MoveToLine
-  constructor: (@editor, @editorView) ->
-    super
+  constructor: (@editor, @editorView, @scrolloff) ->
+    super(@editor)
 
-  execute: (count) ->
+  getDestinationRow: (count=0) ->
     lastScreenRow = @editorView.getLastVisibleScreenRow()
     lastRow = @editor.getBuffer().getLastRow()
-    destRow = if lastRow != lastScreenRow then lastScreenRow - 1 else lastRow + 1
-    super(destRow)
+    if lastScreenRow != lastRow
+      offset = Math.max(count - 1, @scrolloff)
+    else
+      offset = count - 1
+    lastScreenRow - offset
 
 class MoveToMiddleOfScreen extends MoveToLine
   constructor: (@editor, @editorView) ->
-    super
+    super(@editor)
 
-  execute: (count) ->
+  getDestinationRow: (count) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow()
     lastScreenRow = @editorView.getLastVisibleScreenRow()
     height = lastScreenRow - firstScreenRow
-    middleScreenRow = Math.floor(firstScreenRow + (height / 2))
-    super(middleScreenRow)
+    Math.floor(firstScreenRow + (height / 2))
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,

@@ -21,6 +21,7 @@ class VimState
     @history = []
     @registers = {}
     @mode = 'command'
+    @scrolloff = 2 # current chromium default
 
     @setupCommandMode()
     @registerInsertIntercept()
@@ -111,8 +112,8 @@ class VimState
       'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
       'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
       'move-to-line': => new motions.MoveToLine(@editor)
-      'move-to-top-of-screen': => new motions.MoveToTopOfScreen(@editor, @editorView)
-      'move-to-bottom-of-screen': => new motions.MoveToBottomOfScreen(@editor, @editorView)
+      'move-to-top-of-screen': => new motions.MoveToTopOfScreen(@editor, @editorView, @scrolloff)
+      'move-to-bottom-of-screen': => new motions.MoveToBottomOfScreen(@editor, @editorView, @scrolloff)
       'move-to-middle-of-screen': => new motions.MoveToMiddleOfScreen(@editor, @editorView)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
