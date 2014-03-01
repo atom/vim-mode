@@ -22,6 +22,8 @@
   'y': 'vim-mode:yank'
   '>': 'vim-mode:indent'
   '<': 'vim-mode:outdent'
+  '$': 'vim-mode:move-to-last-character-of-line'
+  '^': 'vim-mode:move-to-first-character-of-line'
 
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
