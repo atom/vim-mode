@@ -4,6 +4,7 @@
   'ctrl-[': 'vim-mode:activate-command-mode'
 
 '.vim-mode.visual-mode:not(.mini)':
+  'i w': 'vim-mode:inner-word'
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
   'ctrl-[': 'vim-mode:activate-command-mode'
