@@ -24,6 +24,7 @@
   '<': 'vim-mode:outdent'
   '$': 'vim-mode:move-to-last-character-of-line'
   '^': 'vim-mode:move-to-first-character-of-line'
+  '0': 'vim-mode:move-to-beginning-of-line'
 
 '.vim-mode.command-mode:not(.mini)':
   'i': 'vim-mode:activate-insert-mode'
