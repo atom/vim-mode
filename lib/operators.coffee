@@ -82,6 +82,12 @@ class Delete extends Operator
 # It changes everything selected by the following motion.
 #
 class Change extends Operator
+  # selectOptions - The options object to pass through to the motion when
+  #                 selecting.
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @vimState.activateOperatorPendingMode()
+    @complete = false
+
   # Public: Changes the text selected by the given motion.
   #
   # count - The number of times to execute.
