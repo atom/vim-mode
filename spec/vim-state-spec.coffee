@@ -60,12 +60,18 @@ describe "VimState", ->
         expect(editorView).not.toHaveClass 'command-mode'
 
     describe "the V keybinding", ->
-      beforeEach -> keydown('V', shift: true)
+      beforeEach ->
+        editor.setText("012345\nabcdef")
+        editor.setCursorScreenPosition([0, 0])
+        keydown('V', shift: true)
 
-      it "puts the editor into visual characterwise mode", ->
+      it "puts the editor into visual linewise mode", ->
         expect(editorView).toHaveClass 'visual-mode'
         expect(vimState.submode).toEqual 'linewise'
         expect(editorView).not.toHaveClass 'command-mode'
+
+      it "selects the current line", ->
+        expect(editor.getSelection().getText()).toEqual '012345\n'
 
     describe "the ctrl-v keybinding", ->
       beforeEach -> keydown('v', ctrl: true)
@@ -156,3 +162,12 @@ describe "VimState", ->
 
       it "operate on the current selection", ->
         expect(editor.getText()).toEqual "\nabcdef"
+
+    describe "returning to command-mode", ->
+      beforeEach ->
+        editor.setText("012345\n\nabcdef")
+        editor.selectLine()
+        keydown('escape')
+
+      it "operate on the current selection", ->
+        expect(editor.getSelection().getText()).toEqual ''

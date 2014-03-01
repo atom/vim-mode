@@ -251,6 +251,7 @@ class VimState
 
     @editorView.removeClass('insert-mode visual-mode')
     @editorView.addClass('command-mode')
+    @editor.clearSelections()
 
     @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
 
@@ -275,8 +276,10 @@ class VimState
     @submode = type
     @editorView.removeClass('command-mode insert-mode')
     @editorView.addClass('visual-mode')
-
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
+
+    if @submode == 'linewise'
+      @editor.selectLine()
 
   # Private: Resets the command mode back to it's initial state.
   #
