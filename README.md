@@ -30,7 +30,7 @@ them useful as no one person uses all of vim's functionality.
 * Block backspace in command mode.
   * Block `ctrl-d` in insert mode.
 * More advanced keymap to support `iw` motion.
-  * Support for 'f' and 't'
+  * Support for `f` and `t`
   * Handle `g{line}` and `gg`
 
 ### Documentation
