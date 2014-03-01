@@ -23,7 +23,6 @@ class ScrollDown extends Scroll
     lastScreenRow = @editorView.getLastVisibleScreenRow() - @scrolloff
     @editorView.scrollToBufferPosition([lastScreenRow + count, 0])
 
-
 class ScrollUp extends Scroll
   constructor: (@editorView, @editor, @scrolloff) ->
     super(@editorView, @editor)
@@ -41,6 +40,5 @@ class ScrollUp extends Scroll
   scrollDown: (count) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow() + @scrolloff
     @editorView.scrollToBufferPosition([firstScreenRow - count, 0])
-
 
 module.exports = { ScrollDown, ScrollUp }
