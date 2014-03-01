@@ -1,5 +1,3 @@
-{Point, Range} = require 'atom'
-
 class Scroll
   constructor: (@editorView, @editor) ->
   isComplete: -> true
