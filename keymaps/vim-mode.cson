@@ -109,3 +109,7 @@
   'ctrl-w k': 'vim-mode:focus-pane-view-above'
   'ctrl-w j': 'vim-mode:focus-pane-view-below'
   'ctrl-w ctrl-p': 'vim-mode:focus-previous-pane-view'
+  'ctrl-w ctrl-v': 'pane:split-right'
+  'ctrl-w v': 'pane:split-right'
+  'ctrl-w ctrl-s': 'pane:split-down'
+  'ctrl-w s': 'pane:split-down'
