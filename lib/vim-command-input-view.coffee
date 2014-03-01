@@ -9,6 +9,8 @@ class VimCommandModeInputView extends View
         @subview 'editor', new EditorView(mini: true)
 
   initialize: (@motion, opts = {})->
+    @editor.setFontSize(11)
+
     if opts.class?
       @editorContainer.addClass opts.class
 
