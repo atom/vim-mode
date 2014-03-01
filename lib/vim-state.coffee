@@ -6,6 +6,7 @@ prefixes = require './prefixes'
 commands = require './commands'
 motions = require './motions'
 utils = require './utils'
+panes = require './panes'
 
 module.exports =
 class VimState
@@ -114,6 +115,11 @@ class VimState
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
+      'focus-pane-view-on-left': => new panes.FocusPaneViewOnLeft()
+      'focus-pane-view-on-right': => new panes.FocusPaneViewOnRight()
+      'focus-pane-view-above': => new panes.FocusPaneViewAbove()
+      'focus-pane-view-below': => new panes.FocusPaneViewBelow()
+      'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
 
   # Private: A helper to actually register the given commands with the
   # editor.
