@@ -10,13 +10,13 @@ class ScrollDown extends Scroll
     super(@editorView, @editor)
 
   execute: (count=1) ->
+    {row, column} = @editor.getCursorBufferPosition()
     lastRow = @editorView.getLastVisibleScreenRow() - @scrolloff
     firstRow = @editorView.getFirstVisibleScreenRow() + @scrolloff
-    [cursorRow, cursorColumn] = @editor.getCursorBufferPosition().toArray()
 
-    if cursorRow - count <= firstRow
-      @editor.setCursorBufferPosition([firstRow + count, cursorColumn])
-    @editorView.scrollToBufferPosition([lastRow + count, cursorColumn])
+    if row - count <= firstRow
+      @editor.setCursorBufferPosition([firstRow + count, column])
+    @editorView.scrollToBufferPosition([lastRow + count, column])
 
 
 class ScrollUp extends Scroll
@@ -24,12 +24,12 @@ class ScrollUp extends Scroll
     super(@editorView, @editor)
 
   execute: (count=1) ->
+    {row, column} = @editor.getCursorBufferPosition()
     lastRow = @editorView.getLastVisibleScreenRow() - @scrolloff
     firstRow = @editorView.getFirstVisibleScreenRow() + @scrolloff
-    [cursorRow, cursorColumn] = @editor.getCursorBufferPosition().toArray()
 
-    if cursorRow + count >= lastRow
-      @editor.setCursorBufferPosition([lastRow - count, cursorColumn])
-    @editorView.scrollToBufferPosition([firstRow - count, cursorColumn])
+    if row + count >= lastRow
+      @editor.setCursorBufferPosition([lastRow - count, column])
+    @editorView.scrollToBufferPosition([firstRow - count, column])
 
 module.exports = { ScrollDown, ScrollUp }
