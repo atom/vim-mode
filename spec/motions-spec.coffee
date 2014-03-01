@@ -468,3 +468,35 @@ describe "Motions", ->
             editor.setCursorBufferPosition([0, 0])
             keydown 'N', shift: true
             expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+    describe "using search history", ->
+      beforeEach ->
+        keydown '/'
+        editor.commandModeInputView.editor.setText 'def'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        keydown '/'
+        editor.commandModeInputView.editor.setText 'abc'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+      it "allows searching history in the search field", ->
+        keydown '/'
+        editor.commandModeInputView.editor.trigger 'core:move-up'
+        expect(editor.commandModeInputView.editor.getText()).toEqual 'abc'
+        editor.commandModeInputView.editor.trigger 'core:move-up'
+        expect(editor.commandModeInputView.editor.getText()).toEqual 'def'
+        editor.commandModeInputView.editor.trigger 'core:move-up'
+        expect(editor.commandModeInputView.editor.getText()).toEqual 'def'
+
+      it "resets the search field to empty when scrolling back", ->
+        keydown '/'
+        editor.commandModeInputView.editor.trigger 'core:move-up'
+        expect(editor.commandModeInputView.editor.getText()).toEqual 'abc'
+        editor.commandModeInputView.editor.trigger 'core:move-up'
+        expect(editor.commandModeInputView.editor.getText()).toEqual 'def'
+        editor.commandModeInputView.editor.trigger 'core:move-down'
+        expect(editor.commandModeInputView.editor.getText()).toEqual 'abc'
+        editor.commandModeInputView.editor.trigger 'core:move-down'
+        expect(editor.commandModeInputView.editor.getText()).toEqual ''
