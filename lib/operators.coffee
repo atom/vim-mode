@@ -1,4 +1,5 @@
 _ = require 'underscore-plus'
+textObjects = require './text-objects'
 
 class OperatorError
   constructor: (@message) ->
@@ -99,6 +100,12 @@ class Change extends Operator
 class Yank extends Operator
   register: '"'
 
+  # selectOptions - The options object to pass through to the motion when
+  #                 selecting.
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @vimState.activateOperatorPendingMode()
+    @complete = false
+
   # Public: Copies the text selected by the given motion.
   #
   # count - The number of times to execute.
@@ -119,6 +126,9 @@ class Yank extends Operator
       @editor.setCursorScreenPosition(originalPosition)
     else
       @editor.clearSelections()
+
+    if @motion instanceof textObjects.InnerWord
+      @editor.moveCursorToBeginningOfWord()
 
     @vimState.activateCommandMode()
 

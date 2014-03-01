@@ -158,3 +158,4 @@
   '7': 'vim-mode:repeat-prefix'
   '8': 'vim-mode:repeat-prefix'
   '9': 'vim-mode:repeat-prefix'
+  'u': 'core:undo'

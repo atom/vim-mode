@@ -13,6 +13,8 @@ scroll = require './scroll'
 module.exports =
 class VimState
   editor: null
+  # The opStack is a stack of operations that are being executed. Think of it as
+  # an internal representation of something like "3dw"
   opStack: null
   mode: null
   submode: null
@@ -136,6 +138,7 @@ class VimState
       'yank': => @operatorPending(operators.Yank)
       'indent': => @operatorPending(operators.Indent)
       'outdent': => @operatorPending(operators.Outdent)
+      'inner-word': => new textObjects.InnerWord(@editor)
 
   # Private: A helper to actually register the given commands with the
   # editor.
@@ -359,7 +362,6 @@ class VimState
   #
   # Returns nothing.
   operatorPending: (constructor) ->
-    @activateOperatorPendingMode()
     if @isOperationPending(constructor)
       new motions.MoveToLine(@editor)
     else

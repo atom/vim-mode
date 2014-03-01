@@ -10,8 +10,7 @@ class InnerWord extends TextObject
 
   select: (count=1) ->
     _.times count, =>
-      @editor.moveCursorToBeginningOfWord()
-      @editor.selectToEndOfWord()
+      @editor.selectWord()
       true
 
 module.exports = { TextObject, InnerWord }
