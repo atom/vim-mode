@@ -54,11 +54,14 @@ describe "VimState", ->
     describe "the D keybinding", ->
       beforeEach ->
         editor.setText("0123456\nabcdef")
-        editor.setCursorScreenPosition([0, 0])
+        editor.setCursorScreenPosition([0, 2])
         keydown('D', shift: true)
 
       it "does not join lines", ->
-        expect(editor.getText()).toEqual "\nabcdef"
+        expect(editor.getText()).toEqual "01\nabcdef"
+
+      it "moves the cursor backward 1 character", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
     describe "the v keybinding", ->
       beforeEach -> keydown('v')
