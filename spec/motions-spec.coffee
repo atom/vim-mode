@@ -171,7 +171,7 @@ describe "Motions", ->
       editor.setCursorScreenPosition([0, 0])
 
     describe "as a motion", ->
-      it "moves the cursor to the beginning of the paragraph", ->
+      it "moves the cursor to the end of the paragraph", ->
         keydown('}')
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
@@ -191,6 +191,34 @@ describe "Motions", ->
 
       it 'selects to the end of the current paragraph', ->
         expect(vimState.getRegister('"').text).toBe "abcde\n"
+
+  describe "the { keybinding", ->
+    beforeEach ->
+      editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
+      editor.setCursorScreenPosition([9, 0])
+
+    describe "as a motion", ->
+      it "moves the cursor to the beginning of the paragraph", ->
+        keydown('{')
+        expect(editor.getCursorScreenPosition()).toEqual [7, 0]
+
+        keydown('{')
+        expect(editor.getCursorScreenPosition()).toEqual [5, 0]
+
+        keydown('{')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+        keydown('{')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a selection", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([7, 0])
+        keydown('y')
+        keydown('{')
+
+      it 'selects to the beginning of the current paragraph', ->
+        expect(vimState.getRegister('"').text).toBe "\nzip\n"
 
   describe "the b keybinding", ->
     beforeEach -> editor.setText(" ab cde1+- \n xyz\n\nzip }\n last")
@@ -271,6 +299,26 @@ describe "Motions", ->
       it 'selects to the beginning of the lines', ->
         expect(editor.getText()).toBe '  cde'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+  describe "the 0 keybinding", ->
+    beforeEach ->
+      editor.setText("  abcde")
+      editor.setCursorScreenPosition([0, 4])
+
+    describe "as a motion", ->
+      beforeEach -> keydown('0')
+
+      it "moves the cursor to the first column", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a selection", ->
+      beforeEach ->
+        keydown('d')
+        keydown('0')
+
+      it 'selects to the first column of the line', ->
+        expect(editor.getText()).toBe 'cde'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
   describe "the $ keybinding", ->
     beforeEach ->

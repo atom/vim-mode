@@ -407,6 +407,25 @@ describe "Operators", ->
         expect(editorView).toHaveClass 'insert-mode'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+  describe "the I keybinding", ->
+    beforeEach ->
+      editor.getBuffer().setText("11\n  22\n")
+
+    describe "at the end of a line", ->
+      it "switches to insert mode at the beginning of the line", ->
+        editor.setCursorScreenPosition([0,2])
+        keydown('I', shift: true)
+
+        expect(editorView).toHaveClass 'insert-mode'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      it "switches to insert mode after leading whitespace", ->
+        editor.setCursorScreenPosition([1,4])
+        keydown('I', shift: true)
+
+        expect(editorView).toHaveClass 'insert-mode'
+        expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
   describe "the J keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n    456\n")

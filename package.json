@@ -1,13 +1,13 @@
 {
   "name": "vim-mode",
   "main": "./lib/vim-mode",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Add vim modal control, currently experimental",
   "license": "MIT",
   "private": true,
   "repository": "https://github.com/atom/vim-mode",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">0.61.0"
   },
   "dependencies": {
     "underscore-plus": "1.x"
