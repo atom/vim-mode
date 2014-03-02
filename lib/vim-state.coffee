@@ -93,7 +93,7 @@ class VimState
       'change-to-last-character-of-line': => [new operators.Change(@editor, @), new motions.MoveToLastCharacterOfLine(@editor)]
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
       'delete-left': => [new operators.Delete(@editor), new motions.MoveLeft(@editor)]
-      'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
+      'delete-to-last-character-of-line': => [new operators.Delete(@editor, @, {allowEOL: true}), new motions.MoveToLastCharacterOfLine(@editor)]
       'yank': => @linewiseAliasedOperator(operators.Yank)
       'yank-line': => [new operators.Yank(@editor, @), new motions.MoveToLine(@editor)]
       'put-before': => new operators.Put(@editor, @, location: 'before')

@@ -51,6 +51,15 @@ describe "VimState", ->
         it "clears the operator stack", ->
           expect(vimState.opStack.length).toBe 0
 
+    describe "the D keybinding", ->
+      beforeEach ->
+        editor.setText("0123456\nabcdef")
+        editor.setCursorScreenPosition([0, 0])
+        keydown('D', shift: true)
+
+      it "does not join lines", ->
+        expect(editor.getText()).toEqual "\nabcdef"
+
     describe "the v keybinding", ->
       beforeEach -> keydown('v')
 
