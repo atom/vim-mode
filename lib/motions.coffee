@@ -261,7 +261,7 @@ class MoveToLine extends Motion
   isLinewise: -> true
 
   execute: (count) ->
-    @editor.setCursorBufferPosition([@getDestinationRow(count), 0])
+    @setCursorPosition(count)
     @editor.getCursor().skipLeadingWhitespace()
 
   # Options
@@ -293,11 +293,19 @@ class MoveToLine extends Motion
 
       new Range(startPoint, endPoint)
 
-    getDestinationRow: (count) ->
-      if count?
-        count - 1
-      else
-        (@editor.getLineCount() - 1)
+  setCursorPosition: (count) ->
+    @editor.setCursorBufferPosition([@getDestinationRow(count), 0])
+
+  getDestinationRow: (count) ->
+    if count? then count - 1 else (@editor.getLineCount() - 1)
+
+class MoveToScreenLine extends MoveToLine
+  constructor: (@editor, @editorView, @scrolloff) ->
+    @scrolloff = 2 # atom default
+    super(@editor)
+
+  setCursorPosition: (count) ->
+    @editor.setCursorScreenPosition([@getDestinationRow(count), 0])
 
 class MoveToBeginningOfLine extends Motion
   execute: (count=1) ->
@@ -332,10 +340,7 @@ class MoveToStartOfFile extends MoveToLine
   getDestinationRow: (count=0) ->
     count
 
-class MoveToTopOfScreen extends MoveToLine
-  constructor: (@editor, @editorView, @scrolloff) ->
-    super(@editor)
-
+class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow()
     if firstScreenRow > 0
@@ -344,10 +349,7 @@ class MoveToTopOfScreen extends MoveToLine
       offset = count - 1
     firstScreenRow + offset
 
-class MoveToBottomOfScreen extends MoveToLine
-  constructor: (@editor, @editorView, @scrolloff) ->
-    super(@editor)
-
+class MoveToBottomOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
     lastScreenRow = @editorView.getLastVisibleScreenRow()
     lastRow = @editor.getBuffer().getLastRow()
@@ -357,10 +359,7 @@ class MoveToBottomOfScreen extends MoveToLine
       offset = count - 1
     lastScreenRow - offset
 
-class MoveToMiddleOfScreen extends MoveToLine
-  constructor: (@editor, @editorView) ->
-    super(@editor)
-
+class MoveToMiddleOfScreen extends MoveToScreenLine
   getDestinationRow: (count) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow()
     lastScreenRow = @editorView.getLastVisibleScreenRow()
