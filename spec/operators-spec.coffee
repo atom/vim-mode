@@ -195,6 +195,18 @@ describe "Operators", ->
       editor.getBuffer().setText("012 345\nabc\n")
       editor.setCursorScreenPosition([0, 4])
 
+    describe "when selected lines in visual linewise mode", ->
+      beforeEach ->
+        keydown('V', shift: true)
+        keydown('j')
+        keydown('y')
+
+      it "is in linewise motion", ->
+        expect(vimState.getRegister('"').type).toEqual "linewise"
+
+      it "saves the lines to the default register", ->
+        expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
+
     describe "when followed by a second y ", ->
       beforeEach ->
         keydown('y')

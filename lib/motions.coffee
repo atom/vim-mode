@@ -13,6 +13,8 @@ class CurrentSelection extends Motion
   select: (count=1) ->
     _.times(count, -> true)
 
+  isLinewise: -> @editor.mode == 'visual' and @editor.submode == 'linewise'
+
 class SelectLeft extends Motion
   execute: (count=1) ->
     @select(count)
