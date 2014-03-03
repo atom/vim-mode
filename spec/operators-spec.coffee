@@ -194,16 +194,19 @@ describe "Operators", ->
     beforeEach ->
       editor.getBuffer().setText("012 345\nabc\n")
       editor.setCursorScreenPosition([0, 4])
-      
+
     describe "when selected lines in visual linewise mode", ->
       beforeEach ->
-        keydown('V')
-        keydown('k')
+        keydown('V', shift: true)
+        keydown('j')
         keydown('y')
-    
-      it "saves the lines to the default register in linewise mode", ->
+
+      it "is in linewise motion", ->
+        console.log("CK", vimState.getRegister('"').type)
+        expect(vimState.getRegister('"').type).toEqual "linewise"
+
+      it "saves the lines to the default register", ->
         expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
-        expect(vimState.getRegister('"').type).toBe 'linewise'
 
     describe "when followed by a second y ", ->
       beforeEach ->
