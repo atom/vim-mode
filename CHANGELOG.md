@@ -1,3 +1,7 @@
+## HEAD - 
+* API Fixes for Atom 0.62 @bhuga
+* Add `$` and `0` to visual mode @spyc3r
+
 ## 0.7.2 - Full steam ahead
 * Leaving insert mode always moves cursor left @joefiorini
 * Implemented `I` command @dysfunction
