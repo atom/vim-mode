@@ -202,7 +202,6 @@ describe "Operators", ->
         keydown('y')
 
       it "is in linewise motion", ->
-        console.log("CK", vimState.getRegister('"').type)
         expect(vimState.getRegister('"').type).toEqual "linewise"
 
       it "saves the lines to the default register", ->
