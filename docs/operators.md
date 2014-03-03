@@ -7,6 +7,7 @@
   * `dd` - linewise
   * `d2d` - repeated linewise
   * `D` - delete to the end of the line
+  * `X` - delete the character before the cursor
 * [Change](http://vimhelp.appspot.com/change.txt.html#c)
   * `vwc` - works in visual mode
   * `cw` - deletes the next word and switches to insert mode.

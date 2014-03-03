@@ -63,6 +63,7 @@
   'A': 'vim-mode:insert-after-eol'
   'J': 'vim-mode:join'
   'x': 'vim-mode:delete-right'
+  'X': 'vim-mode:delete-left'
   's': 'vim-mode:substitute'
   'S': 'vim-mode:substitute-line'
   'y': 'vim-mode:yank'
