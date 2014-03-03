@@ -4,6 +4,7 @@
 * Add `0` to visual mode @ruedap
 * Fix for yanking entire lines @chadkouse
 * Add `X` operator @ruedap
+* Add `W` and `B` motions @jcurtis
 
 ## 0.7.2 - Full steam ahead
 * Leaving insert mode always moves cursor left @joefiorini
