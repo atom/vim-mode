@@ -2,6 +2,7 @@
 * API Fixes for Atom 0.62 @bhuga
 * Add `$` and `0` to visual mode @spyc3r
 * Add `0` to visual mode @ruedap
+* Fix for yanking entire lines @chadkouse
 
 ## 0.7.2 - Full steam ahead
 * Leaving insert mode always moves cursor left @joefiorini
