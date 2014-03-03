@@ -117,6 +117,13 @@ describe "VimState", ->
           keydown('escape')
           expect(editor.getCursorScreenPosition()).toEqual [0,2]
 
+      describe "when cursor is at the beginning of line", ->
+        beforeEach -> editor.setCursorScreenPosition([1,0])
+
+        it "leaves the cursor at the beginning of line", ->
+          keydown('escape')
+          expect(editor.getCursorScreenPosition()).toEqual [1,0]
+
       describe "on a line with content", ->
         beforeEach -> editor.setCursorScreenPosition([0, 6])
 
