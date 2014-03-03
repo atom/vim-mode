@@ -1,7 +1,8 @@
 class Scroll
-  constructor: (@editorView, @editor) ->
   isComplete: -> true
   isRecordable: -> false
+  constructor: (@editorView, @editor) ->
+    @scrolloff = 2 # atom default
 
 class ScrollDown extends Scroll
   constructor: (@editorView, @editor, @scrolloff) ->
@@ -12,14 +13,14 @@ class ScrollDown extends Scroll
     @scrollUp(count)
 
   keepCursorOnScreen: (count) ->
-    {row, column} = @editor.getCursorBufferPosition()
-    firstScreenRow = @editorView.getFirstVisibleScreenRow() + @scrolloff
+    {row, column} = @editor.getCursorScreenPosition()
+    firstScreenRow = @editorView.getFirstVisibleScreenRow() + @scrolloff + 1
     if row - count <= firstScreenRow
-      @editor.setCursorBufferPosition([firstScreenRow + count, column])
+      @editor.setCursorScreenPosition([firstScreenRow + count, column])
 
   scrollUp: (count) ->
     lastScreenRow = @editorView.getLastVisibleScreenRow() - @scrolloff
-    @editorView.scrollToBufferPosition([lastScreenRow + count, 0])
+    @editorView.scrollToScreenPosition([lastScreenRow + count, 0])
 
 class ScrollUp extends Scroll
   constructor: (@editorView, @editor, @scrolloff) ->
@@ -30,13 +31,13 @@ class ScrollUp extends Scroll
     @scrollDown(count)
 
   keepCursorOnScreen: (count) ->
-    {row, column} = @editor.getCursorBufferPosition()
-    lastScreenRow = @editorView.getLastVisibleScreenRow() - @scrolloff
+    {row, column} = @editor.getCursorScreenPosition()
+    lastScreenRow = @editorView.getLastVisibleScreenRow() - @scrolloff - 1
     if row + count >= lastScreenRow
-        @editor.setCursorBufferPosition([lastScreenRow - count, column])
+        @editor.setCursorScreenPosition([lastScreenRow - count, column])
 
   scrollDown: (count) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow() + @scrolloff
-    @editorView.scrollToBufferPosition([firstScreenRow - count, 0])
+    @editorView.scrollToScreenPosition([firstScreenRow - count, 0])
 
 module.exports = { ScrollDown, ScrollUp }

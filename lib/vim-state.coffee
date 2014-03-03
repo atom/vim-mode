@@ -23,7 +23,6 @@ class VimState
     @history = []
     @registers = {}
     @mode = 'command'
-    @scrolloff = 2 # chromium default
 
     @setupCommandMode()
     @registerInsertIntercept()
