@@ -119,6 +119,40 @@ describe "Motions", ->
         it "selects the whitespace", ->
           expect(vimState.getRegister('"').text).toBe ' '
 
+  describe "the W keybinding", ->
+    beforeEach -> editor.setText("cde1+- ab \n xyz\n\nzip")
+
+    describe "as a motion", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 0])
+
+      it "moves the cursor to the beginning of the next word", ->
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+    describe "as a selection", ->
+      describe "within a word", ->
+
+        it "selects to the end of the whole word", ->
+          editor.setCursorScreenPosition([0, 0])
+          keydown('y')
+          keydown('W', shift:true)
+          expect(vimState.getRegister('"').text).toBe 'cde1+- '
+
+        it "doesn't go past the end of the file", ->
+          editor.setCursorScreenPosition([2, 0])
+          keydown('y')
+          keydown('W', shift:true)
+          expect(vimState.getRegister('"').text).toBe ''
+
   describe "the e keybinding", ->
     beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
 
@@ -279,6 +313,41 @@ describe "Motions", ->
         it "selects to the beginning of the last word", ->
           expect(vimState.getRegister('"').text).toBe 'ab '
           expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+  describe "the B keybinding", ->
+    beforeEach -> editor.setText("cde1+- ab \n xyz-123\n\n zip")
+
+    describe "as a motion", ->
+      beforeEach -> editor.setCursorScreenPosition([4, 1])
+
+      it "moves the cursor to the beginning of the previous word", ->
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [3, 1]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a selection", ->
+      it "selects to the beginning of the whole word", ->
+        editor.setCursorScreenPosition([1, 8])
+        keydown('y')
+        keydown('B', shift:true)
+        expect(vimState.getRegister('"').text).toBe 'xyz-123'
+
+      it "doesn't go past the beginning of the file", ->
+        editor.setCursorScreenPosition([0, 0])
+        keydown('y')
+        keydown('B', shift:true)
+        expect(vimState.getRegister('"').text).toBe ''
 
   describe "the ^ keybinding", ->
     beforeEach ->
