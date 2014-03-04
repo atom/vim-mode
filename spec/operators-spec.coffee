@@ -564,6 +564,19 @@ describe "Operators", ->
         it "indents both lines", ->
           expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
 
+  xdescribe "the = keybinding", ->
+    beforeEach ->
+      editor.setText("12345\n  abcde")
+      editor.setCursorScreenPosition([1, 0])
+
+    describe "when followed by a =", ->
+      beforeEach ->
+        keydown('=')
+        keydown('=')
+
+      it "indents the current line", ->
+        expect(editor.indentationForBufferRow(1)).toBe 0
+
   describe "the . keybinding", ->
     beforeEach ->
       editor.setText("12\n34\n56\n78")
