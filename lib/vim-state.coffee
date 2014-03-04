@@ -229,7 +229,8 @@ class VimState
     @submode = null
 
     if @editorView.is(".insert-mode")
-      @editor.getCursor().moveLeft()
+      cursor = @editor.getCursor()
+      cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
     @editorView.removeClass('insert-mode visual-mode')
     @editorView.addClass('command-mode')
