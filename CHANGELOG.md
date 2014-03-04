@@ -1,6 +1,6 @@
 ## HEAD - 
 * API Fixes for Atom 0.62 @bhuga
-* Add `$` and `0` to visual mode @spyc3r
+* Add `$` and `^` to visual mode @spyc3r
 * Add `0` to visual mode @ruedap
 * Fix for yanking entire lines @chadkouse
 * Add `X` operator @ruedap
