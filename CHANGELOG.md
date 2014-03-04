@@ -5,6 +5,7 @@
 * Fix for yanking entire lines @chadkouse
 * Add `X` operator @ruedap
 * Add `W` and `B` motions @jcurtis
+* Prevent cursor left at column 0 when switching to insert mode @adrianolaru
 
 ## 0.7.2 - Full steam ahead
 * Leaving insert mode always moves cursor left @joefiorini
