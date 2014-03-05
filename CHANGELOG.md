@@ -7,6 +7,7 @@
 * Add `W` and `B` motions @jcurtis
 * Prevent cursor left at column 0 when switching to insert mode @adrianolaru
 * Add pane switching shortcuts see #104 for details @dougblack
+* Add `H`, `L` and `M` motions @dougblack
 
 ## 0.7.2 - Full steam ahead
 * Leaving insert mode always moves cursor left @joefiorini
