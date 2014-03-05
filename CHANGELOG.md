@@ -1,4 +1,4 @@
-## HEAD - 
+## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
 * Add `$` and `^` to visual mode @spyc3r
 * Add `0` to visual mode @ruedap
