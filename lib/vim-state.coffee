@@ -223,6 +223,10 @@ class VimState
       text = atom.clipboard.read()
       type = utils.copyType(text)
       {text, type}
+    else if name == '%'
+      text = @editor.getUri()
+      type = utils.copyType(text)
+      {text, type}
     else
       atom.workspace.vimState.registers[name]
 
