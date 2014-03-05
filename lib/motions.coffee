@@ -261,10 +261,7 @@ class MoveToLine extends Motion
   isLinewise: -> true
 
   execute: (count) ->
-    if count?
-      @editor.setCursorBufferPosition([count - 1, 0])
-    else
-      @editor.setCursorBufferPosition([@editor.getLineCount() - 1, 0])
+    @setCursorPosition(count)
     @editor.getCursor().skipLeadingWhitespace()
 
   # Options
@@ -296,6 +293,20 @@ class MoveToLine extends Motion
 
       new Range(startPoint, endPoint)
 
+  setCursorPosition: (count) ->
+    @editor.setCursorBufferPosition([@getDestinationRow(count), 0])
+
+  getDestinationRow: (count) ->
+    if count? then count - 1 else (@editor.getLineCount() - 1)
+
+class MoveToScreenLine extends MoveToLine
+  constructor: (@editor, @editorView, @scrolloff) ->
+    @scrolloff = 2 # atom default
+    super(@editor)
+
+  setCursorPosition: (count) ->
+    @editor.setCursorScreenPosition([@getDestinationRow(count), 0])
+
 class MoveToBeginningOfLine extends Motion
   execute: (count=1) ->
     @editor.moveCursorToBeginningOfLine()
@@ -326,11 +337,38 @@ class MoveToLastCharacterOfLine extends Motion
       true
 
 class MoveToStartOfFile extends MoveToLine
-  execute: (count=1) ->
-    super(count)
+  getDestinationRow: (count=0) ->
+    count
+
+class MoveToTopOfScreen extends MoveToScreenLine
+  getDestinationRow: (count=0) ->
+    firstScreenRow = @editorView.getFirstVisibleScreenRow()
+    if firstScreenRow > 0
+      offset = Math.max(count - 1, @scrolloff)
+    else
+      offset = if count > 0 then count - 1 else count
+    firstScreenRow + offset
+
+class MoveToBottomOfScreen extends MoveToScreenLine
+  getDestinationRow: (count=0) ->
+    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    lastRow = @editor.getBuffer().getLastRow()
+    if lastScreenRow != lastRow
+      offset = Math.max(count - 1, @scrolloff)
+    else
+      offset = if count > 0 then count - 1 else count
+    lastScreenRow - offset
+
+class MoveToMiddleOfScreen extends MoveToScreenLine
+  getDestinationRow: (count) ->
+    firstScreenRow = @editorView.getFirstVisibleScreenRow()
+    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    height = lastScreenRow - firstScreenRow
+    Math.floor(firstScreenRow + (height / 2))
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
   MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
   MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile }
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen }
