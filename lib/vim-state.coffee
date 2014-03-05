@@ -227,6 +227,10 @@ class VimState
       text = @editor.getUri()
       type = utils.copyType(text)
       {text, type}
+    else if name == "_" # Blackhole always returns nothing
+      text = ''
+      type = utils.copyType(text)
+      {text, type}
     else
       atom.workspace.vimState.registers[name]
 
@@ -239,6 +243,8 @@ class VimState
   setRegister: (name, value) ->
     if name == '*' || name == '+'
       atom.clipboard.write(value.text)
+    else if name == '_'
+      # Blackhole register, nothing to do
     else
       atom.workspace.vimState.registers[name] = value
 

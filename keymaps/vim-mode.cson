@@ -47,6 +47,7 @@
   '" *': 'vim-mode:register-prefix'
   '" +': 'vim-mode:register-prefix'
   '" %': 'vim-mode:register-prefix'
+  '" _': 'vim-mode:register-prefix'
   '1': 'vim-mode:repeat-prefix'
   '2': 'vim-mode:repeat-prefix'
   '3': 'vim-mode:repeat-prefix'
