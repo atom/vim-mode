@@ -30,7 +30,7 @@ describe "Panes", ->
         getActiveView: -> editorView
       }
 
-    describe "focus pane right", ->
+    describe "the ctrl-w l keybinding", ->
       beforeEach ->
         spyOn(atom.workspaceView, 'focusPaneViewOnRight')
 
@@ -40,7 +40,7 @@ describe "Panes", ->
 
         expect(atom.workspaceView.focusPaneViewOnRight).toHaveBeenCalled()
 
-    describe "focus pane left", ->
+    describe "the ctrl-w h keybinding", ->
       beforeEach ->
         spyOn(atom.workspaceView, 'focusPaneViewOnLeft')
 
@@ -50,7 +50,7 @@ describe "Panes", ->
 
         expect(atom.workspaceView.focusPaneViewOnLeft).toHaveBeenCalled()
 
-    describe "focus pane below", ->
+    describe "the ctrl-w j keybinding", ->
       beforeEach ->
         spyOn(atom.workspaceView, 'focusPaneViewBelow')
 
@@ -60,7 +60,7 @@ describe "Panes", ->
 
         expect(atom.workspaceView.focusPaneViewBelow).toHaveBeenCalled()
 
-    describe "focus pane above", ->
+    describe "the ctrl-w k keybinding", ->
       beforeEach ->
         spyOn(atom.workspaceView, 'focusPaneViewAbove')
 
