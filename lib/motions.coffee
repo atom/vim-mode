@@ -346,7 +346,7 @@ class MoveToTopOfScreen extends MoveToScreenLine
     if firstScreenRow > 0
       offset = Math.max(count - 1, @scrolloff)
     else
-      offset = count - 1
+      offset = if count > 0 then count - 1 else count
     firstScreenRow + offset
 
 class MoveToBottomOfScreen extends MoveToScreenLine
@@ -356,7 +356,7 @@ class MoveToBottomOfScreen extends MoveToScreenLine
     if lastScreenRow != lastRow
       offset = Math.max(count - 1, @scrolloff)
     else
-      offset = count - 1
+      offset = if count > 0 then count - 1 else count
     lastScreenRow - offset
 
 class MoveToMiddleOfScreen extends MoveToScreenLine
