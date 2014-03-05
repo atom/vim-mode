@@ -5,9 +5,6 @@ class Scroll
     @scrolloff = 2 # atom default
 
 class ScrollDown extends Scroll
-  constructor: (@editorView, @editor, @scrolloff) ->
-    super(@editorView, @editor)
-
   execute: (count=1) ->
     @keepCursorOnScreen(count)
     @scrollUp(count)
@@ -23,9 +20,6 @@ class ScrollDown extends Scroll
     @editorView.scrollToScreenPosition([lastScreenRow + count, 0])
 
 class ScrollUp extends Scroll
-  constructor: (@editorView, @editor, @scrolloff) ->
-    super(@editorView, @editor)
-
   execute: (count=1) ->
     @keepCursorOnScreen(count)
     @scrollDown(count)
