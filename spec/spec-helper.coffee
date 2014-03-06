@@ -1,11 +1,11 @@
 {EditorView} = require 'atom'
-atom.workspace ||= {}
 
 VimState = require '../lib/vim-state'
 
 originalKeymap = null
 
 beforeEach ->
+  atom.workspace ||= {}
   atom.workspace.vimState ||= {}
   atom.workspace.vimState.registers ||= {}
   atom.workspace.vimState.searchHistory ||= []
