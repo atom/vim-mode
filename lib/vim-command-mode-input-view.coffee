@@ -8,7 +8,7 @@ class VimCommandModeInputView extends View
       @div class: 'editor-container', outlet: 'editorContainer', =>
         @subview 'editor', new EditorView(mini: true)
 
-  initialize: (@motion, opts = {})->
+  initialize: (@viewModel, opts = {})->
     @editor.setFontSize(atom.config.get('vim-mode.commandModeInputViewFontSize'))
 
     if opts.class?
@@ -37,7 +37,7 @@ class VimCommandModeInputView extends View
 
   confirm: =>
     @value = @editor.getText()
-    @motion.confirm(@)
+    @viewModel.confirm(@)
     @remove()
 
   focus: =>

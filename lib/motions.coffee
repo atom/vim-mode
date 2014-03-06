@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
-VimCommandModeInputView = require './vim-command-mode-input-view'
+SearchViewModel = require './search-view-model'
 
 class Motion
   constructor: (@editor, @state) ->
@@ -374,91 +374,21 @@ class Search extends Motion
   # of the editor, as we'll need to attach a CMIV to it.
   constructor: (@editorView, @state) ->
     super(@editorView.editor, @state)
-    @historyIndex = -1
-    @view = new VimCommandModeInputView(@, class: 'search')
-    @editor.commandModeInputView = @view
-    @view.editor.on('core:move-up', @increaseHistorySearch)
-    @view.editor.on('core:move-down', @decreaseHistorySearch)
-
-  restoreHistory: (index) ->
-    @view.editor.setText(@history(index).searchTerm)
-
-  history: (location) ->
-    @state.searchHistory[location]
-
-  increaseHistorySearch: =>
-    if @history(@historyIndex + 1)?
-      @historyIndex += 1
-      @restoreHistory(@historyIndex)
-
-  decreaseHistorySearch: =>
-    if @historyIndex <= 0
-      # get us back to a clean slate
-      @historyIndex = -1
-      @view.editor.setText('')
-    else
-      @historyIndex -= 1
-      @restoreHistory(@historyIndex)
-
-  reversed: =>
-    @initiallyReversed = @reverse = true
-
-  execute: (count=1) ->
-    @scan()
-    @match count, (pos) =>
-      @editor.setCursorBufferPosition(pos)
-
-  select: (count=1) ->
-    @scan()
-    cur = @editor.getCursorBufferPosition()
-    @match count, (pos) =>
-      @editor.setSelectedBufferRange([cur, pos])
-    [true]
-
-  confirm: (view) =>
-    @searchTerm = view.value
-    @state.pushSearchHistory(@)
-    @editorView.trigger('vim-mode:search-complete')
+    @viewModel = new SearchViewModel(@)
 
   repeat: (opts = {}) =>
-    reverse = opts.backwards
-    if @initiallyReversed and reverse
-      @reverse = false
-    else
-      @reverse = reverse or @initiallyReversed
-
+    @viewModel.repeat(opts)
     @
 
-  # Private
-  match: (count, callback) ->
-    pos = @matches[(count - 1) % @matches.length]
-    if pos?
-      callback(pos)
-    else
-      atom.beep()
+  reversed: =>
+    @viewModel.reversed()
+    @
 
-  # Private
-  scan: ->
-    term = @searchTerm
-    regexp = new RegExp(term, 'g')
-    cur = @editor.getCursorBufferPosition()
-    matchPoints = []
-    iterator = (item) =>
-      matchPoints.push(item.range.start)
+  execute: (count=1) ->
+    @viewModel.execute(count)
 
-    @editor.scan(regexp, iterator)
-
-    previous = _.filter matchPoints, (point) ->
-      if @reverse
-        point.compare(cur) < 0
-      else
-        point.compare(cur) <= 0
-
-    after = _.difference(matchPoints, previous)
-    after.push(previous...)
-    after = after.reverse() if @reverse
-
-    @matches = after
+  select: (count=1) ->
+    @viewModel.select(count)
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,

@@ -68,6 +68,8 @@ class VimState
   #
   # Returns nothing.
   setupCommandMode: ->
+    # Commands here start a new mode instead of popping the operator stack
+    # immediately.
     @editorView.command 'vim-mode:search', =>
       @currentSearch = new motions.Search(@editorView, @)
     @editorView.command 'vim-mode:reverse-search', =>
