@@ -1,14 +1,13 @@
 {EditorView} = require 'atom'
 
 VimState = require '../lib/vim-state'
+VimMode  = require '../lib/vim-mode'
 
 originalKeymap = null
 
 beforeEach ->
   atom.workspace ||= {}
-  atom.workspace.vimState ||= {}
-  atom.workspace.vimState.registers ||= {}
-  atom.workspace.vimState.searchHistory ||= []
+  VimMode._initializeWorkspaceState()
 
 cacheEditor = (existingEditorView) ->
   session = atom.project.openSync()
