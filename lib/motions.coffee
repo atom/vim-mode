@@ -4,7 +4,6 @@ SearchViewModel = require './search-view-model'
 
 class Motion
   constructor: (@editor, @state) ->
-    @initialize?()
 
   isComplete: -> true
   isRecordable: -> false
