@@ -14,13 +14,14 @@ class VimState
   opStack: null
   mode: null
   submode: null
-  registers: null
 
   constructor: (@editorView) ->
     @editor = @editorView.editor
     @opStack = []
     @history = []
-    @registers = {}
+    atom.workspace ||= {}
+    atom.workspace.vimState ||= {}
+    atom.workspace.vimState.registers ||= {}
     @mode = 'command'
 
     @setupCommandMode()
@@ -212,7 +213,7 @@ class VimState
       type = utils.copyType(text)
       {text, type}
     else
-      @registers[name]
+      atom.workspace.vimState.registers[name]
 
   # Private: Sets the value of a given register.
   #
@@ -224,7 +225,7 @@ class VimState
     if name == '*'
       atom.clipboard.write(value.text)
     else
-      @registers[name] = value
+      atom.workspace.vimState.registers[name] = value
 
   ##############################################################################
   # Commands
