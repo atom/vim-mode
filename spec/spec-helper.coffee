@@ -5,6 +5,10 @@ VimState = require '../lib/vim-state'
 
 originalKeymap = null
 
+beforeEach ->
+  atom.workspace.vimState ||= {}
+  atom.workspace.vimState.registers ||= {}
+
 cacheEditor = (existingEditorView) ->
   session = atom.project.openSync()
   if existingEditorView?

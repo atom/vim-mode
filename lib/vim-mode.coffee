@@ -3,6 +3,8 @@ VimState = require './vim-state'
 module.exports =
 
   activate: (state) ->
+    atom.workspace.vimState ||= {}
+    atom.workspace.vimState.registers ||= {}
     atom.workspaceView.eachEditorView (editorView) =>
       return unless editorView.attached
 
