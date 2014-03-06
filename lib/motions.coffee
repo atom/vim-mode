@@ -1,8 +1,10 @@
 _ = require 'underscore-plus'
-{Point, Range} = require 'atom'
+{$$, Point, Range} = require 'atom'
+SearchViewModel = require './search-view-model'
 
 class Motion
-  constructor: (@editor) ->
+  constructor: (@editor, @state) ->
+
   isComplete: -> true
   isRecordable: -> false
 
@@ -366,9 +368,30 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
+class Search extends Motion
+  # We're overwriting the constructor to use the editor view instead
+  # of the editor, as we'll need to attach a CMIV to it.
+  constructor: (@editorView, @state) ->
+    super(@editorView.editor, @state)
+    @viewModel = new SearchViewModel(@)
+
+  repeat: (opts = {}) =>
+    @viewModel.repeat(opts)
+    @
+
+  reversed: =>
+    @viewModel.reversed()
+    @
+
+  execute: (count=1) ->
+    @viewModel.execute(count)
+
+  select: (count=1) ->
+    @viewModel.select(count)
+
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
   MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
   MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
-  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen }
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search }

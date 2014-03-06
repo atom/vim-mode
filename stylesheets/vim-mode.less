@@ -8,3 +8,27 @@
     opacity: 0.5;
   }
 }
+.command-mode-input .editor.mini {
+  background-color: inherit;
+  border: none;
+  width: 100%;
+  font-weight: normal;
+  color: #aaaaaa;
+  text-shadow: 0 -1px 0 #333333;
+  // see also the commandModeInputViewFontSize setting.
+  line-height: 1.28;
+  cursor: default;
+  white-space: nowrap;
+  padding-left: 10px;
+}
+
+.command-mode-input-field.hidden-input {
+  padding: 0;
+  border: 0;
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 1px;
+}
