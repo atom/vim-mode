@@ -118,4 +118,3 @@
   'ctrl-w v': 'pane:split-right'
   'ctrl-w ctrl-s': 'pane:split-down'
   'ctrl-w s': 'pane:split-down'
-  'ctrl-e': 'vim-mode:scroll-down'
