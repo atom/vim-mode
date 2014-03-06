@@ -396,7 +396,6 @@ describe "Motions", ->
       it "moves the cursor to the specified search pattern", ->
         keydown '/'
 
-        # How to simulate typing?
         editor.commandModeInputView.editor.setText 'def'
         editor.commandModeInputView.editor.trigger 'core:confirm'
 
