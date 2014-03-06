@@ -394,7 +394,7 @@ describe "Motions", ->
 
     describe "as a motion", ->
       it "moves the cursor to the specified search pattern", ->
-        keydown '/'
+        keydown('/')
 
         editor.commandModeInputView.editor.setText 'def'
         editor.commandModeInputView.editor.trigger 'core:confirm'
@@ -403,7 +403,7 @@ describe "Motions", ->
 
       it "loops back around", ->
         editor.setCursorBufferPosition([3, 0])
-        keydown '/'
+        keydown('/')
         editor.commandModeInputView.editor.setText 'def'
         editor.commandModeInputView.editor.trigger 'core:confirm'
 
@@ -411,91 +411,91 @@ describe "Motions", ->
 
       describe "repeating", ->
         beforeEach ->
-          keydown '/'
+          keydown('/')
           editor.commandModeInputView.editor.setText 'def'
           editor.commandModeInputView.editor.trigger 'core:confirm'
 
         describe "the n keybinding", ->
           it "repeats the last search", ->
-            keydown 'n'
+            keydown('n')
             expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
         describe "the N keybinding", ->
           it "repeats the last search backwards", ->
             editor.setCursorBufferPosition([0, 0])
-            keydown 'N', shift: true
+            keydown('N', shift: true)
             expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
       describe "composing", ->
         it "composes with operators", ->
-          keydown 'd'
-          keydown '/'
-          editor.commandModeInputView.editor.setText 'def'
-          editor.commandModeInputView.editor.trigger 'core:confirm'
+          keydown('d')
+          keydown('/')
+          editor.commandModeInputView.editor.setText('def')
+          editor.commandModeInputView.editor.trigger('core:confirm')
           expect(editor.getText()).toEqual "def\nabc\ndef\n"
 
         it "repeats correctly with operators", ->
-          keydown 'd'
-          keydown '/'
-          editor.commandModeInputView.editor.setText 'def'
-          editor.commandModeInputView.editor.trigger 'core:confirm'
+          keydown('d')
+          keydown('/')
+          editor.commandModeInputView.editor.setText('def')
+          editor.commandModeInputView.editor.trigger('core:confirm')
 
-          keydown '.'
+          keydown('.')
           expect(editor.getText()).toEqual "def\n"
 
     describe "when reversed as ?", ->
       it "moves the cursor backwards to the specified search pattern", ->
-        keydown '?'
-        editor.commandModeInputView.editor.setText 'def'
-        editor.commandModeInputView.editor.trigger 'core:confirm'
+        keydown('?')
+        editor.commandModeInputView.editor.setText('def')
+        editor.commandModeInputView.editor.trigger('core:confirm')
         expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
       describe "repeating", ->
         beforeEach ->
-          keydown '?'
-          editor.commandModeInputView.editor.setText 'def'
-          editor.commandModeInputView.editor.trigger 'core:confirm'
+          keydown('?')
+          editor.commandModeInputView.editor.setText('def')
+          editor.commandModeInputView.editor.trigger('core:confirm')
 
         describe 'the n keybinding', ->
           it "repeats the last search backwards", ->
             editor.setCursorBufferPosition([0, 0])
-            keydown 'n'
+            keydown('n')
             expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
         describe 'the N keybinding', ->
           it "repeats the last search forwards", ->
             editor.setCursorBufferPosition([0, 0])
-            keydown 'N', shift: true
+            keydown('N', shift: true)
             expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
     describe "using search history", ->
       beforeEach ->
-        keydown '/'
-        editor.commandModeInputView.editor.setText 'def'
-        editor.commandModeInputView.editor.trigger 'core:confirm'
+        keydown('/')
+        editor.commandModeInputView.editor.setText('def')
+        editor.commandModeInputView.editor.trigger('core:confirm')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-        keydown '/'
-        editor.commandModeInputView.editor.setText 'abc'
-        editor.commandModeInputView.editor.trigger 'core:confirm'
+        keydown('/')
+        editor.commandModeInputView.editor.setText('abc')
+        editor.commandModeInputView.editor.trigger('core:confirm')
         expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
       it "allows searching history in the search field", ->
-        keydown '/'
-        editor.commandModeInputView.editor.trigger 'core:move-up'
-        expect(editor.commandModeInputView.editor.getText()).toEqual 'abc'
-        editor.commandModeInputView.editor.trigger 'core:move-up'
-        expect(editor.commandModeInputView.editor.getText()).toEqual 'def'
-        editor.commandModeInputView.editor.trigger 'core:move-up'
-        expect(editor.commandModeInputView.editor.getText()).toEqual 'def'
+        keydown('/')
+        editor.commandModeInputView.editor.trigger('core:move-up')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
+        editor.commandModeInputView.editor.trigger('core:move-up')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('def')
+        editor.commandModeInputView.editor.trigger('core:move-up')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('def')
 
       it "resets the search field to empty when scrolling back", ->
-        keydown '/'
-        editor.commandModeInputView.editor.trigger 'core:move-up'
-        expect(editor.commandModeInputView.editor.getText()).toEqual 'abc'
-        editor.commandModeInputView.editor.trigger 'core:move-up'
-        expect(editor.commandModeInputView.editor.getText()).toEqual 'def'
-        editor.commandModeInputView.editor.trigger 'core:move-down'
-        expect(editor.commandModeInputView.editor.getText()).toEqual 'abc'
-        editor.commandModeInputView.editor.trigger 'core:move-down'
+        keydown('/')
+        editor.commandModeInputView.editor.trigger('core:move-up')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
+        editor.commandModeInputView.editor.trigger('core:move-up')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('def')
+        editor.commandModeInputView.editor.trigger('core:move-down')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
+        editor.commandModeInputView.editor.trigger('core:move-down')
         expect(editor.commandModeInputView.editor.getText()).toEqual ''
