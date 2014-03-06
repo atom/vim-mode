@@ -9,7 +9,6 @@ module.exports =
     atom.workspace.vimState.registers ||= {}
     atom.workspace.vimState.searchHistory ||= []
 
-
   activate: (state) ->
     @_initializeWorkspaceState()
     atom.workspaceView.eachEditorView (editorView) =>
