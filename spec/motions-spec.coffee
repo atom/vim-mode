@@ -87,7 +87,7 @@ describe "Motions", ->
 
         # FIXME: The definition of Cursor#getEndOfCurrentWordBufferPosition,
         # means that the end of the word can't be the current cursor
-        # position (even though it is when you're cursor is on a new line).
+        # position (even though it is when your cursor is on a new line).
         #
         # Therefore it picks the end of the next word here (which is [3,3])
         # to start looking for the next word, which is also the end of the
@@ -118,6 +118,40 @@ describe "Motions", ->
 
         it "selects the whitespace", ->
           expect(vimState.getRegister('"').text).toBe ' '
+
+  describe "the W keybinding", ->
+    beforeEach -> editor.setText("cde1+- ab \n xyz\n\nzip")
+
+    describe "as a motion", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 0])
+
+      it "moves the cursor to the beginning of the next word", ->
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+        keydown('W', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+    describe "as a selection", ->
+      describe "within a word", ->
+
+        it "selects to the end of the whole word", ->
+          editor.setCursorScreenPosition([0, 0])
+          keydown('y')
+          keydown('W', shift:true)
+          expect(vimState.getRegister('"').text).toBe 'cde1+- '
+
+        it "doesn't go past the end of the file", ->
+          editor.setCursorScreenPosition([2, 0])
+          keydown('y')
+          keydown('W', shift:true)
+          expect(vimState.getRegister('"').text).toBe ''
 
   describe "the e keybinding", ->
     beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
@@ -279,6 +313,41 @@ describe "Motions", ->
         it "selects to the beginning of the last word", ->
           expect(vimState.getRegister('"').text).toBe 'ab '
           expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+  describe "the B keybinding", ->
+    beforeEach -> editor.setText("cde1+- ab \n xyz-123\n\n zip")
+
+    describe "as a motion", ->
+      beforeEach -> editor.setCursorScreenPosition([4, 1])
+
+      it "moves the cursor to the beginning of the previous word", ->
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [3, 1]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+
+        keydown('B', shift:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a selection", ->
+      it "selects to the beginning of the whole word", ->
+        editor.setCursorScreenPosition([1, 8])
+        keydown('y')
+        keydown('B', shift:true)
+        expect(vimState.getRegister('"').text).toBe 'xyz-123'
+
+      it "doesn't go past the beginning of the file", ->
+        editor.setCursorScreenPosition([0, 0])
+        keydown('y')
+        keydown('B', shift:true)
+        expect(vimState.getRegister('"').text).toBe ''
 
   describe "the ^ keybinding", ->
     beforeEach ->
@@ -503,3 +572,59 @@ describe "Motions", ->
         expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
         editor.commandModeInputView.editor.trigger('core:move-down')
         expect(editor.commandModeInputView.editor.getText()).toEqual ''
+
+  describe "the H keybinding", ->
+    beforeEach ->
+      editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")
+      editor.setCursorScreenPosition([8, 0])
+      spyOn(editor, 'setCursorScreenPosition')
+
+    it "moves the cursor to the first row if visible", ->
+      spyOn(editorView, 'getFirstVisibleScreenRow').andReturn(0)
+      keydown('H', shift: true)
+      expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([0, 0])
+
+    it "moves the cursor to the first visible row plus offset", ->
+      spyOn(editorView, 'getFirstVisibleScreenRow').andReturn(2)
+      keydown('H', shift: true)
+      expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([4, 0])
+
+    it "respects counts", ->
+      spyOn(editorView, 'getFirstVisibleScreenRow').andReturn(0)
+      keydown('3')
+      keydown('H', shift: true)
+      expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([2, 0])
+
+  describe "the L keybinding", ->
+    beforeEach ->
+      editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")
+      editor.setCursorScreenPosition([8, 0])
+      spyOn(editor, 'setCursorScreenPosition')
+
+    it "moves the cursor to the first row if visible", ->
+      spyOn(editorView, 'getLastVisibleScreenRow').andReturn(10)
+      keydown('L', shift: true)
+      expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([10, 0])
+
+    it "moves the cursor to the first visible row plus offset", ->
+      spyOn(editorView, 'getLastVisibleScreenRow').andReturn(6)
+      keydown('L', shift: true)
+      expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([4, 0])
+
+    it "respects counts", ->
+      spyOn(editorView, 'getLastVisibleScreenRow').andReturn(10)
+      keydown('3')
+      keydown('L', shift: true)
+      expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([8, 0])
+
+  describe "the M keybinding", ->
+    beforeEach ->
+      editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")
+      editor.setCursorScreenPosition([8, 0])
+      spyOn(editor, 'setCursorScreenPosition')
+      spyOn(editorView, 'getLastVisibleScreenRow').andReturn(10)
+      spyOn(editorView, 'getFirstVisibleScreenRow').andReturn(0)
+
+    it "moves the cursor to the first row if visible", ->
+      keydown('M', shift: true)
+      expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([5, 0])

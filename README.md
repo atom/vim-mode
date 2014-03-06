@@ -30,7 +30,7 @@ them useful as no one person uses all of vim's functionality.
 * Block backspace in command mode.
   * Block `ctrl-d` in insert mode.
 * More advanced keymap to support `iw` motion.
-  * Support for 'f' and 't'
+  * Support for `f` and `t`
   * Handle `g{line}` and `gg`
 
 ### Documentation
@@ -39,6 +39,7 @@ them useful as no one person uses all of vim's functionality.
 * [Motions](https://github.com/atom/vim-mode/blob/master/docs/motions.md)
 * [Operators](https://github.com/atom/vim-mode/blob/master/docs/operators.md)
 * [Commands](https://github.com/atom/vim-mode/blob/master/docs/commands.md)
+* [Splits](https://github.com/atom/vim-mode/blob/master/docs/splits.md)
 
 ### Development
 

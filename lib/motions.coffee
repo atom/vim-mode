@@ -16,6 +16,8 @@ class CurrentSelection extends Motion
   select: (count=1) ->
     _.times(count, -> true)
 
+  isLinewise: -> @editor.mode == 'visual' and @editor.submode == 'linewise'
+
 class SelectLeft extends Motion
   execute: (count=1) ->
     @select(count)
@@ -101,6 +103,26 @@ class MoveToPreviousWord extends Motion
       @editor.selectToBeginningOfWord()
       true
 
+class MoveToPreviousWholeWord extends Motion
+  execute: (count=1) ->
+    _.times count, =>
+      @editor.moveCursorToBeginningOfWord()
+      @editor.moveCursorToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
+
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectToBeginningOfWord()
+      @editor.selectToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
+      true
+
+  isWholeWord: ->
+    char = @editor.getCursor().getCurrentWordPrefix().slice(-1)
+    char is ' ' or char is '\n'
+
+  isBeginningOfFile: ->
+    cur = @editor.getCursorBufferPosition();
+    not cur.row and not cur.column
+
 class MoveToNextWord extends Motion
   execute: (count=1) ->
     _.times count, =>
@@ -121,6 +143,36 @@ class MoveToNextWord extends Motion
         @editor.selectToBeginningOfNextWord()
 
       true
+
+class MoveToNextWholeWord extends Motion
+  execute: (count=1) ->
+    _.times count, =>
+      @editor.moveCursorToBeginningOfNextWord()
+      @editor.moveCursorToBeginningOfNextWord() while not @isWholeWord() and not @isEndOfFile()
+
+  select: (count=1, {excludeWhitespace}={}) ->
+    cursor = @editor.getCursor()
+
+    _.times count, =>
+      current = cursor.getBufferPosition()
+      next = cursor.getBeginningOfNextWordBufferPosition(/[^\s]/)
+
+      if current.row != next.row or excludeWhitespace
+        @editor.selectToEndOfWord()
+      else
+        @editor.selectToBeginningOfNextWord()
+        @editor.selectToBeginningOfNextWord() while not @isWholeWord() and not @isEndOfFile()
+
+      true
+
+  isWholeWord: ->
+    char = @editor.getCursor().getCurrentWordPrefix().slice(-1)
+    char is ' ' or char is '\n'
+
+  isEndOfFile: ->
+    last = @editor.getEofBufferPosition()
+    cur = @editor.getCursorBufferPosition()
+    last.row is cur.row and last.column is cur.column
 
 class MoveToEndOfWord extends Motion
   execute: (count=1) ->
@@ -212,10 +264,7 @@ class MoveToLine extends Motion
   isLinewise: -> true
 
   execute: (count) ->
-    if count?
-      @editor.setCursorBufferPosition([count - 1, 0])
-    else
-      @editor.setCursorBufferPosition([@editor.getLineCount() - 1, 0])
+    @setCursorPosition(count)
     @editor.getCursor().skipLeadingWhitespace()
 
   # Options
@@ -247,6 +296,20 @@ class MoveToLine extends Motion
 
       new Range(startPoint, endPoint)
 
+  setCursorPosition: (count) ->
+    @editor.setCursorBufferPosition([@getDestinationRow(count), 0])
+
+  getDestinationRow: (count) ->
+    if count? then count - 1 else (@editor.getLineCount() - 1)
+
+class MoveToScreenLine extends MoveToLine
+  constructor: (@editor, @editorView, @scrolloff) ->
+    @scrolloff = 2 # atom default
+    super(@editor)
+
+  setCursorPosition: (count) ->
+    @editor.setCursorScreenPosition([@getDestinationRow(count), 0])
+
 class MoveToBeginningOfLine extends Motion
   execute: (count=1) ->
     @editor.moveCursorToBeginningOfLine()
@@ -277,8 +340,34 @@ class MoveToLastCharacterOfLine extends Motion
       true
 
 class MoveToStartOfFile extends MoveToLine
-  execute: (count=1) ->
-    super(count)
+  getDestinationRow: (count=0) ->
+    count
+
+class MoveToTopOfScreen extends MoveToScreenLine
+  getDestinationRow: (count=0) ->
+    firstScreenRow = @editorView.getFirstVisibleScreenRow()
+    if firstScreenRow > 0
+      offset = Math.max(count - 1, @scrolloff)
+    else
+      offset = if count > 0 then count - 1 else count
+    firstScreenRow + offset
+
+class MoveToBottomOfScreen extends MoveToScreenLine
+  getDestinationRow: (count=0) ->
+    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    lastRow = @editor.getBuffer().getLastRow()
+    if lastScreenRow != lastRow
+      offset = Math.max(count - 1, @scrolloff)
+    else
+      offset = if count > 0 then count - 1 else count
+    lastScreenRow - offset
+
+class MoveToMiddleOfScreen extends MoveToScreenLine
+  getDestinationRow: (count) ->
+    firstScreenRow = @editorView.getFirstVisibleScreenRow()
+    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    height = lastScreenRow - firstScreenRow
+    Math.floor(firstScreenRow + (height / 2))
 
 class Search extends Motion
   # We're overwriting the constructor to use the editor view instead
@@ -372,7 +461,8 @@ class Search extends Motion
     @matches = after
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
-  MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToNextWord,
-  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine,
-  MoveToBeginningOfLine, MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine,
-  MoveToStartOfFile, Search }
+  MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
+  MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
+  MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search }

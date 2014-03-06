@@ -49,6 +49,37 @@ describe "Operators", ->
       it "deletes nothing when cursor is on empty line", ->
         expect(editor.getText()).toBe "012345\n\nabcdef"
 
+  describe "the X keybinding", ->
+    describe "on a line with content", ->
+      beforeEach ->
+        editor.setText("012345")
+        editor.setCursorScreenPosition([0, 2])
+
+      it "deletes a character", ->
+        keydown('X', shift: true)
+        expect(editor.getText()).toBe '02345'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        expect(vimState.getRegister('"').text).toBe '1'
+
+        keydown('X', shift: true)
+        expect(editor.getText()).toBe '2345'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        expect(vimState.getRegister('"').text).toBe '0'
+
+        keydown('X', shift: true)
+        expect(editor.getText()).toBe '2345'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        expect(vimState.getRegister('"').text).toBe '0'
+
+    describe "on an empty line", ->
+      beforeEach ->
+        editor.setText("012345\n\nabcdef")
+        editor.setCursorScreenPosition([1, 0])
+        keydown('X', shift: true)
+
+      it "deletes nothing when cursor is on empty line", ->
+        expect(editor.getText()).toBe "012345\n\nabcdef"
+
   describe "the s keybinding", ->
     beforeEach ->
       editor.setText('012345')
@@ -194,6 +225,18 @@ describe "Operators", ->
     beforeEach ->
       editor.getBuffer().setText("012 345\nabc\n")
       editor.setCursorScreenPosition([0, 4])
+
+    describe "when selected lines in visual linewise mode", ->
+      beforeEach ->
+        keydown('V', shift: true)
+        keydown('j')
+        keydown('y')
+
+      it "is in linewise motion", ->
+        expect(vimState.getRegister('"').type).toEqual "linewise"
+
+      it "saves the lines to the default register", ->
+        expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
     describe "when followed by a second y ", ->
       beforeEach ->

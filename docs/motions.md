@@ -1,8 +1,10 @@
 ## Implemented Motions
 
 * [w](http://vimhelp.appspot.com/motion.txt.html#w)
+* [W](http://vimhelp.appspot.com/motion.txt.html#W)
 * [e](http://vimhelp.appspot.com/motion.txt.html#e)
 * [b](http://vimhelp.appspot.com/motion.txt.html#b)
+* [B](http://vimhelp.appspot.com/motion.txt.html#B)
 * [h](http://vimhelp.appspot.com/motion.txt.html#h)
 * [j](http://vimhelp.appspot.com/motion.txt.html#j)
 * [k](http://vimhelp.appspot.com/motion.txt.html#k)
@@ -16,3 +18,6 @@
 * [G](http://vimhelp.appspot.com/motion.txt.html#G)
 * [gt](http://vimhelp.appspot.com/tabpage.txt.html#gt)
 * [gT](http://vimhelp.appspot.com/tabpage.txt.html#gT)
+* [H](http://vimhelp.appspot.com/motion.txt.html#H)
+* [L](http://vimhelp.appspot.com/motion.txt.html#L)
+* [M](http://vimhelp.appspot.com/motion.txt.html#M)

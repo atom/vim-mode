@@ -6,6 +6,7 @@ prefixes = require './prefixes'
 commands = require './commands'
 motions = require './motions'
 utils = require './utils'
+panes = require './panes'
 
 module.exports =
 class VimState
@@ -91,6 +92,7 @@ class VimState
       'change': => @linewiseAliasedOperator(operators.Change)
       'change-to-last-character-of-line': => [new operators.Change(@editor, @), new motions.MoveToLastCharacterOfLine(@editor)]
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
+      'delete-left': => [new operators.Delete(@editor), new motions.MoveLeft(@editor)]
       'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
       'yank': => @linewiseAliasedOperator(operators.Yank)
       'yank-line': => [new operators.Yank(@editor, @), new motions.MoveToLine(@editor)]
@@ -106,8 +108,10 @@ class VimState
       'move-down': => new motions.MoveDown(@editor)
       'move-right': => new motions.MoveRight(@editor)
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
+      'move-to-next-whole-word': => new motions.MoveToNextWholeWord(@editor)
       'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
+      'move-to-previous-whole-word': => new motions.MoveToPreviousWholeWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
       'move-to-previous-paragraph': => new motions.MoveToPreviousParagraph(@editor)
       'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)
@@ -115,13 +119,20 @@ class VimState
       'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
       'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
       'move-to-line': => new motions.MoveToLine(@editor)
+      'move-to-top-of-screen': => new motions.MoveToTopOfScreen(@editor, @editorView)
+      'move-to-bottom-of-screen': => new motions.MoveToBottomOfScreen(@editor, @editorView)
+      'move-to-middle-of-screen': => new motions.MoveToMiddleOfScreen(@editor, @editorView)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
       'search-complete': (e) => @currentSearch
       'repeat-search': (e) => @currentSearch.repeat() if @currentSearch?
       'repeat-search-backwards': (e) => @currentSearch.repeat(backwards: true) if @currentSearch?
-
+      'focus-pane-view-on-left': => new panes.FocusPaneViewOnLeft()
+      'focus-pane-view-on-right': => new panes.FocusPaneViewOnRight()
+      'focus-pane-view-above': => new panes.FocusPaneViewAbove()
+      'focus-pane-view-below': => new panes.FocusPaneViewBelow()
+      'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
 
   # Private: A helper to actually register the given commands with the
   # editor.
@@ -245,7 +256,8 @@ class VimState
     @submode = null
 
     if @editorView.is(".insert-mode")
-      @editor.getCursor().moveLeft()
+      cursor = @editor.getCursor()
+      cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
     @editorView.removeClass('insert-mode visual-mode')
     @editorView.addClass('command-mode')
