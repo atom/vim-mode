@@ -72,8 +72,6 @@ class VimState
     @editorView.command 'vim-mode:reverse-search', =>
       @currentSearch = new motions.Search(@editorView, @)
       @currentSearch.reversed()
-    @editorView.command 'vim-mode:search-history:previous', =>
-      console.log "previous!"
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
