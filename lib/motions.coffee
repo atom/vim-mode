@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
-VimCommandModeInputView = require './vim-command-input-view'
+VimCommandModeInputView = require './vim-command-mode-input-view'
 
 class Motion
   constructor: (@editor, @state) ->

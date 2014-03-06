@@ -9,7 +9,7 @@ class VimCommandModeInputView extends View
         @subview 'editor', new EditorView(mini: true)
 
   initialize: (@motion, opts = {})->
-    @editor.setFontSize(11)
+    @editor.setFontSize(atom.config.get('vim-mode.commandModeInputViewFontSize'))
 
     if opts.class?
       @editorContainer.addClass opts.class
