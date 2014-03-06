@@ -7,6 +7,8 @@ module.exports =
   activate: (state) ->
     atom.workspace.vimState ||= {}
     atom.workspace.vimState.registers ||= {}
+    atom.workspace.vimState.searchHistory ||= []
+
     atom.workspaceView.eachEditorView (editorView) =>
       return unless editorView.attached
 

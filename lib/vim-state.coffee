@@ -20,7 +20,6 @@ class VimState
     @editor = @editorView.editor
     @opStack = []
     @history = []
-    @searchHistory = []
     @mode = 'command'
 
     @setupCommandMode()
@@ -245,7 +244,7 @@ class VimState
   #
   # Returns nothing
   pushSearchHistory: (search) ->
-    @searchHistory.unshift search
+    atom.workspace.vimState.searchHistory.unshift search
 
   # Public: Get the search history item at the given index.
   #
@@ -253,7 +252,7 @@ class VimState
   #
   # Returns a search motion
   getSearchHistoryItem: (index) ->
-    @searchHistory[index]
+    atom.workspace.vimState.searchHistory[index]
 
   ##############################################################################
   # Commands

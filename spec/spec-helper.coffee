@@ -8,6 +8,7 @@ originalKeymap = null
 beforeEach ->
   atom.workspace.vimState ||= {}
   atom.workspace.vimState.registers ||= {}
+  atom.workspace.vimState.searchHistory ||= []
 
 cacheEditor = (existingEditorView) ->
   session = atom.project.openSync()
