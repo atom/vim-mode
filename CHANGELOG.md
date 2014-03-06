@@ -1,5 +1,6 @@
 ## HEAD
 * Implement `ctrl-e` and `ctrl-y`
+* Implement `/`, `?`, `n` and `N` @bhuga
 
 ## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
