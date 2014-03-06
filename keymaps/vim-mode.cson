@@ -100,6 +100,8 @@
   'ctrl-r': 'core:redo'
   'ctrl-u': 'core:page-up'
   'ctrl-d': 'core:page-down'
+  'ctrl-e': 'vim-mode:scroll-down'
+  'ctrl-y': 'vim-mode:scroll-up'
   '/': 'vim-mode:search'
   '?': 'vim-mode:reverse-search'
   'n': 'vim-mode:repeat-search'

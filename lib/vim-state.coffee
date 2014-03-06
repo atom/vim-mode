@@ -7,6 +7,7 @@ commands = require './commands'
 motions = require './motions'
 utils = require './utils'
 panes = require './panes'
+scroll = require './scroll'
 
 module.exports =
 class VimState
@@ -124,6 +125,8 @@ class VimState
       'move-to-top-of-screen': => new motions.MoveToTopOfScreen(@editor, @editorView)
       'move-to-bottom-of-screen': => new motions.MoveToBottomOfScreen(@editor, @editorView)
       'move-to-middle-of-screen': => new motions.MoveToMiddleOfScreen(@editor, @editorView)
+      'scroll-down': => new scroll.ScrollDown(@editorView, @editor)
+      'scroll-up': => new scroll.ScrollUp(@editorView, @editor)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
