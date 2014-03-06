@@ -7,6 +7,7 @@ commands = require './commands'
 motions = require './motions'
 utils = require './utils'
 panes = require './panes'
+scroll = require './scroll'
 
 module.exports =
 class VimState
@@ -19,6 +20,7 @@ class VimState
     @editor = @editorView.editor
     @opStack = []
     @history = []
+    @searchHistory = []
     @mode = 'command'
 
     @setupCommandMode()
@@ -65,6 +67,14 @@ class VimState
   #
   # Returns nothing.
   setupCommandMode: ->
+    # Commands here start a new mode instead of popping the operator stack
+    # immediately.
+    @editorView.command 'vim-mode:search', =>
+      @currentSearch = new motions.Search(@editorView, @)
+    @editorView.command 'vim-mode:reverse-search', =>
+      @currentSearch = new motions.Search(@editorView, @)
+      @currentSearch.reversed()
+
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
       'activate-insert-mode': => @activateInsertMode()
@@ -113,9 +123,14 @@ class VimState
       'move-to-top-of-screen': => new motions.MoveToTopOfScreen(@editor, @editorView)
       'move-to-bottom-of-screen': => new motions.MoveToBottomOfScreen(@editor, @editorView)
       'move-to-middle-of-screen': => new motions.MoveToMiddleOfScreen(@editor, @editorView)
+      'scroll-down': => new scroll.ScrollDown(@editorView, @editor)
+      'scroll-up': => new scroll.ScrollUp(@editorView, @editor)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
+      'search-complete': (e) => @currentSearch
+      'repeat-search': (e) => @currentSearch.repeat() if @currentSearch?
+      'repeat-search-backwards': (e) => @currentSearch.repeat(backwards: true) if @currentSearch?
       'focus-pane-view-on-left': => new panes.FocusPaneViewOnLeft()
       'focus-pane-view-on-right': => new panes.FocusPaneViewOnRight()
       'focus-pane-view-above': => new panes.FocusPaneViewAbove()
@@ -223,6 +238,14 @@ class VimState
       atom.clipboard.write(value.text)
     else
       atom.workspace.vimState.registers[name] = value
+
+  # Public: Append a search to the search history.
+  #
+  # motions.Search - The confirmed search motion to append
+  #
+  # Returns nothing
+  pushSearchHistory: (search) ->
+    @searchHistory.unshift search
 
   ##############################################################################
   # Commands

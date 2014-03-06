@@ -1,6 +1,8 @@
 VimState = require './vim-state'
 
 module.exports =
+  configDefaults:
+    'commandModeInputViewFontSize': 11
 
   activate: (state) ->
     atom.workspace.vimState ||= {}

@@ -38,7 +38,6 @@ class Operator
     @motion = motion
     @complete = true
 
-
   # Protected: Wraps the function within an single undo step.
   #
   # fn - The function to wrap.
