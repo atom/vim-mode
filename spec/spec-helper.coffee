@@ -1,4 +1,5 @@
 {EditorView} = require 'atom'
+atom.workspace ||= {}
 
 VimState = require '../lib/vim-state'
 

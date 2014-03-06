@@ -19,7 +19,6 @@ class VimState
     @editor = @editorView.editor
     @opStack = []
     @history = []
-    atom.workspace ||= {}
     atom.workspace.vimState ||= {}
     atom.workspace.vimState.registers ||= {}
     @mode = 'command'
