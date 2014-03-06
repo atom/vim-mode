@@ -579,3 +579,19 @@ describe "Operators", ->
       keydown '.'
 
       expect(editor.getText()).toBe "78"
+
+  describe "the r keybinding", ->
+    beforeEach ->
+      editor.setText("12\n34\n")
+      editor.setCursorBufferPosition([0,0])
+
+    it "replaces a single character", ->
+      keydown 'r'
+      keydown 'x', element: editor.commandModeInputView.editor.find('input').get(0)
+      expect(editor.getText()).toBe 'x2\n34\n'
+
+    it "composes properly with motions", ->
+      keydown '2'
+      keydown 'r'
+      keydown 'x', element: editor.commandModeInputView.editor.find('input').get(0)
+      expect(editor.getText()).toBe 'xx\n34\n'
