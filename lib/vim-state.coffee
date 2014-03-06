@@ -247,6 +247,14 @@ class VimState
   pushSearchHistory: (search) ->
     @searchHistory.unshift search
 
+  # Public: Get the search history item at the given index.
+  #
+  # index - the index of the search history item
+  #
+  # Returns a search motion
+  getSearchHistoryItem: (index) ->
+    @searchHistory[index]
+
   ##############################################################################
   # Commands
   ##############################################################################
