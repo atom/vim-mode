@@ -1,7 +1,7 @@
 ## Maintainers Guide
 
 We'd like to foster an active community of mutual respect. With that as our
-guiding principal, we strive to do the following:
+guiding principle, we strive to do the following:
 
 * Respond to issues/pulls in a timely manner.
 * Encourage new contributors when possible.
