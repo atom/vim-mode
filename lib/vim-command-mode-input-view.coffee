@@ -14,6 +14,12 @@ class VimCommandModeInputView extends View
     if opts.class?
       @editorContainer.addClass opts.class
 
+    if opts.hidden?
+      @editorContainer.addClass 'hidden-input'
+
+    if opts.singleChar?
+      @singleChar = true
+
     unless atom.workspaceView?
       # We're in test mode. Don't append to anything, just initialize.
       @focus()
@@ -31,9 +37,15 @@ class VimCommandModeInputView extends View
     @handleEvents()
 
   handleEvents: ->
+    if @singleChar?
+      @editor.find('input').on 'textInput', @autosubmit
     @editor.on 'core:confirm', @confirm
     @editor.on 'core:cancel', @remove
     @editor.find('input').on 'blur', @remove
+
+  autosubmit: (event) =>
+    @editor.setText(event.originalEvent.data)
+    @confirm()
 
   confirm: =>
     @value = @editor.getText()

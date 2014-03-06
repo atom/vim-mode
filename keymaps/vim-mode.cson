@@ -106,6 +106,7 @@
   '?': 'vim-mode:reverse-search'
   'n': 'vim-mode:repeat-search'
   'N': 'vim-mode:repeat-search-backwards'
+  'r': 'vim-mode:replace'
   'ctrl-c': 'vim-mode:reset-command-mode'
   'backspace': 'core:move-left'
   'g t': 'pane:show-next-item'
