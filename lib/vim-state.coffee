@@ -15,14 +15,11 @@ class VimState
   opStack: null
   mode: null
   submode: null
-  registers: null
 
   constructor: (@editorView) ->
     @editor = @editorView.editor
     @opStack = []
     @history = []
-    @searchHistory = []
-    @registers = {}
     @mode = 'command'
 
     @setupCommandMode()
@@ -227,7 +224,7 @@ class VimState
       type = utils.copyType(text)
       {text, type}
     else
-      @registers[name]
+      atom.workspace.vimState.registers[name]
 
   # Private: Sets the value of a given register.
   #
@@ -239,7 +236,7 @@ class VimState
     if name == '*'
       atom.clipboard.write(value.text)
     else
-      @registers[name] = value
+      atom.workspace.vimState.registers[name] = value
 
   # Public: Append a search to the search history.
   #
@@ -247,7 +244,15 @@ class VimState
   #
   # Returns nothing
   pushSearchHistory: (search) ->
-    @searchHistory.unshift search
+    atom.workspace.vimState.searchHistory.unshift search
+
+  # Public: Get the search history item at the given index.
+  #
+  # index - the index of the search history item
+  #
+  # Returns a search motion
+  getSearchHistoryItem: (index) ->
+    atom.workspace.vimState.searchHistory[index]
 
   ##############################################################################
   # Commands

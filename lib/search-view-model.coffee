@@ -22,7 +22,7 @@ class SearchViewModel
     @view.editor.setText(@history(index).searchTerm)
 
   history: (index) ->
-    @vimState.searchHistory[index]
+    @vimState.getSearchHistoryItem(index)
 
   increaseHistorySearch: =>
     if @history(@historyIndex + 1)?
