@@ -82,7 +82,7 @@ class SearchViewModel
 
     @editor.scan(regexp, iterator)
 
-    previous = _.filter matchPoints, (point) ->
+    previous = _.filter matchPoints, (point) =>
       if @reverse
         point.compare(cur) < 0
       else

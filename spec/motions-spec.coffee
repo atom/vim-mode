@@ -498,6 +498,8 @@ describe "Motions", ->
             editor.setCursorBufferPosition([0, 0])
             keydown('N', shift: true)
             expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+            keydown('N', shift: true)
+            expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
       describe "composing", ->
         it "composes with operators", ->
