@@ -1,5 +1,5 @@
 ## HEAD
-* Implement `ctrl-e` and `ctrl-y`
+* Implement `ctrl-e` and `ctrl-y` @dougblack
 * Implement `/`, `?`, `n` and `N` @bhuga
 
 ## 0.8.0 - Keep rocking
