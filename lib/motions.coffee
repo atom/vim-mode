@@ -281,10 +281,10 @@ class MoveToStartOfFile extends MoveToLine
     super(count)
 
 class Search extends Motion
+  # We're overwriting the constructor to use the editor view instead
+  # of the editor, as we'll need to attach a CMIV to it.
   constructor: (@editorView, @state) ->
     super(@editorView.editor, @state)
-
-  initialize: =>
     @historyIndex = -1
     @view = new VimCommandModeInputView(@, class: 'search')
     @editor.commandModeInputView = @view
