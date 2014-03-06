@@ -121,8 +121,8 @@ class VimState
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
       'search-complete': (e) => @currentSearch
-      'repeat-search': (e) => @currentSearch.repeat()
-      'repeat-search-backwards': (e) => @currentSearch.repeat backwards: true
+      'repeat-search': (e) => @currentSearch.repeat() if @currentSearch?
+      'repeat-search-backwards': (e) => @currentSearch.repeat(backwards: true) if @currentSearch?
 
 
   # Private: A helper to actually register the given commands with the

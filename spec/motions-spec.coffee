@@ -410,6 +410,10 @@ describe "Motions", ->
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
       describe "repeating", ->
+        it "does nothing with no search history", ->
+          # This tests that no exception is raised
+          keydown('n')
+
         beforeEach ->
           keydown('/')
           editor.commandModeInputView.editor.setText 'def'
