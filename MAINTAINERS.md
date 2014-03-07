@@ -14,6 +14,9 @@ guiding principle, we strive to do the following:
     advice to get it there.
 * Add `CHANGELOG.md` entries for every pull merged.
 * Publish new releases in a timely manner.
+* Responsibly upgrade along with Atom core
+  * Tag the last compatible version with the correct Atom version before making a breaking change
+  * Merge finished pull requests before merging breaking changes
 * Label issues clearly
   * As either an `issue`, `enhancement` or `question`.
   * The `question` label indicates that there's a question about current
