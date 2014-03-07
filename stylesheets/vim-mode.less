@@ -1,10 +1,20 @@
 @import "syntax-variables";
 
-.editor.is-focused.vim-mode.command-mode:not(.mini) {
+.block-cursor(@visibility: visible) {
+  border: 0;
+  background-color: @syntax-cursor-color;
+  visibility: @visibility;
+  opacity: 0.5;
+}
+
+.vim-mode.command-mode:not(.mini) {
   .cursor, .cursor.blink-off {
-    border: 0;
-    background-color: @syntax-cursor-color;
-    visibility: visible;
-    opacity: 0.5;
+    .block-cursor(hidden);
+  }
+
+  &.editor.is-focused {
+    .cursor, .cursor.blink-off {
+      .block-cursor;
+    }
   }
 }
