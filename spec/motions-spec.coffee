@@ -27,10 +27,10 @@ describe "Motions", ->
       describe "as a motion", ->
         it "moves the cursor left, but not to the previous line", ->
           keydown('h')
-          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
           keydown('h')
-          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
       describe "as a selection", ->
         it "selects the character to the left", ->
@@ -43,28 +43,28 @@ describe "Motions", ->
     describe "the j keybinding", ->
       it "moves the cursor down, but not to the end of the last line", ->
         keydown('j')
-        expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+        expect(editor.getCursorBufferPosition()).toEqual [2, 1]
 
         keydown('j')
-        expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+        expect(editor.getCursorBufferPosition()).toEqual [2, 1]
 
     describe "the k keybinding", ->
       it "moves the cursor up, but not to the beginning of the first line", ->
         keydown('k')
-        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        expect(editor.getCursorBufferPosition()).toEqual [0, 1]
 
         keydown('k')
-        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        expect(editor.getCursorBufferPosition()).toEqual [0, 1]
 
     describe "the l keybinding", ->
       beforeEach -> editor.setCursorScreenPosition([1, 3])
 
       it "moves the cursor right, but not to the next line", ->
         keydown('l')
-        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+        expect(editor.getCursorBufferPosition()).toEqual [1, 4]
 
         keydown('l')
-        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+        expect(editor.getCursorBufferPosition()).toEqual [1, 4]
 
   describe "the w keybinding", ->
     beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
