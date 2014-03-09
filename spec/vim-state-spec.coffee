@@ -52,15 +52,17 @@ describe "VimState", ->
           expect(vimState.opStack.length).toBe 0
 
     describe "the D keybinding", ->
-      beforeEach ->
+      it "does not join lines", ->
+        editor.setText("0123456\nabcdef")
+        editor.setCursorScreenPosition([1, 0])
+        keydown('D', shift: true)
+        expect(editor.getText()).toEqual "0123456\n"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+      it "moves the cursor backward 1 character", ->
         editor.setText("0123456\nabcdef")
         editor.setCursorScreenPosition([0, 2])
         keydown('D', shift: true)
-
-      it "does not join lines", ->
-        expect(editor.getText()).toEqual "01\nabcdef"
-
-      it "moves the cursor backward 1 character", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
     describe "the v keybinding", ->
