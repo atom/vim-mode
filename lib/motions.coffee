@@ -124,15 +124,16 @@ class MoveToPreviousWholeWord extends Motion
 
 class MoveToNextWord extends Motion
   execute: (count=1) ->
+    cursor = @editor.getCursor()
+
     _.times count, =>
-      cursor = @editor.getCursor()
       current = cursor.getBufferPosition()
       next = cursor.getBeginningOfNextWordBufferPosition()
 
       if current != next
-        @editor.moveCursorToBeginningOfNextWord()
+        cursor.moveToBeginningOfNextWord()
       else
-        @editor.moveCursorToEndOfWord()
+        cursor.moveToEndOfWord()
 
   # Options
   #  excludeWhitespace - if true, whitespace shouldn't be selected
