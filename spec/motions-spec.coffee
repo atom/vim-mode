@@ -100,6 +100,12 @@ describe "Motions", ->
         keydown('w')
         expect(editor.getCursorScreenPosition()).toEqual [3, 2]
 
+      it "moves the cursor to the end of the word if last word in file", ->
+        editor.setText("abc")
+        editor.setCursorScreenPosition([0, 0])
+        keydown('w')
+        expect(editor.getCursorScreenPosition()).toEqual([0, 3])
+
     describe "as a selection", ->
       describe "within a word", ->
         beforeEach ->
