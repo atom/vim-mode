@@ -1,4 +1,5 @@
 _ = require 'underscore-plus'
+textObjects = require './text-objects'
 
 class OperatorError
   constructor: (@message) ->
@@ -81,6 +82,12 @@ class Delete extends Operator
 # It changes everything selected by the following motion.
 #
 class Change extends Operator
+  # selectOptions - The options object to pass through to the motion when
+  #                 selecting.
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @vimState.activateOperatorPendingMode()
+    @complete = false
+
   # Public: Changes the text selected by the given motion.
   #
   # count - The number of times to execute.
@@ -98,6 +105,12 @@ class Change extends Operator
 #
 class Yank extends Operator
   register: '"'
+
+  # selectOptions - The options object to pass through to the motion when
+  #                 selecting.
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @vimState.activateOperatorPendingMode()
+    @complete = false
 
   # Public: Copies the text selected by the given motion.
   #
@@ -119,6 +132,11 @@ class Yank extends Operator
       @editor.setCursorScreenPosition(originalPosition)
     else
       @editor.clearSelections()
+
+    if @motion instanceof textObjects.InnerWord
+      @editor.moveCursorToBeginningOfWord()
+
+    @vimState.activateCommandMode()
 
 #
 # It indents everything selected by the following motion.

@@ -5,6 +5,7 @@ operators = require './operators'
 prefixes = require './prefixes'
 commands = require './commands'
 motions = require './motions'
+textObjects = require './text-objects'
 utils = require './utils'
 panes = require './panes'
 scroll = require './scroll'
@@ -12,6 +13,8 @@ scroll = require './scroll'
 module.exports =
 class VimState
   editor: null
+  # The opStack is a stack of operations that are being executed. Think of it as
+  # an internal representation of something like "3dw"
   opStack: null
   mode: null
   submode: null
@@ -88,19 +91,14 @@ class VimState
       'insert-at-bol': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
-      'delete': => @linewiseAliasedOperator(operators.Delete)
-      'change': => @linewiseAliasedOperator(operators.Change)
       'change-to-last-character-of-line': => [new operators.Change(@editor, @), new motions.MoveToLastCharacterOfLine(@editor)]
       'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
       'delete-left': => [new operators.Delete(@editor), new motions.MoveLeft(@editor)]
       'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
-      'yank': => @linewiseAliasedOperator(operators.Yank)
       'yank-line': => [new operators.Yank(@editor, @), new motions.MoveToLine(@editor)]
       'put-before': => new operators.Put(@editor, @, location: 'before')
       'put-after': => new operators.Put(@editor, @, location: 'after')
       'join': => new operators.Join(@editor)
-      'indent': => @linewiseAliasedOperator(operators.Indent)
-      'outdent': => @linewiseAliasedOperator(operators.Outdent)
       'select-left': => new motions.SelectLeft(@editor)
       'select-right': => new motions.SelectRight(@editor)
       'move-left': => new motions.MoveLeft(@editor)
@@ -135,6 +133,12 @@ class VimState
       'focus-pane-view-above': => new panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
+      'delete': => @operatorPending(operators.Delete)
+      'change': => @operatorPending(operators.Change)
+      'yank': => @operatorPending(operators.Yank)
+      'indent': => @operatorPending(operators.Indent)
+      'outdent': => @operatorPending(operators.Outdent)
+      'inner-word': => new textObjects.InnerWord(@editor)
 
   # Private: A helper to actually register the given commands with the
   # editor.
@@ -148,20 +152,20 @@ class VimState
     _.each commands, (fn, commandName) =>
       eventName = "vim-mode:#{commandName}"
       @editorView.command eventName, (e) =>
-        possibleOperators = fn(e)
-        possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
-        for possibleOperator in possibleOperators
+        operations = fn(e)
+        operations = if _.isArray(operations) then operations else [operations]
+        for operation in operations
           # Motions in visual mode perform their selections.
-          if @mode == 'visual' and possibleOperator instanceof motions.Motion
-            possibleOperator.origExecute = possibleOperator.execute
-            possibleOperator.execute = possibleOperator.select
+          if @mode == 'visual' and operation instanceof motions.Motion
+            operation.origExecute = operation.execute
+            operation.execute = operation.select
 
-          @pushOperator(possibleOperator) if possibleOperator?.execute
+          @pushOperation(operation) if operation?.execute
 
-          # If we've received an operator in visual mode, mark the current
+          # If we've received an operation in visual mode, mark the current
           # selection as the motion to operate on.
-          if @mode == 'visual' and possibleOperator instanceof operators.Operator
-            @pushOperator(new motions.CurrentSelection(@))
+          if @mode == 'visual' and operation instanceof operators.Operator
+            @pushOperation(new motions.CurrentSelection(@))
             @activateCommandMode() if @mode == 'visual'
 
   # Private: Attempts to prevent the cursor from selecting the newline
@@ -174,12 +178,12 @@ class VimState
     if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
 
-  # Private: Adds an operator to the operation stack.
+  # Private: Adds an operation to the operation stack.
   #
   # operation - The operation to add.
   #
   # Returns nothing.
-  pushOperator: (operation) ->
+  pushOperation: (operation) ->
     @opStack.push(operation)
     @processOpStack()
 
@@ -193,23 +197,23 @@ class VimState
   #
   # Returns nothing.
   processOpStack: ->
-    return unless @topOperator().isComplete()
+    return unless @topOperation().isComplete()
 
-    poppedOperator = @opStack.pop()
+    poppedOperation = @opStack.pop()
     if @opStack.length
       try
-        @topOperator().compose(poppedOperator)
+        @topOperation().compose(poppedOperation)
         @processOpStack()
       catch e
         (e instanceof operators.OperatorError) and @resetCommandMode() or throw e
     else
-      @history.unshift(poppedOperator) if poppedOperator.isRecordable()
-      poppedOperator.execute()
+      @history.unshift(poppedOperation) if poppedOperation.isRecordable()
+      poppedOperation.execute()
 
   # Private: Fetches the last operation.
   #
   # Returns the last operation.
-  topOperator: ->
+  topOperation: ->
     _.last @opStack
 
   # Private: Fetches the value of a given register.
@@ -269,7 +273,7 @@ class VimState
       cursor = @editor.getCursor()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
-    @editorView.removeClass('insert-mode visual-mode')
+    @editorView.removeClass('insert-mode visual-mode operator-pending-mode')
     @editorView.addClass('command-mode')
     @editor.clearSelections()
 
@@ -281,7 +285,7 @@ class VimState
   activateInsertMode: ->
     @mode = 'insert'
     @submode = null
-    @editorView.removeClass('command-mode visual-mode')
+    @editorView.removeClass('command-mode visual-mode operator-pending-mode')
     @editorView.addClass('insert-mode')
 
     @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
@@ -294,12 +298,23 @@ class VimState
   activateVisualMode: (type) ->
     @mode = 'visual'
     @submode = type
-    @editorView.removeClass('command-mode insert-mode')
+    @editorView.removeClass('command-mode insert-mode operator-pending-mode')
     @editorView.addClass('visual-mode')
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
     if @submode == 'linewise'
       @editor.selectLine()
+
+  # Private: Used to enable operator pending mode.
+  #
+  # Returns nothing.
+  activateOperatorPendingMode: ->
+    @mode = 'operator-pending'
+    @submode = null
+    @editorView.removeClass('command-mode insert-mode visual-mode')
+    @editorView.addClass('operator-pending-mode')
+
+    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
 
   # Private: Resets the command mode back to it's initial state.
   #
@@ -314,7 +329,7 @@ class VimState
   # Returns nothing.
   registerPrefix: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
-    @pushOperator(new prefixes.Register(name))
+    @pushOperation(new prefixes.Register(name))
 
   # Private: A generic way to create a Number prefix based on the event.
   #
@@ -323,10 +338,10 @@ class VimState
   # Returns nothing.
   repeatPrefix: (e) ->
     num = parseInt(atom.keymap.keystrokeStringForEvent(e.originalEvent))
-    if @topOperator() instanceof prefixes.Repeat
-      @topOperator().addDigit(num)
+    if @topOperation() instanceof prefixes.Repeat
+      @topOperation().addDigit(num)
     else
-      @pushOperator(new prefixes.Repeat(num))
+      @pushOperation(new prefixes.Repeat(num))
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
@@ -336,19 +351,18 @@ class VimState
   #
   # Returns nothing.
   moveOrRepeat: (e) ->
-    if @topOperator() instanceof prefixes.Repeat
+    if @topOperation() instanceof prefixes.Repeat
       @repeatPrefix(e)
     else
       new motions.MoveToBeginningOfLine(@editor)
 
-  # Private: A generic way to handle operators that can be repeated for
-  # their linewise form.
+  # Private: Put us into operator pending mode with the given operator.
   #
   # constructor - The constructor of the operator.
   #
   # Returns nothing.
-  linewiseAliasedOperator: (constructor) ->
-    if @isOperatorPending(constructor)
+  operatorPending: (constructor) ->
+    if @isOperationPending(constructor)
       new motions.MoveToLine(@editor)
     else
       new constructor(@editor, @)
@@ -358,7 +372,7 @@ class VimState
   # constructor - The constructor of the object type you're looking for.
   #
   # Returns nothing.
-  isOperatorPending: (constructor) ->
+  isOperationPending: (constructor) ->
     for op in @opStack
       return op if op instanceof constructor
     false
