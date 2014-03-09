@@ -2,6 +2,8 @@
 * Implement `ctrl-e` and `ctrl-y` @dougblack
 * Implement `/`, `?`, `n` and `N` @bhuga
 * Registers are now shared between tabs in a single atom window @bhuga
+* Show cursor only in focused editor @tony612
+* Docs updated with new methods for entering insert mode @tednaleid
 
 ## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
