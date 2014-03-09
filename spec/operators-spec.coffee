@@ -18,6 +18,11 @@ describe "Operators", ->
     options.element ?= editorView[0]
     helpers.keydown(key, options)
 
+  commandModeInputKeydown = (key, opts = {}) ->
+    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.raw     = true
+    keydown(key, opts)
+
   describe "the x keybinding", ->
     describe "on a line with content", ->
       beforeEach ->
@@ -587,11 +592,11 @@ describe "Operators", ->
 
     it "replaces a single character", ->
       keydown 'r'
-      keydown 'x', element: editor.commandModeInputView.editor.find('input').get(0)
+      commandModeInputKeydown 'x'
       expect(editor.getText()).toBe 'x2\n34\n'
 
     it "composes properly with motions", ->
       keydown '2'
       keydown 'r'
-      keydown 'x', element: editor.commandModeInputView.editor.find('input').get(0)
+      commandModeInputKeydown 'x'
       expect(editor.getText()).toBe 'xx\n34\n'

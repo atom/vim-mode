@@ -26,7 +26,7 @@ cacheEditor = (existingEditorView) ->
 
   existingEditorView or editorView
 
-keydown = (key, {element, ctrl, shift, alt, meta}={}) ->
+keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
   dispatchKeyboardEvent = (target, eventArgs...) ->
     e = document.createEvent('KeyboardEvent')
     e.initKeyboardEvent eventArgs...
@@ -37,7 +37,7 @@ keydown = (key, {element, ctrl, shift, alt, meta}={}) ->
     e.initTextEvent eventArgs...
     target.dispatchEvent e
 
-  key = "U+#{key.charCodeAt(0).toString(16)}" unless key == 'escape'
+  key = "U+#{key.charCodeAt(0).toString(16)}" unless key == 'escape' || raw?
   element ||= document.activeElement
   eventArgs = [true, true, null, key, 0, ctrl, alt, shift, meta] # bubbles, cancelable, view, key, location
 
