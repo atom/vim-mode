@@ -259,6 +259,13 @@ class Replace extends Operator
 
   execute: (count=1) ->
     editor = @editorView.editor
+    pos = editor.getCursorBufferPosition()
+    currentRowLength = editor.lineLengthForBufferRow(pos.row)
+    # Do nothing on an empty line
+    return unless currentRowLength > 0
+
+    # Do nothing if asked to replace more characters than there are on a line
+    return unless currentRowLength - pos.column >= count
     @undoTransaction =>
       start = editor.getCursorBufferPosition()
       _.times count, =>

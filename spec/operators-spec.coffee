@@ -587,16 +587,28 @@ describe "Operators", ->
 
   describe "the r keybinding", ->
     beforeEach ->
-      editor.setText("12\n34\n")
+      editor.setText("12\n34\n\n")
       editor.setCursorBufferPosition([0,0])
 
     it "replaces a single character", ->
-      keydown 'r'
-      commandModeInputKeydown 'x'
-      expect(editor.getText()).toBe 'x2\n34\n'
+      keydown('r')
+      commandModeInputKeydown('x')
+      expect(editor.getText()).toBe 'x2\n34\n\n'
 
     it "composes properly with motions", ->
-      keydown '2'
-      keydown 'r'
-      commandModeInputKeydown 'x'
-      expect(editor.getText()).toBe 'xx\n34\n'
+      keydown('2')
+      keydown('r')
+      commandModeInputKeydown('x')
+      expect(editor.getText()).toBe 'xx\n34\n\n'
+
+    it "does nothing on an empty line", ->
+      editor.setCursorBufferPosition([2, 0])
+      keydown('r')
+      commandModeInputKeydown('x')
+      expect(editor.getText()).toBe '12\n34\n\n'
+
+    it "does nothing if asked to replace more characters than there are on a line", ->
+      keydown('3')
+      keydown('r')
+      commandModeInputKeydown('x')
+      expect(editor.getText()).toBe '12\n34\n\n'
