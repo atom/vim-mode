@@ -265,29 +265,34 @@ class VimState
   #
   # Returns nothing.
   activateCommandMode: ->
+    @deactivateInsertMode()
+    @deactivateVisualMode()
     @mode = 'command'
-    @submode = null
 
     if @editorView.is(".insert-mode")
       cursor = @editor.getCursor()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
-    @editorView.removeClass('insert-mode visual-mode')
     @editorView.addClass('command-mode')
     @editor.clearSelections()
 
     @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
 
+  deactivateCommandMode: ->
+    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editorView.removeClass('command-mode')
+
   # Private: Used to enable insert mode.
   #
   # Returns nothing.
   activateInsertMode: ->
+    @deactivateCommandMode()
+    @deactivateVisualMode()
     @mode = 'insert'
-    @submode = null
-    @editorView.removeClass('command-mode visual-mode')
     @editorView.addClass('insert-mode')
 
-    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+  deactivateInsertMode: ->
+    @editorView.removeClass('insert-mode')
 
   # Private: Used to enable visual mode.
   #
@@ -295,14 +300,18 @@ class VimState
   #
   # Returns nothing.
   activateVisualMode: (type) ->
+    @deactivateInsertMode()
+    @deactivateCommandMode()
     @mode = 'visual'
     @submode = type
-    @editorView.removeClass('command-mode insert-mode')
     @editorView.addClass('visual-mode')
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
     if @submode == 'linewise'
       @editor.selectLine()
+
+  deactivateVisualMode: ->
+    @editorView.removeClass('visual-mode')
+    @submode = null
 
   # Private: Resets the command mode back to it's initial state.
   #
