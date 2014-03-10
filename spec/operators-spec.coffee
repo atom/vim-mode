@@ -565,18 +565,23 @@ describe "Operators", ->
           expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
 
   describe "the = keybinding", ->
+    oldGrammar = []
+
     beforeEach ->
       waitsForPromise ->
         atom.packages.activatePackage('language-javascript')
 
+      oldGrammar = editor.getGrammar()
       editor.setText("foo\n  bar\n  baz")
       editor.setCursorScreenPosition([1, 0])
 
     describe "when used in a scope that supports auto-indent", ->
       beforeEach ->
-        grammar = atom.syntax.grammarForScopeName('source.js')
-        atom.syntax.setGrammarOverrideForPath(editor.getPath(), grammar.scopeName)
-        editor.setGrammar(grammar)
+        jsGrammar = atom.syntax.grammarForScopeName('source.js')
+        editor.setGrammar(jsGrammar)
+
+      afterEach ->
+        editor.setGrammar(oldGrammar)
 
       describe "when followed by a =", ->
         beforeEach ->
