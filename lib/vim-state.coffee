@@ -219,7 +219,7 @@ class VimState
   # Returns the value of the given register or undefined if it hasn't
   # been set.
   getRegister: (name) ->
-    if name == '*' || name == '+'
+    if name in ['*', '+']
       text = atom.clipboard.read()
       type = utils.copyType(text)
       {text, type}
@@ -241,7 +241,7 @@ class VimState
   #
   # Returns nothing.
   setRegister: (name, value) ->
-    if name == '*' || name == '+'
+    if name in ['*', '+']
       atom.clipboard.write(value.text)
     else if name == '_'
       # Blackhole register, nothing to do
