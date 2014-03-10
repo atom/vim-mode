@@ -5,6 +5,7 @@
 * Show cursor only in focused editor @tony612
 * Docs updated with new methods for entering insert mode @tednaleid
 * Implement `r` @bhuga
+* Fix `w` when on the last word of a file @dougblack
 
 ## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
