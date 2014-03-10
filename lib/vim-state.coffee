@@ -73,6 +73,8 @@ class VimState
     @editorView.command 'vim-mode:reverse-search', =>
       @currentSearch = new motions.Search(@editorView, @)
       @currentSearch.reversed()
+    @editorView.command 'vim-mode:replace', =>
+      @currentReplace = new operators.Replace(@editorView, @)
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
@@ -128,6 +130,7 @@ class VimState
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
       'search-complete': (e) => @currentSearch
+      'replace-complete': (e) => @currentReplace
       'repeat-search': (e) => @currentSearch.repeat() if @currentSearch?
       'repeat-search-backwards': (e) => @currentSearch.repeat(backwards: true) if @currentSearch?
       'focus-pane-view-on-left': => new panes.FocusPaneViewOnLeft()

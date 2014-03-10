@@ -1,4 +1,6 @@
 _ = require 'underscore-plus'
+{$$, Range} = require 'atom'
+ReplaceViewModel = require './replace-view-model'
 
 class OperatorError
   constructor: (@message) ->
@@ -246,5 +248,32 @@ class Repeat extends Operator
         cmd = @vimState.history[0]
         cmd?.execute()
 
+#
+# Replace the character under the cursor
+#
+class Replace extends Operator
+  constructor: (@editorView, @vimState, {@selectOptions}={}) ->
+    @editor = @editorView.editor
+    @complete = true
+    @viewModel = new ReplaceViewModel(@)
+
+  execute: (count=1) ->
+    editor = @editorView.editor
+    pos = editor.getCursorBufferPosition()
+    currentRowLength = editor.lineLengthForBufferRow(pos.row)
+
+    # Do nothing on an empty line
+    return unless currentRowLength > 0
+    # Do nothing if asked to replace more characters than there are on a line
+    return unless currentRowLength - pos.column >= count
+
+    @undoTransaction =>
+      start = editor.getCursorBufferPosition()
+      _.times count, =>
+        point = editor.getCursorBufferPosition()
+        editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @viewModel.char)
+        editor.moveCursorRight()
+      editor.setCursorBufferPosition(start)
+
 module.exports = { Operator, OperatorError, Delete, Change, Yank, Indent,
-  Outdent, Put, Join, Repeat }
+  Outdent, Put, Join, Repeat, Replace }
