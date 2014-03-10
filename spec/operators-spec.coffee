@@ -20,7 +20,7 @@ describe "Operators", ->
 
   commandModeInputKeydown = (key, opts = {}) ->
     opts.element = editor.commandModeInputView.editor.find('input').get(0)
-    opts.raw     = true
+    opts.raw = true
     keydown(key, opts)
 
   describe "the x keybinding", ->
