@@ -360,14 +360,21 @@ class MoveToBeginningOfLine extends Motion
       true
 
 class MoveToFirstCharacterOfLine extends Motion
-  execute: (count=1) ->
-    _.times count, =>
-      @editor.moveCursorToFirstCharacterOfLine()
+  constructor:(@editor) ->
+    @cursor = @editor.getCursor()
+    super(@editor)
+
+  execute: () ->
+    @editor.setCursorScreenPosition([@cursor.getScreenRow(), @getDestinationColumn()])
 
   select: (count=1) ->
-    _.times count, =>
-      @editor.selectToFirstCharacterOfLine()
-      true
+    if @getDestinationColumn() isnt @cursor.getScreenColumn()
+      _.times count, =>
+        @editor.selectToFirstCharacterOfLine()
+        true
+
+  getDestinationColumn: ->
+    @editor.lineForBufferRow(@cursor.getScreenRow()).search(/\S/)
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
