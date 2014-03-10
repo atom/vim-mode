@@ -199,6 +199,47 @@ describe "Motions", ->
         it "selects to the end of the next word", ->
           expect(vimState.getRegister('"').text).toBe ' cde1'
 
+  describe "the E keybinding", ->
+    beforeEach -> editor.setText("ab  cde1+- \n xyz \n\nzip\n")
+
+    describe "as a motion", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 0])
+
+      it "moves the cursor to the end of the current word", ->
+        keydown('E', shift: true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+        keydown('E', shift: true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+
+        keydown('E', shift: true)
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+        keydown('E', shift: true)
+        expect(editor.getCursorScreenPosition()).toEqual [3, 2]
+
+        keydown('E', shift: true)
+        expect(editor.getCursorScreenPosition()).toEqual [4, 0]
+
+    describe "as selection", ->
+      describe "within a word", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 0])
+          keydown('y')
+          keydown('E', shift: true)
+
+        it "selects to the end of the current word", ->
+          expect(vimState.getRegister('"').text).toBe 'ab'
+
+      describe "between words", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 2])
+          keydown('y')
+          keydown('E', shift: true)
+
+        it "selects to the end of the next word", ->
+          expect(vimState.getRegister('"').text).toBe '  cde1+-'
+
   describe "the } keybinding", ->
     beforeEach ->
       editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
