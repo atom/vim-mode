@@ -265,7 +265,7 @@ class VimState
   #
   # Returns nothing.
   activateCommandMode: ->
-    @deactivateInsertMode()
+    @deactivateInsertMode() if @mode?
     @deactivateVisualMode()
     @mode = 'command'
 
