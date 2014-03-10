@@ -75,7 +75,9 @@ describe "Prefixes", ->
           expect(atom.clipboard.read()).toEqual 'new content'
 
     # FIXME: once linux support comes out, this needs to read from
-    # the correct system clipboard. For now it behaves just like the * register
+    # the correct clipboard. For now it behaves just like the * register
+    # See :help x11-cut-buffer and :help registers for more details on how these
+    # registers work on an X11 based system.
     describe "the + register", ->
       describe "reading", ->
         it "is the same the system clipboard", ->
