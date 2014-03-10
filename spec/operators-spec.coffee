@@ -564,6 +564,49 @@ describe "Operators", ->
         it "indents both lines", ->
           expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
 
+  describe "the = keybinding", ->
+    oldGrammar = []
+
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('language-javascript')
+
+      oldGrammar = editor.getGrammar()
+      editor.setText("foo\n  bar\n  baz")
+      editor.setCursorScreenPosition([1, 0])
+
+    describe "when used in a scope that supports auto-indent", ->
+      beforeEach ->
+        jsGrammar = atom.syntax.grammarForScopeName('source.js')
+        editor.setGrammar(jsGrammar)
+
+      afterEach ->
+        editor.setGrammar(oldGrammar)
+
+      describe "when followed by a =", ->
+        beforeEach ->
+          keydown('=')
+          keydown('=')
+
+        it "indents the current line", ->
+          expect(editor.indentationForBufferRow(1)).toBe 0
+
+      describe "when followed by a repeating =", ->
+        beforeEach ->
+          keydown('2')
+          keydown('=')
+          keydown('=')
+
+        it "autoindents multiple lines at once", ->
+          expect(editor.getText()).toBe "foo\nbar\nbaz"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+        describe "undo behavior", ->
+          beforeEach -> keydown('u')
+
+          it "indents both lines", ->
+            expect(editor.getText()).toBe "foo\n  bar\n  baz"
+
   describe "the . keybinding", ->
     beforeEach ->
       editor.setText("12\n34\n56\n78")

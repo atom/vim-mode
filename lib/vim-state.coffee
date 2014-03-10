@@ -103,6 +103,7 @@ class VimState
       'join': => new operators.Join(@editor)
       'indent': => @linewiseAliasedOperator(operators.Indent)
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
+      'auto-indent': => @linewiseAliasedOperator(operators.Autoindent)
       'select-left': => new motions.SelectLeft(@editor)
       'select-right': => new motions.SelectRight(@editor)
       'move-left': => new motions.MoveLeft(@editor)
