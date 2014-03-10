@@ -365,16 +365,16 @@ class MoveToFirstCharacterOfLine extends Motion
     super(@editor)
 
   execute: () ->
-    @editor.setCursorScreenPosition([@cursor.getScreenRow(), @getDestinationColumn()])
+    @editor.setCursorBufferPosition([@cursor.getBufferRow(), @getDestinationColumn()])
 
   select: (count=1) ->
-    if @getDestinationColumn() isnt @cursor.getScreenColumn()
+    if @getDestinationColumn() isnt @cursor.getBufferColumn()
       _.times count, =>
         @editor.selectToFirstCharacterOfLine()
         true
 
   getDestinationColumn: ->
-    @editor.lineForBufferRow(@cursor.getScreenRow()).search(/\S/)
+    @editor.lineForBufferRow(@cursor.getBufferRow()).search(/\S/)
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
