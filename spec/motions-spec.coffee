@@ -426,7 +426,7 @@ describe "Motions", ->
 
   describe "the gg keybinding", ->
     beforeEach ->
-      editor.setText(" 1abc\n2\n3\n")
+      editor.setText(" 1abc\n 2\n3\n")
       editor.setCursorScreenPosition([0, 2])
 
     describe "as a motion", ->
@@ -436,6 +436,15 @@ describe "Motions", ->
 
       it "moves the cursor to the beginning of the first line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+    describe "as a repeated motion", ->
+      beforeEach ->
+        keydown('2')
+        keydown('g')
+        keydown('g')
+
+      it "moves the cursor to a specified line", ->
+        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
   describe "the G keybinding", ->
     beforeEach ->
