@@ -99,14 +99,15 @@ describe "Prefixes", ->
           vimState.setRegister('_', text: 'new content')
           expect(vimState.getRegister("_").text).toEqual ''
 
-    # FIXME: @editor.getUri() is returning undefined. Not sure how to setup
-    # the @editor instance in test most.
-    xdescribe "the % register", ->
+    describe "the % register", ->
+      beforeEach ->
+        spyOn(editor, 'getUri').andReturn('/Users/atom/known_value.txt')
+
       describe "reading", ->
         it "returns the filename of the current editor", ->
-          expect(vimState.getRegister('%').text).toEqual 'fjdka'
+          expect(vimState.getRegister('%').text).toEqual '/Users/atom/known_value.txt'
 
       describe "writing", ->
         it "throws away anything written to it", ->
           vimState.setRegister('%', "new content")
-          expect(vimState.getRegister('%').text).toEqual 'fjdka'
+          expect(vimState.getRegister('%').text).toEqual '/Users/atom/known_value.txt'
