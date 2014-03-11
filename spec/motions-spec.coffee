@@ -399,22 +399,60 @@ describe "Motions", ->
   describe "the ^ keybinding", ->
     beforeEach ->
       editor.setText("  abcde")
-      editor.setCursorScreenPosition([0, 4])
 
-    describe "as a motion", ->
-      beforeEach -> keydown('^')
+    describe "from the beginning of the line", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 0])
 
-      it "moves the cursor to the beginning of the line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      describe "as a motion", ->
+        beforeEach -> keydown('^')
 
-    describe "as a selection", ->
-      beforeEach ->
-        keydown('d')
-        keydown('^')
+        it "moves the cursor to the first character of the line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
-      it 'selects to the beginning of the lines', ->
-        expect(editor.getText()).toBe '  cde'
-        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('^')
+
+        it 'selects to the first character of the line', ->
+          expect(editor.getText()).toBe 'abcde'
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "from the first character of the line", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 2])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('^')
+
+        it "stays put", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('^')
+
+        it "does nothing", ->
+          expect(editor.getText()).toBe '  abcde'
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    describe "from the middle of a word", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 4])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('^')
+
+        it "moves the cursor to the first character of the line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('^')
+
+        it 'selects to the first character of the line', ->
+          expect(editor.getText()).toBe '  cde'
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
   describe "the 0 keybinding", ->
     beforeEach ->
