@@ -387,8 +387,8 @@ class MoveToLastCharacterOfLine extends Motion
       true
 
 class MoveToStartOfFile extends MoveToLine
-  getDestinationRow: (count=0) ->
-    count
+  getDestinationRow: (count=1) ->
+    count - 1
 
 class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
