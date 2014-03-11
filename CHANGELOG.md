@@ -9,6 +9,7 @@
 * Implement `=` @ciarand
 * Implement `E` motion @tony612
 * Implement basic `ctrl-f` and `ctrl-b` support @ciarand
+* Added `+`, `*` and `%` registers @cschneid
 
 ## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
