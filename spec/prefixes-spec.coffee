@@ -50,6 +50,17 @@ describe "Prefixes", ->
         expect(editor.getText()).toBe 'three'
 
   describe "Register", ->
+    describe "the a register", ->
+      it "saves a value for future reading", ->
+        vimState.setRegister('a', text: 'new content')
+        expect(vimState.getRegister("a").text).toEqual 'new content'
+
+      it "overwrites a value previously in the register", ->
+        vimState.setRegister('a', text: 'content')
+        vimState.setRegister('a', text: 'new content')
+        expect(vimState.getRegister("a").text).toEqual 'new content'
+
+
     describe "the * register", ->
       describe "reading", ->
         it "is the same the system clipboard", ->
@@ -62,3 +73,43 @@ describe "Prefixes", ->
 
         it "overwrites the contents of the system clipboard", ->
           expect(atom.clipboard.read()).toEqual 'new content'
+
+    # FIXME: once linux support comes out, this needs to read from
+    # the correct clipboard. For now it behaves just like the * register
+    # See :help x11-cut-buffer and :help registers for more details on how these
+    # registers work on an X11 based system.
+    describe "the + register", ->
+      describe "reading", ->
+        it "is the same the system clipboard", ->
+          expect(vimState.getRegister('*').text).toEqual 'initial clipboard content'
+          expect(vimState.getRegister('*').type).toEqual 'character'
+
+      describe "writing", ->
+        beforeEach ->
+          vimState.setRegister('*', text: 'new content')
+
+        it "overwrites the contents of the system clipboard", ->
+          expect(atom.clipboard.read()).toEqual 'new content'
+
+    describe "the _ register", ->
+      describe "reading", ->
+        it "is always the empty string", ->
+          expect(vimState.getRegister("_").text).toEqual ''
+
+      describe "writing", ->
+        it "throws away anything written to it", ->
+          vimState.setRegister('_', text: 'new content')
+          expect(vimState.getRegister("_").text).toEqual ''
+
+    describe "the % register", ->
+      beforeEach ->
+        spyOn(editor, 'getUri').andReturn('/Users/atom/known_value.txt')
+
+      describe "reading", ->
+        it "returns the filename of the current editor", ->
+          expect(vimState.getRegister('%').text).toEqual '/Users/atom/known_value.txt'
+
+      describe "writing", ->
+        it "throws away anything written to it", ->
+          vimState.setRegister('%', "new content")
+          expect(vimState.getRegister('%').text).toEqual '/Users/atom/known_value.txt'
