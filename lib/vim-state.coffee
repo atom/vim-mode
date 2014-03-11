@@ -113,6 +113,7 @@ class VimState
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
       'move-to-next-whole-word': => new motions.MoveToNextWholeWord(@editor)
       'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
+      'move-to-end-of-whole-word': => new motions.MoveToEndOfWholeWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-previous-whole-word': => new motions.MoveToPreviousWholeWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
