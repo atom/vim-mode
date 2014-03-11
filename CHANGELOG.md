@@ -8,6 +8,7 @@
 * Fix `w` when on the last word of a file @dougblack
 * Implement `=` @ciarand
 * Implement `E` motion @tony612
+* Implement basic `ctrl-f` and `ctrl-b` support @ciarand
 
 ## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
