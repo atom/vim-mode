@@ -11,6 +11,7 @@
 * Implement basic `ctrl-f` and `ctrl-b` support @ciarand
 * Added `+`, `*` and `%` registers @cschneid
 * Improved `^` movement when already at the first character @zenhob
+* Fix off-by-one error for `15gg` @tony612
 
 ## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
