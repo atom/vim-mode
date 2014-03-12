@@ -1,9 +1,9 @@
 ## Implemented Split Pane Commands
 
-* `ctrl-w h`/`ctrl-w left` - focus pane on left
-* `ctrl-w l`/`ctrl-w right` - focus pane on right
-* `ctrl-w k`/`ctrl-w up` - focus pane above
-* `ctrl-w j`/`ctrl-w down` - focus pane below
+* `ctrl-w h`/`ctrl-w left`/`ctrl-w ctrl-h` - focus pane on left
+* `ctrl-w l`/`ctrl-w right`/`ctrl-w ctrl-l` - focus pane on right
+* `ctrl-w k`/`ctrl-w up`/`ctrl-w ctrl-k` - focus pane above
+* `ctrl-w j`/`ctrl-w down`/`ctrl-w ctrl-j` - focus pane below
 * `ctrl-w w`/`ctrl-w ctrl-w` - focus next pane
 * `ctrl-w p`/`ctrl-w ctrl-p` - focus previous pane
 * `ctrl-w v`/`ctrl-w ctrl-v` - create vertical split
