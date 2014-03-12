@@ -9,4 +9,4 @@
 * `ctrl-w v`/`ctrl-w ctrl-v` - create vertical split
 * `ctrl-w s`/`ctrl-w ctrl-s` - create horizontal split
 * `ctrl-w c`/`ctrl-w ctrl-c`: close focused pane
-* `ctrl-w q` - close focused tab
+* `ctrl-w q`/`ctrl-w ctrl-q` - close focused tab

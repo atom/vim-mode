@@ -158,4 +158,5 @@
   'ctrl-w s': 'pane:split-down'
   'ctrl-w ctrl-c': 'pane:close'
   'ctrl-w c': 'pane:close'
+  'ctrl-w ctrl-q': 'core:close'
   'ctrl-w q': 'core:close'
