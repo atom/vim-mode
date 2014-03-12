@@ -1,4 +1,4 @@
-## Implemented Split Commands
+## Implemented Split Pane Commands
 
 * `ctrl-w h`/`ctrl-w left` - focus pane on left
 * `ctrl-w l`/`ctrl-w right` - focus pane on right
