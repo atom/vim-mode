@@ -1,3 +1,6 @@
+## HEAD
+* Enable arrow keys in visual mode @fholgado
+
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
 * Implement `/`, `?`, `n` and `N` @bhuga
