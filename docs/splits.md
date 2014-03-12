@@ -6,7 +6,7 @@
 * `ctrl-w j`/`ctrl-w down` - focus pane below
 * `ctrl-w w`/`ctrl-w ctrl-w` - focus next pane
 * `ctrl-w p`/`ctrl-w ctrl-p` - focus previous pane
-* `ctrl-w ctrl-v`/`ctrl-w v` - create vertical split
-* `ctrl-w ctrl-s`/`ctrl-w s` - create horizontal split
+* `ctrl-w v`/`ctrl-w ctrl-v` - create vertical split
+* `ctrl-w s`/`ctrl-w ctrl-s` - create horizontal split
 * `ctrl-w c`/`ctrl-w ctrl-c`: close focused pane
 * `ctrl-w q` - close focused tab
