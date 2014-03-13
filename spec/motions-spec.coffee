@@ -572,6 +572,25 @@ describe "Motions", ->
 
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
+      it "uses a valid regex as a regex", ->
+        keydown('/')
+        # Cycle through the 'abc' on the first line with a character pattern
+        editor.commandModeInputView.editor.setText '[abc]'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 1]
+        keydown('n')
+        expect(editor.getCursorBufferPosition()).toEqual [0, 2]
+
+      it "uses an invalid regex as a literal string", ->
+        # Go straight to the literal [abc
+        editor.setText("abc\n[abc]\n")
+        keydown('/')
+        editor.commandModeInputView.editor.setText '[abc'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        keydown('n')
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
       describe "repeating", ->
         it "does nothing with no search history", ->
           # This tests that no exception is raised
