@@ -20,8 +20,6 @@ them useful as no one person uses all of vim's functionality.
 ### Future Work (in rough order)
 
 * Visual mode
-  * ~~Characterwise~~
-  * ~~Linewise~~
   * Blockwise
 * Support for marks (including \`.)
 * Support for `q` and `.`
