@@ -74,7 +74,11 @@ class SearchViewModel
 
   scan: ->
     term = @searchTerm
-    regexp = new RegExp(term, 'g')
+    regexp = try
+               new RegExp(term, 'g')
+             catch
+               new RegExp(_.escapeRegExp(term), 'g')
+
     cur = @editor.getCursorBufferPosition()
     matchPoints = []
     iterator = (item) =>
