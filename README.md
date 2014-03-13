@@ -39,7 +39,7 @@ them useful as no one person uses all of vim's functionality.
 * [Motions](https://github.com/atom/vim-mode/blob/master/docs/motions.md)
 * [Operators](https://github.com/atom/vim-mode/blob/master/docs/operators.md)
 * [Commands](https://github.com/atom/vim-mode/blob/master/docs/commands.md)
-* [Splits](https://github.com/atom/vim-mode/blob/master/docs/splits.md)
+* [Splits](https://github.com/atom/vim-mode/blob/master/docs/windows.md)
 * [Scrolling](https://github.com/atom/vim-mode/blob/master/docs/scrolling.md)
 
 ### Development
