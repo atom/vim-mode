@@ -103,6 +103,7 @@ class VimState
       'join': => new operators.Join(@editor)
       'indent': => @linewiseAliasedOperator(operators.Indent)
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
+      'auto-indent': => @linewiseAliasedOperator(operators.Autoindent)
       'select-left': => new motions.SelectLeft(@editor)
       'select-right': => new motions.SelectRight(@editor)
       'move-left': => new motions.MoveLeft(@editor)
@@ -112,6 +113,7 @@ class VimState
       'move-to-next-word': => new motions.MoveToNextWord(@editor)
       'move-to-next-whole-word': => new motions.MoveToNextWholeWord(@editor)
       'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
+      'move-to-end-of-whole-word': => new motions.MoveToEndOfWholeWord(@editor)
       'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
       'move-to-previous-whole-word': => new motions.MoveToPreviousWholeWord(@editor)
       'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
@@ -222,8 +224,16 @@ class VimState
   # Returns the value of the given register or undefined if it hasn't
   # been set.
   getRegister: (name) ->
-    if name == '*'
+    if name in ['*', '+']
       text = atom.clipboard.read()
+      type = utils.copyType(text)
+      {text, type}
+    else if name == '%'
+      text = @editor.getUri()
+      type = utils.copyType(text)
+      {text, type}
+    else if name == "_" # Blackhole always returns nothing
+      text = ''
       type = utils.copyType(text)
       {text, type}
     else
@@ -236,8 +246,10 @@ class VimState
   #
   # Returns nothing.
   setRegister: (name, value) ->
-    if name == '*'
+    if name in ['*', '+']
       atom.clipboard.write(value.text)
+    else if name == '_'
+      # Blackhole register, nothing to do
     else
       atom.workspace.vimState.registers[name] = value
 

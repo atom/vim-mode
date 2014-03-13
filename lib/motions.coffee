@@ -124,8 +124,16 @@ class MoveToPreviousWholeWord extends Motion
 
 class MoveToNextWord extends Motion
   execute: (count=1) ->
+    cursor = @editor.getCursor()
+
     _.times count, =>
-      @editor.moveCursorToBeginningOfNextWord()
+      current = cursor.getBufferPosition()
+      next = cursor.getBeginningOfNextWordBufferPosition()
+
+      if current != next
+        cursor.moveToBeginningOfNextWord()
+      else
+        cursor.moveToEndOfWord()
 
   # Options
   #  excludeWhitespace - if true, whitespace shouldn't be selected
@@ -136,7 +144,7 @@ class MoveToNextWord extends Motion
       current = cursor.getBufferPosition()
       next = cursor.getBeginningOfNextWordBufferPosition()
 
-      if current.row != next.row or excludeWhitespace
+      if current.row != next.row or excludeWhitespace or current == next
         @editor.selectToEndOfWord()
       else
         @editor.selectToBeginningOfNextWord()
@@ -207,6 +215,39 @@ class MoveToEndOfWord extends Motion
       next.column -= 1
 
     next
+
+class MoveToEndOfWholeWord extends Motion
+  execute: (count=1) ->
+    cursor = @editor.getCursor()
+    _.times count, =>
+      cursor.setBufferPosition(@nextBufferPosition(exclusive: true))
+
+  select: (count=1) ->
+    _.times count, =>
+      bufferPosition = @nextBufferPosition()
+      screenPosition = @editor.screenPositionForBufferPosition(bufferPosition)
+      @editor.selectToScreenPosition(screenPosition)
+      true
+
+  # Private: Finds the end of the current whole word and stops on the last character
+  #
+  # exclusive - If true will stop on the last character of the whole word rather
+  #             than the next character after the word.
+  nextBufferPosition: ({exclusive}={})->
+    # get next position and reset cursor's position
+    @editor.moveCursorRight()
+    start = @editor.getCursorBufferPosition()
+    @editor.moveCursorLeft()
+
+    scanRange = [start, @editor.getEofBufferPosition()]
+    position = @editor.getEofBufferPosition()
+
+    @editor.scanInBufferRange /\S+/, scanRange, ({range, stop}) =>
+      position = range.end
+      stop()
+
+    position.column -= 1 if exclusive
+    position
 
 class MoveToNextParagraph extends Motion
   execute: (count=1) ->
@@ -319,14 +360,21 @@ class MoveToBeginningOfLine extends Motion
       true
 
 class MoveToFirstCharacterOfLine extends Motion
-  execute: (count=1) ->
-    _.times count, =>
-      @editor.moveCursorToFirstCharacterOfLine()
+  constructor:(@editor) ->
+    @cursor = @editor.getCursor()
+    super(@editor)
+
+  execute: () ->
+    @editor.setCursorBufferPosition([@cursor.getBufferRow(), @getDestinationColumn()])
 
   select: (count=1) ->
-    _.times count, =>
-      @editor.selectToFirstCharacterOfLine()
-      true
+    if @getDestinationColumn() isnt @cursor.getBufferColumn()
+      _.times count, =>
+        @editor.selectToFirstCharacterOfLine()
+        true
+
+  getDestinationColumn: ->
+    @editor.lineForBufferRow(@cursor.getBufferRow()).search(/\S/)
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
@@ -339,8 +387,8 @@ class MoveToLastCharacterOfLine extends Motion
       true
 
 class MoveToStartOfFile extends MoveToLine
-  getDestinationRow: (count=0) ->
-    count
+  getDestinationRow: (count=1) ->
+    count - 1
 
 class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
@@ -394,4 +442,5 @@ module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
   MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
-  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search }
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search,
+  MoveToEndOfWholeWord }

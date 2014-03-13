@@ -1,10 +1,20 @@
 ## HEAD
+* Enable arrow keys in visual mode @fholgado
+
+## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
 * Implement `/`, `?`, `n` and `N` @bhuga
 * Registers are now shared between tabs in a single atom window @bhuga
 * Show cursor only in focused editor @tony612
 * Docs updated with new methods for entering insert mode @tednaleid
 * Implement `r` @bhuga
+* Fix `w` when on the last word of a file @dougblack
+* Implement `=` @ciarand
+* Implement `E` motion @tony612
+* Implement basic `ctrl-f` and `ctrl-b` support @ciarand
+* Added `+`, `*` and `%` registers @cschneid
+* Improved `^` movement when already at the first character @zenhob
+* Fix off-by-one error for `15gg` @tony612
 
 ## 0.8.0 - Keep rocking
 * API Fixes for Atom 0.62 @bhuga
