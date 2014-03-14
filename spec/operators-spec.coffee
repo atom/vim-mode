@@ -198,7 +198,7 @@ describe "Operators", ->
         keydown('c')
         keydown('c')
 
-        expect(editor.getText()).toBe "12345\nABCDE"
+        expect(editor.getText()).toBe "12345\n\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
         expect(editorView).not.toHaveClass 'command-mode'
         expect(editorView).toHaveClass 'insert-mode'
@@ -209,8 +209,20 @@ describe "Operators", ->
         keydown('c')
         keydown('c')
 
-        expect(editor.getText()).toBe "12345\nabcde"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+        expect(editor.getText()).toBe "12345\nabcde\n"
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+        expect(editorView).not.toHaveClass 'command-mode'
+        expect(editorView).toHaveClass 'insert-mode'
+
+      it "deletes the only line and enters insert mode", ->
+        editor.setText("12345")
+        editor.setCursorScreenPosition([0, 2])
+
+        keydown('c')
+        keydown('c')
+
+        expect(editor.getText()).toBe ""
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
         expect(editorView).not.toHaveClass 'command-mode'
         expect(editorView).toHaveClass 'insert-mode'
 
