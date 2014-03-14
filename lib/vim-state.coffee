@@ -18,6 +18,7 @@ class VimState
 
   constructor: (@editorView) ->
     @editor = @editorView.editor
+    @editor.beginTransaction()
     @opStack = []
     @history = []
     @mode = 'command'
@@ -302,9 +303,11 @@ class VimState
     @deactivateVisualMode()
     @mode = 'insert'
     @editorView.addClass('insert-mode')
+    @editor.beginTransaction()
 
   deactivateInsertMode: ->
     @editorView.removeClass('insert-mode')
+    @editor.commitTransaction()
 
   # Private: Used to enable visual mode.
   #

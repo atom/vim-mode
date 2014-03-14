@@ -1,5 +1,5 @@
 {EditorView} = require 'atom'
-
+util = require 'util'
 VimState = require '../lib/vim-state'
 VimMode  = require '../lib/vim-mode'
 
@@ -12,16 +12,22 @@ beforeEach ->
 cacheEditor = (existingEditorView) ->
   session = atom.project.openSync()
   if existingEditorView?
+    console.log "using existing editor"
+    existingEditorView.on 'textInput', ->
+      console.log "text inputting"
     existingEditorView.edit(session)
+    #existingEditorView.editor.beginTransaction()
     existingEditorView.vimState = new VimState(existingEditorView)
     existingEditorView.bindKeys()
     existingEditorView.enableKeymap()
   else
+    console.log "creating new editor"
     editorView = new EditorView(session)
-    editorView.simulateDomAttachment()
     editorView.enableKeymap()
+    editorView.attachToDom()
 
     editorView.addClass('vim-mode')
+    editorView.editor.beginTransaction()
     editorView.vimState = new VimState(editorView)
 
   existingEditorView or editorView

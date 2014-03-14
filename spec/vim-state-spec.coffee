@@ -18,6 +18,11 @@ describe "VimState", ->
     options.element ?= editorView[0]
     helpers.keydown(key, options)
 
+  type = (key, options={}) ->
+    options.element = editorView[0].hiddenInput
+    options.raw = true
+    helpers.keydown(key, options)
+
   describe "initialization", ->
     it "puts the editor in command-mode initially", ->
       expect(editorView).toHaveClass 'vim-mode'
@@ -105,7 +110,8 @@ describe "VimState", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "insert-mode", ->
-    beforeEach -> keydown('i')
+    beforeEach ->
+      keydown('i')
 
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
@@ -135,12 +141,29 @@ describe "VimState", ->
 
       expect(editorView).toHaveClass 'command-mode'
       expect(editorView).not.toHaveClass 'insert-mode'
+      expect(editorView).not.toHaveClass 'visual-mode'
 
-    it "puts the editor into command mode when <ctrl-c> is pressed", ->
+    fit "puts the editor into command mode when <ctrl-c> is pressed", ->
       keydown('c', ctrl: true)
 
       expect(editorView).toHaveClass 'command-mode'
       expect(editorView).not.toHaveClass 'insert-mode'
+      expect(editorView).not.toHaveClass 'visual-mode'
+
+    fit "allows undoing an entire batch of typing", ->
+      type('a')
+      editorView.hiddenInput.textInput 'a'
+      keydown('b', raw: true)
+      keydown('c', raw: true)
+      keydown('escape')
+      keydown('i')
+      keydown('d', raw: true)
+      keydown('e', raw: true)
+      keydown('f', raw: true)
+      keydown('escape')
+      expect(editor.getText()).toBe "abcdef"
+      editorView.trigger ('core:undo')
+      expect(editor.getText()).toBe "abc"
 
   describe "visual-mode", ->
     beforeEach -> keydown('v')
