@@ -26,6 +26,7 @@
   '{': 'vim-mode:move-to-previous-paragraph'
   'd': 'vim-mode:delete'
   'c': 'vim-mode:change'
+  's': 'vim-mode:change'
   'y': 'vim-mode:yank'
   '>': 'vim-mode:indent'
   '<': 'vim-mode:outdent'
