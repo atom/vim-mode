@@ -89,28 +89,26 @@ describe "Operators", ->
     beforeEach ->
       editor.setText('012345')
       editor.setCursorScreenPosition([0, 1])
-      keydown('s')
 
     it "deletes the character to the right and enters insert mode", ->
+      keydown('s')
       expect(editorView).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe '02345'
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
       expect(vimState.getRegister('"').text).toBe '1'
 
-  describe "the v_s keybinding", ->
-    beforeEach ->
-      editor.setText('012345')
-      editor.setCursorScreenPosition([0, 1])
-      keydown('v')
-      editor.selectRight()
-      editor.selectRight()
-      keydown('s')
+    describe "in visual mode", ->
+      beforeEach ->
+        keydown('v')
+        editor.selectRight()
+        editor.selectRight()
+        keydown('s')
 
-    it "deletes the selected characters and enters insert mode", ->
-      expect(editorView).toHaveClass 'insert-mode'
-      expect(editor.getText()).toBe '0345'
-      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-      expect(vimState.getRegister('"').text).toBe '12'
+      it "deletes the selected characters and enters insert mode", ->
+        expect(editorView).toHaveClass 'insert-mode'
+        expect(editor.getText()).toBe '0345'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        expect(vimState.getRegister('"').text).toBe '12'
 
   describe "the S keybinding", ->
     beforeEach ->
