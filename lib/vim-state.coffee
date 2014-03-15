@@ -308,6 +308,12 @@ class VimState
   deactivateInsertMode: ->
     @editorView.removeClass('insert-mode')
     @editor.commitTransaction()
+    transaction = _.last(@editor.buffer.history.undoStack)
+    if transaction?
+      input = new operators.Input(@editor,
+                                  @,
+                                  _.last(@editor.buffer.history.undoStack))
+      @history.unshift(input)
 
   # Private: Used to enable visual mode.
   #
