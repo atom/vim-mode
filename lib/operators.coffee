@@ -306,8 +306,6 @@ class Input extends Operator
   buildInsertText: ->
     return undefined unless @isJustTyping()
     typedCharacters = (patch.newText for patch in @transaction.patches)
-    window.trans = @transaction
-    window.tc = typedCharacters
     typedCharacters.join("")
 
   # Determines if the transaction consists of just a set of typing without
