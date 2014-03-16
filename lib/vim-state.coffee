@@ -140,6 +140,9 @@ class VimState
       'focus-pane-view-above': => new panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
+      'mark': (e) => @markCommand(e)
+      'move-to-mark': (e) => @moveToMark(e)
+      'mark-to-mark-literal': (e) => @moveToLiteralMark(e)
 
   # Private: A helper to actually register the given commands with the
   # editor.
@@ -154,7 +157,7 @@ class VimState
       eventName = "vim-mode:#{commandName}"
       @editorView.command eventName, (e) =>
         possibleOperators = fn(e)
-        possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
+        possibleOperators = if possibleOperators? then (if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]) else []
         for possibleOperator in possibleOperators
           # Motions in visual mode perform their selections.
           if @mode == 'visual' and possibleOperator instanceof motions.Motion
@@ -253,6 +256,11 @@ class VimState
     else
       atom.workspace.vimState.registers[name] = value
 
+  setMark: (name, pos) ->
+    atom.workspace.vimState.marks[name] = pos
+
+  getMark: (name) -> atom.workspace.vimState.marks[name]
+
   # Public: Append a search to the search history.
   #
   # motions.Search - The confirmed search motion to append
@@ -330,6 +338,22 @@ class VimState
   registerPrefix: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
     @pushOperator(new prefixes.Register(name))
+
+  markCommand: (e) ->
+    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
+    new commands.Mark(@editor, @, name)
+
+  moveToMark: (e) ->
+    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
+    pos = @getMark(name)
+    return [] unless pos?
+    new motions.MoveToMark(@editor, @, pos)
+
+  moveToLiteralMark: (e) ->
+    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
+    pos = @getMark(name)
+    return [] unless pos?
+    new motions.MoveToMark(@editor, @, pos, false)
 
   # Private: A generic way to create a Number prefix based on the event.
   #

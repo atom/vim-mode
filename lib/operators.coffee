@@ -122,6 +122,7 @@ class Yank extends Operator
     else
       @editor.clearSelections()
 
+
 #
 # It indents everything selected by the following motion.
 #
