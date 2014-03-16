@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {$$, Range} = require 'atom'
 ReplaceViewModel = require './replace-view-model'
+MarkViewModel = require './mark-view-model'
 
 class OperatorError
   constructor: (@message) ->
@@ -290,5 +291,16 @@ class Replace extends Operator
         editor.moveCursorRight()
       editor.setCursorBufferPosition(start)
 
+class Mark extends Operator
+  constructor: (@editorView, @vimState, {@selectOptions}={}) ->
+    @editor = @editorView.editor
+    @complete = true
+    @viewModel = new MarkViewModel(@)
+
+  execute: (count=1) ->
+    editor = @editorView.editor
+    pos = editor.getCursorBufferPosition()
+    @vimState.setMark(@viewModel.char, pos)
+
 module.exports = { Operator, OperatorError, Delete, Change, Yank, Indent,
-  Outdent, Autoindent, Put, Join, Repeat, Replace }
+  Outdent, Autoindent, Put, Join, Repeat, Replace, Mark }

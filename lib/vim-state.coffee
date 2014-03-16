@@ -75,6 +75,8 @@ class VimState
       @currentSearch.reversed()
     @editorView.command 'vim-mode:replace', =>
       @currentReplace = new operators.Replace(@editorView, @)
+    @editorView.command 'vim-mode:mark', =>
+      @currentMark = new operators.Mark(@editorView, @)
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
@@ -140,9 +142,9 @@ class VimState
       'focus-pane-view-above': => new panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
-      'mark': (e) => @markCommand(e)
+      'mark-complete': (e) => @currentMark
       'move-to-mark': (e) => @moveToMark(e)
-      'mark-to-mark-literal': (e) => @moveToLiteralMark(e)
+      'move-to-mark-literal': (e) => @moveToLiteralMark(e)
 
   # Private: A helper to actually register the given commands with the
   # editor.

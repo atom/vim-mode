@@ -43,11 +43,5 @@ class SubstituteLine extends Command
     @editor.moveCursorUp()
     @vimState.activateInsertMode()
 
-class Mark extends Command
-  constructor: (@editor, @vimState, @name) ->
-  execute: ->
-    originalPosition = @editor.getCursorScreenPosition()
-    @vimState.setMark(@name, originalPosition)
-
 module.exports = { Insert, InsertAfter, InsertAboveWithNewline, InsertBelowWithNewline,
-  Substitute, SubstituteLine, Mark }
+  Substitute, SubstituteLine }
