@@ -342,6 +342,48 @@ class MoveToLine extends Motion
   getDestinationRow: (count) ->
     if count? then count - 1 else (@editor.getLineCount() - 1)
 
+class MoveToMark extends Motion
+
+  isLinewise: -> @linewise
+
+  constructor: (@editor, @state, @position, @linewise=true) ->
+      super(@editor, @state)
+
+  execute: ->
+    @editor.setCursorBufferPosition(@position)
+    # @editor.getCursor().skipLeadingWhitespace()
+
+  select: (count=1, {requireEOL}={}) ->
+    cpos = @editor.getCursorBufferPosition()
+
+    if cpos.isEqual @position
+      position = new Point @position.row, @position.column
+
+      if @linewise
+        cpos.column = 0
+        position.column = Infinity
+        position = @editor.clipBufferPosition(position)
+
+      @editor.setSelectedBufferRange(new Range(cpos,position), requireEOL: requireEOL)
+
+
+    if cpos.isGreaterThan @position
+      position = new Point @position.row, @position.column
+      if @linewise
+        cpos = @editor.clipBufferPosition([cpos.row, Infinity])
+        position.column = 0
+      @editor.setSelectedBufferRange(new Range(position, cpos), requireEOL: requireEOL)
+    else
+      position = new Point @position.row, @position.column
+      if (@linewise)
+        position = @editor.clipBufferPosition([position.row, Infinity])
+        cpos.column = 0
+      @editor.setSelectedBufferRange(new Range(cpos, position), requireEOL: requireEOL)
+
+
+    _.times 1, ->
+      true
+
 class MoveToScreenLine extends MoveToLine
   constructor: (@editor, @editorView, @scrolloff) ->
     @scrolloff = 2 # atom default
@@ -443,4 +485,4 @@ module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
   MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search,
-  MoveToEndOfWholeWord }
+  MoveToEndOfWholeWord, MoveToMark }
