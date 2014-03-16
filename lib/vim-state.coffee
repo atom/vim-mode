@@ -242,6 +242,14 @@ class VimState
     else
       atom.workspace.vimState.registers[name]
 
+  # Private: Fetches the value of a given mark.
+  #
+  # name - The name of the mark to fetch.
+  #
+  # Returns the value of the given mark or undefined if it hasn't
+  # been set.
+  getMark: (name) -> atom.workspace.vimState.marks[name]
+
   # Private: Sets the value of a given register.
   #
   # name  - The name of the register to fetch.
@@ -256,10 +264,14 @@ class VimState
     else
       atom.workspace.vimState.registers[name] = value
 
+  # Private: Sets the value of a given mark.
+  #
+  # name  - The name of the mark to fetch.
+  # value {Point} - The value to set the mark to.
+  #
+  # Returns nothing.
   setMark: (name, pos) ->
     atom.workspace.vimState.marks[name] = pos
-
-  getMark: (name) -> atom.workspace.vimState.marks[name]
 
   # Public: Append a search to the search history.
   #
@@ -339,16 +351,31 @@ class VimState
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
     @pushOperator(new prefixes.Register(name))
 
+  # Private: A generic way to create a Mark op based on the event
+  #
+  # e - The event that triggered the Mark op
+  #
+  # Returns nothing.
   markCommand: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
     new commands.Mark(@editor, @, name)
 
+  # Private: A generic way to create a Mark Motion based on the event, is linewise
+  #
+  # e - The event that triggered the Mark Motion
+  #
+  # Returns nothing.
   moveToMark: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
     pos = @getMark(name)
     return [] unless pos?
     new motions.MoveToMark(@editor, @, pos)
 
+  # Private: A generic way to create a Mark Motion based on the event, isn't linewise
+  #
+  # e - The event that triggered the Mark op
+  #
+  # Returns nothing.
   moveToLiteralMark: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
     pos = @getMark(name)
