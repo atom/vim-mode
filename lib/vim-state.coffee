@@ -77,6 +77,10 @@ class VimState
       @currentReplace = new operators.Replace(@editorView, @)
     @editorView.command 'vim-mode:mark', =>
       @currentMark = new operators.Mark(@editorView, @)
+    @editorView.command 'vim-mode:move-to-mark', =>
+      @currentMoveToMark = new motions.MoveToMark(@editorView, @)
+    @editorView.command 'vim-mode:move-to-mark-literal', =>
+      @currentMoveToMark = new motions.MoveToMark(@editorView, @, false)
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
@@ -143,8 +147,7 @@ class VimState
       'focus-pane-view-below': => new panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
       'mark-complete': (e) => @currentMark
-      'move-to-mark': (e) => @moveToMark(e)
-      'move-to-mark-literal': (e) => @moveToLiteralMark(e)
+      'move-to-mark-complete': (e) => @currentMoveToMark
 
   # Private: A helper to actually register the given commands with the
   # editor.
