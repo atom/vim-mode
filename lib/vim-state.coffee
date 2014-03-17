@@ -25,7 +25,6 @@ class VimState
     @registerInsertIntercept()
     @activateCommandMode()
 
-
     atom.project.eachBuffer (buffer) =>
       @registerChangeHandler(buffer)
 
