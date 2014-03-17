@@ -20,6 +20,7 @@ class VimState
     @editor = @editorView.editor
     @opStack = []
     @history = []
+    @marks = {}
     @mode = 'command'
 
     @setupCommandMode()
@@ -162,7 +163,7 @@ class VimState
       eventName = "vim-mode:#{commandName}"
       @editorView.command eventName, (e) =>
         possibleOperators = fn(e)
-        possibleOperators = if possibleOperators? then (if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]) else []
+        possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
         for possibleOperator in possibleOperators
           # Motions in visual mode perform their selections.
           if @mode == 'visual' and possibleOperator instanceof motions.Motion
@@ -253,7 +254,7 @@ class VimState
   #
   # Returns the value of the given mark or undefined if it hasn't
   # been set.
-  getMark: (name) -> atom.workspace.vimState.marks[name]
+  getMark: (name) -> @marks[name]
 
   # Private: Sets the value of a given register.
   #
@@ -276,7 +277,9 @@ class VimState
   #
   # Returns nothing.
   setMark: (name, pos) ->
-    atom.workspace.vimState.marks[name] = pos
+    # unsure if I should throw an error / if I should start returning a true/false for success
+    if (charCode = name.charCodeAt(0)) >= 97 and charCode <= 122
+      @marks[name] = pos
 
   # Public: Append a search to the search history.
   #
@@ -355,37 +358,6 @@ class VimState
   registerPrefix: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
     @pushOperator(new prefixes.Register(name))
-
-  # Private: A generic way to create a Mark op based on the event
-  #
-  # e - The event that triggered the Mark op
-  #
-  # Returns nothing.
-  markCommand: (e) ->
-    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
-    new commands.Mark(@editor, @, name)
-
-  # Private: A generic way to create a Mark Motion based on the event, is linewise
-  #
-  # e - The event that triggered the Mark Motion
-  #
-  # Returns nothing.
-  moveToMark: (e) ->
-    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
-    pos = @getMark(name)
-    return [] unless pos?
-    new motions.MoveToMark(@editor, @, pos)
-
-  # Private: A generic way to create a Mark Motion based on the event, isn't linewise
-  #
-  # e - The event that triggered the Mark op
-  #
-  # Returns nothing.
-  moveToLiteralMark: (e) ->
-    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
-    pos = @getMark(name)
-    return [] unless pos?
-    new motions.MoveToMark(@editor, @, pos, false)
 
   # Private: A generic way to create a Number prefix based on the event.
   #

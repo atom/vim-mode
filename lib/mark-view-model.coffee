@@ -2,8 +2,8 @@ VimCommandModeInputView = require './vim-command-mode-input-view'
 
 module.exports =
 
-# This is the view model for a Replace operator. It is an implementation
-# detail of the same, and is tested via the use of the `r` keybinding
+# This is the view model for a Mark operator. It is an implementation
+# detail of the same, and is tested via the use of the `m` keybinding
 # in operators-spec.coffee.
 class MarkViewModel
   constructor: (@markOperator) ->

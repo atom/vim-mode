@@ -749,7 +749,7 @@ describe "Motions", ->
       keydown('M', shift: true)
       expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([5, 0])
 
-  describe 'the \`/` keybindings', ->
+  describe 'the mark keybindings', ->
     beforeEach ->
       editor.setText('12\n34\n56\n')
       editor.setCursorBufferPosition([0,1])

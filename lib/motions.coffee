@@ -439,49 +439,18 @@ class Search extends Motion
     @viewModel.select(count)
 
 class MoveToMark extends Motion
-
-  isLinewise: -> @linewise
-
   constructor: (@editorView, @state, @linewise=true) ->
       super(@editorView.editor, @state)
       @viewModel = new MoveToMarkViewModel(@)
 
+  isLinewise: -> @linewise
+
   execute: ->
-    @position = @state.getMark(@viewModel.char)
-    @editor.setCursorBufferPosition(@position)
-    # @editor.getCursor().skipLeadingWhitespace()
+    @viewModel.execute()
 
   select: (count=1, {requireEOL}={}) ->
-    @position = @state.getMark(@viewModel.char)
-    cpos = @editor.getCursorBufferPosition()
-
-    if cpos.isEqual @position
-      position = new Point @position.row, @position.column
-
-      if @linewise
-        cpos.column = 0
-        position.column = Infinity
-        position = @editor.clipBufferPosition(position)
-
-      @editor.setSelectedBufferRange(new Range(cpos,position), requireEOL: requireEOL)
-
-
-    if cpos.isGreaterThan @position
-      position = new Point @position.row, @position.column
-      if @linewise
-        cpos = @editor.clipBufferPosition([cpos.row, Infinity])
-        position.column = 0
-      @editor.setSelectedBufferRange(new Range(position, cpos), requireEOL: requireEOL)
-    else
-      position = new Point @position.row, @position.column
-      if (@linewise)
-        position = @editor.clipBufferPosition([position.row, Infinity])
-        cpos.column = 0
-      @editor.setSelectedBufferRange(new Range(cpos, position), requireEOL: requireEOL)
-
-
-    _.times 1, ->
-      true
+    @viewModel.select(requireEOL)
+    [true]
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
