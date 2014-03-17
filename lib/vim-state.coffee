@@ -21,7 +21,6 @@ class VimState
     @opStack = []
     @history = []
     @mode = 'command'
-
     @setupCommandMode()
     @registerInsertIntercept()
     @activateCommandMode()
@@ -290,6 +289,8 @@ class VimState
 
     @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
 
+    @updateStatusBar()
+
   # Private: Used to enable insert mode.
   #
   # Returns nothing.
@@ -300,6 +301,8 @@ class VimState
     @editorView.addClass('insert-mode')
 
     @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+
+    @updateStatusBar()
 
   # Private: Used to enable visual mode.
   #
@@ -315,6 +318,8 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLine()
+
+    @updateStatusBar()
 
   # Private: Resets the command mode back to it's initial state.
   #
@@ -377,3 +382,15 @@ class VimState
     for op in @opStack
       return op if op instanceof constructor
     false
+
+  updateStatusBar: ->
+    if !$('#status-bar-vim-mode').length
+      atom.packages.once 'activated', ->
+        atom.workspaceView.statusBar?.prependRight("<div id='status-bar-vim-mode' class='inline-block'>Command</div>")
+
+    if @mode is "insert"
+      $('#status-bar-vim-mode').html("Insert")
+    else if @mode is "command"
+      $('#status-bar-vim-mode').html("Command")
+    else if @mode is "visual"
+      $('#status-bar-vim-mode').html("Visual")
