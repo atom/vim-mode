@@ -65,7 +65,7 @@ class VimState
   #
   # Returns nothing.
   setupCommandMode: ->
-    # Commands here start a new mode instead of popping the operator stack
+    # Commands here start a new mode instead of popping the operation stack
     # immediately.
     @editorView.command 'vim-mode:search', =>
       @currentSearch = new motions.Search(@editorView, @)
@@ -150,20 +150,20 @@ class VimState
     _.each commands, (fn, commandName) =>
       eventName = "vim-mode:#{commandName}"
       @editorView.command eventName, (e) =>
-        possibleOperators = fn(e)
-        possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
-        for possibleOperator in possibleOperators
+        possibleOperations = fn(e)
+        possibleOperations = if _.isArray(possibleOperations) then possibleOperations else [possibleOperations]
+        for possibleOperation in possibleOperations
           # Motions in visual mode perform their selections.
-          if @mode == 'visual' and possibleOperator instanceof motions.Motion
-            possibleOperator.origExecute = possibleOperator.execute
-            possibleOperator.execute = possibleOperator.select
+          if @mode == 'visual' and possibleOperation instanceof motions.Motion
+            possibleOperation.origExecute = possibleOperation.execute
+            possibleOperation.execute = possibleOperation.select
 
-          @pushOperator(possibleOperator) if possibleOperator?.execute
+          @pushOperation(possibleOperation) if possibleOperation?.execute
 
           # If we've received an operator in visual mode, mark the current
           # selection as the motion to operate on.
-          if @mode == 'visual' and possibleOperator instanceof operators.Operator
-            @pushOperator(new motions.CurrentSelection(@))
+          if @mode == 'visual' and possibleOperation instanceof operators.Operator
+            @pushOperation(new motions.CurrentSelection(@))
             @activateCommandMode() if @mode == 'visual'
 
   # Private: Attempts to prevent the cursor from selecting the newline
@@ -176,12 +176,12 @@ class VimState
     if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
 
-  # Private: Adds an operator to the operation stack.
+  # Private: Adds an operation to the operation stack.
   #
   # operation - The operation to add.
   #
   # Returns nothing.
-  pushOperator: (operation) ->
+  pushOperation: (operation) ->
     @opStack.push(operation)
     @processOpStack()
 
@@ -195,23 +195,23 @@ class VimState
   #
   # Returns nothing.
   processOpStack: ->
-    return unless @topOperator().isComplete()
+    return unless @topOperation().isComplete()
 
-    poppedOperator = @opStack.pop()
+    poppedOperation = @opStack.pop()
     if @opStack.length
       try
-        @topOperator().compose(poppedOperator)
+        @topOperation().compose(poppedOperation)
         @processOpStack()
       catch e
         (e instanceof operators.OperatorError) and @resetCommandMode() or throw e
     else
-      @history.unshift(poppedOperator) if poppedOperator.isRecordable()
-      poppedOperator.execute()
+      @history.unshift(poppedOperation) if poppedOperation.isRecordable()
+      poppedOperation.execute()
 
   # Private: Fetches the last operation.
   #
   # Returns the last operation.
-  topOperator: ->
+  topOperation: ->
     _.last @opStack
 
   # Private: Fetches the value of a given register.
@@ -332,7 +332,7 @@ class VimState
   # Returns nothing.
   registerPrefix: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
-    @pushOperator(new prefixes.Register(name))
+    @pushOperation(new prefixes.Register(name))
 
   # Private: A generic way to create a Number prefix based on the event.
   #
@@ -341,13 +341,13 @@ class VimState
   # Returns nothing.
   repeatPrefix: (e) ->
     num = parseInt(atom.keymap.keystrokeStringForEvent(e.originalEvent))
-    if @topOperator() instanceof prefixes.Repeat
-      @topOperator().addDigit(num)
+    if @topOperation() instanceof prefixes.Repeat
+      @topOperation().addDigit(num)
     else
       if num is 0
         e.abortKeyBinding()
       else
-        @pushOperator(new prefixes.Repeat(num))
+        @pushOperation(new prefixes.Repeat(num))
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
@@ -357,7 +357,7 @@ class VimState
   #
   # Returns nothing.
   moveOrRepeat: (e) ->
-    if @topOperator() instanceof prefixes.Repeat
+    if @topOperation() instanceof prefixes.Repeat
       @repeatPrefix(e)
     else
       new motions.MoveToBeginningOfLine(@editor)
