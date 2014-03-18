@@ -152,24 +152,7 @@ class VimState
   handleCommands: (commands) ->
     _.each commands, (fn, commandName) =>
       eventName = "vim-mode:#{commandName}"
-
-      @editorView.command eventName, (e) =>
-        possibleOperations = fn(e)
-        possibleOperations = if _.isArray(possibleOperations) then possibleOperations else [possibleOperations]
-        for possibleOperation in possibleOperations
-          # Motions in visual mode perform their selections.
-          if @mode == 'visual' and possibleOperation instanceof motions.Motion
-            possibleOperation.origExecute = possibleOperation.execute
-            possibleOperation.execute = possibleOperation.select
-
-          @opStack.push(possibleOperation) if possibleOperation
-
-          # If we've received an operator in visual mode, mark the current
-          # selection as the motion to operate on.
-          if @mode == 'visual' and possibleOperation instanceof operators.Operator
-            @opStack.push(new motions.CurrentSelection(@))
-
-          @processOpStack()
+      @editorView.command eventName, (event) => @pushOperations(fn(event))
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
@@ -180,6 +163,25 @@ class VimState
   moveCursorBeforeNewline: =>
     if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
+
+  # Private: Push the given operations onto the operation stack, then process
+  # it.
+  pushOperations: (operations) ->
+    operations = [operations] unless _.isArray(operations)
+
+    for operation in operations
+      # Motions in visual mode perform their selections.
+      if @mode is 'visual' and operation instanceof motions.Motion
+        operation.execute = operation.select
+
+      @opStack.push(operation) if operation
+
+      # If we've received an operator in visual mode, mark the current
+      # selection as the motion to operate on.
+      if @mode is 'visual' and operation instanceof operators.Operator
+        @opStack.push(new motions.CurrentSelection(@))
+
+      @processOpStack()
 
   # Private: Removes all operations from the stack.
   #
