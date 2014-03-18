@@ -93,10 +93,6 @@
 
   'u': 'core:undo'
   'ctrl-r': 'core:redo'
-  '/': 'vim-mode:search'
-  '?': 'vim-mode:reverse-search'
-  'n': 'vim-mode:repeat-search'
-  'N': 'vim-mode:repeat-search-backwards'
 
   'O': 'vim-mode:insert-above-with-newline'
   'o': 'vim-mode:insert-below-with-newline'
@@ -106,17 +102,6 @@
   'X': 'vim-mode:delete-left'
   's': 'vim-mode:substitute'
   '.': 'vim-mode:repeat'
-
-  '1': 'vim-mode:repeat-prefix'
-  '2': 'vim-mode:repeat-prefix'
-  '3': 'vim-mode:repeat-prefix'
-  '4': 'vim-mode:repeat-prefix'
-  '5': 'vim-mode:repeat-prefix'
-  '6': 'vim-mode:repeat-prefix'
-  '7': 'vim-mode:repeat-prefix'
-  '8': 'vim-mode:repeat-prefix'
-  '9': 'vim-mode:repeat-prefix'
-  '0': 'vim-mode:repeat-prefix'
 
   '" a': 'vim-mode:register-prefix'
   '" b': 'vim-mode:register-prefix'
@@ -148,6 +133,23 @@
   '" +': 'vim-mode:register-prefix'
   '" %': 'vim-mode:register-prefix'
   '" _': 'vim-mode:register-prefix'
+
+'.vim-mode.command-mode, .vim-mode.operator-pending-mode':
+  '/': 'vim-mode:search'
+  '?': 'vim-mode:reverse-search'
+  'n': 'vim-mode:repeat-search'
+  'N': 'vim-mode:repeat-search-backwards'
+
+  '1': 'vim-mode:repeat-prefix'
+  '2': 'vim-mode:repeat-prefix'
+  '3': 'vim-mode:repeat-prefix'
+  '4': 'vim-mode:repeat-prefix'
+  '5': 'vim-mode:repeat-prefix'
+  '6': 'vim-mode:repeat-prefix'
+  '7': 'vim-mode:repeat-prefix'
+  '8': 'vim-mode:repeat-prefix'
+  '9': 'vim-mode:repeat-prefix'
+  '0': 'vim-mode:repeat-prefix'
 
 '.vim-mode.visual-mode':
   'x': 'vim-mode:delete'

@@ -75,13 +75,14 @@ class VimState
     @editorView.command 'vim-mode:replace', =>
       @currentReplace = new operators.Replace(@editorView, @)
 
+    @editorView.command 'vim-mode:activate-command-mode', => @activateCommandMode()
+    @editorView.command 'vim-mode:activate-insert-mode', => @activateInsertMode()
+    @editorView.command 'vim-mode:activate-linewise-visual-mode', => @activateVisualMode('linewise')
+    @editorView.command 'vim-mode:activate-characterwise-visual-mode', => @activateVisualMode('characterwise')
+    @editorView.command 'vim-mode:activate-blockwise-visual-mode', => @activateVisualMode('blockwise')
+    @editorView.command 'vim-mode:reset-command-mode', => @resetCommandMode()
+
     @handleCommands
-      'activate-command-mode': => @activateCommandMode()
-      'activate-insert-mode': => @activateInsertMode()
-      'activate-linewise-visual-mode': => @activateVisualMode('linewise')
-      'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
-      'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
-      'reset-command-mode': => @resetCommandMode()
       'substitute': => new commands.Substitute(@editor, @)
       'substitute-line': => new commands.SubstituteLine(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
@@ -92,14 +93,14 @@ class VimState
       'delete': => @linewiseAliasedOperator(operators.Delete)
       'change': => @linewiseAliasedOperator(operators.Change)
       'change-to-last-character-of-line': => [new operators.Change(@editor, @), new motions.MoveToLastCharacterOfLine(@editor)]
-      'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
-      'delete-left': => [new operators.Delete(@editor), new motions.MoveLeft(@editor)]
-      'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
+      'delete-right': => [new operators.Delete(@editor, @), new motions.MoveRight(@editor)]
+      'delete-left': => [new operators.Delete(@editor, @), new motions.MoveLeft(@editor)]
+      'delete-to-last-character-of-line': => [new operators.Delete(@editor, @), new motions.MoveToLastCharacterOfLine(@editor)]
       'yank': => @linewiseAliasedOperator(operators.Yank)
       'yank-line': => [new operators.Yank(@editor, @), new motions.MoveToLine(@editor)]
       'put-before': => new operators.Put(@editor, @, location: 'before')
       'put-after': => new operators.Put(@editor, @, location: 'after')
-      'join': => new operators.Join(@editor)
+      'join': => new operators.Join(@editor, @)
       'indent': => @linewiseAliasedOperator(operators.Indent)
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
       'auto-indent': => @linewiseAliasedOperator(operators.Autoindent)
@@ -149,6 +150,7 @@ class VimState
   handleCommands: (commands) ->
     _.each commands, (fn, commandName) =>
       eventName = "vim-mode:#{commandName}"
+
       @editorView.command eventName, (e) =>
         possibleOperations = fn(e)
         possibleOperations = if _.isArray(possibleOperations) then possibleOperations else [possibleOperations]
@@ -158,13 +160,14 @@ class VimState
             possibleOperation.origExecute = possibleOperation.execute
             possibleOperation.execute = possibleOperation.select
 
-          @pushOperation(possibleOperation) if possibleOperation?.execute
+          @opStack.push(possibleOperation) if possibleOperation?.execute
 
           # If we've received an operator in visual mode, mark the current
           # selection as the motion to operate on.
           if @mode == 'visual' and possibleOperation instanceof operators.Operator
-            @pushOperation(new motions.CurrentSelection(@))
-            @activateCommandMode() if @mode == 'visual'
+            @opStack.push(new motions.CurrentSelection(@))
+
+          @processOpStack()
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
@@ -176,15 +179,6 @@ class VimState
     if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
 
-  # Private: Adds an operation to the operation stack.
-  #
-  # operation - The operation to add.
-  #
-  # Returns nothing.
-  pushOperation: (operation) ->
-    @opStack.push(operation)
-    @processOpStack()
-
   # Private: Removes all operations from the stack.
   #
   # Returns nothing.
@@ -195,7 +189,13 @@ class VimState
   #
   # Returns nothing.
   processOpStack: ->
-    return unless @topOperation().isComplete()
+    unless @opStack.length > 0
+      return
+
+    unless @topOperation().isComplete()
+      if @mode is 'command' and @topOperation() instanceof operators.Operator
+        @activateOperatorPendingMode()
+      return
 
     poppedOperation = @opStack.pop()
     if @opStack.length
@@ -281,8 +281,9 @@ class VimState
       cursor = @editor.getCursor()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
-    @editorView.removeClass('insert-mode visual-mode')
-    @editorView.addClass('command-mode')
+    @changeModeClass('command-mode')
+
+    @clearOpStack()
     @editor.clearSelections()
 
     @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
@@ -295,8 +296,7 @@ class VimState
   activateInsertMode: ->
     @mode = 'insert'
     @submode = null
-    @editorView.removeClass('command-mode visual-mode')
-    @editorView.addClass('insert-mode')
+    @changeModeClass('insert-mode')
 
     @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
 
@@ -310,14 +310,31 @@ class VimState
   activateVisualMode: (type) ->
     @mode = 'visual'
     @submode = type
-    @editorView.removeClass('command-mode insert-mode')
-    @editorView.addClass('visual-mode')
+    @changeModeClass('visual-mode')
+
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
     if @submode == 'linewise'
       @editor.selectLine()
 
     @updateStatusBar()
+
+  # Private: Used to enable operator-pending mode.
+  activateOperatorPendingMode: ->
+    @mode = 'operator-pending'
+    @submodule = null
+    @changeModeClass('operator-pending-mode')
+
+    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+
+    @updateStatusBar()
+
+  changeModeClass: (targetMode) ->
+    for mode in ['command-mode', 'insert-mode', 'visual-mode', 'operator-pending-mode']
+      if mode is targetMode
+        @editorView.addClass(mode)
+      else
+        @editorView.removeClass(mode)
 
   # Private: Resets the command mode back to it's initial state.
   #
@@ -332,7 +349,7 @@ class VimState
   # Returns nothing.
   registerPrefix: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
-    @pushOperation(new prefixes.Register(name))
+    new prefixes.Register(name)
 
   # Private: A generic way to create a Number prefix based on the event.
   #
@@ -347,7 +364,7 @@ class VimState
       if num is 0
         e.abortKeyBinding()
       else
-        @pushOperation(new prefixes.Repeat(num))
+        new prefixes.Repeat(num)
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
