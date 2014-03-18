@@ -174,7 +174,7 @@ class VimState
 
     for operation in operations
       # Motions in visual mode perform their selections.
-      if @mode is 'visual' and operation instanceof Motions.Motion
+      if @mode is 'visual' and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
         operation.execute = operation.select
 
       @opStack.push(operation)
