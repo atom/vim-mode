@@ -42,7 +42,6 @@
   'D': 'vim-mode:delete-to-last-character-of-line'
   'c': 'vim-mode:change'
   'C': 'vim-mode:change-to-last-character-of-line'
-  's': 'vim-mode:change'
   'S': 'vim-mode:substitute-line'
   'r': 'vim-mode:replace'
   'I': 'vim-mode:insert-at-beginning-of-line'
