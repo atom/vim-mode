@@ -344,7 +344,10 @@ class VimState
     if @topOperator() instanceof prefixes.Repeat
       @topOperator().addDigit(num)
     else
-      @pushOperator(new prefixes.Repeat(num))
+      if num is 0
+        e.abortKeyBinding()
+      else
+        @pushOperator(new prefixes.Repeat(num))
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
