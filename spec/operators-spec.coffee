@@ -200,6 +200,22 @@ describe "Operators", ->
         expect(editor.getText()).toBe 'four'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
+    describe "when followed by an iw", ->
+      it "deletes the containing word", ->
+        editor.setText("12345 abcde ABCDE")
+        editor.setCursorScreenPosition([0, 9])
+
+        keydown('d')
+        expect(editorView).toHaveClass('operator-pending-mode')
+        keydown('i')
+        keydown('w')
+
+        expect(editor.getText()).toBe "12345  ABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+        expect(vimState.getRegister('"').text).toBe "abcde"
+        expect(editorView).not.toHaveClass('operator-pending-mode')
+        expect(editorView).toHaveClass('command-mode')
+
   describe "the D keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n")

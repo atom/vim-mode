@@ -134,6 +134,9 @@
   '" %': 'vim-mode:register-prefix'
   '" _': 'vim-mode:register-prefix'
 
+'.vim-mode.operator-pending-mode':
+  'i w': 'vim-mode:select-inside-word'
+
 '.vim-mode.command-mode, .vim-mode.operator-pending-mode':
   '/': 'vim-mode:search'
   '?': 'vim-mode:reverse-search'

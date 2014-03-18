@@ -5,6 +5,7 @@ operators = require './operators'
 prefixes = require './prefixes'
 commands = require './commands'
 motions = require './motions'
+textObjects = require './text-objects'
 utils = require './utils'
 panes = require './panes'
 scroll = require './scroll'
@@ -126,6 +127,7 @@ class VimState
       'move-to-middle-of-screen': => new motions.MoveToMiddleOfScreen(@editor, @editorView)
       'scroll-down': => new scroll.ScrollDown(@editorView, @editor)
       'scroll-up': => new scroll.ScrollUp(@editorView, @editor)
+      'select-inside-word': => new textObjects.SelectInsideWord(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
@@ -160,7 +162,7 @@ class VimState
             possibleOperation.origExecute = possibleOperation.execute
             possibleOperation.execute = possibleOperation.select
 
-          @opStack.push(possibleOperation) if possibleOperation?.execute
+          @opStack.push(possibleOperation) if possibleOperation
 
           # If we've received an operator in visual mode, mark the current
           # selection as the motion to operate on.
@@ -360,9 +362,11 @@ class VimState
     num = parseInt(atom.keymap.keystrokeStringForEvent(e.originalEvent))
     if @topOperation() instanceof prefixes.Repeat
       @topOperation().addDigit(num)
+      false
     else
       if num is 0
         e.abortKeyBinding()
+        false
       else
         new prefixes.Repeat(num)
 
