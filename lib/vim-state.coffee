@@ -85,8 +85,8 @@ class VimState
       'substitute': => new commands.Substitute(@editor, @)
       'substitute-line': => new commands.SubstituteLine(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
-      'insert-after-eol': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
-      'insert-at-bol': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
+      'insert-after-end-of-line': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
+      'insert-at-beginning-of-line': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
