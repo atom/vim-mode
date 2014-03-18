@@ -66,24 +66,19 @@ class VimState
   #
   # Returns nothing.
   setupCommandMode: ->
-    # Commands here start a new mode instead of popping the operation stack
-    # immediately.
-    @editorView.command 'vim-mode:search', =>
-      @currentSearch = new Motions.Search(@editorView, @)
-    @editorView.command 'vim-mode:reverse-search', =>
-      @currentSearch = new Motions.Search(@editorView, @)
-      @currentSearch.reversed()
-    @editorView.command 'vim-mode:replace', =>
-      @currentReplace = new Operators.Replace(@editorView, @)
+    @registerCommands
+      'search': => @currentSearch = new Motions.Search(@editorView, @)
+      'reverse-search': => @currentSearch = (new Motions.Search(@editorView, @)).reversed()
+      'replace': => @currentReplace = new Operators.Replace(@editorView, @)
+      'activate-command-mode': => @activateCommandMode()
+      'activate-insert-mode': => @activateInsertMode()
+      'activate-linewise-visual-mode': => @activateVisualMode('linewise')
+      'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
+      'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
+      'reset-command-mode': => @resetCommandMode()
+      'repeat-prefix': (e) => @repeatPrefix(e)
 
-    @editorView.command 'vim-mode:activate-command-mode', => @activateCommandMode()
-    @editorView.command 'vim-mode:activate-insert-mode', => @activateInsertMode()
-    @editorView.command 'vim-mode:activate-linewise-visual-mode', => @activateVisualMode('linewise')
-    @editorView.command 'vim-mode:activate-characterwise-visual-mode', => @activateVisualMode('characterwise')
-    @editorView.command 'vim-mode:activate-blockwise-visual-mode', => @activateVisualMode('blockwise')
-    @editorView.command 'vim-mode:reset-command-mode', => @resetCommandMode()
-
-    @handleCommands
+    @registerOperationCommands
       'substitute': => new Commands.Substitute(@editor, @)
       'substitute-line': => new Commands.SubstituteLine(@editor, @)
       'insert-after': => new Commands.InsertAfter(@editor, @)
@@ -129,7 +124,6 @@ class VimState
       'scroll-up': => new Scroll.ScrollUp(@editorView, @editor)
       'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
       'register-prefix': (e) => @registerPrefix(e)
-      'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
       'search-complete': (e) => @currentSearch
       'replace-complete': (e) => @currentReplace
@@ -141,18 +135,27 @@ class VimState
       'focus-pane-view-below': => new Panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
 
-  # Private: A helper to actually register the given Commands with the
-  # editor.
+  # Private: Register multiple command handlers via an {Object} that maps
+  # command names to command handler functions.
   #
-  # Commands - An object whose keys will be registered within the plugin's
-  #            namespace and whose values are functions that returns the
-  #            operation to push onto the stack or nothing at all.
+  # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
+  # the provided object.
+  registerCommands: (commands) ->
+    for commandName, fn of commands
+      do (fn) =>
+        @editorView.command "vim-mode:#{commandName}", fn
+
+  # Private: Register multiple operation-pushing Commands via an {Object} that
+  # maps command names to functions that return operations to push.
   #
-  # Returns nothing.
-  handleCommands: (Commands) ->
-    _.each Commands, (fn, commandName) =>
-      eventName = "vim-mode:#{commandName}"
-      @editorView.command eventName, (event) => @pushOperations(fn(event))
+  # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
+  # the given object.
+  registerOperationCommands: (operationCommands) ->
+    commands = {}
+    for commandName, operationFn of operationCommands
+      do (operationFn) =>
+        commands[commandName] = (event) => @pushOperations(operationFn(event))
+    @registerCommands(commands)
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
@@ -174,7 +177,7 @@ class VimState
       if @mode is 'visual' and operation instanceof Motions.Motion
         operation.execute = operation.select
 
-      @opStack.push(operation) if operation
+      @opStack.push(operation)
 
       # If we've received an operator in visual mode, mark the current
       # selection as the motion to operate on.
@@ -364,13 +367,11 @@ class VimState
     num = parseInt(atom.keymap.keystrokeStringForEvent(e.originalEvent))
     if @topOperation() instanceof Prefixes.Repeat
       @topOperation().addDigit(num)
-      false
     else
       if num is 0
         e.abortKeyBinding()
-        false
       else
-        new Prefixes.Repeat(num)
+        @pushOperations(new Prefixes.Repeat(num))
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
