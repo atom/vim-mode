@@ -17,24 +17,6 @@ class CurrentSelection extends Motion
 
   isLinewise: -> @editor.mode == 'visual' and @editor.submode == 'linewise'
 
-class SelectLeft extends Motion
-  execute: (count=1) ->
-    @select(count)
-
-  select: (count=1) ->
-    _.times count, =>
-      @editor.selectLeft()
-      true
-
-class SelectRight extends Motion
-  execute: (count=1) ->
-    @select(count)
-
-  select: (count=1) ->
-    _.times count, =>
-      @editor.selectRight()
-      true
-
 class MoveLeft extends Motion
   execute: (count=1) ->
     _.times count, =>
@@ -465,10 +447,10 @@ class Find extends Motion
   select: (count=1, {requireEOL}={}) ->
     @viewModel.select(count, requireEOL)
 
-module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
-  MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
-  MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
-  MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
-  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search,
-  MoveToEndOfWholeWord, MoveToMark, Find }
+module.exports = {
+  Motion, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToPreviousWord,
+  MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord,
+  MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
+  MoveToBottomOfScreen, MoveToMiddleOfScreen, Search, MoveToEndOfWholeWord, MoveToMark, Find
+}

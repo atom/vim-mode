@@ -101,8 +101,8 @@ class VimState
       'substitute': => new commands.Substitute(@editor, @)
       'substitute-line': => new commands.SubstituteLine(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
-      'insert-after-eol': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
-      'insert-at-bol': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
+      'insert-after-end-of-line': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
+      'insert-at-beginning-of-line': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
@@ -119,8 +119,6 @@ class VimState
       'indent': => @linewiseAliasedOperator(operators.Indent)
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
       'auto-indent': => @linewiseAliasedOperator(operators.Autoindent)
-      'select-left': => new motions.SelectLeft(@editor)
-      'select-right': => new motions.SelectRight(@editor)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
       'move-down': => new motions.MoveDown(@editor)
@@ -343,6 +341,8 @@ class VimState
 
     @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
 
+    @updateStatusBar()
+
   # Private: Used to enable insert mode.
   #
   # Returns nothing.
@@ -353,6 +353,8 @@ class VimState
     @editorView.addClass('insert-mode')
 
     @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+
+    @updateStatusBar()
 
   # Private: Used to enable visual mode.
   #
@@ -368,6 +370,8 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLine()
+
+    @updateStatusBar()
 
   # Private: Resets the command mode back to it's initial state.
   #
@@ -394,7 +398,10 @@ class VimState
     if @topOperator() instanceof prefixes.Repeat
       @topOperator().addDigit(num)
     else
-      @pushOperator(new prefixes.Repeat(num))
+      if num is 0
+        e.abortKeyBinding()
+      else
+        @pushOperator(new prefixes.Repeat(num))
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
@@ -430,3 +437,15 @@ class VimState
     for op in @opStack
       return op if op instanceof constructor
     false
+
+  updateStatusBar: ->
+    if !$('#status-bar-vim-mode').length
+      atom.packages.once 'activated', ->
+        atom.workspaceView.statusBar?.prependRight("<div id='status-bar-vim-mode' class='inline-block'>Command</div>")
+
+    if @mode is "insert"
+      $('#status-bar-vim-mode').html("Insert")
+    else if @mode is "command"
+      $('#status-bar-vim-mode').html("Command")
+    else if @mode is "visual"
+      $('#status-bar-vim-mode').html("Visual")
