@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$} = require 'atom'
+{$, Range} = require 'atom'
 
 Operators = require './operators'
 Prefixes = require './prefixes'
@@ -26,6 +26,11 @@ class VimState
     @setupCommandMode()
     @registerInsertIntercept()
     @activateCommandMode()
+
+    @adjustCursorWidth()
+
+    @editorView.on 'cursor:moved', =>
+      @adjustCursorWidth()
 
     atom.project.eachBuffer (buffer) =>
       @registerChangeHandler(buffer)
@@ -444,3 +449,26 @@ class VimState
       $('#status-bar-vim-mode').html("Command")
     else if @mode is "visual"
       $('#status-bar-vim-mode').html("Visual")
+
+  adjustCursorWidth: ->
+    cursorValue = @getCursorValueForCharacter @getCharUnderCursor()
+    cursorView = @editorView.getCursorView()
+    cursorView.html $('<span/>').addClass('chr').html(cursorValue)
+
+  getCharUnderCursor: ->
+    editor = @editorView.getEditor()
+    range = Range.fromPointWithDelta editor.getCursorBufferPosition(), 0, 1
+    editor.getBuffer().getTextInRange(range)
+
+  getCursorValueForCharacter: (ch) ->
+    switch ch
+      when '', '\n', '\r', ' '
+        '&nbsp;'
+      when '\t'
+        tabLength = @editorView.getEditor().getTabLength()
+        if 1 < tabLength
+          ('&nbsp;' while 0 <= --tabLength).join ''
+        else
+          '&nbsp;'
+      else
+        ch
