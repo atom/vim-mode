@@ -85,8 +85,8 @@ class VimState
       'substitute': => new commands.Substitute(@editor, @)
       'substitute-line': => new commands.SubstituteLine(@editor, @)
       'insert-after': => new commands.InsertAfter(@editor, @)
-      'insert-after-eol': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
-      'insert-at-bol': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
+      'insert-after-end-of-line': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
+      'insert-at-beginning-of-line': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
       'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(operators.Delete)
@@ -103,8 +103,6 @@ class VimState
       'indent': => @linewiseAliasedOperator(operators.Indent)
       'outdent': => @linewiseAliasedOperator(operators.Outdent)
       'auto-indent': => @linewiseAliasedOperator(operators.Autoindent)
-      'select-left': => new motions.SelectLeft(@editor)
-      'select-right': => new motions.SelectRight(@editor)
       'move-left': => new motions.MoveLeft(@editor)
       'move-up': => new motions.MoveUp(@editor)
       'move-down': => new motions.MoveDown(@editor)
@@ -346,7 +344,10 @@ class VimState
     if @topOperator() instanceof prefixes.Repeat
       @topOperator().addDigit(num)
     else
-      @pushOperator(new prefixes.Repeat(num))
+      if num is 0
+        e.abortKeyBinding()
+      else
+        @pushOperator(new prefixes.Repeat(num))
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
