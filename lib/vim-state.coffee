@@ -21,6 +21,7 @@ class VimState
     @editor = @editorView.editor
     @opStack = []
     @history = []
+    @marks = {}
     @mode = 'command'
     @setupCommandMode()
     @registerInsertIntercept()
@@ -70,6 +71,9 @@ class VimState
       'search': => @currentSearch = new Motions.Search(@editorView, @)
       'reverse-search': => @currentSearch = (new Motions.Search(@editorView, @)).reversed()
       'replace': => @currentReplace = new Operators.Replace(@editorView, @)
+      'mark': => @currentMark = new Operators.Mark(@editorView, @)
+      'move-to-mark': => @currentMoveToMark = new Motions.MoveToMark(@editorView, @)
+      'move-to-mark-literal': => @currentMoveToMark = new Motions.MoveToMark(@editorView, @, false)
       'activate-command-mode': => @activateCommandMode()
       'activate-insert-mode': => @activateInsertMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
@@ -134,6 +138,8 @@ class VimState
       'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new Panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
+      'mark-complete': (e) => @currentMark
+      'move-to-mark-complete': (e) => @currentMoveToMark
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
@@ -243,6 +249,14 @@ class VimState
     else
       atom.workspace.vimState.registers[name]
 
+  # Private: Fetches the value of a given mark.
+  #
+  # name - The name of the mark to fetch.
+  #
+  # Returns the value of the given mark or undefined if it hasn't
+  # been set.
+  getMark: (name) -> @marks[name]
+
   # Private: Sets the value of a given register.
   #
   # name  - The name of the register to fetch.
@@ -256,6 +270,17 @@ class VimState
       # Blackhole register, nothing to do
     else
       atom.workspace.vimState.registers[name] = value
+
+  # Private: Sets the value of a given mark.
+  #
+  # name  - The name of the mark to fetch.
+  # value {Point} - The value to set the mark to.
+  #
+  # Returns nothing.
+  setMark: (name, pos) ->
+    # check to make sure name is in [a-z]
+    if (charCode = name.charCodeAt(0)) >= 97 and charCode <= 122
+      @marks[name] = pos
 
   # Public: Append a search to the search history.
   #
