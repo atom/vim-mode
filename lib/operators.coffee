@@ -80,6 +80,8 @@ class Delete extends Operator
     if @motion.isLinewise?()
       @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
+    @vimState.activateCommandMode()
+
 #
 # It changes everything selected by the following motion.
 #
@@ -123,6 +125,8 @@ class Yank extends Operator
     else
       @editor.clearSelections()
 
+    @vimState.activateCommandMode()
+
 #
 # It indents everything selected by the following motion.
 #
@@ -134,6 +138,7 @@ class Indent extends Operator
   # Returns nothing.
   execute: (count=1) ->
     @indent(count)
+    @vimState.activateCommandMode()
 
   # Protected: Indents or outdents the text selected by the given motion.
   #
@@ -166,6 +171,7 @@ class Outdent extends Indent
   # Returns nothing.
   execute: (count=1) ->
     @indent(count, 'outdent')
+    @vimState.activateCommandMode()
 
 #
 # It autoindents everything selected by the following motion.
@@ -178,6 +184,7 @@ class Autoindent extends Indent
   # Returns nothing.
   execute: (count=1) ->
     @indent(count, 'auto')
+    @vimState.activateCommandMode()
 
 #
 # It pastes everything contained within the specifed register
@@ -224,6 +231,8 @@ class Put extends Operator
       @editor.setCursorScreenPosition(originalPosition)
       @editor.moveCursorToFirstCharacterOfLine()
 
+    @vimState.activateCommandMode()
+
   # Private: Helper to determine if the editor is currently on the last row.
   #
   # Returns true on the last row and false otherwise.
@@ -248,6 +257,7 @@ class Join extends Operator
     @undoTransaction =>
       _.times count, =>
         @editor.joinLines()
+    @vimState.activateCommandMode()
 
 #
 # Repeat the last operation
@@ -290,6 +300,8 @@ class Replace extends Operator
         editor.moveCursorRight()
       editor.setCursorBufferPosition(start)
 
+    @vimState.activateCommandMode()
+
 class Mark extends Operator
   constructor: (@editorView, @vimState, {@selectOptions}={}) ->
     @editor = @editorView.editor
@@ -300,6 +312,8 @@ class Mark extends Operator
     editor = @editorView.editor
     pos = editor.getCursorBufferPosition()
     @vimState.setMark(@viewModel.char, pos)
+
+    @vimState.activateCommandMode()
 
 module.exports = { Operator, OperatorError, Delete, Change, Yank, Indent,
   Outdent, Autoindent, Put, Join, Repeat, Replace, Mark }

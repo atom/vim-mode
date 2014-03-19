@@ -1,13 +1,14 @@
 _ = require 'underscore-plus'
 {$} = require 'atom'
 
-operators = require './operators'
-prefixes = require './prefixes'
-commands = require './commands'
-motions = require './motions'
-utils = require './utils'
-panes = require './panes'
-scroll = require './scroll'
+Operators = require './operators'
+Prefixes = require './prefixes'
+Commands = require './commands'
+Motions = require './motions'
+TextObjects = require './text-objects'
+Utils = require './utils'
+Panes = require './panes'
+Scroll = require './scroll'
 
 module.exports =
 class VimState
@@ -60,120 +61,107 @@ class VimState
       return unless @setRegister?
 
       if newText == ''
-        @setRegister('"', text: oldText, type: utils.copyType(oldText))
+        @setRegister('"', text: oldText, type: Utils.copyType(oldText))
 
-  # Private: Creates the plugin's commands
+  # Private: Creates the plugin's Commands
   #
   # Returns nothing.
   setupCommandMode: ->
-    # Commands here start a new mode instead of popping the operator stack
-    # immediately.
-    @editorView.command 'vim-mode:search', =>
-      @currentSearch = new motions.Search(@editorView, @)
-    @editorView.command 'vim-mode:reverse-search', =>
-      @currentSearch = new motions.Search(@editorView, @)
-      @currentSearch.reversed()
-    @editorView.command 'vim-mode:replace', =>
-      @currentReplace = new operators.Replace(@editorView, @)
-    @editorView.command 'vim-mode:mark', =>
-      @currentMark = new operators.Mark(@editorView, @)
-    @editorView.command 'vim-mode:move-to-mark', =>
-      @currentMoveToMark = new motions.MoveToMark(@editorView, @)
-    @editorView.command 'vim-mode:move-to-mark-literal', =>
-      @currentMoveToMark = new motions.MoveToMark(@editorView, @, false)
-
-    @handleCommands
+    @registerCommands
+      'search': => @currentSearch = new Motions.Search(@editorView, @)
+      'reverse-search': => @currentSearch = (new Motions.Search(@editorView, @)).reversed()
+      'replace': => @currentReplace = new Operators.Replace(@editorView, @)
+      'mark': => @currentMark = new Operators.Mark(@editorView, @)
+      'move-to-mark': => @currentMoveToMark = new Motions.MoveToMark(@editorView, @)
+      'move-to-mark-literal': => @currentMoveToMark = new Motions.MoveToMark(@editorView, @, false)
       'activate-command-mode': => @activateCommandMode()
       'activate-insert-mode': => @activateInsertMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
       'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
       'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
       'reset-command-mode': => @resetCommandMode()
-      'substitute': => new commands.Substitute(@editor, @)
-      'substitute-line': => new commands.SubstituteLine(@editor, @)
-      'insert-after': => new commands.InsertAfter(@editor, @)
-      'insert-after-end-of-line': => [new motions.MoveToLastCharacterOfLine(@editor), new commands.InsertAfter(@editor, @)]
-      'insert-at-beginning-of-line': => [new motions.MoveToFirstCharacterOfLine(@editor), new commands.Insert(@editor, @)]
-      'insert-above-with-newline': => new commands.InsertAboveWithNewline(@editor, @)
-      'insert-below-with-newline': => new commands.InsertBelowWithNewline(@editor, @)
-      'delete': => @linewiseAliasedOperator(operators.Delete)
-      'change': => @linewiseAliasedOperator(operators.Change)
-      'change-to-last-character-of-line': => [new operators.Change(@editor, @), new motions.MoveToLastCharacterOfLine(@editor)]
-      'delete-right': => [new operators.Delete(@editor), new motions.MoveRight(@editor)]
-      'delete-left': => [new operators.Delete(@editor), new motions.MoveLeft(@editor)]
-      'delete-to-last-character-of-line': => [new operators.Delete(@editor), new motions.MoveToLastCharacterOfLine(@editor)]
-      'yank': => @linewiseAliasedOperator(operators.Yank)
-      'yank-line': => [new operators.Yank(@editor, @), new motions.MoveToLine(@editor)]
-      'put-before': => new operators.Put(@editor, @, location: 'before')
-      'put-after': => new operators.Put(@editor, @, location: 'after')
-      'join': => new operators.Join(@editor)
-      'indent': => @linewiseAliasedOperator(operators.Indent)
-      'outdent': => @linewiseAliasedOperator(operators.Outdent)
-      'auto-indent': => @linewiseAliasedOperator(operators.Autoindent)
-      'move-left': => new motions.MoveLeft(@editor)
-      'move-up': => new motions.MoveUp(@editor)
-      'move-down': => new motions.MoveDown(@editor)
-      'move-right': => new motions.MoveRight(@editor)
-      'move-to-next-word': => new motions.MoveToNextWord(@editor)
-      'move-to-next-whole-word': => new motions.MoveToNextWholeWord(@editor)
-      'move-to-end-of-word': => new motions.MoveToEndOfWord(@editor)
-      'move-to-end-of-whole-word': => new motions.MoveToEndOfWholeWord(@editor)
-      'move-to-previous-word': => new motions.MoveToPreviousWord(@editor)
-      'move-to-previous-whole-word': => new motions.MoveToPreviousWholeWord(@editor)
-      'move-to-next-paragraph': => new motions.MoveToNextParagraph(@editor)
-      'move-to-previous-paragraph': => new motions.MoveToPreviousParagraph(@editor)
-      'move-to-first-character-of-line': => new motions.MoveToFirstCharacterOfLine(@editor)
-      'move-to-last-character-of-line': => new motions.MoveToLastCharacterOfLine(@editor)
-      'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
-      'move-to-start-of-file': => new motions.MoveToStartOfFile(@editor)
-      'move-to-line': => new motions.MoveToLine(@editor)
-      'move-to-top-of-screen': => new motions.MoveToTopOfScreen(@editor, @editorView)
-      'move-to-bottom-of-screen': => new motions.MoveToBottomOfScreen(@editor, @editorView)
-      'move-to-middle-of-screen': => new motions.MoveToMiddleOfScreen(@editor, @editorView)
-      'scroll-down': => new scroll.ScrollDown(@editorView, @editor)
-      'scroll-up': => new scroll.ScrollUp(@editorView, @editor)
-      'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
-      'repeat': (e) => new operators.Repeat(@editor, @)
+
+    @registerOperationCommands
+      'substitute': => new Commands.Substitute(@editor, @)
+      'substitute-line': => new Commands.SubstituteLine(@editor, @)
+      'insert-after': => new Commands.InsertAfter(@editor, @)
+      'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Commands.InsertAfter(@editor, @)]
+      'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Commands.Insert(@editor, @)]
+      'insert-above-with-newline': => new Commands.InsertAboveWithNewline(@editor, @)
+      'insert-below-with-newline': => new Commands.InsertBelowWithNewline(@editor, @)
+      'delete': => @linewiseAliasedOperator(Operators.Delete)
+      'change': => @linewiseAliasedOperator(Operators.Change)
+      'change-to-last-character-of-line': => [new Operators.Change(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor)]
+      'delete-right': => [new Operators.Delete(@editor, @), new Motions.MoveRight(@editor)]
+      'delete-left': => [new Operators.Delete(@editor, @), new Motions.MoveLeft(@editor)]
+      'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor)]
+      'yank': => @linewiseAliasedOperator(Operators.Yank)
+      'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToLine(@editor)]
+      'put-before': => new Operators.Put(@editor, @, location: 'before')
+      'put-after': => new Operators.Put(@editor, @, location: 'after')
+      'join': => new Operators.Join(@editor, @)
+      'indent': => @linewiseAliasedOperator(Operators.Indent)
+      'outdent': => @linewiseAliasedOperator(Operators.Outdent)
+      'auto-indent': => @linewiseAliasedOperator(Operators.Autoindent)
+      'move-left': => new Motions.MoveLeft(@editor)
+      'move-up': => new Motions.MoveUp(@editor)
+      'move-down': => new Motions.MoveDown(@editor)
+      'move-right': => new Motions.MoveRight(@editor)
+      'move-to-next-word': => new Motions.MoveToNextWord(@editor)
+      'move-to-next-whole-word': => new Motions.MoveToNextWholeWord(@editor)
+      'move-to-end-of-word': => new Motions.MoveToEndOfWord(@editor)
+      'move-to-end-of-whole-word': => new Motions.MoveToEndOfWholeWord(@editor)
+      'move-to-previous-word': => new Motions.MoveToPreviousWord(@editor)
+      'move-to-previous-whole-word': => new Motions.MoveToPreviousWholeWord(@editor)
+      'move-to-next-paragraph': => new Motions.MoveToNextParagraph(@editor)
+      'move-to-previous-paragraph': => new Motions.MoveToPreviousParagraph(@editor)
+      'move-to-first-character-of-line': => new Motions.MoveToFirstCharacterOfLine(@editor)
+      'move-to-last-character-of-line': => new Motions.MoveToLastCharacterOfLine(@editor)
+      'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
+      'move-to-start-of-file': => new Motions.MoveToStartOfFile(@editor)
+      'move-to-line': => new Motions.MoveToLine(@editor)
+      'move-to-top-of-screen': => new Motions.MoveToTopOfScreen(@editor, @editorView)
+      'move-to-bottom-of-screen': => new Motions.MoveToBottomOfScreen(@editor, @editorView)
+      'move-to-middle-of-screen': => new Motions.MoveToMiddleOfScreen(@editor, @editorView)
+      'scroll-down': => new Scroll.ScrollDown(@editorView, @editor)
+      'scroll-up': => new Scroll.ScrollUp(@editorView, @editor)
+      'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
+      'register-prefix': (e) => @registerPrefix(e)
+      'repeat': (e) => new Operators.Repeat(@editor, @)
       'search-complete': (e) => @currentSearch
       'replace-complete': (e) => @currentReplace
       'repeat-search': (e) => @currentSearch.repeat() if @currentSearch?
       'repeat-search-backwards': (e) => @currentSearch.repeat(backwards: true) if @currentSearch?
-      'focus-pane-view-on-left': => new panes.FocusPaneViewOnLeft()
-      'focus-pane-view-on-right': => new panes.FocusPaneViewOnRight()
-      'focus-pane-view-above': => new panes.FocusPaneViewAbove()
-      'focus-pane-view-below': => new panes.FocusPaneViewBelow()
-      'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
+      'focus-pane-view-on-left': => new Panes.FocusPaneViewOnLeft()
+      'focus-pane-view-on-right': => new Panes.FocusPaneViewOnRight()
+      'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
+      'focus-pane-view-below': => new Panes.FocusPaneViewBelow()
+      'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
       'mark-complete': (e) => @currentMark
       'move-to-mark-complete': (e) => @currentMoveToMark
 
-  # Private: A helper to actually register the given commands with the
-  # editor.
+  # Private: Register multiple command handlers via an {Object} that maps
+  # command names to command handler functions.
   #
-  # commands - An object whose keys will be registered within the plugin's
-  #            namespace and whose values are functions that returns the
-  #            operation to push onto the stack or nothing at all.
+  # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
+  # the provided object.
+  registerCommands: (commands) ->
+    for commandName, fn of commands
+      do (fn) =>
+        @editorView.command "vim-mode:#{commandName}", fn
+
+  # Private: Register multiple operation-pushing Commands via an {Object} that
+  # maps command names to functions that return operations to push.
   #
-  # Returns nothing.
-  handleCommands: (commands) ->
-    _.each commands, (fn, commandName) =>
-      eventName = "vim-mode:#{commandName}"
-      @editorView.command eventName, (e) =>
-        possibleOperators = fn(e)
-        possibleOperators = if _.isArray(possibleOperators) then possibleOperators else [possibleOperators]
-        for possibleOperator in possibleOperators
-          # Motions in visual mode perform their selections.
-          if @mode == 'visual' and possibleOperator instanceof motions.Motion
-            possibleOperator.origExecute = possibleOperator.execute
-            possibleOperator.execute = possibleOperator.select
-
-          @pushOperator(possibleOperator) if possibleOperator?.execute
-
-          # If we've received an operator in visual mode, mark the current
-          # selection as the motion to operate on.
-          if @mode == 'visual' and possibleOperator instanceof operators.Operator
-            @pushOperator(new motions.CurrentSelection(@))
-            @activateCommandMode() if @mode == 'visual'
+  # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
+  # the given object.
+  registerOperationCommands: (operationCommands) ->
+    commands = {}
+    for commandName, operationFn of operationCommands
+      do (operationFn) =>
+        commands[commandName] = (event) => @pushOperations(operationFn(event))
+    @registerCommands(commands)
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
@@ -185,14 +173,24 @@ class VimState
     if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
       @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
 
-  # Private: Adds an operator to the operation stack.
-  #
-  # operation - The operation to add.
-  #
-  # Returns nothing.
-  pushOperator: (operation) ->
-    @opStack.push(operation)
-    @processOpStack()
+  # Private: Push the given operations onto the operation stack, then process
+  # it.
+  pushOperations: (operations) ->
+    operations = [operations] unless _.isArray(operations)
+
+    for operation in operations
+      # Motions in visual mode perform their selections.
+      if @mode is 'visual' and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
+        operation.execute = operation.select
+
+      @opStack.push(operation)
+
+      # If we've received an operator in visual mode, mark the current
+      # selection as the motion to operate on.
+      if @mode is 'visual' and operation instanceof Operators.Operator
+        @opStack.push(new Motions.CurrentSelection(@))
+
+      @processOpStack()
 
   # Private: Removes all operations from the stack.
   #
@@ -204,23 +202,29 @@ class VimState
   #
   # Returns nothing.
   processOpStack: ->
-    return unless @topOperator().isComplete()
+    unless @opStack.length > 0
+      return
 
-    poppedOperator = @opStack.pop()
+    unless @topOperation().isComplete()
+      if @mode is 'command' and @topOperation() instanceof Operators.Operator
+        @activateOperatorPendingMode()
+      return
+
+    poppedOperation = @opStack.pop()
     if @opStack.length
       try
-        @topOperator().compose(poppedOperator)
+        @topOperation().compose(poppedOperation)
         @processOpStack()
       catch e
-        (e instanceof operators.OperatorError) and @resetCommandMode() or throw e
+        (e instanceof Operators.OperatorError) and @resetCommandMode() or throw e
     else
-      @history.unshift(poppedOperator) if poppedOperator.isRecordable()
-      poppedOperator.execute()
+      @history.unshift(poppedOperation) if poppedOperation.isRecordable()
+      poppedOperation.execute()
 
   # Private: Fetches the last operation.
   #
   # Returns the last operation.
-  topOperator: ->
+  topOperation: ->
     _.last @opStack
 
   # Private: Fetches the value of a given register.
@@ -232,15 +236,15 @@ class VimState
   getRegister: (name) ->
     if name in ['*', '+']
       text = atom.clipboard.read()
-      type = utils.copyType(text)
+      type = Utils.copyType(text)
       {text, type}
     else if name == '%'
       text = @editor.getUri()
-      type = utils.copyType(text)
+      type = Utils.copyType(text)
       {text, type}
     else if name == "_" # Blackhole always returns nothing
       text = ''
-      type = utils.copyType(text)
+      type = Utils.copyType(text)
       {text, type}
     else
       atom.workspace.vimState.registers[name]
@@ -280,7 +284,7 @@ class VimState
 
   # Public: Append a search to the search history.
   #
-  # motions.Search - The confirmed search motion to append
+  # Motions.Search - The confirmed search motion to append
   #
   # Returns nothing
   pushSearchHistory: (search) ->
@@ -309,8 +313,9 @@ class VimState
       cursor = @editor.getCursor()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
-    @editorView.removeClass('insert-mode visual-mode')
-    @editorView.addClass('command-mode')
+    @changeModeClass('command-mode')
+
+    @clearOpStack()
     @editor.clearSelections()
 
     @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
@@ -323,8 +328,7 @@ class VimState
   activateInsertMode: ->
     @mode = 'insert'
     @submode = null
-    @editorView.removeClass('command-mode visual-mode')
-    @editorView.addClass('insert-mode')
+    @changeModeClass('insert-mode')
 
     @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
 
@@ -338,14 +342,31 @@ class VimState
   activateVisualMode: (type) ->
     @mode = 'visual'
     @submode = type
-    @editorView.removeClass('command-mode insert-mode')
-    @editorView.addClass('visual-mode')
+    @changeModeClass('visual-mode')
+
     @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
 
     if @submode == 'linewise'
       @editor.selectLine()
 
     @updateStatusBar()
+
+  # Private: Used to enable operator-pending mode.
+  activateOperatorPendingMode: ->
+    @mode = 'operator-pending'
+    @submodule = null
+    @changeModeClass('operator-pending-mode')
+
+    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+
+    @updateStatusBar()
+
+  changeModeClass: (targetMode) ->
+    for mode in ['command-mode', 'insert-mode', 'visual-mode', 'operator-pending-mode']
+      if mode is targetMode
+        @editorView.addClass(mode)
+      else
+        @editorView.removeClass(mode)
 
   # Private: Resets the command mode back to it's initial state.
   #
@@ -360,7 +381,7 @@ class VimState
   # Returns nothing.
   registerPrefix: (e) ->
     name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
-    @pushOperator(new prefixes.Register(name))
+    new Prefixes.Register(name)
 
   # Private: A generic way to create a Number prefix based on the event.
   #
@@ -369,13 +390,13 @@ class VimState
   # Returns nothing.
   repeatPrefix: (e) ->
     num = parseInt(atom.keymap.keystrokeStringForEvent(e.originalEvent))
-    if @topOperator() instanceof prefixes.Repeat
-      @topOperator().addDigit(num)
+    if @topOperation() instanceof Prefixes.Repeat
+      @topOperation().addDigit(num)
     else
       if num is 0
         e.abortKeyBinding()
       else
-        @pushOperator(new prefixes.Repeat(num))
+        @pushOperations(new Prefixes.Repeat(num))
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat
@@ -385,12 +406,12 @@ class VimState
   #
   # Returns nothing.
   moveOrRepeat: (e) ->
-    if @topOperator() instanceof prefixes.Repeat
+    if @topOperation() instanceof Prefixes.Repeat
       @repeatPrefix(e)
     else
-      new motions.MoveToBeginningOfLine(@editor)
+      new Motions.MoveToBeginningOfLine(@editor)
 
-  # Private: A generic way to handle operators that can be repeated for
+  # Private: A generic way to handle Operators that can be repeated for
   # their linewise form.
   #
   # constructor - The constructor of the operator.
@@ -398,7 +419,7 @@ class VimState
   # Returns nothing.
   linewiseAliasedOperator: (constructor) ->
     if @isOperatorPending(constructor)
-      new motions.MoveToLine(@editor)
+      new Motions.MoveToLine(@editor)
     else
       new constructor(@editor, @)
 

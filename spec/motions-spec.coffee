@@ -18,11 +18,6 @@ describe "Motions", ->
     options.element ?= editorView[0]
     helpers.keydown(key, options)
 
-  commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
-    opts.raw = true
-    keydown(key, opts)
-
   describe "simple motions", ->
     beforeEach ->
       editor.setText("12345\nabcde\nABCDE")
@@ -748,37 +743,3 @@ describe "Motions", ->
     it "moves the cursor to the first row if visible", ->
       keydown('M', shift: true)
       expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([5, 0])
-
-  describe 'the mark keybindings', ->
-    beforeEach ->
-      editor.setText('12\n34\n56\n')
-      editor.setCursorBufferPosition([0,1])
-
-    it 'moves to a mark', ->
-      editor.setCursorBufferPosition([1,1])
-      keydown('m')
-      commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([0,0])
-      keydown('\'')
-      commandModeInputKeydown('a')
-      expect(editor.getCursorBufferPosition()).toEqual [1,1]
-
-    it 'deletes to a mark by line', ->
-      editor.setCursorBufferPosition([1,1])
-      keydown('m')
-      commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([0,0])
-      keydown('d')
-      keydown('\'')
-      commandModeInputKeydown('a')
-      expect(editor.getText()).toEqual '\n56\n'
-
-    it 'deletes to a mark literally', ->
-      editor.setCursorBufferPosition([1,1])
-      keydown('m')
-      commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([0,1])
-      keydown('d')
-      keydown('`')
-      commandModeInputKeydown('a')
-      expect(editor.getText()).toEqual '14\n56\n'

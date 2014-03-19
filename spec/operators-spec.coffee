@@ -124,8 +124,13 @@ describe "Operators", ->
       expect(vimState.getRegister('"').type).toBe 'linewise'
 
   describe "the d keybinding", ->
+    it "enters operator-pending mode", ->
+      keydown('d')
+      expect(editorView).toHaveClass('operator-pending-mode')
+      expect(editorView).not.toHaveClass('command-mode')
+
     describe "when followed by a d", ->
-      it "deletes the current line", ->
+      it "deletes the current line and exits operator-pending mode", ->
         editor.setText("12345\nabcde\n\nABCDE")
         editor.setCursorScreenPosition([1, 1])
 
@@ -135,6 +140,8 @@ describe "Operators", ->
         expect(editor.getText()).toBe "12345\n\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
         expect(vimState.getRegister('"').text).toBe "abcde\n"
+        expect(editorView).not.toHaveClass('operator-pending-mode')
+        expect(editorView).toHaveClass('command-mode')
 
       it "deletes the last line", ->
         editor.setText("12345\nabcde\nABCDE")
@@ -161,7 +168,7 @@ describe "Operators", ->
         expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
 
     describe "when followed by a w", ->
-      it "deletes the next word until the end of the line", ->
+      it "deletes the next word until the end of the line and exits operator-pending mode", ->
         editor.setText("abcd efg\nabc")
         editor.setCursorScreenPosition([0, 5])
 
@@ -170,6 +177,8 @@ describe "Operators", ->
 
         expect(editor.getText()).toBe "abcd \nabc"
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+        expect(editorView).not.toHaveClass('operator-pending-mode')
+        expect(editorView).toHaveClass('command-mode')
 
       it "deletes to the beginning of the next word", ->
         editor.setText('abcd efg')
@@ -190,6 +199,22 @@ describe "Operators", ->
 
         expect(editor.getText()).toBe 'four'
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "when followed by an iw", ->
+      it "deletes the containing word", ->
+        editor.setText("12345 abcde ABCDE")
+        editor.setCursorScreenPosition([0, 9])
+
+        keydown('d')
+        expect(editorView).toHaveClass('operator-pending-mode')
+        keydown('i')
+        keydown('w')
+
+        expect(editor.getText()).toBe "12345  ABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+        expect(vimState.getRegister('"').text).toBe "abcde"
+        expect(editorView).not.toHaveClass('operator-pending-mode')
+        expect(editorView).toHaveClass('command-mode')
 
   describe "the D keybinding", ->
     beforeEach ->
@@ -678,4 +703,3 @@ describe "Operators", ->
       keydown('m')
       commandModeInputKeydown('a')
       expect(vimState.getMark('a')).toEqual [0,1]
-    
