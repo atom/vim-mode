@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
-{SearchViewModel, MoveToMarkViewModel} = require './view-models'
+{SearchViewModel, MoveToMarkViewModel, FindViewModel} = require './view-models'
 
 class Motion
   constructor: (@editor, @state) ->
@@ -451,10 +451,25 @@ class MoveToMark extends Motion
     @viewModel.select(requireEOL)
     [true]
 
+class Find extends Motion
+  constructor: (@editorView, @state) ->
+    super(@editorView.editor, @state)
+    @viewModel = new FindViewModel(@)
+
+  reverse: ->
+    @viewModel.reverse()
+    @
+
+  execute: ->
+    @viewModel.execute()
+
+  select: (count=1, {requireEOL}={}) ->
+    @viewModel.select(count, requireEOL)
+
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
   MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
   MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
   MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search,
-  MoveToEndOfWholeWord, MoveToMark }
+  MoveToEndOfWholeWord, MoveToMark, Find }

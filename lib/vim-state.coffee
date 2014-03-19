@@ -85,6 +85,11 @@ class VimState
       'move-to-mark-literal':
         name: 'move-to-mark'
         fn: => new motions.MoveToMark(@editorView, @, false)
+      'find':
+        fn: => new motions.Find(@editorView, @)
+      'find-backwards':
+        name: 'find'
+        fn: => new motions.Find(@editorView, @).reverse()
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
@@ -152,6 +157,7 @@ class VimState
       'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
       'mark-complete': (e) => @currentOperators.mark
       'move-to-mark-complete': (e) => @currentOperators['move-to-mark']
+      'find-complete': (e) => @currentOperators.find
 
   # Private: A helper to actually register the given commands with the
   # editor.

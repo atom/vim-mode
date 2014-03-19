@@ -140,6 +140,8 @@
   'm': 'vim-mode:mark'
   '`': 'vim-mode:move-to-mark-literal'
   '\'': 'vim-mode:move-to-mark'
+  'f': 'vim-mode:find'
+  'F': 'vim-mode:find-backwards'
   'ctrl-c': 'vim-mode:reset-command-mode'
   'backspace': 'core:move-left'
   'g t': 'pane:show-next-item'

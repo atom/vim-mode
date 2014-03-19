@@ -140,6 +140,38 @@ class MarkViewModel extends ViewModel
     super(@markOperator, class: 'mark', hidden: true, singleChar: true)
     @completionCommand = 'vim-mode:mark-complete'
 
+class FindViewModel extends ViewModel
+  constructor: (@findMotion) ->
+    super(@findMotion, class: 'mark', hidden: true, singleChar: true)
+    @completionCommand = 'vim-mode:find-complete'
+    @reversed = false
+
+  reverse: -> @reversed = !@reversed
+
+  execute: ->
+    currentPosition = @editorView.editor.getCursorBufferPosition()
+    line = @editorView.editor.lineForBufferRow(currentPosition.row)
+    if @reversed
+      if (index = line.lastIndexOf(@value, currentPosition.column-1)) != -1
+        @editorView.editor.setCursorBufferPosition([currentPosition.row, index])
+    else
+      if (index = line.indexOf(@value, currentPosition.column+1)) != -1
+        @editorView.editor.setCursorBufferPosition([currentPosition.row, index])
+
+  select: (count, requireEOL) ->
+    # i don't abide by count currently, will be fixed soon
+    currentPosition = @editorView.editor.getCursorBufferPosition()
+    line = @editorView.editor.lineForBufferRow(currentPosition.row)
+    if @reversed
+      if (index = line.lastIndexOf(@value, currentPosition.column-1)) != -1
+        @editorView.editor.setSelectedBufferRange(new Range(new Point(currentPosition.row, index), currentPosition))
+        return [true]
+    else
+      if (index = line.indexOf(@value, currentPosition.column+1)) != -1
+        @editorView.editor.setSelectedBufferRange(new Range(currentPosition, new Point(currentPosition.row, index+1)))
+        return [true]
+    [false]
+
 class MoveToMarkViewModel extends ViewModel
   constructor: (@moveToMarkOperator) ->
     super(@moveToMarkOperator, class: 'move-to-mark', hidden: true, singleChar: true)
@@ -166,4 +198,4 @@ class MoveToMarkViewModel extends ViewModel
     markPosition = @vimState.getMark(@value)
     @editor.setCursorBufferPosition(markPosition) if markPosition?
 
-module.exports = { ReplaceViewModel, SearchViewModel, MarkViewModel, MoveToMarkViewModel }
+module.exports = { ReplaceViewModel, SearchViewModel, MarkViewModel, MoveToMarkViewModel, FindViewModel }
