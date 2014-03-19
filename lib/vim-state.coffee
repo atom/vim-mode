@@ -22,6 +22,7 @@ class VimState
     @history = []
     @marks = {}
     @mode = 'command'
+    @currentOperators = {}
 
     @setupCommandMode()
     @registerInsertIntercept()
@@ -69,19 +70,21 @@ class VimState
   setupCommandMode: ->
     # Commands here start a new mode instead of popping the operator stack
     # immediately.
-    @editorView.command 'vim-mode:search', =>
-      @currentSearch = new motions.Search(@editorView, @)
-    @editorView.command 'vim-mode:reverse-search', =>
-      @currentSearch = new motions.Search(@editorView, @)
-      @currentSearch.reversed()
-    @editorView.command 'vim-mode:replace', =>
-      @currentReplace = new operators.Replace(@editorView, @)
-    @editorView.command 'vim-mode:mark', =>
-      @currentMark = new operators.Mark(@editorView, @)
-    @editorView.command 'vim-mode:move-to-mark', =>
-      @currentMoveToMark = new motions.MoveToMark(@editorView, @)
-    @editorView.command 'vim-mode:move-to-mark-literal', =>
-      @currentMoveToMark = new motions.MoveToMark(@editorView, @, false)
+    @handleRawCommands
+      'search':
+        fn: => new motions.Search(@editorView, @)
+      'reverse-search':
+        name: 'search'
+        fn: => (new motions.Search(@editorView, @)).reversed()
+      'replace':
+        fn: => new operators.Replace(@editorView, @)
+      'mark':
+        fn: => new operators.Mark(@editorView, @)
+      'move-to-mark':
+        fn: => new motions.MoveToMark(@editorView, @)
+      'move-to-mark-literal':
+        name: 'move-to-mark'
+        fn: => new motions.MoveToMark(@editorView, @, false)
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
@@ -138,17 +141,17 @@ class VimState
       'register-prefix': (e) => @registerPrefix(e)
       'repeat-prefix': (e) => @repeatPrefix(e)
       'repeat': (e) => new operators.Repeat(@editor, @)
-      'search-complete': (e) => @currentSearch
-      'replace-complete': (e) => @currentReplace
-      'repeat-search': (e) => @currentSearch.repeat() if @currentSearch?
-      'repeat-search-backwards': (e) => @currentSearch.repeat(backwards: true) if @currentSearch?
+      'search-complete': (e) => @currentOperators.search
+      'replace-complete': (e) => @currentOperators.replace
+      'repeat-search': (e) => @currentOperators.search.repeat() if @currentOperators.search?
+      'repeat-search-backwards': (e) => @currentOperators.search.repeat(backwards: true) if @currentOperators.search?
       'focus-pane-view-on-left': => new panes.FocusPaneViewOnLeft()
       'focus-pane-view-on-right': => new panes.FocusPaneViewOnRight()
       'focus-pane-view-above': => new panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
-      'mark-complete': (e) => @currentMark
-      'move-to-mark-complete': (e) => @currentMoveToMark
+      'mark-complete': (e) => @currentOperators.mark
+      'move-to-mark-complete': (e) => @currentOperators['move-to-mark']
 
   # Private: A helper to actually register the given commands with the
   # editor.
@@ -177,6 +180,12 @@ class VimState
           if @mode == 'visual' and possibleOperator instanceof operators.Operator
             @pushOperator(new motions.CurrentSelection(@))
             @activateCommandMode() if @mode == 'visual'
+
+  handleRawCommands: (commands) ->
+    _.each commands, ({fn, name}, commandName) =>
+      eventName = "vim-mode:#{commandName}"
+      @editorView.command eventName, (e) =>
+        @currentOperators[name ? commandName] = fn(e)
 
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.

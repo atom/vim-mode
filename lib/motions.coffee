@@ -1,7 +1,6 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
-SearchViewModel = require './search-view-model'
-MoveToMarkViewModel = require './move-to-mark-view-model'
+{SearchViewModel, MoveToMarkViewModel} = require './view-models'
 
 class Motion
   constructor: (@editor, @state) ->
