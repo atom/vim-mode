@@ -180,6 +180,7 @@ class MoveToMarkViewModel extends ViewModel
 
   select: (requireEOL) ->
     markPosition = @vimState.getMark(@value)
+    return unless markPosition?
     currentPosition = @editor.getCursorBufferPosition()
     selectionRange = null
     if currentPosition.isGreaterThan(markPosition)
