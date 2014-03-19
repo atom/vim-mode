@@ -34,3 +34,5 @@
     advanced atom keymap support)
 * [Join](http://vimhelp.appspot.com/change.txt.html#J)
   * `J` - joins the current line with the immediately following line.
+* [Mark](http://vimhelp.appspot.com/motion.txt.html#m)
+  * `m[a-z][A-Z]` - marks the current cursor position

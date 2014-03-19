@@ -20,6 +20,7 @@ class VimState
     @editor = @editorView.editor
     @opStack = []
     @history = []
+    @marks = {}
     @mode = 'command'
     @setupCommandMode()
     @registerInsertIntercept()
@@ -74,6 +75,12 @@ class VimState
       @currentSearch.reversed()
     @editorView.command 'vim-mode:replace', =>
       @currentReplace = new operators.Replace(@editorView, @)
+    @editorView.command 'vim-mode:mark', =>
+      @currentMark = new operators.Mark(@editorView, @)
+    @editorView.command 'vim-mode:move-to-mark', =>
+      @currentMoveToMark = new motions.MoveToMark(@editorView, @)
+    @editorView.command 'vim-mode:move-to-mark-literal', =>
+      @currentMoveToMark = new motions.MoveToMark(@editorView, @, false)
 
     @handleCommands
       'activate-command-mode': => @activateCommandMode()
@@ -137,6 +144,8 @@ class VimState
       'focus-pane-view-above': => new panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new panes.FocusPreviousPaneView()
+      'mark-complete': (e) => @currentMark
+      'move-to-mark-complete': (e) => @currentMoveToMark
 
   # Private: A helper to actually register the given commands with the
   # editor.
@@ -236,6 +245,14 @@ class VimState
     else
       atom.workspace.vimState.registers[name]
 
+  # Private: Fetches the value of a given mark.
+  #
+  # name - The name of the mark to fetch.
+  #
+  # Returns the value of the given mark or undefined if it hasn't
+  # been set.
+  getMark: (name) -> @marks[name]
+
   # Private: Sets the value of a given register.
   #
   # name  - The name of the register to fetch.
@@ -249,6 +266,17 @@ class VimState
       # Blackhole register, nothing to do
     else
       atom.workspace.vimState.registers[name] = value
+
+  # Private: Sets the value of a given mark.
+  #
+  # name  - The name of the mark to fetch.
+  # value {Point} - The value to set the mark to.
+  #
+  # Returns nothing.
+  setMark: (name, pos) ->
+    # check to make sure name is in [a-z]
+    if (charCode = name.charCodeAt(0)) >= 97 and charCode <= 122
+      @marks[name] = pos
 
   # Public: Append a search to the search history.
   #

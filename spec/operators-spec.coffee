@@ -668,3 +668,14 @@ describe "Operators", ->
       keydown('r')
       commandModeInputKeydown('x')
       expect(editor.getText()).toBe '12\n34\n\n'
+
+  describe 'the m keybinding', ->
+    beforeEach ->
+      editor.setText('12\n34\n56\n')
+      editor.setCursorBufferPosition([0,1])
+
+    it 'marks a position', ->
+      keydown('m')
+      commandModeInputKeydown('a')
+      expect(vimState.getMark('a')).toEqual [0,1]
+    

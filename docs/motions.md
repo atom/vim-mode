@@ -22,3 +22,5 @@
 * [H](http://vimhelp.appspot.com/motion.txt.html#H)
 * [L](http://vimhelp.appspot.com/motion.txt.html#L)
 * [M](http://vimhelp.appspot.com/motion.txt.html#M)
+* ['[a-z][A-Z]](http://vimhelp.appspot.com/motion.txt.html#%27)
+* [`[a-z][A-Z]](http://vimhelp.appspot.com/motion.txt.html#%27)
