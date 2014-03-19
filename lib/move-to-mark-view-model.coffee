@@ -21,6 +21,7 @@ class MoveToMarkViewModel
 
   select: (requireEOL) ->
     markPosition = @vimState.getMark(@char)
+    return unless markPosition?
     currentPosition = @editor.getCursorBufferPosition()
     selectionRange = null
     if currentPosition.isGreaterThan(markPosition)
@@ -33,7 +34,6 @@ class MoveToMarkViewModel
         markPosition = @editor.clipBufferPosition([markPosition.row, Infinity])
         currentPosition = new Point(currentPosition.row, 0)
       selectionRange = new Range(currentPosition, markPosition)
-    console.log(selectionRange)
     @editor.setSelectedBufferRange(selectionRange, requireEOL: requireEOL)
 
   execute: ->
