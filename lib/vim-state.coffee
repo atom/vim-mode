@@ -277,7 +277,7 @@ class VimState
   #
   # Returns nothing.
   setMark: (name, pos) ->
-    # unsure if I should throw an error / if I should start returning a true/false for success
+    # check to make sure name is in [a-z]
     if (charCode = name.charCodeAt(0)) >= 97 and charCode <= 122
       @marks[name] = pos
 

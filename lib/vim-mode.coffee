@@ -6,7 +6,6 @@ module.exports =
 
   _initializeWorkspaceState: ->
     atom.workspace.vimState ||= {}
-    atom.workspace.vimState.marks ||= {}
     atom.workspace.vimState.registers ||= {}
     atom.workspace.vimState.searchHistory ||= []
 

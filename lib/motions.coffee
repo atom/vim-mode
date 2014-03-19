@@ -440,8 +440,8 @@ class Search extends Motion
 
 class MoveToMark extends Motion
   constructor: (@editorView, @state, @linewise=true) ->
-      super(@editorView.editor, @state)
-      @viewModel = new MoveToMarkViewModel(@)
+    super(@editorView.editor, @state)
+    @viewModel = new MoveToMarkViewModel(@)
 
   isLinewise: -> @linewise
 
@@ -450,7 +450,6 @@ class MoveToMark extends Motion
 
   select: (count=1, {requireEOL}={}) ->
     @viewModel.select(requireEOL)
-    [true]
 
 module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
   MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
