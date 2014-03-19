@@ -1,7 +1,3 @@
-_ = require 'underscore-plus'
-{$$, Point, Range} = require 'atom'
-SearchViewModel = require './search-view-model'
-
 class TextObject
   constructor: (@editor, @state) ->
 
