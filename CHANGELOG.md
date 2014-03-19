@@ -3,6 +3,7 @@
 * Additional bindings for split pane movement @zenhob
 * Fix search on invalid regex @bhuga
 * Add `s` alias to visual mode @tony612
+* Display current mode in the status bar @gblock0
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
