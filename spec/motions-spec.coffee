@@ -782,3 +782,44 @@ describe "Motions", ->
       keydown('`')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual '14\n56\n'
+
+  describe 'the f/F keybindings', ->
+    beforeEach ->
+      editor.setText("abcabcabcabc\n")
+      editor.setCursorScreenPosition([0, 0])
+
+    it 'moves to the first specified character it finds', ->
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it 'moves backwards to the first specified character it finds', ->
+      editor.setCursorScreenPosition([0, 2])
+      keydown('F', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it 'respects count forward', ->
+      keydown('2')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+    it 'respects count backward', ->
+      editor.setCursorScreenPosition([0, 6])
+      keydown('2')
+      keydown('F', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "doesn't move if the character specified isn't found", ->
+      keydown('f')
+      commandModeInputKeydown('d')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "doesn't move if there aren't the specified count of the specified character", ->
+      keydown('1')
+      keydown('0')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]

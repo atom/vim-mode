@@ -460,8 +460,8 @@ class Find extends Motion
     @viewModel.reverse()
     @
 
-  execute: ->
-    @viewModel.execute()
+  execute: (count=1) ->
+    @viewModel.execute(count)
 
   select: (count=1, {requireEOL}={}) ->
     @viewModel.select(count, requireEOL)

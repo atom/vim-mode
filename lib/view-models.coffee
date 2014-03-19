@@ -148,26 +148,37 @@ class FindViewModel extends ViewModel
 
   reverse: -> @reversed = !@reversed
 
-  execute: ->
+  execute: (count) ->
     currentPosition = @editorView.editor.getCursorBufferPosition()
     line = @editorView.editor.lineForBufferRow(currentPosition.row)
     if @reversed
-      if (index = line.lastIndexOf(@value, currentPosition.column-1)) != -1
+      index = currentPosition.column-1
+      for i in [0..count-1]
+        index = line.lastIndexOf(@value, index-1)
+      if index != -1
         @editorView.editor.setCursorBufferPosition([currentPosition.row, index])
     else
-      if (index = line.indexOf(@value, currentPosition.column+1)) != -1
+      index = currentPosition.column+1
+      for i in [0..count-1]
+        index = line.indexOf(@value, index+1)
+      if index != -1
         @editorView.editor.setCursorBufferPosition([currentPosition.row, index])
 
   select: (count, requireEOL) ->
-    # i don't abide by count currently, will be fixed soon
     currentPosition = @editorView.editor.getCursorBufferPosition()
     line = @editorView.editor.lineForBufferRow(currentPosition.row)
     if @reversed
-      if (index = line.lastIndexOf(@value, currentPosition.column-1)) != -1
+      index = currentPosition.column-1
+      for i in [0..count-1]
+        index = line.lastIndexOf(@value, index-1)
+      if index != -1
         @editorView.editor.setSelectedBufferRange(new Range(new Point(currentPosition.row, index), currentPosition))
         return [true]
     else
-      if (index = line.indexOf(@value, currentPosition.column+1)) != -1
+      index = currentPosition.column+1
+      for i in [0..count-1]
+        index = line.indexOf(@value, index+1)
+      if index != -1
         @editorView.editor.setSelectedBufferRange(new Range(currentPosition, new Point(currentPosition.row, index+1)))
         return [true]
     [false]
