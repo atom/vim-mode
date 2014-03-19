@@ -181,6 +181,16 @@ class VimState
             @pushOperator(new motions.CurrentSelection(@))
             @activateCommandMode() if @mode == 'visual'
 
+  # Private: A helper to register 'raw' commands with the editor.
+  #
+  # commands - An object whose keys will be registered within the plugin's
+  #            namespace and whose values are objects with a 'fn' key to be
+  #            to be called when the commandName is emitted. Return values
+  #            are placed in the `@currentOperators` object with the optionally
+  #            specified 'name' in the supplied value (defaults to the key
+  #            as the name otherwise)
+  #
+  # Returns nothing.
   handleRawCommands: (commands) ->
     _.each commands, ({fn, name}, commandName) =>
       eventName = "vim-mode:#{commandName}"
