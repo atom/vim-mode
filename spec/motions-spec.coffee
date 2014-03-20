@@ -751,20 +751,29 @@ describe "Motions", ->
 
   describe 'the mark keybindings', ->
     beforeEach ->
-      editor.setText('12\n34\n56\n')
+      editor.setText('  12\n    34\n56\n')
       editor.setCursorBufferPosition([0,1])
 
-    it 'moves to a mark', ->
+    it 'moves to the beginning of the line of a mark', ->
       editor.setCursorBufferPosition([1,1])
       keydown('m')
       commandModeInputKeydown('a')
       editor.setCursorBufferPosition([0,0])
       keydown('\'')
       commandModeInputKeydown('a')
+      expect(editor.getCursorBufferPosition()).toEqual [1,4]
+
+    it 'moves literally to a mark', ->
+      editor.setCursorBufferPosition([1,1])
+      keydown('m')
+      commandModeInputKeydown('a')
+      editor.setCursorBufferPosition([0,0])
+      keydown('`')
+      commandModeInputKeydown('a')
       expect(editor.getCursorBufferPosition()).toEqual [1,1]
 
     it 'deletes to a mark by line', ->
-      editor.setCursorBufferPosition([1,1])
+      editor.setCursorBufferPosition([1,5])
       keydown('m')
       commandModeInputKeydown('a')
       editor.setCursorBufferPosition([0,0])
@@ -773,15 +782,26 @@ describe "Motions", ->
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual '\n56\n'
 
-    it 'deletes to a mark literally', ->
-      editor.setCursorBufferPosition([1,1])
+    it 'deletes before to a mark literally', ->
+      editor.setCursorBufferPosition([1,5])
       keydown('m')
       commandModeInputKeydown('a')
       editor.setCursorBufferPosition([0,1])
       keydown('d')
       keydown('`')
       commandModeInputKeydown('a')
-      expect(editor.getText()).toEqual '14\n56\n'
+      expect(editor.getText()).toEqual ' 4\n56\n'
+
+    it 'deletes after to a mark literally', ->
+      editor.setCursorBufferPosition([1,5])
+      keydown('m')
+      commandModeInputKeydown('a')
+      editor.setCursorBufferPosition([2,1])
+      keydown('d')
+      keydown('`')
+      commandModeInputKeydown('a')
+      expect(editor.getText()).toEqual '  12\n    36\n'
+
 
   describe 'the f/F keybindings', ->
     beforeEach ->
@@ -823,3 +843,11 @@ describe "Motions", ->
       keydown('f')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "composes with d", ->
+      editor.setCursorScreenPosition([0,3])
+      keydown('d')
+      keydown('2')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getText()).toEqual 'abcbc\n'

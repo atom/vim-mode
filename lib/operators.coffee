@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {$$, Range} = require 'atom'
-{ReplaceViewModel, MarkViewModel} = require './view-models'
+ReplaceViewModel = require './view-models/replace'
+MarkViewModel = require './view-models/mark'
 
 class OperatorError
   constructor: (@message) ->
@@ -262,19 +263,29 @@ class Repeat extends Operator
         cmd = @vimState.history[0]
         cmd?.execute()
 
+class OperatorWithInput extends Operator
+  constructor: (@editorView, @vimState) ->
+    @editor = @editorView.editor
+    @complete = false
+
+  compose: (input) ->
+    if not input.characters
+      throw new OperatorError('Must compose with an Input')
+
+    @input = input
+    @complete = true
+
 #
 # Replace the character under the cursor
 #
-class Replace extends Operator
+class Replace extends OperatorWithInput
   constructor: (@editorView, @vimState, {@selectOptions}={}) ->
-    @editor = @editorView.editor
-    @complete = true
+    super(@editorView, @vimState)
     @viewModel = new ReplaceViewModel(@)
 
   execute: (count=1) ->
-    editor = @editorView.editor
-    pos = editor.getCursorBufferPosition()
-    currentRowLength = editor.lineLengthForBufferRow(pos.row)
+    pos = @editor.getCursorBufferPosition()
+    currentRowLength = @editor.lineLengthForBufferRow(pos.row)
 
     # Do nothing on an empty line
     return unless currentRowLength > 0
@@ -282,23 +293,20 @@ class Replace extends Operator
     return unless currentRowLength - pos.column >= count
 
     @undoTransaction =>
-      start = editor.getCursorBufferPosition()
+      start = @editor.getCursorBufferPosition()
       _.times count, =>
-        point = editor.getCursorBufferPosition()
-        editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @viewModel.value)
-        editor.moveCursorRight()
-      editor.setCursorBufferPosition(start)
+        point = @editor.getCursorBufferPosition()
+        @editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @input.characters)
+        @editor.moveCursorRight()
+      @editor.setCursorBufferPosition(start)
 
-class Mark extends Operator
+class Mark extends OperatorWithInput
   constructor: (@editorView, @vimState, {@selectOptions}={}) ->
-    @editor = @editorView.editor
-    @complete = true
+    super(@editorView, @vimState)
     @viewModel = new MarkViewModel(@)
 
   execute: (count=1) ->
-    editor = @editorView.editor
-    currentPosition = editor.getCursorBufferPosition()
-    @vimState.setMark(@viewModel.value, currentPosition)
+    @vimState.setMark(@input.characters, @editorView.editor.getCursorBufferPosition())
 
 module.exports = { Operator, OperatorError, Delete, Change, Yank, Indent,
-  Outdent, Autoindent, Put, Join, Repeat, Replace, Mark }
+  Outdent, Autoindent, Put, Join, Repeat, Replace, Mark, OperatorWithInput }

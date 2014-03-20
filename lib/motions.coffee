@@ -1,6 +1,12 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
-{SearchViewModel, MoveToMarkViewModel, FindViewModel} = require './view-models'
+SearchViewModel = require './view-models/search'
+MoveToMarkViewModel = require './view-models/move-to-mark'
+FindViewModel = require './view-models/find'
+
+class MotionError
+  constructor: (@message) ->
+    @name = 'Motion Error'
 
 class Motion
   constructor: (@editor, @state) ->
@@ -398,12 +404,28 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
-class Search extends Motion
+class MotionWithInput extends Motion
+  constructor: (@editorView, @state) ->
+    super(@editorView.editor, @state)
+    @complete = false
+
+  isComplete: -> @complete
+
+  compose: (input) ->
+    if not input.characters
+      throw new MotionError('Must compose with an Input')
+
+    @input = input
+    @complete = true
+
+class Search extends MotionWithInput
+  @currentSearch: null
   # We're overwriting the constructor to use the editor view instead
   # of the editor, as we'll need to attach a CMIV to it.
   constructor: (@editorView, @state) ->
-    super(@editorView.editor, @state)
+    super(@editorView, @state)
     @viewModel = new SearchViewModel(@)
+    Search.currentSearch = @
 
   repeat: (opts = {}) =>
     @viewModel.repeat(opts)
@@ -414,27 +436,27 @@ class Search extends Motion
     @
 
   execute: (count=1) ->
-    @viewModel.execute(count)
+    @viewModel.execute(@input.characters, count)
 
   select: (count=1) ->
-    @viewModel.select(count)
+    @viewModel.select(@input.characters, count)
 
-class MoveToMark extends Motion
+class MoveToMark extends MotionWithInput
   constructor: (@editorView, @state, @linewise=true) ->
-    super(@editorView.editor, @state)
+    super(@editorView, @state)
     @viewModel = new MoveToMarkViewModel(@)
 
   isLinewise: -> @linewise
 
   execute: ->
-    @viewModel.execute()
+    @viewModel.execute(@input.characters)
 
   select: (count=1, {requireEOL}={}) ->
-    @viewModel.select(requireEOL)
+    @viewModel.select(@input.characters, requireEOL)
 
-class Find extends Motion
+class Find extends MotionWithInput
   constructor: (@editorView, @state) ->
-    super(@editorView.editor, @state)
+    super(@editorView, @state)
     @viewModel = new FindViewModel(@)
 
   reverse: ->
@@ -442,15 +464,16 @@ class Find extends Motion
     @
 
   execute: (count=1) ->
-    @viewModel.execute(count)
+    @viewModel.execute(@input.characters, count)
 
   select: (count=1, {requireEOL}={}) ->
-    @viewModel.select(count, requireEOL)
+    @viewModel.select(@input.characters, count, requireEOL)
 
 module.exports = {
   Motion, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToPreviousWord,
   MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord,
   MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
-  MoveToBottomOfScreen, MoveToMiddleOfScreen, Search, MoveToEndOfWholeWord, MoveToMark, Find
+  MoveToBottomOfScreen, MoveToMiddleOfScreen, Search, MoveToEndOfWholeWord, MoveToMark, Find,
+  MotionError, MotionWithInput
 }
