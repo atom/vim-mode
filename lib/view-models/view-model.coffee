@@ -38,10 +38,10 @@ class ViewModel
   # view - the `VimCommandModeInputView` that called this method
   #
   confirm: (view) ->
-    @vimState.pushOperator(new Input(@view.value))
+    @vimState.pushOperations(new Input(@view.value))
 
   cancel: (view) ->
-    @vimState.pushOperator(new Input())
+    @vimState.pushOperations(new Input())
 
 class Input
   constructor: (@characters) ->
