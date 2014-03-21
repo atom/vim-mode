@@ -165,12 +165,15 @@ class VimState
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
   #
-  # FIXME: This doesn't work.
+  # FIXME: This causes a ton of specs to just fail..
   #
   # Returns nothing.
   moveCursorBeforeNewline: =>
-    if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
-      @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
+    return
+    {row, column} = @editor.getCursorScreenPosition()
+    if not @editor.getSelection().modifyingSelection and @editor.getCursor().isAtEndOfLine() \
+       and (lineLength = @editor.getBuffer().lineForRow(row).length) > 0
+      @editor.setCursorBufferPosition([row, lineLength-1])
 
   # Private: Push the given operations onto the operation stack, then process
   # it.
@@ -181,6 +184,24 @@ class VimState
       # Motions in visual mode perform their selections.
       if @mode is 'visual' and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
         operation.execute = operation.select
+
+      # if we have started an operation that responds to canComposeWith check if it can compose
+      # with the operation we're going to push onto the stack
+      if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
+        # if the operation is an input operation then cancel its input
+        if operation.viewModel?
+          operation.viewModel.cancel()
+        # so personally I feel like I should be calling @resetCommandMode() but that doesn't
+        # actually kick us out of operator-pending mode. This in fact might be a bug over when we
+        # catch an Operator/Motion error in the processOpStack function (it only calls
+        # @resetCommandMode but if we input an operator and then some operation that doesn't compose
+        # with it then we will be in operator-pending mode, hopefull this `canComposeWith` resolves
+        # that issue (we might be able to remove the try catch there) since this resets to
+        # command mode if we predict a failure to compose
+        #
+        # tl;dr should we remove the try, catch in the processOpStack, and remove the thrown errors?
+        @activateCommandMode()
+        break
 
       @opStack.push(operation)
 
@@ -317,7 +338,7 @@ class VimState
     @clearOpStack()
     @editor.clearSelections()
 
-    @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.on 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
@@ -329,7 +350,7 @@ class VimState
     @submode = null
     @changeModeClass('insert-mode')
 
-    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
@@ -343,7 +364,7 @@ class VimState
     @submode = type
     @changeModeClass('visual-mode')
 
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     if @submode == 'linewise'
       @editor.selectLine()
@@ -356,7 +377,7 @@ class VimState
     @submodule = null
     @changeModeClass('operator-pending-mode')
 
-    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
@@ -443,3 +464,5 @@ class VimState
       $('#status-bar-vim-mode').html("Command")
     else if @mode is "visual"
       $('#status-bar-vim-mode').html("Visual")
+    else if @mode is "operator-pending"
+      $('#status-bar-vim-mode').html("Pending")

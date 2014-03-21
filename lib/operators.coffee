@@ -41,6 +41,8 @@ class Operator
     @motion = motion
     @complete = true
 
+  canComposeWith: (operation) -> operation.select?
+
   # Protected: Wraps the function within an single undo step.
   #
   # fn - The function to wrap.
@@ -277,6 +279,8 @@ class OperatorWithInput extends Operator
   constructor: (@editorView, @vimState) ->
     @editor = @editorView.editor
     @complete = false
+
+  canComposeWith: (operation) -> operation.characters?
 
   compose: (input) ->
     if not input.characters

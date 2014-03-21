@@ -411,6 +411,8 @@ class MotionWithInput extends Motion
 
   isComplete: -> @complete
 
+  canComposeWith: (operation) -> return operation.characters?
+
   compose: (input) ->
     if not input.characters
       throw new MotionError('Must compose with an Input')

@@ -41,6 +41,9 @@ class ViewModel
     @vimState.pushOperations(new Input(@view.value))
 
   cancel: (view) ->
+    if not view?
+      @view.cancel()
+      return
     @vimState.pushOperations(new Input())
 
 class Input

@@ -115,6 +115,8 @@ describe "VimState", ->
       it 'properly clears the opStack', ->
         keydown('d')
         keydown('r')
+        expect(vimState.mode).toBe 'command'
+        expect(vimState.opStack.length).toBe 0
         commandModeInputKeydown('escape')
         keydown('d')
         expect(editor.getText()).toBe '012345\nabcdef'
