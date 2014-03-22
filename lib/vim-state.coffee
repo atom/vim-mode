@@ -124,8 +124,8 @@ class VimState
       'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
-      'repeat-search': (e) => Motions.Search.currentSearch.repeat() if Motions.Search.currentSearch?
-      'repeat-search-backwards': (e) => Motions.Search.currentSearch.repeat(backwards: true) if Motions.Search.currentSearch?
+      'repeat-search': (e) => currentSearch.repeat() if (currentSearch = Motions.Search.currentSearch)?
+      'repeat-search-backwards': (e) => currentSearch.repeat(backwards: true) if (currentSearch = Motions.Search.currentSearch)?
       'focus-pane-view-on-left': => new Panes.FocusPaneViewOnLeft()
       'focus-pane-view-on-right': => new Panes.FocusPaneViewOnRight()
       'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
@@ -169,15 +169,15 @@ class VimState
   #
   # Returns nothing.
   moveCursorBeforeNewline: =>
-    return
-    {row, column} = @editor.getCursorScreenPosition()
-    if not @editor.getSelection().modifyingSelection and @editor.getCursor().isAtEndOfLine() \
-       and (lineLength = @editor.getBuffer().lineForRow(row).length) > 0
-      @editor.setCursorBufferPosition([row, lineLength-1])
+    # {row, column} = @editor.getCursorScreenPosition()
+    # if not @editor.getSelection().modifyingSelection and @editor.getCursor().isAtEndOfLine() \
+      #  and (lineLength = @editor.getBuffer().lineForRow(row).length) > 0
+      # @editor.setCursorBufferPosition([row, lineLength-1])
 
   # Private: Push the given operations onto the operation stack, then process
   # it.
   pushOperations: (operations) ->
+    return unless operations?
     operations = [operations] unless _.isArray(operations)
 
     for operation in operations

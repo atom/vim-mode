@@ -275,6 +275,7 @@ class Repeat extends Operator
         cmd = @vimState.history[0]
         cmd?.execute()
 
+# Public: Generic class for an operator that requires extra input
 class OperatorWithInput extends Operator
   constructor: (@editorView, @vimState) ->
     @editor = @editorView.editor

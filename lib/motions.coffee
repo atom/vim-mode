@@ -404,6 +404,7 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
+# Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
   constructor: (@editorView, @state) ->
     super(@editorView.editor, @state)
@@ -422,8 +423,6 @@ class MotionWithInput extends Motion
 
 class Search extends MotionWithInput
   @currentSearch: null
-  # We're overwriting the constructor to use the editor view instead
-  # of the editor, as we'll need to attach a CMIV to it.
   constructor: (@editorView, @state) ->
     super(@editorView, @state)
     @viewModel = new SearchViewModel(@)
