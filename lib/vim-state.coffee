@@ -453,5 +453,3 @@ class VimState
       $('#status-bar-vim-mode').html("Command")
     else if @mode is "visual"
       $('#status-bar-vim-mode').html("Visual")
-    else if @mode is "operator-pending"
-      $('#status-bar-vim-mode').html("Pending")
