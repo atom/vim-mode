@@ -30,6 +30,7 @@ class ViewModel
 
     @view = new VimCommandModeInputView(@, opts)
     @editorView.editor.commandModeInputView = @view
+    @editorView.on 'vim-mode:compose-failure', => @view.remove()
 
   # Public: Override this in subclasses for custom behavior when the `VimCommandModeInputView`
   #         has called `confirm`, optionally call super to get the default behavior of setting
@@ -41,9 +42,6 @@ class ViewModel
     @vimState.pushOperations(new Input(@view.value))
 
   cancel: (view) ->
-    if not view?
-      @view.cancel()
-      return
     @vimState.pushOperations(new Input())
 
 class Input

@@ -188,19 +188,8 @@ class VimState
       # if we have started an operation that responds to canComposeWith check if it can compose
       # with the operation we're going to push onto the stack
       if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
-        # if the operation is an input operation then cancel its input
-        if operation.viewModel?
-          operation.viewModel.cancel()
-        # so personally I feel like I should be calling @resetCommandMode() but that doesn't
-        # actually kick us out of operator-pending mode. This in fact might be a bug over when we
-        # catch an Operator/Motion error in the processOpStack function (it only calls
-        # @resetCommandMode but if we input an operator and then some operation that doesn't compose
-        # with it then we will be in operator-pending mode, hopefull this `canComposeWith` resolves
-        # that issue (we might be able to remove the try catch there) since this resets to
-        # command mode if we predict a failure to compose
-        #
-        # tl;dr should we remove the try, catch in the processOpStack, and remove the thrown errors?
-        @activateCommandMode()
+        @editorView.trigger 'vim-mode:compose-failure'
+        @resetCommandMode()
         break
 
       @opStack.push(operation)
@@ -392,7 +381,7 @@ class VimState
   #
   # Returns nothing.
   resetCommandMode: ->
-    @clearOpStack()
+    @activateCommandMode()
 
   # Private: A generic way to create a Register prefix based on the event.
   #
