@@ -86,6 +86,9 @@
   '`': 'vim-mode:move-to-mark-literal'
   '\'': 'vim-mode:move-to-mark'
 
+  'f': 'vim-mode:find'
+  'F': 'vim-mode:find-backwards'
+
 '.vim-mode.command-mode':
   'i': 'vim-mode:activate-insert-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'

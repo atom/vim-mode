@@ -18,6 +18,11 @@ describe "Motions", ->
     options.element ?= editorView[0]
     helpers.keydown(key, options)
 
+  commandModeInputKeydown = (key, opts = {}) ->
+    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.raw = true
+    keydown(key, opts)
+
   describe "simple motions", ->
     beforeEach ->
       editor.setText("12345\nabcde\nABCDE")
@@ -743,3 +748,106 @@ describe "Motions", ->
     it "moves the cursor to the first row if visible", ->
       keydown('M', shift: true)
       expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([5, 0])
+
+  describe 'the mark keybindings', ->
+    beforeEach ->
+      editor.setText('  12\n    34\n56\n')
+      editor.setCursorBufferPosition([0,1])
+
+    it 'moves to the beginning of the line of a mark', ->
+      editor.setCursorBufferPosition([1,1])
+      keydown('m')
+      commandModeInputKeydown('a')
+      editor.setCursorBufferPosition([0,0])
+      keydown('\'')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorBufferPosition()).toEqual [1,4]
+
+    it 'moves literally to a mark', ->
+      editor.setCursorBufferPosition([1,1])
+      keydown('m')
+      commandModeInputKeydown('a')
+      editor.setCursorBufferPosition([0,0])
+      keydown('`')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorBufferPosition()).toEqual [1,1]
+
+    it 'deletes to a mark by line', ->
+      editor.setCursorBufferPosition([1,5])
+      keydown('m')
+      commandModeInputKeydown('a')
+      editor.setCursorBufferPosition([0,0])
+      keydown('d')
+      keydown('\'')
+      commandModeInputKeydown('a')
+      expect(editor.getText()).toEqual '\n56\n'
+
+    it 'deletes before to a mark literally', ->
+      editor.setCursorBufferPosition([1,5])
+      keydown('m')
+      commandModeInputKeydown('a')
+      editor.setCursorBufferPosition([0,1])
+      keydown('d')
+      keydown('`')
+      commandModeInputKeydown('a')
+      expect(editor.getText()).toEqual ' 4\n56\n'
+
+    it 'deletes after to a mark literally', ->
+      editor.setCursorBufferPosition([1,5])
+      keydown('m')
+      commandModeInputKeydown('a')
+      editor.setCursorBufferPosition([2,1])
+      keydown('d')
+      keydown('`')
+      commandModeInputKeydown('a')
+      expect(editor.getText()).toEqual '  12\n    36\n'
+
+
+  describe 'the f/F keybindings', ->
+    beforeEach ->
+      editor.setText("abcabcabcabc\n")
+      editor.setCursorScreenPosition([0, 0])
+
+    it 'moves to the first specified character it finds', ->
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it 'moves backwards to the first specified character it finds', ->
+      editor.setCursorScreenPosition([0, 2])
+      keydown('F', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it 'respects count forward', ->
+      keydown('2')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+    it 'respects count backward', ->
+      editor.setCursorScreenPosition([0, 6])
+      keydown('2')
+      keydown('F', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "doesn't move if the character specified isn't found", ->
+      keydown('f')
+      commandModeInputKeydown('d')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "doesn't move if there aren't the specified count of the specified character", ->
+      keydown('1')
+      keydown('0')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "composes with d", ->
+      editor.setCursorScreenPosition([0,3])
+      keydown('d')
+      keydown('2')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getText()).toEqual 'abcbc\n'

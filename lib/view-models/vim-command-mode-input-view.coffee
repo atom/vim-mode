@@ -40,8 +40,15 @@ class VimCommandModeInputView extends View
     if @singleChar?
       @editor.find('input').on 'textInput', @autosubmit
     @editor.on 'core:confirm', @confirm
-    @editor.on 'core:cancel', @remove
-    @editor.find('input').on 'blur', @remove
+    @editor.on 'core:cancel', @cancel
+    @editor.find('input').on 'blur', @cancel
+
+  stopHandlingEvents: ->
+    if @singleChar?
+      @editor.find('input').off 'textInput', @autosubmit
+    @editor.off 'core:confirm', @confirm
+    @editor.off 'core:cancel', @cancel
+    @editor.find('input').off 'blur', @cancel
 
   autosubmit: (event) =>
     @editor.setText(event.originalEvent.data)
@@ -55,6 +62,11 @@ class VimCommandModeInputView extends View
   focus: =>
     @editorContainer.find('.editor').focus()
 
+  cancel: (e) =>
+    @viewModel.cancel(@)
+    @remove()
+
   remove: =>
+    @stopHandlingEvents()
     atom.workspaceView.focus() if atom.workspaceView?
     super()

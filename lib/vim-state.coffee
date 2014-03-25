@@ -1,10 +1,10 @@
 _ = require 'underscore-plus'
 {$} = require 'atom'
 
-Operators = require './operators'
+Operators = require './operators/index'
 Prefixes = require './prefixes'
 Commands = require './commands'
-Motions = require './motions'
+Motions = require './motions/index'
 TextObjects = require './text-objects'
 Utils = require './utils'
 Panes = require './panes'
@@ -23,6 +23,7 @@ class VimState
     @history = []
     @marks = {}
     @mode = 'command'
+
     @setupCommandMode()
     @registerInsertIntercept()
     @activateCommandMode()
@@ -68,12 +69,6 @@ class VimState
   # Returns nothing.
   setupCommandMode: ->
     @registerCommands
-      'search': => @currentSearch = new Motions.Search(@editorView, @)
-      'reverse-search': => @currentSearch = (new Motions.Search(@editorView, @)).reversed()
-      'replace': => @currentReplace = new Operators.Replace(@editorView, @)
-      'mark': => @currentMark = new Operators.Mark(@editorView, @)
-      'move-to-mark': => @currentMoveToMark = new Motions.MoveToMark(@editorView, @)
-      'move-to-mark-literal': => @currentMoveToMark = new Motions.MoveToMark(@editorView, @, false)
       'activate-command-mode': => @activateCommandMode()
       'activate-insert-mode': => @activateInsertMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
@@ -129,17 +124,21 @@ class VimState
       'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
-      'search-complete': (e) => @currentSearch
-      'replace-complete': (e) => @currentReplace
-      'repeat-search': (e) => @currentSearch.repeat() if @currentSearch?
-      'repeat-search-backwards': (e) => @currentSearch.repeat(backwards: true) if @currentSearch?
+      'repeat-search': (e) => currentSearch.repeat() if (currentSearch = Motions.Search.currentSearch)?
+      'repeat-search-backwards': (e) => currentSearch.repeat(backwards: true) if (currentSearch = Motions.Search.currentSearch)?
       'focus-pane-view-on-left': => new Panes.FocusPaneViewOnLeft()
       'focus-pane-view-on-right': => new Panes.FocusPaneViewOnRight()
       'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new Panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
-      'mark-complete': (e) => @currentMark
-      'move-to-mark-complete': (e) => @currentMoveToMark
+      'move-to-mark': (e) => new Motions.MoveToMark(@editorView, @)
+      'move-to-mark-literal': (e) => new Motions.MoveToMark(@editorView, @, false)
+      'mark': (e) => new Operators.Mark(@editorView, @)
+      'find': (e) => new Motions.Find(@editorView, @)
+      'find-backwards': (e) => new Motions.Find(@editorView, @).reverse()
+      'replace': (e) => new Operators.Replace(@editorView, @)
+      'search': (e) => new Motions.Search(@editorView, @)
+      'reverse-search': (e) => (new Motions.Search(@editorView, @)).reversed()
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
@@ -166,22 +165,32 @@ class VimState
   # Private: Attempts to prevent the cursor from selecting the newline
   # while in command mode.
   #
-  # FIXME: This doesn't work.
+  # FIXME: This causes a ton of specs to just fail..
   #
   # Returns nothing.
   moveCursorBeforeNewline: =>
-    if not @editor.getSelection().modifyingSelection and @editor.cursor.isOnEOL() and @editor.getCurrentBufferLine().length > 0
-      @editor.setCursorBufferColumn(@editor.getCurrentBufferLine().length - 1)
+    # {row, column} = @editor.getCursorScreenPosition()
+    # if not @editor.getSelection().modifyingSelection and @editor.getCursor().isAtEndOfLine() \
+      #  and (lineLength = @editor.getBuffer().lineForRow(row).length) > 0
+      # @editor.setCursorBufferPosition([row, lineLength-1])
 
   # Private: Push the given operations onto the operation stack, then process
   # it.
   pushOperations: (operations) ->
+    return unless operations?
     operations = [operations] unless _.isArray(operations)
 
     for operation in operations
       # Motions in visual mode perform their selections.
       if @mode is 'visual' and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
         operation.execute = operation.select
+
+      # if we have started an operation that responds to canComposeWith check if it can compose
+      # with the operation we're going to push onto the stack
+      if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
+        @editorView.trigger 'vim-mode:compose-failure'
+        @resetCommandMode()
+        break
 
       @opStack.push(operation)
 
@@ -216,7 +225,7 @@ class VimState
         @topOperation().compose(poppedOperation)
         @processOpStack()
       catch e
-        (e instanceof Operators.OperatorError) and @resetCommandMode() or throw e
+        ((e instanceof Operators.OperatorError) or (e instanceof Motions.MotionError)) and @resetCommandMode() or throw e
     else
       @history.unshift(poppedOperation) if poppedOperation.isRecordable()
       poppedOperation.execute()
@@ -318,7 +327,7 @@ class VimState
     @clearOpStack()
     @editor.clearSelections()
 
-    @editorView.on 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.on 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
@@ -330,7 +339,7 @@ class VimState
     @submode = null
     @changeModeClass('insert-mode')
 
-    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
@@ -344,7 +353,7 @@ class VimState
     @submode = type
     @changeModeClass('visual-mode')
 
-    @editor.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     if @submode == 'linewise'
       @editor.selectLine()
@@ -357,7 +366,7 @@ class VimState
     @submodule = null
     @changeModeClass('operator-pending-mode')
 
-    @editorView.off 'cursor:position-changed', @moveCursorBeforeNewline
+    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
@@ -372,7 +381,7 @@ class VimState
   #
   # Returns nothing.
   resetCommandMode: ->
-    @clearOpStack()
+    @activateCommandMode()
 
   # Private: A generic way to create a Register prefix based on the event.
   #
