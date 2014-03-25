@@ -1,56 +1,38 @@
 _ = require 'underscore-plus'
-ViewModel = require './view-model'
+{MotionWithInput} = require './general-motions'
+SearchViewModel = require '../view-models/search-view-model'
 
 module.exports =
-class SearchViewModel extends ViewModel
-  constructor: (@searchMotion) ->
-    super(@searchMotion, class: 'search')
-    @historyIndex = -1
-    @editor = @searchMotion.editor
+class Search extends MotionWithInput
+  @currentSearch: null
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    @viewModel = new SearchViewModel(@)
+    Search.currentSearch = @
+    @reverse = @initiallyReversed = false
 
-    @view.editor.on('core:move-up', @increaseHistorySearch)
-    @view.editor.on('core:move-down', @decreaseHistorySearch)
+  compose: (input) ->
+    super(input)
+    @viewModel.value = @input.characters
 
-  restoreHistory: (index) ->
-    @view.editor.setText(@history(index).value)
-
-  history: (index) ->
-    @vimState.getSearchHistoryItem(index)
-
-  increaseHistorySearch: =>
-    if @history(@historyIndex + 1)?
-      @historyIndex += 1
-      @restoreHistory(@historyIndex)
-
-  decreaseHistorySearch: =>
-    if @historyIndex <= 0
-      # get us back to a clean slate
-      @historyIndex = -1
-      @view.editor.setText('')
-    else
-      @historyIndex -= 1
-      @restoreHistory(@historyIndex)
-
-  reversed: =>
-    @initiallyReversed = @reverse = true
-
-  confirm: (view) =>
-    @vimState.pushSearchHistory(@)
-    super(view)
-
-  repeat: (opts) =>
+  repeat: (opts = {}) =>
     reverse = opts.backwards
     if @initiallyReversed and reverse
       @reverse = false
     else
       @reverse = reverse or @initiallyReversed
+    @
 
-  execute: (@value, count) =>
+  reversed: =>
+    @initiallyReversed = @reverse = true
+    @
+
+  execute: (count=1) ->
     @scan()
     @match count, (pos) =>
       @editor.setCursorBufferPosition(pos)
 
-  select: (@value, count) =>
+  select: (count=1) ->
     @scan()
     cur = @editor.getCursorBufferPosition()
     @match count, (pos) =>
@@ -65,7 +47,7 @@ class SearchViewModel extends ViewModel
       atom.beep()
 
   scan: ->
-    term = @value
+    term = @input.characters
     regexp =
       try
         new RegExp(term, 'g')

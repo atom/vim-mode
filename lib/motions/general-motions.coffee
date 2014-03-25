@@ -1,15 +1,12 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
-SearchViewModel = require './view-models/search'
-MoveToMarkViewModel = require './view-models/move-to-mark'
-FindViewModel = require './view-models/find'
 
 class MotionError
   constructor: (@message) ->
     @name = 'Motion Error'
 
 class Motion
-  constructor: (@editor, @state) ->
+  constructor: (@editor, @vimState) ->
 
   isComplete: -> true
   isRecordable: -> false
@@ -22,6 +19,22 @@ class CurrentSelection extends Motion
     _.times(count, -> true)
 
   isLinewise: -> @editor.mode == 'visual' and @editor.submode == 'linewise'
+
+# Public: Generic class for motions that require extra input
+class MotionWithInput extends Motion
+  constructor: (@editorView, @vimState) ->
+    super(@editorView.editor, @vimState)
+    @complete = false
+
+  isComplete: -> @complete
+
+  canComposeWith: (operation) -> return operation.characters?
+
+  compose: (input) ->
+    if not input.characters
+      throw new MotionError('Must compose with an Input')
+    @input = input
+    @complete = true
 
 class MoveLeft extends Motion
   execute: (count=1) ->
@@ -404,77 +417,10 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
-# Public: Generic class for motions that require extra input
-class MotionWithInput extends Motion
-  constructor: (@editorView, @state) ->
-    super(@editorView.editor, @state)
-    @complete = false
-
-  isComplete: -> @complete
-
-  canComposeWith: (operation) -> return operation.characters?
-
-  compose: (input) ->
-    if not input.characters
-      throw new MotionError('Must compose with an Input')
-
-    @input = input
-    @complete = true
-
-class Search extends MotionWithInput
-  @currentSearch: null
-  constructor: (@editorView, @state) ->
-    super(@editorView, @state)
-    @viewModel = new SearchViewModel(@)
-    Search.currentSearch = @
-
-  repeat: (opts = {}) =>
-    @viewModel.repeat(opts)
-    @
-
-  reversed: =>
-    @viewModel.reversed()
-    @
-
-  execute: (count=1) ->
-    @viewModel.execute(@input.characters, count)
-
-  select: (count=1) ->
-    @viewModel.select(@input.characters, count)
-
-class MoveToMark extends MotionWithInput
-  constructor: (@editorView, @state, @linewise=true) ->
-    super(@editorView, @state)
-    @viewModel = new MoveToMarkViewModel(@)
-
-  isLinewise: -> @linewise
-
-  execute: ->
-    @viewModel.execute(@input.characters)
-
-  select: (count=1, {requireEOL}={}) ->
-    @viewModel.select(@input.characters, requireEOL)
-
-class Find extends MotionWithInput
-  constructor: (@editorView, @state) ->
-    super(@editorView, @state)
-    @viewModel = new FindViewModel(@)
-
-  reverse: ->
-    @viewModel.reverse()
-    @
-
-  execute: (count=1) ->
-    @viewModel.execute(@input.characters, count)
-
-  select: (count=1, {requireEOL}={}) ->
-    @viewModel.select(@input.characters, count, requireEOL)
-
 module.exports = {
-  Motion, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown, MoveToPreviousWord,
-  MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord,
-  MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
+  MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
+  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
-  MoveToBottomOfScreen, MoveToMiddleOfScreen, Search, MoveToEndOfWholeWord, MoveToMark, Find,
-  MotionError, MotionWithInput
+  MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
 }

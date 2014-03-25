@@ -1,10 +1,10 @@
 _ = require 'underscore-plus'
 {$} = require 'atom'
 
-Operators = require './operators'
+Operators = require './operators/index'
 Prefixes = require './prefixes'
 Commands = require './commands'
-Motions = require './motions'
+Motions = require './motions/index'
 TextObjects = require './text-objects'
 Utils = require './utils'
 Panes = require './panes'

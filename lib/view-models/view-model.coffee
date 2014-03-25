@@ -1,6 +1,5 @@
 VimCommandModeInputView = require './vim-command-mode-input-view'
 
-module.exports =
 # Public: Base class for all view models; a view model
 #         is the model attached to a VimCommandModeInputView
 #         which is used when a given operator, motion
@@ -27,12 +26,9 @@ class ViewModel
   #
   #            - singleChar {Boolean} - tells the view whether it should only listen for a single
   #                                      character or an entire string
-  constructor: (@operator, opts={}) ->
-    @editorView = @operator.editorView
-    @vimState   = @operator.vimState ? @operator.state # so motions seem to have .state defined
-                                                       # and operators have .vimState
-                                                       # can we change this to be uniform across
-                                                       # all types of operators?
+  constructor: (@operation, opts={}) ->
+    @editorView = @operation.editorView
+    @vimState   = @operation.vimState
 
     @view = new VimCommandModeInputView(@, opts)
     @editorView.editor.commandModeInputView = @view
@@ -63,3 +59,7 @@ class Input
   constructor: (@characters) ->
   isComplete: -> true
   isRecordable: -> true
+
+module.exports = {
+  ViewModel, Input
+}

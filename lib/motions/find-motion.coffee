@@ -1,13 +1,13 @@
+{MotionWithInput} = require './general-motions'
+{ViewModel} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
-ViewModel = require './view-model'
 
 module.exports =
-class FindViewModel extends ViewModel
-  constructor: (@findMotion) ->
-    super(@findMotion, class: 'find', singleChar: true, hidden: true)
+class Find extends MotionWithInput
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    @viewModel = new ViewModel(@, class: 'find', singleChar: true, hidden: true)
     @reversed = false
-
-  reverse: -> @reversed = !@reversed
 
   match: (count) ->
     currentPosition = @editorView.editor.getCursorBufferPosition()
@@ -15,7 +15,7 @@ class FindViewModel extends ViewModel
     if @reversed
       index = currentPosition.column
       for i in [0..count-1]
-        index = line.lastIndexOf(@value, index-1)
+        index = line.lastIndexOf(@input.characters, index-1)
       if index != -1
         point = new Point(currentPosition.row, index)
         return {} =
@@ -24,18 +24,22 @@ class FindViewModel extends ViewModel
     else
       index = currentPosition.column
       for i in [0..count-1]
-        index = line.indexOf(@value, index+1)
+        index = line.indexOf(@input.characters, index+1)
       if index != -1
         point = new Point(currentPosition.row, index)
         return {} =
           point: point
           range: new Range(currentPosition, point.translate([0,1]))
 
-  execute: (@value, count) ->
+  reverse: ->
+    @reversed = !@reversed
+    @
+
+  execute: (count=1) ->
     if (match = @match(count))?
       @editorView.editor.setCursorBufferPosition(match.point)
 
-  select: (@value, count, requireEOL) ->
+  select: (count=1, {requireEOL}={}) ->
     if (match = @match(count))?
       @editorView.editor.setSelectedBufferRange(match.range)
       return [true]
