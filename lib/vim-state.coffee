@@ -162,18 +162,6 @@ class VimState
         commands[commandName] = (event) => @pushOperations(operationFn(event))
     @registerCommands(commands)
 
-  # Private: Attempts to prevent the cursor from selecting the newline
-  # while in command mode.
-  #
-  # FIXME: This causes a ton of specs to just fail..
-  #
-  # Returns nothing.
-  moveCursorBeforeNewline: =>
-    # {row, column} = @editor.getCursorScreenPosition()
-    # if not @editor.getSelection().modifyingSelection and @editor.getCursor().isAtEndOfLine() \
-      #  and (lineLength = @editor.getBuffer().lineForRow(row).length) > 0
-      # @editor.setCursorBufferPosition([row, lineLength-1])
-
   # Private: Push the given operations onto the operation stack, then process
   # it.
   pushOperations: (operations) ->
@@ -327,8 +315,6 @@ class VimState
     @clearOpStack()
     @editor.clearSelections()
 
-    @editor.getCursor().marker.on 'changed', @moveCursorBeforeNewline
-
     @updateStatusBar()
 
   # Private: Used to enable insert mode.
@@ -338,8 +324,6 @@ class VimState
     @mode = 'insert'
     @submode = null
     @changeModeClass('insert-mode')
-
-    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
@@ -353,8 +337,6 @@ class VimState
     @submode = type
     @changeModeClass('visual-mode')
 
-    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
-
     if @submode == 'linewise'
       @editor.selectLine()
 
@@ -365,8 +347,6 @@ class VimState
     @mode = 'operator-pending'
     @submodule = null
     @changeModeClass('operator-pending-mode')
-
-    @editor.getCursor().marker.off 'changed', @moveCursorBeforeNewline
 
     @updateStatusBar()
 
