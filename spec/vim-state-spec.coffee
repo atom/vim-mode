@@ -18,6 +18,11 @@ describe "VimState", ->
     options.element ?= editorView[0]
     helpers.keydown(key, options)
 
+  commandModeInputKeydown = (key, opts = {}) ->
+    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.raw = true
+    keydown(key, opts)
+
   describe "initialization", ->
     it "puts the editor in command-mode initially", ->
       expect(editorView).toHaveClass 'vim-mode'
@@ -103,6 +108,18 @@ describe "VimState", ->
 
         it "allows the cursor to be placed on the \n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+    describe 'with character-input operations', ->
+      beforeEach -> editor.setText('012345\nabcdef')
+
+      it 'properly clears the opStack', ->
+        keydown('d')
+        keydown('r')
+        expect(vimState.mode).toBe 'command'
+        expect(vimState.opStack.length).toBe 0
+        commandModeInputKeydown('escape')
+        keydown('d')
+        expect(editor.getText()).toBe '012345\nabcdef'
 
   describe "insert-mode", ->
     beforeEach -> keydown('i')

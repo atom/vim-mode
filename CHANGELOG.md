@@ -2,6 +2,10 @@
 * Enable arrow keys in visual mode @fholgado
 * Additional bindings for split pane movement @zenhob
 * Fix search on invalid regex @bhuga
+* Add `s` alias to visual mode @tony612
+* Display current mode in the status bar @gblock0
+* Add marks (m, `, ') @danzimm
+* Add operator-pending mode and a single text object (`iw`) @nathansobo, @jroes
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack

@@ -1,9 +1,12 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
-SearchViewModel = require './search-view-model'
+
+class MotionError
+  constructor: (@message) ->
+    @name = 'Motion Error'
 
 class Motion
-  constructor: (@editor, @state) ->
+  constructor: (@editor, @vimState) ->
 
   isComplete: -> true
   isRecordable: -> false
@@ -17,23 +20,21 @@ class CurrentSelection extends Motion
 
   isLinewise: -> @editor.mode == 'visual' and @editor.submode == 'linewise'
 
-class SelectLeft extends Motion
-  execute: (count=1) ->
-    @select(count)
+# Public: Generic class for motions that require extra input
+class MotionWithInput extends Motion
+  constructor: (@editorView, @vimState) ->
+    super(@editorView.editor, @vimState)
+    @complete = false
 
-  select: (count=1) ->
-    _.times count, =>
-      @editor.selectLeft()
-      true
+  isComplete: -> @complete
 
-class SelectRight extends Motion
-  execute: (count=1) ->
-    @select(count)
+  canComposeWith: (operation) -> return operation.characters?
 
-  select: (count=1) ->
-    _.times count, =>
-      @editor.selectRight()
-      true
+  compose: (input) ->
+    if not input.characters
+      throw new MotionError('Must compose with an Input')
+    @input = input
+    @complete = true
 
 class MoveLeft extends Motion
   execute: (count=1) ->
@@ -416,31 +417,10 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
-class Search extends Motion
-  # We're overwriting the constructor to use the editor view instead
-  # of the editor, as we'll need to attach a CMIV to it.
-  constructor: (@editorView, @state) ->
-    super(@editorView.editor, @state)
-    @viewModel = new SearchViewModel(@)
-
-  repeat: (opts = {}) =>
-    @viewModel.repeat(opts)
-    @
-
-  reversed: =>
-    @viewModel.reversed()
-    @
-
-  execute: (count=1) ->
-    @viewModel.execute(count)
-
-  select: (count=1) ->
-    @viewModel.select(count)
-
-module.exports = { Motion, CurrentSelection, SelectLeft, SelectRight, MoveLeft,
-  MoveRight, MoveUp, MoveDown, MoveToPreviousWord, MoveToPreviousWholeWord,
-  MoveToNextWord, MoveToNextWholeWord, MoveToEndOfWord, MoveToNextParagraph,
-  MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile,
-  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, Search,
-  MoveToEndOfWholeWord }
+module.exports = {
+  Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
+  MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
+  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
+  MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
+}
