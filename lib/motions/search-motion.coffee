@@ -1,19 +1,14 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
 SearchViewModel = require '../view-models/search-view-model'
+{Input} = require '../view-models/view-model'
 
-module.exports =
-class Search extends MotionWithInput
+class BasicSearch extends MotionWithInput
   @currentSearch: null
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
-    @viewModel = new SearchViewModel(@)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
-
-  compose: (input) ->
-    super(input)
-    @viewModel.value = @input.characters
 
   repeat: (opts = {}) =>
     reverse = opts.backwards
@@ -72,3 +67,41 @@ class Search extends MotionWithInput
     after = after.reverse() if @reverse
 
     @matches = after
+
+
+class Search extends BasicSearch
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    @viewModel = new SearchViewModel(@)
+    Search.currentSearch = @
+    @reverse = @initiallyReversed = false
+
+  compose: (input) ->
+    super(input)
+    @viewModel.value = @input.characters
+
+class SearchCurrentWord extends BasicSearch
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    Search.currentSearch = @
+    @reverse = @initiallyReversed = false
+    @input = new Input(@getCurrentWordMatch())
+
+  getCurrentWord: ->
+    wordRange  = @editor.getCursor().getCurrentWordBufferRange()
+    @editor.getTextInBufferRange(wordRange)
+
+  getCurrentWordMatch: ->
+    characters = @getCurrentWord()
+    if /\W/.test(characters) then "#{characters}\\b" else "\\b#{characters}\\b"
+
+  isOnWord: ->
+    @getCurrentWord().length isnt 0
+
+  isComplete: -> true
+
+  execute: (count=1) ->
+    super(count) if @isOnWord()
+
+
+module.exports = {Search, SearchCurrentWord}
