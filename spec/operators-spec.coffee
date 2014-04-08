@@ -375,7 +375,7 @@ describe "Operators", ->
         keydown('p')
 
       it "inserts the contents of the default register", ->
-        expect(editor.getText()).toBe "012\n 345"
+        expect(editor.getText()).toBe "012\n 345\n"
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
     describe "with multiple linewise contents", ->
@@ -386,7 +386,7 @@ describe "Operators", ->
         keydown('p')
 
       it "inserts the contents of the default register", ->
-        expect(editor.getText()).toBe "012\nabc\n 345\n 678"
+        expect(editor.getText()).toBe "012\nabc\n 345\n 678\n"
         expect(editor.getCursorScreenPosition()).toEqual [2, 1]
 
     describe "pasting twice", ->

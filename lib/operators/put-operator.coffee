@@ -40,7 +40,7 @@ class Put extends Operator
 
     textToInsert = _.times(count, -> text).join('')
     if @location == 'after' and type == 'linewise' and @onLastRow()
-      textToInsert = "\n#{textToInsert.substring(0, textToInsert.length - 1)}"
+      textToInsert = "\n#{textToInsert}"
     @editor.insertText(textToInsert)
 
     if originalPosition?
