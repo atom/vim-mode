@@ -709,7 +709,7 @@ describe "Motions", ->
         keydown("*")
         expect(editor.getCursorBufferPosition()).toEqual [0, 0]
 
-      describe "with words that containt 'non-word' characters", ->
+      describe "with words that contain 'non-word' characters", ->
         it "moves cursor to next occurence of word under cursor", ->
           editor.setText("abc\n@def\nabc\n@def\n")
           editor.setCursorBufferPosition([1, 0])
@@ -721,7 +721,7 @@ describe "Motions", ->
           # FIXME: I suspect there is a bug laying around
           # Cursor#getEndOfCurrentWordBufferPosition, this function
           # is returning '@' as a word, instead of returning the whole
-          # word '@def', this behavior is avoid in this test, when we
+          # word '@def', this behavior is avoided in this test, when we
           # execute the '*' command when cursor is on character after '@'
           # (in this particular example, the 'd' char)
           editor.setCursorBufferPosition([1, 1])
@@ -777,10 +777,6 @@ describe "Motions", ->
   #        expect(editor.getCursorBufferPosition()).toEqual [3, 1]
 
   #    describe "when cursor is on non-word char column", ->
-  #      # NOTE: I suspect there is a bug laying around
-  #      # Cursor#getEndOfCurrentWordBufferPosition, this function
-  #      # is returning '@' as a word, instead of returning the whole
-  #      # word '@def'
   #      it "matches only the non-word char", ->
   #        editor.setText("abc\n@def\nabc\n@def\n")
   #        editor.setCursorBufferPosition([1, 0])

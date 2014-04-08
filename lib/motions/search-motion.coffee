@@ -88,7 +88,7 @@ class SearchCurrentWord extends BasicSearch
     @input = new Input(@getCurrentWordMatch())
 
   getCurrentWord: ->
-    wordRange  = @editor.getCursor().getCurrentWordBufferRange()
+    wordRange = @editor.getCursor().getCurrentWordBufferRange()
     @editor.getTextInBufferRange(wordRange)
 
   getCurrentWordMatch: ->
@@ -102,6 +102,5 @@ class SearchCurrentWord extends BasicSearch
 
   execute: (count=1) ->
     super(count) if @isOnWord()
-
 
 module.exports = {Search, SearchCurrentWord}
