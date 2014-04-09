@@ -728,6 +728,12 @@ describe "Motions", ->
           keydown("*")
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
+        # FIXME: This behavior is different from the one found in
+        # vim. This is because the word boundary match in Javascript
+        # ignores starting 'non-word' characters.
+        # e.g.
+        # in Vim:        /\<def\>/.test("@def") => false
+        # in Javascript: /\bdef\b/.test("@def") => true
         it "moves cursor to the start of valid word char", ->
           editor.setText("abc\ndef\nabc\n@def\n")
           editor.setCursorBufferPosition([1, 0])
@@ -741,47 +747,53 @@ describe "Motions", ->
           keydown("*")
           expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
-  # FIXME: for some reasons this tests are being skipped on test execution
-  #
-  #describe "the # keybinding", ->
-  #  describe "as a motion", ->
-  #    it "moves cursor to next occurence of word under cursor", ->
-  #      editor.setText("abc\n@def\nabc\ndef\n")
-  #      editor.setCursorBufferPosition([2, 0])
-  #      keydown("#")
-  #      expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+      describe "when cursor is not on a word", ->
+        it "does a match with the next word", ->
+          editor.setText("abc\n  @def\n abc\n @def")
+          editor.setCursorBufferPosition([1, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 1]
 
-  #    it "doesn't move cursor unless next occurence is the exact word (no partial matches)", ->
-  #      editor.setText("abc\ndef\nghiabc\njkl\nabcdef")
-  #      editor.setCursorBufferPosition([0, 0])
-  #      keydown("#")
-  #      expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+      describe "when cursor is at EOF", ->
+        it "doesn't try to do any match", ->
+          editor.setText("abc\n@def\nabc\n ")
+          editor.setCursorBufferPosition([3, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 1]
 
-  #    describe "with words that containt 'non-word' characters", ->
-  #      it "moves cursor to next occurence of word under cursor", ->
-  #        editor.setText("abc\n@def\nabc\n@def\n")
-  #        editor.setCursorBufferPosition([3, 0])
-  #        keydown("#")
-  #        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+  describe "the dash keybinding", ->
+    describe "as a motion", ->
+      it "moves cursor to next occurence of word under cursor", ->
+        editor.setText("abc\n@def\nabc\ndef\n")
+        editor.setCursorBufferPosition([2, 0])
+        keydown("#")
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
 
-  #      it "doesn't move cursor unless next match has exact word ending", ->
-  #        editor.setText("abc\n@def\nabc\n@def1\n")
-  #        editor.setCursorBufferPosition([3, 1])
-  #        keydown("#")
-  #        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+      it "doesn't move cursor unless next occurence is the exact word (no partial matches)", ->
+        editor.setText("abc\ndef\nghiabc\njkl\nabcdef")
+        editor.setCursorBufferPosition([0, 0])
+        keydown("#")
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
 
-  #      it "moves cursor to the start of valid word char", ->
-  #        editor.setText("abc\ndef\nabc\n@def\n")
-  #        editor.setCursorBufferPosition([1, 0])
-  #        keydown("#")
-  #        expect(editor.getCursorBufferPosition()).toEqual [3, 1]
+      describe "with words that containt 'non-word' characters", ->
+        it "moves cursor to next occurence of word under cursor", ->
+          editor.setText("abc\n@def\nabc\n@def\n")
+          editor.setCursorBufferPosition([3, 0])
+          keydown("#")
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-  #    describe "when cursor is on non-word char column", ->
-  #      it "matches only the non-word char", ->
-  #        editor.setText("abc\n@def\nabc\n@def\n")
-  #        editor.setCursorBufferPosition([1, 0])
-  #        keydown("*")
-  #        expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+        it "moves cursor to the start of valid word char", ->
+          editor.setText("abc\n@def\nabc\ndef\n")
+          editor.setCursorBufferPosition([3, 0])
+          keydown("#")
+          expect(editor.getCursorBufferPosition()).toEqual [1, 1]
+
+      describe "when cursor is on non-word char column", ->
+        it "matches only the non-word char", ->
+          editor.setText("abc\n@def\nabc\n@def\n")
+          editor.setCursorBufferPosition([1, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
   describe "the H keybinding", ->
     beforeEach ->

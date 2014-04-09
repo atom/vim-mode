@@ -3,7 +3,7 @@ _ = require 'underscore-plus'
 SearchViewModel = require '../view-models/search-view-model'
 {Input} = require '../view-models/view-model'
 
-class BasicSearch extends MotionWithInput
+class Base extends MotionWithInput
   @currentSearch: null
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
@@ -69,7 +69,7 @@ class BasicSearch extends MotionWithInput
     @matches = after
 
 
-class Search extends BasicSearch
+class Search extends Base
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
     @viewModel = new SearchViewModel(@)
@@ -80,27 +80,52 @@ class Search extends BasicSearch
     super(input)
     @viewModel.value = @input.characters
 
-class SearchCurrentWord extends BasicSearch
+class SearchCurrentWord extends Base
+  @keywordRegex: null
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
+
+    # FIXME: This must depend on the current language
+    defaultIsKeyword = "[@a-zA-Z0-9_\-]+"
+    userIsKeyword = atom.config.get('vim-mode.iskeyword')
+    @keywordRegex = new RegExp(userIsKeyword or defaultIsKeyword)
+
     @input = new Input(@getCurrentWordMatch())
 
-  getCurrentWord: ->
-    wordRange = @editor.getCursor().getCurrentWordBufferRange()
-    @editor.getTextInBufferRange(wordRange)
+  getCurrentWord: (onRecursion=false) ->
+    cursor = @editor.getCursor()
+    wordRange  = cursor.getCurrentWordBufferRange(wordRegex: @keywordRegex)
+    characters = @editor.getTextInBufferRange(wordRange)
+
+    # We are not standing on top of a word, let's try to
+    # get to the next word and try again
+    if characters.length is 0 and not onRecursion
+      if @cursorIsOnEOF()
+        ""
+      else
+        cursor.moveToNextWordBoundary(wordRegex: @keywordRegex)
+        @getCurrentWord(true)
+    else
+      characters
+
+  cursorIsOnEOF: ->
+    cursor = @editor.getCursor()
+    pos = cursor.getMoveNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
+    eofPos = @editor.getEofBufferPosition()
+    pos.row == eofPos.row && pos.column == eofPos.column
 
   getCurrentWordMatch: ->
     characters = @getCurrentWord()
-    if /\W/.test(characters) then "#{characters}\\b" else "\\b#{characters}\\b"
-
-  isOnWord: ->
-    @getCurrentWord().length isnt 0
+    if characters.length > 0
+      if /\W/.test(characters) then "#{characters}\\b" else "\\b#{characters}\\b"
+    else
+      characters
 
   isComplete: -> true
 
   execute: (count=1) ->
-    super(count) if @isOnWord()
+    super(count) if @input.characters.length > 0
 
 module.exports = {Search, SearchCurrentWord}
