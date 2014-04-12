@@ -22,11 +22,13 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
-    @mode = 'command'
 
     @setupCommandMode()
     @registerInsertIntercept()
-    @activateCommandMode()
+    if atom.config.get 'vim-mode.startInInsertMode'
+      @activateInsertMode()
+    else
+      @activateCommandMode()
 
     atom.project.eachBuffer (buffer) =>
       @registerChangeHandler(buffer)

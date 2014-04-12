@@ -1,4 +1,5 @@
 helpers = require './spec-helper'
+VimState = require '../lib/vim-state'
 
 describe "VimState", ->
   [editor, editorView, vimState] = []
@@ -24,9 +25,14 @@ describe "VimState", ->
     keydown(key, opts)
 
   describe "initialization", ->
-    it "puts the editor in command-mode initially", ->
+    it "puts the editor in command-mode initially by default", ->
       expect(editorView).toHaveClass 'vim-mode'
       expect(editorView).toHaveClass 'command-mode'
+
+    it "puts the editor in insert-mode if startInInsertMode is true", ->
+      atom.config.set 'vim-mode.startInInsertMode', true
+      editorView.vimState = new VimState(editorView) # Reload vim-mode
+      expect(editorView).toHaveClass 'insert-mode'
 
   describe "command-mode", ->
     describe "when entering an insertable character", ->
