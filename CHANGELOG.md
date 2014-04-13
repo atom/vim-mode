@@ -7,6 +7,7 @@
 * Add marks (m, `, ') @danzimm
 * Add operator-pending mode and a single text object (`iw`) @nathansobo, @jroes
 * Add an option to start in insert mode @viveksjain
+* Fix weird behavior when pasting at the end of a file @msvbg
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
