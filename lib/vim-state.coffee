@@ -140,6 +140,8 @@ class VimState
       'find-backwards': (e) => new Motions.Find(@editorView, @).reverse()
       'replace': (e) => new Operators.Replace(@editorView, @)
       'search': (e) => new Motions.Search(@editorView, @)
+      'search-current-word': (e) => new Motions.SearchCurrentWord(@editorView, @)
+      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editorView, @)).reversed()
       'reverse-search': (e) => (new Motions.Search(@editorView, @)).reversed()
 
   # Private: Register multiple command handlers via an {Object} that maps
