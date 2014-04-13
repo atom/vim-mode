@@ -703,3 +703,20 @@ describe "Operators", ->
       keydown('m')
       commandModeInputKeydown('a')
       expect(vimState.getMark('a')).toEqual [0,1]
+
+  describe 'the ~ keybinding', ->
+    beforeEach ->
+      editor.setText('aB12')
+      editor.setCursorBufferPosition([0, 0])
+    it 'toggles the case and moves right', ->
+      keydown('~')
+      expect(editor.getText()).toBe 'AB12'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+      keydown('~')
+      expect(editor.getText()).toBe 'Ab12'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+      keydown('~')
+      expect(editor.getText()).toBe 'Ab12'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]

@@ -107,6 +107,7 @@
   'A': 'vim-mode:insert-after-end-of-line'
   'x': 'vim-mode:delete-right'
   'X': 'vim-mode:delete-left'
+  '~': 'vim-mode:toggle-case'
   's': 'vim-mode:substitute'
   '.': 'vim-mode:repeat'
 
