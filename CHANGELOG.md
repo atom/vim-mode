@@ -8,6 +8,7 @@
 * Add operator-pending mode and a single text object (`iw`) @nathansobo, @jroes
 * Add an option to start in insert mode @viveksjain
 * Fix weird behavior when pasting at the end of a file @msvbg
+* More fixes for corner cases in paste behavior @SKAhack
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
