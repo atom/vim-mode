@@ -141,6 +141,8 @@ class VimState
       'replace': (e) => new Operators.Replace(@editorView, @)
       'search': (e) => new Motions.Search(@editorView, @)
       'reverse-search': (e) => (new Motions.Search(@editorView, @)).reversed()
+      'search-current-word': (e) => new Motions.SearchCurrentWord(@editorView, @)
+      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editorView, @)).reversed()
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
