@@ -1,5 +1,5 @@
 Motions = require './general-motions'
-Search = require './search-motion'
+{Search} = require './search-motion'
 MoveToMark = require './move-to-mark-motion'
 Find = require './find-motion'
 

@@ -2,18 +2,12 @@ _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
 SearchViewModel = require '../view-models/search-view-model'
 
-module.exports =
-class Search extends MotionWithInput
+class SearchBase extends MotionWithInput
   @currentSearch: null
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
-    @viewModel = new SearchViewModel(@)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
-
-  compose: (input) ->
-    super(input)
-    @viewModel.value = @input.characters
 
   repeat: (opts = {}) =>
     reverse = opts.backwards
@@ -72,3 +66,16 @@ class Search extends MotionWithInput
     after = after.reverse() if @reverse
 
     @matches = after
+
+class Search extends SearchBase
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    @viewModel = new SearchViewModel(@)
+    Search.currentSearch = @
+    @reverse = @initiallyReversed = false
+
+  compose: (input) ->
+    super(input)
+    @viewModel.value = @input.characters
+
+module.exports = {Search}
