@@ -102,21 +102,33 @@ class Delete extends Operator
 # It toggles the case of everything selected by the following motion
 #
 class ToggleCase extends Operator
-  allowEOL: null
 
   constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
-  execute: () ->
-    point = @editor.getCursorBufferPosition()
-    range = Range.fromPointWithDelta(point, 0, 1)
-    text = @editor.getTextInBufferRange(range)
 
-    if /[a-z]/i.test(text) is false
-      return true
+  execute: (count=1) ->
+    pos = @editor.getCursorBufferPosition()
+    currentRowLength = @editor.lineLengthForBufferRow(pos.row)
+    lastCharIndex = @editor.getBuffer().lineForRow(pos.row).length - 1
 
-    if text is text.toLowerCase()
-      @editor.setTextInBufferRange(range, text.toUpperCase())
-    else if text is text.toUpperCase()
-      @editor.setTextInBufferRange(range, text.toLowerCase())
+    # Do nothing on an empty line
+    return unless currentRowLength > 0
+
+    @undoTransaction =>
+      start = @editor.getCursorBufferPosition()
+      _.times count, =>
+        point = @editor.getCursorBufferPosition()
+        range = Range.fromPointWithDelta(point, 0, 1)
+        char = @editor.getTextInBufferRange(range)
+        if char is char.toLowerCase()
+          @editor.setTextInBufferRange(range, char.toUpperCase())
+        else
+          @editor.setTextInBufferRange(range, char.toLowerCase())
+
+        unless point.column >= lastCharIndex
+          @editor.moveCursorRight()
+
+
+    @vimState.activateCommandMode()
 #
 # It changes everything selected by the following motion.
 #

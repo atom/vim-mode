@@ -708,6 +708,7 @@ describe "Operators", ->
     beforeEach ->
       editor.setText('aB12')
       editor.setCursorBufferPosition([0, 0])
+
     it 'toggles the case and moves right', ->
       keydown('~')
       expect(editor.getText()).toBe 'AB12'
@@ -718,5 +719,12 @@ describe "Operators", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
       keydown('~')
+      expect(editor.getText()).toBe 'Ab12'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+    it 'can be repeated', ->
+      keydown('4')
+      keydown('~')
+
       expect(editor.getText()).toBe 'Ab12'
       expect(editor.getCursorScreenPosition()).toEqual [0, 3]
