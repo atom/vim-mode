@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
 SearchViewModel = require '../view-models/search-view-model'
+{Input} = require '../view-models/view-model'
 
 class SearchBase extends MotionWithInput
   @currentSearch: null
@@ -78,4 +79,52 @@ class Search extends SearchBase
     super(input)
     @viewModel.value = @input.characters
 
-module.exports = {Search}
+class SearchCurrentWord extends SearchBase
+  @keywordRegex: null
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    Search.currentSearch = @
+    @reverse = @initiallyReversed = false
+
+    # FIXME: This must depend on the current language
+    defaultIsKeyword = "[@a-zA-Z0-9_\-]+"
+    userIsKeyword = atom.config.get('vim-mode.iskeyword')
+    @keywordRegex = new RegExp(userIsKeyword or defaultIsKeyword)
+
+    @input = new Input(@getCurrentWordMatch())
+
+  getCurrentWord: (onRecursion=false) ->
+    cursor = @editor.getCursor()
+    wordRange  = cursor.getCurrentWordBufferRange(wordRegex: @keywordRegex)
+    characters = @editor.getTextInBufferRange(wordRange)
+
+    # We are not standing on top of a word, let's try to
+    # get to the next word and try again
+    if characters.length is 0 and not onRecursion
+      if @cursorIsOnEOF()
+        ""
+      else
+        cursor.moveToNextWordBoundary(wordRegex: @keywordRegex)
+        @getCurrentWord(true)
+    else
+      characters
+
+  cursorIsOnEOF: ->
+    cursor = @editor.getCursor()
+    pos = cursor.getMoveNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
+    eofPos = @editor.getEofBufferPosition()
+    pos.row == eofPos.row && pos.column == eofPos.column
+
+  getCurrentWordMatch: ->
+    characters = @getCurrentWord()
+    if characters.length > 0
+      if /\W/.test(characters) then "#{characters}\\b" else "\\b#{characters}\\b"
+    else
+      characters
+
+  isComplete: -> true
+
+  execute: (count=1) ->
+    super(count) if @input.characters.length > 0
+
+module.exports = {Search, SearchCurrentWord}
