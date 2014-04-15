@@ -119,6 +119,7 @@ class ToggleCase extends Operator
         point = @editor.getCursorBufferPosition()
         range = Range.fromPointWithDelta(point, 0, 1)
         char = @editor.getTextInBufferRange(range)
+
         if char is char.toLowerCase()
           @editor.setTextInBufferRange(range, char.toUpperCase())
         else
@@ -126,7 +127,6 @@ class ToggleCase extends Operator
 
         unless point.column >= lastCharIndex
           @editor.moveCursorRight()
-
 
     @vimState.activateCommandMode()
 #
