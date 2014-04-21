@@ -93,6 +93,7 @@ class VimState
       'delete-right': => [new Operators.Delete(@editor, @), new Motions.MoveRight(@editor)]
       'delete-left': => [new Operators.Delete(@editor, @), new Motions.MoveLeft(@editor)]
       'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor)]
+      'toggle-case': => new Operators.ToggleCase(@editor, @)
       'yank': => @linewiseAliasedOperator(Operators.Yank)
       'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToLine(@editor)]
       'put-before': => new Operators.Put(@editor, @, location: 'before')
