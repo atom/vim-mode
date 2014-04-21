@@ -10,6 +10,7 @@
 * Fix weird behavior when pasting at the end of a file @msvbg
 * More fixes for corner cases in paste behavior @SKAhack
 * Implement * and # @roman
+* Implement ~ @badunk
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
