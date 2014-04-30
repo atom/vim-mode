@@ -1,4 +1,4 @@
-## Vim Mode package [![Build Status](https://travis-ci.org/atom/vim-mode?branch=master)](https://travis-ci.org/atom/vim-mode)
+## Vim Mode package [![Build Status](https://travis-ci.org/atom/vim-mode.svg?branch=master)](https://travis-ci.org/atom/vim-mode)
 
 Provides vim modal control for Atom, ideally blending the best of vim
 and Atom.
