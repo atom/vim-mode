@@ -1,4 +1,5 @@
 helpers = require './spec-helper'
+VimState = require '../lib/vim-state'
 
 describe "VimState", ->
   [editor, editorView, vimState] = []
@@ -23,10 +24,20 @@ describe "VimState", ->
     options.raw = true
     helpers.keydown(key, options)
 
+  commandModeInputKeydown = (key, opts = {}) ->
+    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.raw = true
+    keydown(key, opts)
+
   describe "initialization", ->
-    it "puts the editor in command-mode initially", ->
+    it "puts the editor in command-mode initially by default", ->
       expect(editorView).toHaveClass 'vim-mode'
       expect(editorView).toHaveClass 'command-mode'
+
+    it "puts the editor in insert-mode if startInInsertMode is true", ->
+      atom.config.set 'vim-mode.startInInsertMode', true
+      editorView.vimState = new VimState(editorView) # Reload vim-mode
+      expect(editorView).toHaveClass 'insert-mode'
 
   describe "command-mode", ->
     describe "when entering an insertable character", ->
@@ -108,6 +119,18 @@ describe "VimState", ->
 
         it "allows the cursor to be placed on the \n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+    describe 'with character-input operations', ->
+      beforeEach -> editor.setText('012345\nabcdef')
+
+      it 'properly clears the opStack', ->
+        keydown('d')
+        keydown('r')
+        expect(vimState.mode).toBe 'command'
+        expect(vimState.opStack.length).toBe 0
+        commandModeInputKeydown('escape')
+        keydown('d')
+        expect(editor.getText()).toBe '012345\nabcdef'
 
   describe "insert-mode", ->
     beforeEach ->

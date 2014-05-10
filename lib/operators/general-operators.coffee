@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {$$, Range} = require 'atom'
-ReplaceViewModel = require './replace-view-model'
+{ViewModel} = require '../view-models/view-model'
 
 class OperatorError
   constructor: (@message) ->
@@ -40,6 +40,8 @@ class Operator
     @motion = motion
     @complete = true
 
+  canComposeWith: (operation) -> operation.select?
+
   # Protected: Wraps the function within an single undo step.
   #
   # fn - The function to wrap.
@@ -47,6 +49,22 @@ class Operator
   # Returns nothing.
   undoTransaction: (fn) ->
     @editor.getBuffer().transact(fn)
+
+# Public: Generic class for an operator that requires extra input
+class OperatorWithInput extends Operator
+  constructor: (@editorView, @vimState) ->
+    @editor = @editorView.editor
+    @complete = false
+
+  canComposeWith: (operation) -> operation.characters?
+
+  compose: (input) ->
+    if not input.characters
+      throw new OperatorError('Must compose with an Input')
+
+    @input = input
+    @complete = true
+
 #
 # It deletes everything selected by the following motion.
 #
@@ -79,6 +97,37 @@ class Delete extends Operator
     if @motion.isLinewise?()
       @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
+    @vimState.activateCommandMode()
+#
+# It toggles the case of everything selected by the following motion
+#
+class ToggleCase extends Operator
+
+  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
+
+  execute: (count=1) ->
+    pos = @editor.getCursorBufferPosition()
+    lastCharIndex = @editor.lineLengthForBufferRow(pos.row) - 1
+    count = Math.min count, @editor.lineLengthForBufferRow(pos.row) - pos.column
+
+    # Do nothing on an empty line
+    return if @editor.getBuffer().isRowBlank(pos.row)
+
+    @undoTransaction =>
+      _.times count, =>
+        point = @editor.getCursorBufferPosition()
+        range = Range.fromPointWithDelta(point, 0, 1)
+        char = @editor.getTextInBufferRange(range)
+
+        if char is char.toLowerCase()
+          @editor.setTextInBufferRange(range, char.toUpperCase())
+        else
+          @editor.setTextInBufferRange(range, char.toLowerCase())
+
+        unless point.column >= lastCharIndex
+          @editor.moveCursorRight()
+
+    @vimState.activateCommandMode()
 #
 # It changes everything selected by the following motion.
 #
@@ -122,116 +171,8 @@ class Yank extends Operator
     else
       @editor.clearSelections()
 
-#
-# It indents everything selected by the following motion.
-#
-class Indent extends Operator
-  # Public: Indents the text selected by the given motion.
-  #
-  # count - The number of times to execute.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    @indent(count)
+    @vimState.activateCommandMode()
 
-  # Protected: Indents or outdents the text selected by the given motion.
-  #
-  # count  - The number of times to execute.
-  # direction - Either 'indent' or 'outdent'
-  #
-  # Returns nothing.
-  indent: (count, direction='indent') ->
-    row = @editor.getCursorScreenRow()
-
-    @motion.select(count)
-    if direction == 'indent'
-      @editor.indentSelectedRows()
-    else if direction == 'outdent'
-      @editor.outdentSelectedRows()
-    else if direction == 'auto'
-      @editor.autoIndentSelectedRows()
-
-    @editor.setCursorScreenPosition([row, 0])
-    @editor.moveCursorToFirstCharacterOfLine()
-
-#
-# It outdents everything selected by the following motion.
-#
-class Outdent extends Indent
-  # Public: Indents the text selected by the given motion.
-  #
-  # count - The number of times to execute.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    @indent(count, 'outdent')
-
-#
-# It autoindents everything selected by the following motion.
-#
-class Autoindent extends Indent
-  # Public: Autoindents the text selected by the given motion.
-  #
-  # count - The number of times to execute.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    @indent(count, 'auto')
-
-#
-# It pastes everything contained within the specifed register
-#
-class Put extends Operator
-  register: '"'
-
-  constructor: (@editor, @vimState, {@location, @selectOptions}={}) ->
-    @location ?= 'after'
-    @complete = true
-
-  # Public: Pastes the text in the given register.
-  #
-  # count - The number of times to execute.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    {text, type} = @vimState.getRegister(@register) || {}
-    return unless text
-
-    if @location == 'after'
-      if type == 'linewise'
-        if @onLastRow()
-          @editor.moveCursorToEndOfLine()
-
-          originalPosition = @editor.getCursorScreenPosition()
-          originalPosition.row += 1
-        else
-          @editor.moveCursorDown()
-      else
-        unless @onLastColumn()
-          @editor.moveCursorRight()
-
-    if type == 'linewise' and !originalPosition?
-      @editor.moveCursorToBeginningOfLine()
-      originalPosition = @editor.getCursorScreenPosition()
-
-    textToInsert = _.times(count, -> text).join('')
-    if @location == 'after' and type == 'linewise' and @onLastRow()
-      textToInsert = "\n#{textToInsert.substring(0, textToInsert.length - 1)}"
-    @editor.insertText(textToInsert)
-
-    if originalPosition?
-      @editor.setCursorScreenPosition(originalPosition)
-      @editor.moveCursorToFirstCharacterOfLine()
-
-  # Private: Helper to determine if the editor is currently on the last row.
-  #
-  # Returns true on the last row and false otherwise.
-  onLastRow: ->
-    {row, column} = @editor.getCursorBufferPosition()
-    row == @editor.getBuffer().getLastRow()
-
-  onLastColumn: ->
-    @editor.getCursor().isAtEndOfLine()
 #
 # It combines the current line with the following line.
 #
@@ -247,6 +188,7 @@ class Join extends Operator
     @undoTransaction =>
       _.times count, =>
         @editor.joinLines()
+    @vimState.activateCommandMode()
 
 #
 # Repeat the last operation
@@ -261,25 +203,21 @@ class Repeat extends Operator
       _.times count, =>
         cmd = @vimState.history[0]
         cmd?.execute()
-
 #
-# Replace the character under the cursor
+# It creates a mark at the current cursor position
 #
-class Replace extends Operator
+class Mark extends OperatorWithInput
   constructor: (@editorView, @vimState, {@selectOptions}={}) ->
-    @editor = @editorView.editor
-    @complete = true
-    @viewModel = new ReplaceViewModel(@)
+    super(@editorView, @vimState)
+    @viewModel = new ViewModel(@, class: 'mark', singleChar: true, hidden: true)
 
-  execute: (count=1) ->
-    editor = @editorView.editor
-    pos = editor.getCursorBufferPosition()
-    currentRowLength = editor.lineLengthForBufferRow(pos.row)
-
-    # Do nothing on an empty line
-    return unless currentRowLength > 0
-    # Do nothing if asked to replace more characters than there are on a line
-    return unless currentRowLength - pos.column >= count
+  # Public: Creates the mark in the specified mark register (from user input)
+  # at the current position
+  #
+  # Returns nothing.
+  execute: () ->
+    @vimState.setMark(@input.characters, @editorView.editor.getCursorBufferPosition())
+    @vimState.activateCommandMode()
 
     @undoTransaction =>
       start = editor.getCursorBufferPosition()
@@ -320,5 +258,7 @@ class Input extends Operator
     @undoTransaction =>
       @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
 
-module.exports = { Operator, OperatorError, Delete, Change, Yank, Indent,
-  Outdent, Autoindent, Put, Join, Repeat, Replace, Input }
+module.exports = {
+  Operator, OperatorWithInput, OperatorError, Delete, ToggleCase, Change,
+  Yank, Join, Repeat, Mark, Input
+}

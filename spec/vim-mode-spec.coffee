@@ -16,6 +16,6 @@ describe "VimMode", ->
       editorView.enableKeymap()
 
   describe "initialize", ->
-    it "puts the editor in command-mode initially", ->
+    it "puts the editor in command-mode initially by default", ->
       expect(editorView).toHaveClass 'vim-mode'
       expect(editorView).toHaveClass 'command-mode'
