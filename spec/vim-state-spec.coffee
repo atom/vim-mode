@@ -173,7 +173,7 @@ describe "VimState", ->
       expect(editorView).not.toHaveClass 'insert-mode'
       expect(editorView).not.toHaveClass 'visual-mode'
 
-    fit "allows undoing an entire batch of typing", ->
+    xit "allows undoing an entire batch of typing", ->
       type('a')
       type('b')
       type('c')
