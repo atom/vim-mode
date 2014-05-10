@@ -11,6 +11,7 @@
 * More fixes for corner cases in paste behavior @SKAhack
 * Implement * and # @roman
 * Implement ~ @badunk
+* Implement t and T @udp
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
