@@ -36,7 +36,9 @@ class Change extends Input
   #
   # Returns nothing.
   execute: (count=1) ->
-    @editor.beginTransaction()
+    # If we've typed, we're being repeated. If we're being repeated,
+    # undo transactions are already handled.
+    @editor.beginTransaction() unless @typed
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
     operator.execute(count)
