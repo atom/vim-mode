@@ -40,13 +40,13 @@ class Change extends Input
   #
   # Returns nothing.
   execute: (count=1) ->
-    # if we already have typed text, we've already been executed.
-
     @editor.beginTransaction()
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
     operator.execute(count)
+    # if we already have typed text, we've already been executed.
     return super if @typed
+    
     @vimState.activateInsertMode(transactionStarted = true)
     @typed = true
 
@@ -55,7 +55,6 @@ class TransactionBundler
   constructor: (@transaction) ->
 
   buildInsertText: ->
-    console.log "building inserted text, just typing: #{@justTyping} trans #{@transaction}"
     return undefined unless @isJustTyping()
     typedCharacters = (patch.newText for patch in @transaction.patches)
     typedCharacters.join("")
@@ -64,7 +63,6 @@ class TransactionBundler
     return undefined unless @transaction
     return true
     window.trans = @transaction
-    console.log "set window.trans"
     typedSingleChars = (patch.oldText == "" && patch.newText != "" for patch in @transaction.patches)
     _.every(typedSingleChars)
 
