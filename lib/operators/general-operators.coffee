@@ -138,11 +138,12 @@ class Change extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
+    @editor.beginTransaction()
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
     operator.execute(count)
 
-    @vimState.activateInsertMode()
+    @vimState.activateInsertMode(transactionStarted = true)
 
 #
 # It copies everything selected by the following motion.
@@ -201,8 +202,17 @@ class Repeat extends Operator
   execute: (count=1) ->
     @undoTransaction =>
       _.times count, =>
-        cmd = @vimState.history[0]
-        cmd?.execute()
+        top = @vimState.history[0]
+        console.log "repeating"
+        console.log top
+        if top?.composesWithRepeat
+          console.log "repeating parent:"
+          console.log @vimState.history[1]
+          @vimState.history[1]?.execute()
+        top?.execute()
+
+  composesWithInput: (historyItem) ->
+    historyItem instanceof Change
 #
 # It creates a mark at the current cursor position
 #

@@ -26,16 +26,21 @@ class Input extends Operator
     @undoTransaction =>
       @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
 
+  composesWithRepeat: true
+
 # Takes a transaction and turns it into a string of what was typed.
 class TransactionBundler
   constructor: (@transaction) ->
 
   buildInsertText: ->
+    console.log "building inserted text, just typing: #{@justTyping} trans #{@transaction}"
     return undefined unless @isJustTyping()
     typedCharacters = (patch.newText for patch in @transaction.patches)
     typedCharacters.join("")
 
   isJustTyping: ->
     return undefined unless @transaction
+    window.trans = @transaction
+    console.log "set window.trans"
     typedSingleChars = (patch.oldText == "" && patch.newText != "" for patch in @transaction.patches)
     _.every(typedSingleChars)

@@ -14,6 +14,11 @@ describe "Operators", ->
     vimState.activateCommandMode()
     vimState.resetCommandMode()
 
+  type = (key, options={}) ->
+    options.element = editorView[0]
+    options.raw = true
+    helpers.keydown(key, options)
+
   keydown = (key, options={}) ->
     options.element ?= editorView[0]
     helpers.keydown(key, options)
@@ -226,10 +231,10 @@ describe "Operators", ->
       expect(editor.getText()).toBe "0\n"
 
   describe "the c keybinding", ->
-    describe "when followed by a c", ->
-      beforeEach ->
-        editor.setText("12345\nabcde\nABCDE")
+    beforeEach ->
+      editor.setText("12345\nabcde\nABCDE")
 
+    describe "when followed by a c", ->
       it "deletes the current line and enters insert mode", ->
         editor.setCursorScreenPosition([1, 1])
 
@@ -251,6 +256,30 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
         expect(editorView).not.toHaveClass 'command-mode'
         expect(editorView).toHaveClass 'insert-mode'
+
+    describe "when followed by i w", ->
+      xit "undo's and redo's completely", ->
+        editor.commitTransaction()
+        editor.setCursorScreenPosition([1, 1])
+
+        keydown('c')
+        keydown('i')
+        keydown('w')
+        expect(editor.getText()).toBe "12345\n\nABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+        expect(editorView).toHaveClass 'insert-mode'
+
+        type('a')
+        type('b')
+        keydown('escape')
+        expect(editorView).toHaveClass 'command-mode'
+        expect(editor.getText()).toBe "12345\nab\nABCDE"
+
+        keydown('u')
+        editorView.trigger 'core:undo'
+        expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+        keydown('r')
+        expect(editor.getText()).toBe "12345\nab\nABCDE"
 
   describe "the C keybinding", ->
     beforeEach ->
