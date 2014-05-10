@@ -19,10 +19,6 @@ class Input extends Operator
     bundler = new TransactionBundler(transaction)
     @typedText = bundler.buildInsertText()
 
-  # 'Executes' this input operation. Input operations are synthetic; typing
-  # is done natively in insert mode. So we just insert the typed text.
-  # But first, if the operator above us in the history enters input mode,
-  # such as `cw`, repeat that operation too.
   execute: ->
     return undefined unless @typedText
     @undoTransaction =>
@@ -46,7 +42,7 @@ class Change extends Input
     operator.execute(count)
     # if we already have typed text, we've already been executed.
     return super if @typed
-    
+
     @vimState.activateInsertMode(transactionStarted = true)
     @typed = true
 
@@ -61,7 +57,7 @@ class TransactionBundler
 
   isJustTyping: ->
     return undefined unless @transaction
-    return true
+    return true # required for subclasses like Change
     window.trans = @transaction
     typedSingleChars = (patch.oldText == "" && patch.newText != "" for patch in @transaction.patches)
     _.every(typedSingleChars)
