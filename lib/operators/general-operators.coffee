@@ -186,8 +186,8 @@ class Repeat extends Operator
   execute: (count=1) ->
     @undoTransaction =>
       _.times count, =>
-        top = @vimState.history[0]
-        top?.execute()
+        cmd = @vimState.history[0]
+        cmd?.execute()
 #
 # It creates a mark at the current cursor position
 #
