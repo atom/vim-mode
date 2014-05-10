@@ -15,7 +15,7 @@ class Find extends MotionWithInput
     if @reversed
       index = currentPosition.column
       for i in [0..count-1]
-        index = line.lastIndexOf(@input.characters, index)
+        index = line.lastIndexOf(@input.characters, index-1)
       if index != -1
         point = new Point(currentPosition.row, index+@offset)
         return {} =
@@ -24,7 +24,7 @@ class Find extends MotionWithInput
     else
       index = currentPosition.column
       for i in [0..count-1]
-        index = line.indexOf(@input.characters, index)
+        index = line.indexOf(@input.characters, index+1)
       if index != -1
         point = new Point(currentPosition.row, index-@offset)
         return {} =
