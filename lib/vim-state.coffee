@@ -19,7 +19,6 @@ class VimState
 
   constructor: (@editorView) ->
     @editor = @editorView.editor
-    @editor.beginTransaction()
     @opStack = []
     @history = []
     @marks = {}
@@ -338,8 +337,8 @@ class VimState
     transaction = _.last(@editor.buffer.history.undoStack)
     if transaction?
       input = new Operators.Input(@editor,
-                                 @,
-                                 _.last(@editor.buffer.history.undoStack))
+                                  @,
+                                  _.last(@editor.buffer.history.undoStack))
       @history.unshift(input)
 
   # Private: Used to enable visual mode.
