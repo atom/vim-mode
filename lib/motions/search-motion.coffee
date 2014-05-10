@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
 SearchViewModel = require '../view-models/search-view-model'
+{$$, Point, Range} = require 'atom'
 {Input} = require '../view-models/view-model'
 
 class SearchBase extends MotionWithInput
@@ -25,13 +26,16 @@ class SearchBase extends MotionWithInput
   execute: (count=1) ->
     @scan()
     @match count, (pos) =>
-      @editor.setCursorBufferPosition(pos)
+        q = pos.start.toArray()
+        @editor.setCursorBufferPosition(new Point(q[0],q[1]+pos.matchText.length))
+        for i in [0..pos.matchText.length-1]
+          @editor.selectLeft()
 
   select: (count=1) ->
     @scan()
     cur = @editor.getCursorBufferPosition()
     @match count, (pos) =>
-      @editor.setSelectedBufferRange([cur, pos])
+      @editor.setSelectedBufferRange([cur, pos.start])
     [true]
 
   match: (count, callback) ->
@@ -52,15 +56,28 @@ class SearchBase extends MotionWithInput
     cur = @editor.getCursorBufferPosition()
     matchPoints = []
     iterator = (item) =>
-      matchPoints.push(item.range.start)
+      matchPointItem =
+        start: item.range.start
+        matchText: item.matchText
+      matchPoints.push(matchPointItem)
 
     @editor.scan(regexp, iterator)
 
-    previous = _.filter matchPoints, (point) =>
-      if @reverse
-        point.compare(cur) < 0
+    previous2 = _.filter matchPoints, (point) =>
+        point.start.compare(cur) <= 0
+    if @reverse
+      if previous2.length>0
+        if previous2[previous2.length-1].start.compare(cur)<0
+          previous = previous2[..]
+        else
+          if previous2.length > 1
+            previous = previous2[0..previous2.length-2]
+          else
+            previous = []
       else
-        point.compare(cur) <= 0
+        previous2 = []
+    else
+        previous = previous2[..]
 
     after = _.difference(matchPoints, previous)
     after.push(previous...)
