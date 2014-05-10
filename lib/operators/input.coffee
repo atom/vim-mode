@@ -30,3 +30,11 @@ class Input extends Operator
     return undefined unless @typedText
     @undoTransaction =>
       @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
+
+    @undoTransaction =>
+      start = editor.getCursorBufferPosition()
+      _.times count, =>
+        point = editor.getCursorBufferPosition()
+        editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @viewModel.char)
+        editor.moveCursorRight()
+      editor.setCursorBufferPosition(start)

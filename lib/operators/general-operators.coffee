@@ -219,14 +219,6 @@ class Mark extends OperatorWithInput
     @vimState.setMark(@input.characters, @editorView.editor.getCursorBufferPosition())
     @vimState.activateCommandMode()
 
-    @undoTransaction =>
-      start = editor.getCursorBufferPosition()
-      _.times count, =>
-        point = editor.getCursorBufferPosition()
-        editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @viewModel.char)
-        editor.moveCursorRight()
-      editor.setCursorBufferPosition(start)
-
 module.exports = {
   Operator, OperatorWithInput, OperatorError, Delete, ToggleCase, Change,
   Yank, Join, Repeat, Mark
