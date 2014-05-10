@@ -326,7 +326,6 @@ class VimState
   #
   # Returns nothing.
   activateInsertMode: ->
-    @deactivateVisualMode()
     @mode = 'insert'
     @editor.beginTransaction()
     @submode = null
@@ -338,9 +337,9 @@ class VimState
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
     if transaction?
-      input = new operators.Input(@editor,
-                                  @,
-                                  _.last(@editor.buffer.history.undoStack))
+      input = new Operators.Input(@editor,
+                                 @,
+                                 _.last(@editor.buffer.history.undoStack))
       @history.unshift(input)
 
   # Private: Used to enable visual mode.

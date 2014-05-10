@@ -20,7 +20,7 @@ describe "VimState", ->
     helpers.keydown(key, options)
 
   type = (key, options={}) ->
-    options.element = editorView[0].hiddenInput
+    options.element = editorView[0]
     options.raw = true
     helpers.keydown(key, options)
 
@@ -166,7 +166,7 @@ describe "VimState", ->
       expect(editorView).not.toHaveClass 'insert-mode'
       expect(editorView).not.toHaveClass 'visual-mode'
 
-    fit "puts the editor into command mode when <ctrl-c> is pressed", ->
+    it "puts the editor into command mode when <ctrl-c> is pressed", ->
       keydown('c', ctrl: true)
 
       expect(editorView).toHaveClass 'command-mode'
@@ -175,17 +175,16 @@ describe "VimState", ->
 
     fit "allows undoing an entire batch of typing", ->
       type('a')
-      editorView.hiddenInput.textInput 'a'
-      keydown('b', raw: true)
-      keydown('c', raw: true)
-      keydown('escape')
-      keydown('i')
-      keydown('d', raw: true)
-      keydown('e', raw: true)
-      keydown('f', raw: true)
-      keydown('escape')
+      type('b')
+      type('c')
+      editorView.trigger('vim-mode:activate-command-mode')
+      editorView.trigger('vim-mode:insert-after')
+      type('d')
+      type('e')
+      type('f')
+      editorView.trigger('vim-mode:activate-command-mode')
       expect(editor.getText()).toBe "abcdef"
-      editorView.trigger ('core:undo')
+      editorView.trigger('core:undo')
       expect(editor.getText()).toBe "abc"
 
   describe "visual-mode", ->
