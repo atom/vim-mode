@@ -6,8 +6,7 @@ Replace = require './replace-operator'
 Operators = require './general-operators'
 
 Operators.Put = Put;
-Operators.Input = Put;
+Operators.Input = Input;
 Operators.Replace = Replace;
 _.extend(Operators, IndentOperators)
-
 module.exports = Operators

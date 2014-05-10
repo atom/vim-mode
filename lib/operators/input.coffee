@@ -1,5 +1,7 @@
 {Operator} = require './general-operators'
+_ = require 'underscore-plus'
 
+module.exports =
 # The operation for text entered in input mode. This operator is not
 # used as the user types, but is created when the user leaves insert mode,
 # and is available for repeating with the . operator (Replace)
@@ -12,29 +14,28 @@
 #
 class Input extends Operator
   constructor: (@editor, @vimState, @transaction) ->
-    @typedText = @buildInsertText()
+    bundler = new TransactionBundler(@transaction)
+    @typedText = bundler.buildInsertText()
+
+  # 'Executes' this input operation. Input operations are synthetic; typing
+  # is done natively in insert mode. So we just insert the typed text.
+  # But first, if the operator above us in the history enters input mode,
+  # such as `cw`, repeat that operation too.
+  execute: ->
+    return undefined unless @typedText
+    @undoTransaction =>
+      @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
+
+# Takes a transaction and turns it into a string of what was typed.
+class TransactionBundler
+  constructor: (@transaction) ->
 
   buildInsertText: ->
     return undefined unless @isJustTyping()
     typedCharacters = (patch.newText for patch in @transaction.patches)
     typedCharacters.join("")
 
-  # Determines if the transaction consists of just a set of typing without
-  # deletions, which we can safely recreate.
   isJustTyping: ->
     return undefined unless @transaction
     typedSingleChars = (patch.oldText == "" && patch.newText != "" for patch in @transaction.patches)
     _.every(typedSingleChars)
-
-  execute: ->
-    return undefined unless @typedText
-    @undoTransaction =>
-      @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
-
-    @undoTransaction =>
-      start = editor.getCursorBufferPosition()
-      _.times count, =>
-        point = editor.getCursorBufferPosition()
-        editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @viewModel.char)
-        editor.moveCursorRight()
-      editor.setCursorBufferPosition(start)
