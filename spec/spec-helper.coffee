@@ -12,8 +12,6 @@ beforeEach ->
 cacheEditor = (existingEditorView) ->
   session = atom.project.openSync()
   if existingEditorView?
-    existingEditorView.on 'textInput', ->
-      console.log "text inputting"
     existingEditorView.edit(session)
     existingEditorView.vimState = new VimState(existingEditorView)
     existingEditorView.bindKeys()
