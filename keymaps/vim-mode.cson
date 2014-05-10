@@ -88,6 +88,8 @@
 
   'f': 'vim-mode:find'
   'F': 'vim-mode:find-backwards'
+  't': 'vim-mode:till'
+  'T': 'vim-mode:till-backwards'
 
 '.vim-mode.command-mode':
   'i': 'vim-mode:activate-insert-mode'
