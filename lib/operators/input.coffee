@@ -1,7 +1,6 @@
-{Operator} = require './general-operators'
+{Operator, Delete} = require './general-operators'
 _ = require 'underscore-plus'
 
-module.exports =
 # The operation for text entered in input mode. This operator is not
 # used as the user types, but is created when the user leaves insert mode,
 # and is available for repeating with the . operator (Replace)
@@ -14,7 +13,10 @@ module.exports =
 #
 class Input extends Operator
   constructor: (@editor, @vimState, @transaction) ->
-    bundler = new TransactionBundler(@transaction)
+    @confirmTransaction(@transaction)
+
+  confirmTransaction: (transaction) ->
+    bundler = new TransactionBundler(transaction)
     @typedText = bundler.buildInsertText()
 
   # 'Executes' this input operation. Input operations are synthetic; typing
@@ -26,7 +28,27 @@ class Input extends Operator
     @undoTransaction =>
       @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
 
-  composesWithRepeat: true
+  inputOperator: -> true
+
+#
+# It changes everything selected by the following motion.
+#
+class Change extends Input
+  # Public: Changes the text selected by the given motion.
+  #
+  # count - The number of times to execute.
+  #
+  # Returns nothing.
+  execute: (count=1) ->
+    # if we already have typed text, we've already been executed.
+
+    @editor.beginTransaction()
+    operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
+    operator.compose(@motion)
+    operator.execute(count)
+    return super if @typed
+    @vimState.activateInsertMode(transactionStarted = true)
+    @typed = true
 
 # Takes a transaction and turns it into a string of what was typed.
 class TransactionBundler
@@ -40,7 +62,10 @@ class TransactionBundler
 
   isJustTyping: ->
     return undefined unless @transaction
+    return true
     window.trans = @transaction
     console.log "set window.trans"
     typedSingleChars = (patch.oldText == "" && patch.newText != "" for patch in @transaction.patches)
     _.every(typedSingleChars)
+
+module.exports = {Input, Change}

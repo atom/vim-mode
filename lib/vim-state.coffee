@@ -222,8 +222,6 @@ class VimState
       catch e
         ((e instanceof Operators.OperatorError) or (e instanceof Motions.MotionError)) and @resetCommandMode() or throw e
     else
-      console.log "unshifting:"
-      console.log poppedOperation
       @history.unshift(poppedOperation) if poppedOperation.isRecordable()
       poppedOperation.execute()
 
@@ -339,11 +337,15 @@ class VimState
     return unless @mode == 'insert'
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
-    if transaction?
+    return unless transaction?
+    if @history[0]?.inputOperator?()
+      # give transaction to this input-like operation (such as change)
+      @history[0].confirmTransaction(transaction)
+    else
+      # inputs are only created after the fact.
       input = new Operators.Input(@editor,
                                   @,
                                   _.last(@editor.buffer.history.undoStack))
-      console.log "unshifting input: #{input.typedText}"
       @history.unshift(input)
 
   # Private: Used to enable visual mode.

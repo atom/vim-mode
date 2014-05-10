@@ -128,22 +128,6 @@ class ToggleCase extends Operator
           @editor.moveCursorRight()
 
     @vimState.activateCommandMode()
-#
-# It changes everything selected by the following motion.
-#
-class Change extends Operator
-  # Public: Changes the text selected by the given motion.
-  #
-  # count - The number of times to execute.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    @editor.beginTransaction()
-    operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
-    operator.compose(@motion)
-    operator.execute(count)
-
-    @vimState.activateInsertMode(transactionStarted = true)
 
 #
 # It copies everything selected by the following motion.
@@ -203,16 +187,7 @@ class Repeat extends Operator
     @undoTransaction =>
       _.times count, =>
         top = @vimState.history[0]
-        console.log "repeating"
-        console.log top
-        if top?.composesWithRepeat
-          console.log "repeating parent:"
-          console.log @vimState.history[1]
-          @vimState.history[1]?.execute()
         top?.execute()
-
-  composesWithInput: (historyItem) ->
-    historyItem instanceof Change
 #
 # It creates a mark at the current cursor position
 #
@@ -230,6 +205,6 @@ class Mark extends OperatorWithInput
     @vimState.activateCommandMode()
 
 module.exports = {
-  Operator, OperatorWithInput, OperatorError, Delete, ToggleCase, Change,
+  Operator, OperatorWithInput, OperatorError, Delete, ToggleCase,
   Yank, Join, Repeat, Mark
 }
