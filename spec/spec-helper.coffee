@@ -1,7 +1,7 @@
 {EditorView} = require 'atom'
-util = require 'util'
 VimState = require '../lib/vim-state'
 VimMode  = require '../lib/vim-mode'
+
 originalKeymap = null
 
 beforeEach ->
@@ -17,8 +17,8 @@ cacheEditor = (existingEditorView) ->
     existingEditorView.enableKeymap()
   else
     editorView = new EditorView(session)
+    editorView.simulateDomAttachment()
     editorView.enableKeymap()
-    editorView.attachToDom()
 
     editorView.addClass('vim-mode')
     editorView.vimState = new VimState(editorView)

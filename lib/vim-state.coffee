@@ -312,6 +312,7 @@ class VimState
   activateCommandMode: ->
     @deactivateInsertMode()
     @mode = 'command'
+    @submode = null
 
     if @editorView.is(".insert-mode")
       cursor = @editor.getCursor()
