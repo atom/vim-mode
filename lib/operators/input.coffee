@@ -14,7 +14,7 @@ _ = require 'underscore-plus'
 class Input extends Operator
   standalone: true
 
-  isComplete: -> @standalone || @composed
+  isComplete: -> @standalone || super
 
   confirmTransaction: (transaction) ->
     bundler = new TransactionBundler(transaction)
