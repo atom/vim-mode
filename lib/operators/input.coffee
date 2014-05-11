@@ -58,15 +58,18 @@ class TransactionBundler
   constructor: (@transaction) ->
 
   buildInsertText: ->
-    return undefined unless @isJustTyping()
-    typedCharacters = (patch.newText for patch in @transaction.patches)
-    typedCharacters.join("")
+    chars = []
+    for patch in @transaction.patches
+      switch
+        when @isTypedChar(patch) then chars.push(@isTypedChar(patch))
+        when @isBackspacedChar(patch) then chars.pop()
+    chars.join("")
 
-  isJustTyping: ->
-    return undefined unless @transaction
-    return true # required for subclasses like Change
-    window.trans = @transaction
-    typedSingleChars = (patch.oldText == "" && patch.newText != "" for patch in @transaction.patches)
-    _.every(typedSingleChars)
+  isTypedChar: (patch) ->
+    return false unless patch.newText?.length >= 1 and patch.oldText?.length == 0
+    patch.newText
+
+  isBackspacedChar: (patch) ->
+    patch.newText == "" and patch.oldText?.length == 1
 
 module.exports = {Input, Change}
