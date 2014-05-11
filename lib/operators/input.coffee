@@ -12,24 +12,30 @@ _ = require 'underscore-plus'
 # Never use this code.
 #
 class Input extends Operator
-  constructor: (@editor, @vimState, @transaction) ->
-    @confirmTransaction(@transaction)
+  standalone: true
+
+  isComplete: -> @standalone || @composed
 
   confirmTransaction: (transaction) ->
     bundler = new TransactionBundler(transaction)
     @typedText = bundler.buildInsertText()
 
   execute: ->
-    return undefined unless @typedText
-    @undoTransaction =>
-      @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
+    if @typed
+      @undoTransaction =>
+        @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
+    else
+      @vimState.activateInsertMode()
+      @typed = true
 
   inputOperator: -> true
 
 #
-# It changes everything selected by the following motion.
+# Delete the following motion and enter insert mode to replace it.
 #
 class Change extends Input
+  standalone: false
+
   # Public: Changes the text selected by the given motion.
   #
   # count - The number of times to execute.
@@ -42,7 +48,6 @@ class Change extends Input
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
     operator.execute(count)
-    # if we already have typed text, we've already been executed.
     return super if @typed
 
     @vimState.activateInsertMode(transactionStarted = true)

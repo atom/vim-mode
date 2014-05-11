@@ -72,7 +72,6 @@ class VimState
   setupCommandMode: ->
     @registerCommands
       'activate-command-mode': => @activateCommandMode()
-      'activate-insert-mode': => @activateInsertMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
       'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
       'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
@@ -80,6 +79,7 @@ class VimState
       'repeat-prefix': (e) => @repeatPrefix(e)
 
     @registerOperationCommands
+      'activate-insert-mode': => new Operators.Input(@editor, @)
       'substitute': => new Commands.Substitute(@editor, @)
       'substitute-line': => new Commands.SubstituteLine(@editor, @)
       'insert-after': => new Commands.InsertAfter(@editor, @)
@@ -337,16 +337,9 @@ class VimState
     return unless @mode == 'insert'
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
-    return unless transaction?
-    if @history[0]?.inputOperator?()
+    if @history[0]?.inputOperator?() and transaction?
       # give transaction to this input-like operation (such as change)
       @history[0].confirmTransaction(transaction)
-    else
-      # inputs are only created after the fact.
-      input = new Operators.Input(@editor,
-                                  @,
-                                  _.last(@editor.buffer.history.undoStack))
-      @history.unshift(input)
 
   # Private: Used to enable visual mode.
   #
