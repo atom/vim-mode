@@ -14,11 +14,6 @@ describe "Operators", ->
     vimState.activateCommandMode()
     vimState.resetCommandMode()
 
-  type = (key, options={}) ->
-    options.element = editorView[0]
-    options.raw = true
-    helpers.keydown(key, options)
-
   keydown = (key, options={}) ->
     options.element ?= editorView[0]
     helpers.keydown(key, options)
@@ -258,8 +253,7 @@ describe "Operators", ->
         expect(editorView).toHaveClass 'insert-mode'
 
     describe "when followed by i w", ->
-      xit "undo's and redo's completely", ->
-        editor.commitTransaction()
+      it "undo's and redo's completely", ->
         editor.setCursorScreenPosition([1, 1])
 
         keydown('c')
@@ -269,17 +263,16 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
         expect(editorView).toHaveClass 'insert-mode'
 
-        type('a')
-        type('b')
+        # Just cannot get "typing" to work correctly in test.
+        editor.setText("12345\nfg\nABCDE")
         keydown('escape')
         expect(editorView).toHaveClass 'command-mode'
-        expect(editor.getText()).toBe "12345\nab\nABCDE"
+        expect(editor.getText()).toBe "12345\nfg\nABCDE"
 
         keydown('u')
-        editorView.trigger 'core:undo'
         expect(editor.getText()).toBe "12345\nabcde\nABCDE"
-        keydown('r')
-        expect(editor.getText()).toBe "12345\nab\nABCDE"
+        keydown('r', ctrl: true)
+        expect(editor.getText()).toBe "12345\nfg\nABCDE"
 
   describe "the C keybinding", ->
     beforeEach ->

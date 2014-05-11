@@ -2,7 +2,6 @@
 util = require 'util'
 VimState = require '../lib/vim-state'
 VimMode  = require '../lib/vim-mode'
-
 originalKeymap = null
 
 beforeEach ->
@@ -22,10 +21,13 @@ cacheEditor = (existingEditorView) ->
     editorView.attachToDom()
 
     editorView.addClass('vim-mode')
-    editorView.editor.beginTransaction()
     editorView.vimState = new VimState(editorView)
 
-  existingEditorView or editorView
+  view = existingEditorView or editorView
+  history = view.editor.buffer.history
+  history.abortTransaction() if history.currentTransaction?
+  history.clearUndoStack()
+  view
 
 keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
   dispatchKeyboardEvent = (target, eventArgs...) ->
