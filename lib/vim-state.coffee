@@ -322,6 +322,7 @@ class VimState
 
     @clearOpStack()
     @editor.clearSelections()
+
     @updateStatusBar()
 
   # Private: Used to enable insert mode.
@@ -355,6 +356,7 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLine()
+
     @updateStatusBar()
 
   # Private: Used to enable operator-pending mode.
