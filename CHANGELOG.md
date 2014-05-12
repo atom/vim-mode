@@ -1,4 +1,6 @@
 ## HEAD
+
+## 0.9.0 - Lots of new features
 * Enable arrow keys in visual mode @fholgado
 * Additional bindings for split pane movement @zenhob
 * Fix search on invalid regex @bhuga
