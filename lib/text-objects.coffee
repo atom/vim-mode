@@ -12,20 +12,24 @@ class SelectInsideWord extends TextObject
 
 class SelectInsideQuotes extends TextObject
   constructor: (@editor, @char) ->
-  select: ->
-    start = @editor.getCursorBufferPosition().copy()
 
-    return [false] unless (=>
-      while start.row >= 0
-        startLine = @editor.lineForBufferRow(start.row)
-        start.column = startLine.length - 1 if start.column == -1
-        while start.column >= 0
-          if startLine[start.column] == @char
-            return true if start.column == 0 or startLine[start.column - 1] != '\\'
-          -- start.column
-        start.column = -1
-        -- start.row
-    )()
+  findOpeningQuote: (pos) ->
+
+    pos = pos.copy()
+    while pos.row >= 0
+      line = @editor.lineForBufferRow(pos.row)
+      pos.column = line.length - 1 if pos.column == -1
+      while pos.column >= 0
+        if line[pos.column] == @char
+          return pos if pos.column == 0 or line[pos.column - 1] != '\\'
+        -- pos.column
+      pos.column = -1
+      -- pos.row
+
+  select: ->
+
+    start = @findOpeningQuote(@editor.getCursorBufferPosition())
+    return [false] unless start?
      
     ++ start.column  # skip the opening quote
      
@@ -50,24 +54,28 @@ class SelectInsideQuotes extends TextObject
 
 class SelectInsideBrackets extends TextObject
   constructor: (@editor, @beginChar, @endChar) ->
-  select: ->
-    start = @editor.getCursorBufferPosition().copy()
+
+  findOpeningBracket: (pos) ->
+
+    pos = pos.copy()
     depth = 0
-             
-    return [false] unless (=>
-      while start.row >= 0
-        startLine = @editor.lineForBufferRow(start.row)
-        start.column = startLine.length - 1 if start.column == -1
-        while start.column >= 0
-          switch startLine[start.column]
-            when @endChar then ++ depth
-            when @beginChar
-              return true if -- depth < 0
-          -- start.column
-        start.column = -1
-        -- start.row
-    )()
-     
+    while pos.row >= 0
+      line = @editor.lineForBufferRow(pos.row)
+      pos.column = line.length - 1 if pos.column == -1
+      while pos.column >= 0
+        switch line[pos.column]
+          when @endChar then ++ depth
+          when @beginChar
+            return pos if -- depth < 0
+        -- pos.column
+      pos.column = -1
+      -- pos.row
+
+  select: ->
+
+    start = @findOpeningBracket(@editor.getCursorBufferPosition())
+    return [false] unless start?
+
     ++ start.column  # skip the opening bracket
      
     end = start.copy()
