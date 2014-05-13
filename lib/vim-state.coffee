@@ -155,7 +155,7 @@ class VimState
   registerCommands: (commands) ->
     for commandName, fn of commands
       do (fn) =>
-        @editorView.command "vim-mode:#{commandName}", fn
+        @editorView.command "vim-mode:#{commandName}.vim-mode", fn
 
   # Private: Register multiple operation-pushing Commands via an {Object} that
   # maps command names to functions that return operations to push.
@@ -167,6 +167,7 @@ class VimState
     for commandName, operationFn of operationCommands
       do (operationFn) =>
         commands[commandName] = (event) => @pushOperations(operationFn(event))
+
     @registerCommands(commands)
 
   # Private: Push the given operations onto the operation stack, then process
