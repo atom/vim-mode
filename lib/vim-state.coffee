@@ -400,10 +400,11 @@ class VimState
   #
   # e - The triggered event.
   #
-  # Returns nothing.
+  # Returns new motion or nothing.
   moveOrRepeat: (e) ->
     if @topOperation() instanceof Prefixes.Repeat
       @repeatPrefix(e)
+      null
     else
       new Motions.MoveToBeginningOfLine(@editor)
 

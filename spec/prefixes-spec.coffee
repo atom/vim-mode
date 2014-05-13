@@ -49,6 +49,18 @@ describe "Prefixes", ->
 
         expect(editor.getText()).toBe 'three'
 
+    describe "in visual mode", ->
+      beforeEach ->
+        editor.setText('one two three')
+        editor.setCursorScreenPosition([0, 0])
+
+      it "repeats movements in visual mode", ->
+        keydown("v")
+        keydown("2")
+        keydown("w")
+
+        expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
   describe "Register", ->
     describe "the a register", ->
       it "saves a value for future reading", ->
