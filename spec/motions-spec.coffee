@@ -904,6 +904,15 @@ describe "Motions", ->
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual '  12\n    36\n'
 
+    it 'moves back to previous', ->
+      editor.setCursorBufferPosition([1,5])
+      keydown('`')
+      commandModeInputKeydown('`')
+      editor.setCursorBufferPosition([2,1])
+      keydown('`')
+      commandModeInputKeydown('`')
+      expect(editor.getCursorBufferPosition()).toEqual [1,5]
+      
 
   describe 'the f/F keybindings', ->
     beforeEach ->
@@ -969,32 +978,32 @@ describe "Motions", ->
       keydown('T', shift: true)
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-  
+
     it 'respects count forward', ->
       keydown('2')
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 5]
-  
+
     it 'respects count backward', ->
       editor.setCursorScreenPosition([0, 6])
       keydown('2')
       keydown('T', shift: true)
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-  
+
     it "doesn't move if the character specified isn't found", ->
       keydown('t')
       commandModeInputKeydown('d')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-  
+
     it "doesn't move if there aren't the specified count of the specified character", ->
       keydown('1')
       keydown('0')
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-  
+
     it "composes with d", ->
       editor.setCursorScreenPosition([0,3])
       keydown('d')
@@ -1002,5 +1011,3 @@ describe "Motions", ->
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcabc\n'
-  
-
