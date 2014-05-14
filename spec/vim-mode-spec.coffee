@@ -33,4 +33,4 @@ describe "VimMode", ->
 
     it 'clears the vim namespaced events from the editorView', ->
       handlers = editorView.handlers()
-      expect(handlers['vim-mode:move-down'].length).toEqual(1)
+      expect(handlers['move-down'].length).toEqual(1)

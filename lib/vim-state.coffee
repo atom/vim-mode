@@ -150,17 +150,17 @@ class VimState
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
   #
-  # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
+  # Namespaces the given command names with '.vim-mode' to reduce redundancy in
   # the provided object.
   registerCommands: (commands) ->
     for commandName, fn of commands
       do (fn) =>
-        @editorView.command "vim-mode:#{commandName}.vim-mode", fn
+        @editorView.command "#{commandName}.vim-mode", fn
 
   # Private: Register multiple operation-pushing Commands via an {Object} that
   # maps command names to functions that return operations to push.
   #
-  # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
+  # Namespaces the given command names with '.vim-mode' to reduce redundancy in
   # the given object.
   registerOperationCommands: (operationCommands) ->
     commands = {}
@@ -183,7 +183,7 @@ class VimState
       # if we have started an operation that responds to canComposeWith check if it can compose
       # with the operation we're going to push onto the stack
       if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
-        @editorView.trigger 'vim-mode:compose-failure'
+        @editorView.trigger 'compose-failure'
         @resetCommandMode()
         break
 

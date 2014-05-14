@@ -19,7 +19,7 @@ class MoveToMark extends MotionWithInput
 
     @editor.setCursorBufferPosition(markPosition) if markPosition?
     if @linewise
-      @editorView.trigger 'vim-mode:move-to-first-character-of-line'
+      @editorView.trigger 'move-to-first-character-of-line'
 
   select: (count=1, {requireEOL}={}) ->
     markPosition = @vimState.getMark(@input.characters)
