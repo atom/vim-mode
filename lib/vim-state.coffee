@@ -278,12 +278,12 @@ class VimState
   # Private: Sets the value of a given mark.
   #
   # name  - The name of the mark to fetch.
-  # value {Point} - The value to set the mark to.
+  # pos {Point} - The value to set the mark to.
   #
   # Returns nothing.
   setMark: (name, pos) ->
-    # check to make sure name is in [a-z]
-    if (charCode = name.charCodeAt(0)) >= 97 and charCode <= 122
+    # check to make sure name is in [a-z] or is `
+    if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
       @marks[name] = pos
 
   # Public: Append a search to the search history.
