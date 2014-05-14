@@ -1,6 +1,7 @@
 ## HEAD
 * Fix E in visual mode @tony612
 * Implement `` @guanlun
+* Fix broken behavior when enabling/disabling @cadwallion
 
 ## 0.9.0 - Lots of new features
 * Enable arrow keys in visual mode @fholgado
