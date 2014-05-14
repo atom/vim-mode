@@ -1,0 +1,20 @@
+// The ui-variables file is provided by base themes provided by Atom.
+//
+// See https://github.com/atom/atom-dark-ui/blob/master/stylesheets/ui-variables.less
+// for a full listing of what's available.
+@import "ui-variables";
+
+.editor .marker .region {
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.pane.active .editor .highlight-selected .marker .region {
+  border-radius: 2px;
+  box-sizing: content-box;
+  padding: 0 0px;
+  margin: -1px 0 0 0;
+  background-color: transparent;
+  border: 1px solid #ddd
+}

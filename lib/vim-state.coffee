@@ -10,6 +10,8 @@ Utils = require './utils'
 Panes = require './panes'
 Scroll = require './scroll'
 
+HighlightedAreaView = require './motions/highlighted-area-view'
+
 module.exports =
 class VimState
   editor: null
@@ -32,6 +34,9 @@ class VimState
 
     atom.project.eachBuffer (buffer) =>
       @registerChangeHandler(buffer)
+
+    @area = new HighlightedAreaView(@editorView)
+    @area.attach()
 
   # Private: Creates a handle to block insertion while in command mode.
   #

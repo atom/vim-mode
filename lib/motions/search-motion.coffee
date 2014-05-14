@@ -2,6 +2,7 @@ _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
 SearchViewModel = require '../view-models/search-view-model'
 {Input} = require '../view-models/view-model'
+MarkerView = require './marker-view'
 
 class SearchBase extends MotionWithInput
   @currentSearch: null
@@ -22,16 +23,24 @@ class SearchBase extends MotionWithInput
     @initiallyReversed = @reverse = true
     @
 
-  execute: (count=1) ->
+  markAll: ->
     @scan()
+    @vimState.area.removeMarkers()
+    for pos in @matches
+        marker = new MarkerView(pos.range,@editorView,this)
+        @vimState.area.appendMarker(marker)
+
+  execute: (count=1) ->
+    @markAll()
+
     @match count, (pos) =>
-      @editor.setCursorBufferPosition(pos)
+        @editor.setCursorBufferPosition(pos.range.start)
 
   select: (count=1) ->
     @scan()
     cur = @editor.getCursorBufferPosition()
     @match count, (pos) =>
-      @editor.setSelectedBufferRange([cur, pos])
+      @editor.setSelectedBufferRange([cur, pos.range.start])
     [true]
 
   match: (count, callback) ->
@@ -52,15 +61,17 @@ class SearchBase extends MotionWithInput
     cur = @editor.getCursorBufferPosition()
     matchPoints = []
     iterator = (item) =>
-      matchPoints.push(item.range.start)
+      matchPointItem =
+        range: item.range
+      matchPoints.push(matchPointItem)
 
     @editor.scan(regexp, iterator)
 
     previous = _.filter matchPoints, (point) =>
       if @reverse
-        point.compare(cur) < 0
+        point.range.start.compare(cur) < 0
       else
-        point.compare(cur) <= 0
+        point.range.start.compare(cur) <= 0
 
     after = _.difference(matchPoints, previous)
     after.push(previous...)
