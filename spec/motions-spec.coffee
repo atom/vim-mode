@@ -251,6 +251,17 @@ describe "Motions", ->
         it "selects to the end of the next word", ->
           expect(vimState.getRegister('"').text).toBe '  cde1+-'
 
+      describe "press more than once", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 0])
+          keydown('v')
+          keydown('E', shift: true)
+          keydown('E', shift: true)
+          keydown('y')
+
+        it "selects to the end of the current word", ->
+          expect(vimState.getRegister('"').text).toBe 'ab  cde1+-'
+
   describe "the } keybinding", ->
     beforeEach ->
       editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
