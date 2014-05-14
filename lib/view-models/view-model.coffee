@@ -33,7 +33,7 @@ class ViewModel
     @view = new VimCommandModeInputView(@, opts)
     @editorView.editor.commandModeInputView = @view
     # when the opStack is prematurely cleared we need to remove the view
-    @editorView.on 'vim-mode:compose-failure', => @view.remove()
+    @editorView.on 'compose-failure', => @view.remove()
 
   # Public: Overriding this isn't usually necessary in subclasses, this pushes another operation
   #         to the `opStack` in `vim-stack.coffee` which causes the opStack to collapse and
