@@ -167,7 +167,6 @@ class VimState
     for commandName, operationFn of operationCommands
       do (operationFn) =>
         commands[commandName] = (event) => @pushOperations(operationFn(event))
-
     @registerCommands(commands)
 
   # Private: Push the given operations onto the operation stack, then process
