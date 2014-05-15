@@ -29,10 +29,16 @@ class SearchBase extends MotionWithInput
 
   select: (count=1) ->
     @scan()
-    cur = @editor.getCursorBufferPosition()
+    selectionStart = @getSelectionStart()
     @match count, (pos) =>
-      @editor.setSelectedBufferRange([cur, pos])
+      reversed = selectionStart.compare(pos) > 0
+      @editor.setSelectedBufferRange([selectionStart, pos], {reversed})
     [true]
+
+  getSelectionStart: ->
+    cur = @editor.getCursorBufferPosition()
+    {start, end} = @editor.getSelectedBufferRange()
+    if start.compare(cur) is 0 then end else start
 
   match: (count, callback) ->
     pos = @matches[(count - 1) % @matches.length]

@@ -617,6 +617,20 @@ describe "Motions", ->
         keydown('d')
         expect(editor.getText()).toBe 'three'
 
+      it 'extends selection when repeating search in visual mode', ->
+        editor.setText('line1\nline2\nline3')
+        keydown('v')
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'line'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        {start, end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 1
+        keydown('n')
+        {start,end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 2
+
       describe "repeating", ->
         it "does nothing with no search history", ->
           # This tests that no exception is raised
