@@ -607,6 +607,30 @@ describe "Motions", ->
         keydown('n')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
+      it 'works with selection in visual mode', ->
+        editor.setText('one two three')
+        keydown('v')
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'th'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 8]
+        keydown('d')
+        expect(editor.getText()).toBe 'three'
+
+      it 'extends selection when repeating search in visual mode', ->
+        editor.setText('line1\nline2\nline3')
+        keydown('v')
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'line'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        {start, end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 1
+        keydown('n')
+        {start,end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 2
+
       describe "repeating", ->
         it "does nothing with no search history", ->
           # This tests that no exception is raised
@@ -923,7 +947,7 @@ describe "Motions", ->
       keydown('`')
       commandModeInputKeydown('`')
       expect(editor.getCursorBufferPosition()).toEqual [1,5]
-      
+
 
   describe 'the f/F keybindings', ->
     beforeEach ->
