@@ -146,6 +146,7 @@
   '/': 'vim-mode:search'
   '?': 'vim-mode:reverse-search'
   '*': 'vim-mode:search-current-word'
+  '%': 'vim-mode:bracket-matching-motion'
   '#': 'vim-mode:reverse-search-current-word'
   'n': 'vim-mode:repeat-search'
   'N': 'vim-mode:repeat-search-backwards'
