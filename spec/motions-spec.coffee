@@ -492,15 +492,21 @@ describe "Motions", ->
 
   describe "the $ keybinding", ->
     beforeEach ->
-      editor.setText("  abcde\n")
+      editor.setText("  abcde\n\n")
       editor.setCursorScreenPosition([0, 4])
+
+    describe "as a motion from empty line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 0])
+
+      it "moves the cursor to the end of the line", ->
+        expect(editor.getCursorScreenPosition()).toEqual {row:1, column:0}
 
     describe "as a motion", ->
       beforeEach -> keydown('$')
 
       # FIXME: See atom/vim-mode#2
-      xit "moves the cursor to the end of the line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+      it "moves the cursor to the end of the line", ->
+        expect(editor.getCursorScreenPosition()).toEqual {row:0, column:6}
 
     describe "as a selection", ->
       beforeEach ->
@@ -508,9 +514,8 @@ describe "Motions", ->
         keydown('$')
 
       it "selects to the beginning of the lines", ->
-        expect(editor.getText()).toBe "  ab\n"
-        # FIXME: See atom/vim-mode#2
-        #expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+        expect(editor.getText()).toBe "  ab\n\n"
+        expect(editor.getCursorScreenPosition()).toEqual {row:0, column:3}
 
   # FIXME: this doesn't work as we can't determine if this is a motion
   # or part of a repeat prefix.
