@@ -2,7 +2,7 @@
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-[': 'vim-mode:activate-command-mode'
 
-'.platform-darin .vim-mode:not(.command-mode)':
+'.platform-darwin .vim-mode:not(.command-mode)':
   'ctrl-c': 'vim-mode:activate-command-mode'
 
 
