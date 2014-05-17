@@ -130,11 +130,17 @@ class MoveToNextWord extends Motion
     _.times count, =>
       current = cursor.getBufferPosition()
       next = cursor.getBeginningOfNextWordBufferPosition()
+      lineEnd = cursor.getCurrentLineBufferRange().end
 
-      if current != next
-        cursor.moveToBeginningOfNextWord()
-      else
+      if current.column is lineEnd.column and current.row is lineEnd.row
+        cursor.moveDown()
+        if cursor.row isnt current.row
+          cursor.moveToBeginningOfLine()
+          cursor.skipLeadingWhitespace()
+      else if current is next
         cursor.moveToEndOfWord()
+      else
+        cursor.moveToBeginningOfNextWord()
 
   # Options
   #  excludeWhitespace - if true, whitespace shouldn't be selected
