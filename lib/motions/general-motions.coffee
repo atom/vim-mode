@@ -380,8 +380,7 @@ class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
     _.times count, =>
       @editor.moveCursorToEndOfLine()
-      if @editor.getCursor().getBufferColumn() isnt 0
-          @editor.moveCursorLeft()
+      @editor.moveCursorLeft() unless @editor.getCursor().getBufferColumn() is 0
 
   select: (count=1) ->
     _.times count, =>
