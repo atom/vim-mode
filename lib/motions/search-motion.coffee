@@ -26,13 +26,13 @@ class SearchBase extends MotionWithInput
   execute: (count=1) ->
     @scan()
     @match count, (pos) =>
-      @editor.setCursorBufferPosition(pos)
+      @editor.setCursorBufferPosition(pos.range.start)
 
   select: (count=1) ->
     @scan()
     cur = @editor.getCursorBufferPosition()
     @match count, (pos) =>
-      @editor.setSelectedBufferRange([cur, pos])
+      @editor.setSelectedBufferRange([cur, pos.range.start])
     [true]
 
   match: (count, callback) ->
@@ -53,15 +53,17 @@ class SearchBase extends MotionWithInput
     cur = @editor.getCursorBufferPosition()
     matchPoints = []
     iterator = (item) =>
-      matchPoints.push(item.range.start)
+      matchPointItem =
+        range: item.range
+      matchPoints.push(matchPointItem)
 
     @editor.scan(regexp, iterator)
 
     previous = _.filter matchPoints, (point) =>
       if @reverse
-        point.compare(cur) < 0
+        point.range.start.compare(cur) < 0
       else
-        point.compare(cur) <= 0
+        point.range.start.compare(cur) <= 0
 
     after = _.difference(matchPoints, previous)
     after.push(previous...)
@@ -163,7 +165,7 @@ class BracketMatchingMotion extends SearchBase
       @reverse=false
     else
       @character = ''
-      
+
     @character
 
   getCurrentWordMatch: ->
