@@ -102,9 +102,12 @@ describe "Motions", ->
         keydown('w')
         expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
-        # TODO: Is it really expected to be on [3,2]? or [3,3]?
-        #keydown('w')
-        #expect(editor.getCursorScreenPosition()).toEqual [3, 2]
+        keydown('w')
+        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+
+        # After cursor gets to the EOF, it should stay there.
+        keydown('w')
+        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
       it "moves the cursor to the end of the word if last word in file", ->
         editor.setText("abc")

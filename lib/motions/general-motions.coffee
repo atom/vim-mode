@@ -130,14 +130,14 @@ class MoveToNextWord extends Motion
     _.times count, =>
       current = cursor.getBufferPosition()
       next = cursor.getBeginningOfNextWordBufferPosition()
-      lineEnd = cursor.getCurrentLineBufferRange().end
 
-      if current.column is lineEnd.column and current.row is lineEnd.row
+      return if @isEndOfFile()
+
+      if @isEndOfLine()
         cursor.moveDown()
-        if cursor.row isnt current.row
-          cursor.moveToBeginningOfLine()
-          cursor.skipLeadingWhitespace()
-      else if current is next
+        cursor.moveToBeginningOfLine()
+        cursor.skipLeadingWhitespace()
+      else if current.row is next.row and current.column is next.column
         cursor.moveToEndOfWord()
       else
         cursor.moveToBeginningOfNextWord()
@@ -157,6 +157,16 @@ class MoveToNextWord extends Motion
         @editor.selectToBeginningOfNextWord()
 
       true
+
+  isEndOfLine: ->
+    cur = @editor.getCursor().getBufferPosition()
+    end = @editor.getCursor().getCurrentLineBufferRange().end
+    cur.row is end.row and cur.column is end.column
+
+  isEndOfFile: ->
+    cur = @editor.getCursor().getBufferPosition()
+    eof = @editor.getEofBufferPosition()
+    cur.row is eof.row and cur.column is eof.column
 
 class MoveToNextWholeWord extends Motion
   execute: (count=1) ->
