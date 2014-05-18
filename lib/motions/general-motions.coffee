@@ -133,7 +133,7 @@ class MoveToNextWord extends Motion
 
       return if @isEndOfFile()
 
-      if @isEndOfLine()
+      if cursor.isAtEndOfLine()
         cursor.moveDown()
         cursor.moveToBeginningOfLine()
         cursor.skipLeadingWhitespace()
@@ -157,11 +157,6 @@ class MoveToNextWord extends Motion
         @editor.selectToBeginningOfNextWord()
 
       true
-
-  isEndOfLine: ->
-    cur = @editor.getCursor().getBufferPosition()
-    end = @editor.getCursor().getCurrentLineBufferRange().end
-    cur.row is end.row and cur.column is end.column
 
   isEndOfFile: ->
     cur = @editor.getCursor().getBufferPosition()
