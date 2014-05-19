@@ -32,8 +32,8 @@ class SearchBase extends MotionWithInput
     @scan()
     selectionStart = @getSelectionStart()
     @match count, (pos) =>
-      reversed = selectionStart.compare(pos) > 0
-      @editor.setSelectedBufferRange([selectionStart, pos], {reversed})
+      reversed = selectionStart.compare(pos.range.start) > 0
+      @editor.setSelectedBufferRange([selectionStart, pos.range.start], {reversed})
     [true]
 
   getSelectionStart: ->
@@ -150,25 +150,25 @@ class BracketMatchingMotion extends SearchBase
   getCurrentWord: (onRecursion=false) ->
     cursor = @editor.getCursor()
     tempPoint = cursor.getBufferPosition().toArray()
-    @character = @editor.getTextInBufferRange([cursor.getBufferPosition(),new Point(tempPoint[0],tempPoint[1]+1)])
-    if @character==']'
-      @matching='['
-      @reverse=true
-    else if @character=='['
-      @matching=']'
-      @reverse=false
-    else if @character==')'
-      @matching='('
-      @reverse=true
-    else if @character=='('
-      @matching=')'
-      @reverse=false
-    else if @character=='}'
-      @matching='{'
-      @reverse=true
-    else if @character=='{'
-      @matching='}'
-      @reverse=false
+    @character = @editor.getTextInBufferRange([cursor.getBufferPosition(),new Point(tempPoint[0],tempPoint[1] + 1)])
+    if @character == ']'
+      @matching = '['
+      @reverse = true
+    else if @character == '['
+      @matching = ']'
+      @reverse = false
+    else if @character == ')'
+      @matching = '('
+      @reverse = true
+    else if @character == '('
+      @matching = ')'
+      @reverse = false
+    else if @character == '}'
+      @matching = '{'
+      @reverse = true
+    else if @character == '{'
+      @matching = '}'
+      @reverse = false
     else
       @character = ''
 
@@ -216,10 +216,10 @@ class BracketMatchingMotion extends SearchBase
     @match count, (pos) =>
       if @reverse
         tempPoint = cur.toArray()
-        @editor.setSelectedBufferRange([new Point(tempPoint[0],tempPoint[1]+1), pos.range.start])
+        @editor.setSelectedBufferRange([pos.range.start, new Point(tempPoint[0],tempPoint[1] + 1)], {reversed: true})
       else
         tempPoint = pos.range.start.toArray()
-        @editor.setSelectedBufferRange([cur, new Point(tempPoint[0],tempPoint[1]+1)])
+        @editor.setSelectedBufferRange([ cur, new Point(tempPoint[0],tempPoint[1] + 1)], {reversed: true})
     [true]
 
   scan: ->
@@ -236,9 +236,9 @@ class BracketMatchingMotion extends SearchBase
         compVal = 1
       else
         compVal = -1
-      while counter>0
+      while counter > 0
         if matchIndex < matchesMatching.length and charIndex < matchesCharacter.length
-          if matchesCharacter[charIndex].range.compare(matchesMatching[matchIndex].range)==compVal
+          if matchesCharacter[charIndex].range.compare(matchesMatching[matchIndex].range) == compVal
             counter = counter + 1
             charIndex = charIndex + 1
           else

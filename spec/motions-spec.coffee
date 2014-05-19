@@ -1051,3 +1051,40 @@ describe "Motions", ->
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcabc\n'
+
+  describe 'the % motion', ->
+    beforeEach ->
+      editor.setText("( ( ) )--{ text in here; and a function call(with parameters) }\n")
+      editor.setCursorScreenPosition([0, 0])
+
+    it 'matches the correct parenthesis', ->
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+    it 'matches the correct brace', ->
+      editor.setCursorScreenPosition([0, 9])
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 62]
+
+    it 'composes correctly with d', ->
+      editor.setCursorScreenPosition([0, 9])
+      keydown('d')
+      keydown('%')
+      expect(editor.getText()).toEqual  "( ( ) )--\n"
+
+    it 'moves correctly when composed with v going forward', ->
+      keydown('v')
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it 'moves correctly when composed with v going backward', ->
+      editor.setCursorScreenPosition([0, 6])
+      keydown('v')
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it 'no-ops when no matching action is possible', ->
+      editor.setCursorScreenPosition([0, 3])
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      expect(editor.getText()).toEqual  "( ( ) )--{ text in here; and a function call(with parameters) }\n"
