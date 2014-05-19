@@ -1,4 +1,11 @@
 ## HEAD
+* Fix E in visual mode @tony612
+* Implement `` @guanlun
+* Fix broken behavior when enabling/disabling @cadwallion
+* Enable search in visual mode @romankuznietsov
+* Fix end-of-line movement @abijr
+
+## 0.9.0 - Lots of new features
 * Enable arrow keys in visual mode @fholgado
 * Additional bindings for split pane movement @zenhob
 * Fix search on invalid regex @bhuga
@@ -6,6 +13,12 @@
 * Display current mode in the status bar @gblock0
 * Add marks (m, `, ') @danzimm
 * Add operator-pending mode and a single text object (`iw`) @nathansobo, @jroes
+* Add an option to start in insert mode @viveksjain
+* Fix weird behavior when pasting at the end of a file @msvbg
+* More fixes for corner cases in paste behavior @SKAhack
+* Implement * and # @roman
+* Implement ~ @badunk
+* Implement t and T @udp
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack
@@ -60,7 +73,7 @@
 * Compatibility with Atom 0.50.0
 
 ## 0.5.0 - Updates
-* Switches apm db to cloudant from iriscouch
+* Switches apm db to buttant from iriscouch
 
 ## 0.4.0 - Updates
 * Compatibilty with Atom 26

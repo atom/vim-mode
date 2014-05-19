@@ -22,11 +22,13 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
-    @mode = 'command'
 
     @setupCommandMode()
     @registerInsertIntercept()
-    @activateCommandMode()
+    if atom.config.get 'vim-mode.startInInsertMode'
+      @activateInsertMode()
+    else
+      @activateCommandMode()
 
     atom.project.eachBuffer (buffer) =>
       @registerChangeHandler(buffer)
@@ -91,6 +93,7 @@ class VimState
       'delete-right': => [new Operators.Delete(@editor, @), new Motions.MoveRight(@editor)]
       'delete-left': => [new Operators.Delete(@editor, @), new Motions.MoveLeft(@editor)]
       'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor)]
+      'toggle-case': => new Operators.ToggleCase(@editor, @)
       'yank': => @linewiseAliasedOperator(Operators.Yank)
       'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToLine(@editor)]
       'put-before': => new Operators.Put(@editor, @, location: 'before')
@@ -136,9 +139,13 @@ class VimState
       'mark': (e) => new Operators.Mark(@editorView, @)
       'find': (e) => new Motions.Find(@editorView, @)
       'find-backwards': (e) => new Motions.Find(@editorView, @).reverse()
+      'till': (e) => new Motions.Till(@editorView, @)
+      'till-backwards': (e) => new Motions.Till(@editorView, @).reverse()
       'replace': (e) => new Operators.Replace(@editorView, @)
       'search': (e) => new Motions.Search(@editorView, @)
       'reverse-search': (e) => (new Motions.Search(@editorView, @)).reversed()
+      'search-current-word': (e) => new Motions.SearchCurrentWord(@editorView, @)
+      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editorView, @)).reversed()
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
@@ -148,7 +155,7 @@ class VimState
   registerCommands: (commands) ->
     for commandName, fn of commands
       do (fn) =>
-        @editorView.command "vim-mode:#{commandName}", fn
+        @editorView.command "vim-mode:#{commandName}.vim-mode", fn
 
   # Private: Register multiple operation-pushing Commands via an {Object} that
   # maps command names to functions that return operations to push.
@@ -271,12 +278,12 @@ class VimState
   # Private: Sets the value of a given mark.
   #
   # name  - The name of the mark to fetch.
-  # value {Point} - The value to set the mark to.
+  # pos {Point} - The value to set the mark to.
   #
   # Returns nothing.
   setMark: (name, pos) ->
-    # check to make sure name is in [a-z]
-    if (charCode = name.charCodeAt(0)) >= 97 and charCode <= 122
+    # check to make sure name is in [a-z] or is `
+    if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
       @marks[name] = pos
 
   # Public: Append a search to the search history.
@@ -393,10 +400,11 @@ class VimState
   #
   # e - The triggered event.
   #
-  # Returns nothing.
+  # Returns new motion or nothing.
   moveOrRepeat: (e) ->
     if @topOperation() instanceof Prefixes.Repeat
       @repeatPrefix(e)
+      null
     else
       new Motions.MoveToBeginningOfLine(@editor)
 

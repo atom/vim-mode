@@ -1,19 +1,14 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
 SearchViewModel = require '../view-models/search-view-model'
+{Input} = require '../view-models/view-model'
 
-module.exports =
-class Search extends MotionWithInput
+class SearchBase extends MotionWithInput
   @currentSearch: null
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
-    @viewModel = new SearchViewModel(@)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
-
-  compose: (input) ->
-    super(input)
-    @viewModel.value = @input.characters
 
   repeat: (opts = {}) =>
     reverse = opts.backwards
@@ -34,10 +29,16 @@ class Search extends MotionWithInput
 
   select: (count=1) ->
     @scan()
-    cur = @editor.getCursorBufferPosition()
+    selectionStart = @getSelectionStart()
     @match count, (pos) =>
-      @editor.setSelectedBufferRange([cur, pos])
+      reversed = selectionStart.compare(pos) > 0
+      @editor.setSelectedBufferRange([selectionStart, pos], {reversed})
     [true]
+
+  getSelectionStart: ->
+    cur = @editor.getCursorBufferPosition()
+    {start, end} = @editor.getSelectedBufferRange()
+    if start.compare(cur) is 0 then end else start
 
   match: (count, callback) ->
     pos = @matches[(count - 1) % @matches.length]
@@ -72,3 +73,64 @@ class Search extends MotionWithInput
     after = after.reverse() if @reverse
 
     @matches = after
+
+class Search extends SearchBase
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    @viewModel = new SearchViewModel(@)
+    Search.currentSearch = @
+    @reverse = @initiallyReversed = false
+
+  compose: (input) ->
+    super(input)
+    @viewModel.value = @input.characters
+
+class SearchCurrentWord extends SearchBase
+  @keywordRegex: null
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    Search.currentSearch = @
+    @reverse = @initiallyReversed = false
+
+    # FIXME: This must depend on the current language
+    defaultIsKeyword = "[@a-zA-Z0-9_\-]+"
+    userIsKeyword = atom.config.get('vim-mode.iskeyword')
+    @keywordRegex = new RegExp(userIsKeyword or defaultIsKeyword)
+
+    @input = new Input(@getCurrentWordMatch())
+
+  getCurrentWord: (onRecursion=false) ->
+    cursor = @editor.getCursor()
+    wordRange  = cursor.getCurrentWordBufferRange(wordRegex: @keywordRegex)
+    characters = @editor.getTextInBufferRange(wordRange)
+
+    # We are not standing on top of a word, let's try to
+    # get to the next word and try again
+    if characters.length is 0 and not onRecursion
+      if @cursorIsOnEOF()
+        ""
+      else
+        cursor.moveToNextWordBoundary(wordRegex: @keywordRegex)
+        @getCurrentWord(true)
+    else
+      characters
+
+  cursorIsOnEOF: ->
+    cursor = @editor.getCursor()
+    pos = cursor.getMoveNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
+    eofPos = @editor.getEofBufferPosition()
+    pos.row == eofPos.row && pos.column == eofPos.column
+
+  getCurrentWordMatch: ->
+    characters = @getCurrentWord()
+    if characters.length > 0
+      if /\W/.test(characters) then "#{characters}\\b" else "\\b#{characters}\\b"
+    else
+      characters
+
+  isComplete: -> true
+
+  execute: (count=1) ->
+    super(count) if @input.characters.length > 0
+
+module.exports = {Search, SearchCurrentWord}

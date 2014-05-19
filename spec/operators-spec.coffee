@@ -390,6 +390,28 @@ describe "Operators", ->
         expect(editor.getText()).toBe "012\n 345"
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
+    describe "with linewise contents", ->
+      beforeEach ->
+        editor.getBuffer().setText("012\n 345")
+        editor.setCursorScreenPosition([0, 1])
+        vimState.setRegister('"', text: " 456\n", type: 'linewise')
+        keydown('p')
+
+      it "inserts the contents of the default register at middle line", ->
+        expect(editor.getText()).toBe "012\n 456\n 345"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+    describe "with linewise contents", ->
+      beforeEach ->
+        editor.getBuffer().setText("012\n 345")
+        editor.setCursorScreenPosition([1, 1])
+        vimState.setRegister('"', text: " 456", type: 'linewise')
+        keydown('p')
+
+      it "inserts the contents of the default register at end of line", ->
+        expect(editor.getText()).toBe "012\n 345\n 456"
+        expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+
     describe "with multiple linewise contents", ->
       beforeEach ->
         editor.getBuffer().setText("012\nabc")
@@ -715,3 +737,28 @@ describe "Operators", ->
       keydown('m')
       commandModeInputKeydown('a')
       expect(vimState.getMark('a')).toEqual [0,1]
+
+  describe 'the ~ keybinding', ->
+    beforeEach ->
+      editor.setText('aBc')
+      editor.setCursorBufferPosition([0, 0])
+
+    it 'toggles the case and moves right', ->
+      keydown('~')
+      expect(editor.getText()).toBe 'ABc'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+      keydown('~')
+      expect(editor.getText()).toBe 'Abc'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+      keydown('~')
+      expect(editor.getText()).toBe 'AbC'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it 'can be repeated', ->
+      keydown('4')
+      keydown('~')
+
+      expect(editor.getText()).toBe 'AbC'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]

@@ -1,6 +1,4 @@
-## Vim Mode package
-
-:rotating_light: Package is experimental :rotating_light:
+## Vim Mode package [![Build Status](https://travis-ci.org/atom/vim-mode.svg?branch=master)](https://travis-ci.org/atom/vim-mode)
 
 Provides vim modal control for Atom, ideally blending the best of vim
 and Atom.
@@ -12,23 +10,14 @@ run `apm install vim-mode` from the command line.
 
 ### Current Status
 
-This package is far from finished (vim wasn't built in a day). The
-current focus is to ensure that an appropriate model is in place so that
-operators and motions can be incrementally added by the users who find
-them useful as no one person uses all of vim's functionality.
+Sizable portions of Vim's command mode work as you'd expect, including
+many complex combinations. Even so, this package is far from finished (Vim
+wasn't built in a day).
 
-### Future Work (in rough order)
-
-* Visual mode
-  * Blockwise
-* Support for marks (including \`.)
-* Support for `q` and `.`
-  * There is now partial support for `.`, full support is pending atom/atom#962
-* Block backspace in command mode.
-  * Block `ctrl-d` in insert mode.
-* More advanced keymap to support `iw` motion.
-  * Support for `f` and `t`
-  * Handle `g{line}`
+If there's a feature of Vim you're missing, it might just be that you use it
+more often than other developers. Adding a feature can be quick and easy. Check
+out the [closed pull requests](https://github.com/atom/vim-mode/pulls?direction=desc&page=1&sort=created&state=closed)
+to see examples of community contributions. We're looking forward to yours, too.
 
 ### Documentation
 
@@ -47,7 +36,8 @@ them useful as no one person uses all of vim's functionality.
   `docs/`
 * Create a PR.
 
-When in doubt, open a PR earlier rather than later so that you can
-receive feedback from the community.
+When in doubt, open a PR earlier rather than later so that you can receive
+feedback from the community. We want to get your fix or feature included as much
+as you do.
 
 See [the contribution guide](https://github.com/atom/vim-mode/blob/master/CONTRIBUTING.md).

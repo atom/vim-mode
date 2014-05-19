@@ -21,6 +21,16 @@ class Put extends Operator
     {text, type} = @vimState.getRegister(@register) || {}
     return unless text
 
+    textToInsert = _.times(count, -> text).join('')
+
+    # Clean up some corner cases on the last line of the file
+    if type == 'linewise'
+      textToInsert = textToInsert.replace(/\n$/, '')
+      if @location == 'after' and @onLastRow()
+        textToInsert = "\n#{textToInsert}"
+      else
+        textToInsert = "#{textToInsert}\n"
+
     if @location == 'after'
       if type == 'linewise'
         if @onLastRow()
@@ -38,9 +48,6 @@ class Put extends Operator
       @editor.moveCursorToBeginningOfLine()
       originalPosition = @editor.getCursorScreenPosition()
 
-    textToInsert = _.times(count, -> text).join('')
-    if @location == 'after' and type == 'linewise' and @onLastRow()
-      textToInsert = "\n#{textToInsert.substring(0, textToInsert.length - 1)}"
     @editor.insertText(textToInsert)
 
     if originalPosition?

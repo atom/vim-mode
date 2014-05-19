@@ -236,9 +236,8 @@ class MoveToEndOfWholeWord extends Motion
   #             than the next character after the word.
   nextBufferPosition: ({exclusive}={})->
     # get next position and reset cursor's position
-    @editor.moveCursorRight()
-    start = @editor.getCursorBufferPosition()
-    @editor.moveCursorLeft()
+    {row, column} = @editor.getCursorBufferPosition()
+    start = new Point(row, column + 1)
 
     scanRange = [start, @editor.getEofBufferPosition()]
     position = @editor.getEofBufferPosition()
@@ -381,6 +380,7 @@ class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
     _.times count, =>
       @editor.moveCursorToEndOfLine()
+      @editor.moveCursorLeft() unless @editor.getCursor().getBufferColumn() is 0
 
   select: (count=1) ->
     _.times count, =>

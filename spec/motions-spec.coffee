@@ -251,6 +251,17 @@ describe "Motions", ->
         it "selects to the end of the next word", ->
           expect(vimState.getRegister('"').text).toBe '  cde1+-'
 
+      describe "press more than once", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 0])
+          keydown('v')
+          keydown('E', shift: true)
+          keydown('E', shift: true)
+          keydown('y')
+
+        it "selects to the end of the current word", ->
+          expect(vimState.getRegister('"').text).toBe 'ab  cde1+-'
+
   describe "the } keybinding", ->
     beforeEach ->
       editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
@@ -481,14 +492,20 @@ describe "Motions", ->
 
   describe "the $ keybinding", ->
     beforeEach ->
-      editor.setText("  abcde\n")
+      editor.setText("  abcde\n\n")
       editor.setCursorScreenPosition([0, 4])
+
+    describe "as a motion from empty line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 0])
+
+      it "moves the cursor to the end of the line", ->
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
     describe "as a motion", ->
       beforeEach -> keydown('$')
 
       # FIXME: See atom/vim-mode#2
-      xit "moves the cursor to the end of the line", ->
+      it "moves the cursor to the end of the line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     describe "as a selection", ->
@@ -497,9 +514,8 @@ describe "Motions", ->
         keydown('$')
 
       it "selects to the beginning of the lines", ->
-        expect(editor.getText()).toBe "  ab\n"
-        # FIXME: See atom/vim-mode#2
-        #expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+        expect(editor.getText()).toBe "  ab\n\n"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
   # FIXME: this doesn't work as we can't determine if this is a motion
   # or part of a repeat prefix.
@@ -595,6 +611,30 @@ describe "Motions", ->
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
         keydown('n')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+      it 'works with selection in visual mode', ->
+        editor.setText('one two three')
+        keydown('v')
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'th'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 8]
+        keydown('d')
+        expect(editor.getText()).toBe 'three'
+
+      it 'extends selection when repeating search in visual mode', ->
+        editor.setText('line1\nline2\nline3')
+        keydown('v')
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'line'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        {start, end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 1
+        keydown('n')
+        {start,end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 2
 
       describe "repeating", ->
         it "does nothing with no search history", ->
@@ -692,6 +732,108 @@ describe "Motions", ->
         expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
         editor.commandModeInputView.editor.trigger('core:move-down')
         expect(editor.commandModeInputView.editor.getText()).toEqual ''
+
+  describe "the * keybinding", ->
+    beforeEach ->
+      editor.setText("abc\n@def\nabc\ndef\n")
+      editor.setCursorBufferPosition([0, 0])
+
+    describe "as a motion", ->
+      it "moves cursor to next occurence of word under cursor", ->
+        keydown("*")
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+      it "doesn't move cursor unless next occurence is the exact word (no partial matches)", ->
+        editor.setText("abc\ndef\nghiabc\njkl\nabcdef")
+        editor.setCursorBufferPosition([0, 0])
+        keydown("*")
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+      describe "with words that contain 'non-word' characters", ->
+        it "moves cursor to next occurence of word under cursor", ->
+          editor.setText("abc\n@def\nabc\n@def\n")
+          editor.setCursorBufferPosition([1, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
+        it "doesn't move cursor unless next match has exact word ending", ->
+          editor.setText("abc\n@def\nabc\n@def1\n")
+          # FIXME: I suspect there is a bug laying around
+          # Cursor#getEndOfCurrentWordBufferPosition, this function
+          # is returning '@' as a word, instead of returning the whole
+          # word '@def', this behavior is avoided in this test, when we
+          # execute the '*' command when cursor is on character after '@'
+          # (in this particular example, the 'd' char)
+          editor.setCursorBufferPosition([1, 1])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        # FIXME: This behavior is different from the one found in
+        # vim. This is because the word boundary match in Javascript
+        # ignores starting 'non-word' characters.
+        # e.g.
+        # in Vim:        /\<def\>/.test("@def") => false
+        # in Javascript: /\bdef\b/.test("@def") => true
+        it "moves cursor to the start of valid word char", ->
+          editor.setText("abc\ndef\nabc\n@def\n")
+          editor.setCursorBufferPosition([1, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 1]
+
+      describe "when cursor is on non-word char column", ->
+        it "matches only the non-word char", ->
+          editor.setText("abc\n@def\nabc\n@def\n")
+          editor.setCursorBufferPosition([1, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
+      describe "when cursor is not on a word", ->
+        it "does a match with the next word", ->
+          editor.setText("abc\n  @def\n abc\n @def")
+          editor.setCursorBufferPosition([1, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 1]
+
+      describe "when cursor is at EOF", ->
+        it "doesn't try to do any match", ->
+          editor.setText("abc\n@def\nabc\n ")
+          editor.setCursorBufferPosition([3, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 1]
+
+  describe "the hash keybinding", ->
+    describe "as a motion", ->
+      it "moves cursor to next occurence of word under cursor", ->
+        editor.setText("abc\n@def\nabc\ndef\n")
+        editor.setCursorBufferPosition([2, 0])
+        keydown("#")
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+      it "doesn't move cursor unless next occurence is the exact word (no partial matches)", ->
+        editor.setText("abc\ndef\nghiabc\njkl\nabcdef")
+        editor.setCursorBufferPosition([0, 0])
+        keydown("#")
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+      describe "with words that containt 'non-word' characters", ->
+        it "moves cursor to next occurence of word under cursor", ->
+          editor.setText("abc\n@def\nabc\n@def\n")
+          editor.setCursorBufferPosition([3, 0])
+          keydown("#")
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        it "moves cursor to the start of valid word char", ->
+          editor.setText("abc\n@def\nabc\ndef\n")
+          editor.setCursorBufferPosition([3, 0])
+          keydown("#")
+          expect(editor.getCursorBufferPosition()).toEqual [1, 1]
+
+      describe "when cursor is on non-word char column", ->
+        it "matches only the non-word char", ->
+          editor.setText("abc\n@def\nabc\n@def\n")
+          editor.setCursorBufferPosition([1, 0])
+          keydown("*")
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
   describe "the H keybinding", ->
     beforeEach ->
@@ -802,6 +944,15 @@ describe "Motions", ->
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual '  12\n    36\n'
 
+    it 'moves back to previous', ->
+      editor.setCursorBufferPosition([1,5])
+      keydown('`')
+      commandModeInputKeydown('`')
+      editor.setCursorBufferPosition([2,1])
+      keydown('`')
+      commandModeInputKeydown('`')
+      expect(editor.getCursorBufferPosition()).toEqual [1,5]
+
 
   describe 'the f/F keybindings', ->
     beforeEach ->
@@ -851,3 +1002,52 @@ describe "Motions", ->
       keydown('f')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcbc\n'
+
+  describe 'the t/T keybindings', ->
+    beforeEach ->
+      editor.setText("abcabcabcabc\n")
+      editor.setCursorScreenPosition([0, 0])
+
+    it 'moves to the character previous to the first specified character it finds', ->
+      keydown('t')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it 'moves backwards to the character after the first specified character it finds', ->
+      editor.setCursorScreenPosition([0, 2])
+      keydown('T', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+    it 'respects count forward', ->
+      keydown('2')
+      keydown('t')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
+    it 'respects count backward', ->
+      editor.setCursorScreenPosition([0, 6])
+      keydown('2')
+      keydown('T', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+    it "doesn't move if the character specified isn't found", ->
+      keydown('t')
+      commandModeInputKeydown('d')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "doesn't move if there aren't the specified count of the specified character", ->
+      keydown('1')
+      keydown('0')
+      keydown('t')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it "composes with d", ->
+      editor.setCursorScreenPosition([0,3])
+      keydown('d')
+      keydown('2')
+      keydown('t')
+      commandModeInputKeydown('a')
+      expect(editor.getText()).toEqual 'abcabc\n'

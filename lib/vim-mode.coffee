@@ -3,6 +3,7 @@ VimState = require './vim-state'
 module.exports =
   configDefaults:
     'commandModeInputViewFontSize': 11
+    'startInInsertMode': false
 
   _initializeWorkspaceState: ->
     atom.workspace.vimState ||= {}
@@ -17,3 +18,7 @@ module.exports =
 
       editorView.addClass('vim-mode')
       editorView.vimState = new VimState(editorView)
+
+  deactivate: ->
+    atom.workspaceView?.eachEditorView (editorView) =>
+      editorView.off('.vim-mode')

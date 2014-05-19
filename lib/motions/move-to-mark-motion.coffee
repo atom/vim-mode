@@ -12,6 +12,11 @@ class MoveToMark extends MotionWithInput
 
   execute: ->
     markPosition = @vimState.getMark(@input.characters)
+
+    if @input.characters == '`' # double '`' pressed
+      markPosition ?= [0, 0] # if markPosition not set, go to the beginning of the file
+      @vimState.setMark('`', @editorView.editor.getCursorBufferPosition())
+
     @editor.setCursorBufferPosition(markPosition) if markPosition?
     if @linewise
       @editorView.trigger 'vim-mode:move-to-first-character-of-line'

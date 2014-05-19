@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$$} = require 'atom'
+{$$, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
 
 class OperatorError
@@ -98,7 +98,36 @@ class Delete extends Operator
       @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
     @vimState.activateCommandMode()
+#
+# It toggles the case of everything selected by the following motion
+#
+class ToggleCase extends Operator
 
+  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
+
+  execute: (count=1) ->
+    pos = @editor.getCursorBufferPosition()
+    lastCharIndex = @editor.lineLengthForBufferRow(pos.row) - 1
+    count = Math.min count, @editor.lineLengthForBufferRow(pos.row) - pos.column
+
+    # Do nothing on an empty line
+    return if @editor.getBuffer().isRowBlank(pos.row)
+
+    @undoTransaction =>
+      _.times count, =>
+        point = @editor.getCursorBufferPosition()
+        range = Range.fromPointWithDelta(point, 0, 1)
+        char = @editor.getTextInBufferRange(range)
+
+        if char is char.toLowerCase()
+          @editor.setTextInBufferRange(range, char.toUpperCase())
+        else
+          @editor.setTextInBufferRange(range, char.toLowerCase())
+
+        unless point.column >= lastCharIndex
+          @editor.moveCursorRight()
+
+    @vimState.activateCommandMode()
 #
 # It changes everything selected by the following motion.
 #
@@ -204,6 +233,6 @@ class Mark extends OperatorWithInput
     @vimState.activateCommandMode()
 
 module.exports = {
-  Operator, OperatorWithInput, OperatorError, Delete, Change,
+  Operator, OperatorWithInput, OperatorError, Delete, ToggleCase, Change,
   Yank, Join, Repeat, Mark
 }
