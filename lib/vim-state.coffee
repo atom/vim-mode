@@ -25,6 +25,7 @@ class VimState
 
     @setupCommandMode()
     @registerInsertIntercept()
+    @registerInsertTransactionResets()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
@@ -54,6 +55,17 @@ class VimState
       else
         @clearOpStack()
         false
+
+  # Private: Reset transactions on input for undo/redo/repeat on several
+  # core and vim-mode events
+  registerInsertTransactionResets: ->
+    events = [ 'core:move-up'
+               'core:move-down'
+               'core:move-right'
+               'core:move-left' ]
+    @editorView.on events.join(' '), =>
+      @resetInputTransactions()
+
 
   # Private: Watches for any deletes on the current buffer and places it in the
   # last deleted buffer.
@@ -103,7 +115,7 @@ class VimState
       'outdent': => @linewiseAliasedOperator(Operators.Outdent)
       'auto-indent': => @linewiseAliasedOperator(Operators.Autoindent)
       'move-left': => new Motions.MoveLeft(@editor)
-      'move-up': => new Motions.MoveUp(@editor)
+      'move-up': => new Motions.MoveUp(@editor, @)
       'move-down': => new Motions.MoveDown(@editor)
       'move-right': => new Motions.MoveRight(@editor)
       'move-to-next-word': => new Motions.MoveToNextWord(@editor)
@@ -301,6 +313,11 @@ class VimState
   # Returns a search motion
   getSearchHistoryItem: (index) ->
     atom.workspace.vimState.searchHistory[index]
+
+  resetInputTransactions: ->
+    return unless @mode == 'insert' && @history[0]?.inputOperator?()
+    @deactivateInsertMode()
+    @activateInsertMode()
 
   ##############################################################################
   # Commands

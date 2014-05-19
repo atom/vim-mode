@@ -73,6 +73,7 @@ class MoveRight extends Motion
 
 class MoveUp extends Motion
   execute: (count=1) ->
+    @vimState.resetInputTransactions()
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorUp() if row > 0
