@@ -139,6 +139,8 @@ class VimState
       'mark': (e) => new Operators.Mark(@editorView, @)
       'find': (e) => new Motions.Find(@editorView, @)
       'find-backwards': (e) => new Motions.Find(@editorView, @).reverse()
+      'till': (e) => new Motions.Till(@editorView, @)
+      'till-backwards': (e) => new Motions.Till(@editorView, @).reverse()
       'replace': (e) => new Operators.Replace(@editorView, @)
       'search': (e) => new Motions.Search(@editorView, @)
       'reverse-search': (e) => (new Motions.Search(@editorView, @)).reversed()
@@ -154,7 +156,7 @@ class VimState
   registerCommands: (commands) ->
     for commandName, fn of commands
       do (fn) =>
-        @editorView.command "vim-mode:#{commandName}", fn
+        @editorView.command "vim-mode:#{commandName}.vim-mode", fn
 
   # Private: Register multiple operation-pushing Commands via an {Object} that
   # maps command names to functions that return operations to push.
@@ -277,12 +279,12 @@ class VimState
   # Private: Sets the value of a given mark.
   #
   # name  - The name of the mark to fetch.
-  # value {Point} - The value to set the mark to.
+  # pos {Point} - The value to set the mark to.
   #
   # Returns nothing.
   setMark: (name, pos) ->
-    # check to make sure name is in [a-z]
-    if (charCode = name.charCodeAt(0)) >= 97 and charCode <= 122
+    # check to make sure name is in [a-z] or is `
+    if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
       @marks[name] = pos
 
   # Public: Append a search to the search history.
@@ -399,10 +401,11 @@ class VimState
   #
   # e - The triggered event.
   #
-  # Returns nothing.
+  # Returns new motion or nothing.
   moveOrRepeat: (e) ->
     if @topOperation() instanceof Prefixes.Repeat
       @repeatPrefix(e)
+      null
     else
       new Motions.MoveToBeginningOfLine(@editor)
 

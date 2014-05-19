@@ -1,4 +1,11 @@
 ## HEAD
+* Fix E in visual mode @tony612
+* Implement `` @guanlun
+* Fix broken behavior when enabling/disabling @cadwallion
+* Enable search in visual mode @romankuznietsov
+* Fix end-of-line movement @abijr
+
+## 0.9.0 - Lots of new features
 * Enable arrow keys in visual mode @fholgado
 * Additional bindings for split pane movement @zenhob
 * Fix search on invalid regex @bhuga
@@ -11,6 +18,7 @@
 * More fixes for corner cases in paste behavior @SKAhack
 * Implement * and # @roman
 * Implement ~ @badunk
+* Implement t and T @udp
 
 ## 0.8.1 - Small goodies
 * Implement `ctrl-e` and `ctrl-y` @dougblack

@@ -2,12 +2,12 @@
 {ViewModel} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
 
-module.exports =
 class Find extends MotionWithInput
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
     @viewModel = new ViewModel(@, class: 'find', singleChar: true, hidden: true)
     @reversed = false
+    @offset = 0
 
   match: (count) ->
     currentPosition = @editorView.editor.getCursorBufferPosition()
@@ -17,7 +17,7 @@ class Find extends MotionWithInput
       for i in [0..count-1]
         index = line.lastIndexOf(@input.characters, index-1)
       if index != -1
-        point = new Point(currentPosition.row, index)
+        point = new Point(currentPosition.row, index+@offset)
         return {} =
           point: point
           range: new Range(point, currentPosition)
@@ -26,7 +26,7 @@ class Find extends MotionWithInput
       for i in [0..count-1]
         index = line.indexOf(@input.characters, index+1)
       if index != -1
-        point = new Point(currentPosition.row, index)
+        point = new Point(currentPosition.row, index-@offset)
         return {} =
           point: point
           range: new Range(currentPosition, point.translate([0,1]))
@@ -44,3 +44,10 @@ class Find extends MotionWithInput
       @editorView.editor.setSelectedBufferRange(match.range)
       return [true]
     [false]
+
+class Till extends Find
+  constructor: (@editorView, @vimState) ->
+    super(@editorView, @vimState)
+    @offset = 1
+
+module.exports = {Find, Till}
