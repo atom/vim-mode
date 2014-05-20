@@ -155,7 +155,7 @@ class Change extends Operator
 
   onLastRow: ->
     {row, column} = @editor.getCursorBufferPosition()
-    row == @editor.getBuffer().getLastRow()
+    row is @editor.getBuffer().getLastRow()
 
 #
 # It copies everything selected by the following motion.

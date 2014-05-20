@@ -241,28 +241,30 @@ describe "Operators", ->
         expect(editorView).not.toHaveClass 'command-mode'
         expect(editorView).toHaveClass 'insert-mode'
 
-      it "deletes the last line and enters insert mode", ->
-        editor.setCursorScreenPosition([2, 1])
+      describe "when the cursor is on the last line", ->
+        it "deletes the line's content and enters insert mode on the last line", ->
+          editor.setCursorScreenPosition([2, 1])
 
-        keydown('c')
-        keydown('c')
+          keydown('c')
+          keydown('c')
 
-        expect(editor.getText()).toBe "12345\nabcde\n"
-        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
-        expect(editorView).not.toHaveClass 'command-mode'
-        expect(editorView).toHaveClass 'insert-mode'
+          expect(editor.getText()).toBe "12345\nabcde\n"
+          expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+          expect(editorView).not.toHaveClass 'command-mode'
+          expect(editorView).toHaveClass 'insert-mode'
 
-      it "deletes the only line and enters insert mode", ->
-        editor.setText("12345")
-        editor.setCursorScreenPosition([0, 2])
+      describe "when the cursor is on the only line", ->
+        it "deletes the line's content and enters insert mode", ->
+          editor.setText("12345")
+          editor.setCursorScreenPosition([0, 2])
 
-        keydown('c')
-        keydown('c')
+          keydown('c')
+          keydown('c')
 
-        expect(editor.getText()).toBe ""
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-        expect(editorView).not.toHaveClass 'command-mode'
-        expect(editorView).toHaveClass 'insert-mode'
+          expect(editor.getText()).toBe ""
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+          expect(editorView).not.toHaveClass 'command-mode'
+          expect(editorView).toHaveClass 'insert-mode'
 
   describe "the C keybinding", ->
     beforeEach ->
