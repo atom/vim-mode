@@ -140,9 +140,22 @@ class Change extends Operator
   execute: (count=1) ->
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
-    operator.execute(count)
+
+    @editor.transact =>
+      lastRow = @onLastRow()
+      onlyRow = @editor.getBuffer().getLineCount() is 1
+      operator.execute(count)
+      if @motion.isLinewise?() and not onlyRow
+        if lastRow
+          @editor.insertNewlineBelow()
+        else
+          @editor.insertNewlineAbove()
 
     @vimState.activateInsertMode()
+
+  onLastRow: ->
+    {row, column} = @editor.getCursorBufferPosition()
+    row is @editor.getBuffer().getLastRow()
 
 #
 # It copies everything selected by the following motion.
