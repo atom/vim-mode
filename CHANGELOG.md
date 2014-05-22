@@ -5,6 +5,7 @@
 * Enable search in visual mode @romankuznietsov
 * Fix end-of-line movement @abijr
 * Fix behavior of change current line `cc` in various corner cases. @jcurtis
+* Fix some corner cases of `w` @abijr
 
 ## 0.9.0 - Lots of new features
 * Enable arrow keys in visual mode @fholgado
