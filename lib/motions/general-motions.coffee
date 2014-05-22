@@ -131,10 +131,16 @@ class MoveToNextWord extends Motion
       current = cursor.getBufferPosition()
       next = cursor.getBeginningOfNextWordBufferPosition()
 
-      if current != next
-        cursor.moveToBeginningOfNextWord()
-      else
+      return if @isEndOfFile()
+
+      if cursor.isAtEndOfLine()
+        cursor.moveDown()
+        cursor.moveToBeginningOfLine()
+        cursor.skipLeadingWhitespace()
+      else if current.row is next.row and current.column is next.column
         cursor.moveToEndOfWord()
+      else
+        cursor.moveToBeginningOfNextWord()
 
   # Options
   #  excludeWhitespace - if true, whitespace shouldn't be selected
@@ -151,6 +157,11 @@ class MoveToNextWord extends Motion
         @editor.selectToBeginningOfNextWord()
 
       true
+
+  isEndOfFile: ->
+    cur = @editor.getCursor().getBufferPosition()
+    eof = @editor.getEofBufferPosition()
+    cur.row is eof.row and cur.column is eof.column
 
 class MoveToNextWholeWord extends Motion
   execute: (count=1) ->
