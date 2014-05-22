@@ -1,9 +1,9 @@
-'.vim-mode:not(.command-mode)':
+'.workspace .editor.vim-mode:not(.command-mode)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
   'ctrl-[': 'vim-mode:activate-command-mode'
 
-'.vim-mode:not(.insert-mode)':
+'.workspace .editor.vim-mode:not(.insert-mode)':
   'h': 'vim-mode:move-left'
   'left': 'vim-mode:move-left'
   'backspace': 'core:move-left'
@@ -108,7 +108,7 @@
   '8': 'vim-mode:repeat-prefix'
   '9': 'vim-mode:repeat-prefix'
 
-'.vim-mode.command-mode':
+'.workspace .editor.vim-mode.command-mode':
   'i': 'vim-mode:activate-insert-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'
   'V': 'vim-mode:activate-linewise-visual-mode'
@@ -161,9 +161,9 @@
   '" %': 'vim-mode:register-prefix'
   '" _': 'vim-mode:register-prefix'
 
-'.vim-mode.operator-pending-mode, .vim-mode.visual-mode':
+'.workspace .editor.vim-mode.operator-pending-mode, .workspace .editor.vim-mode.visual-mode':
   'i w': 'vim-mode:select-inside-word'
 
-'.vim-mode.visual-mode':
+'.workspace .editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
   's': 'vim-mode:change'
