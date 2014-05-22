@@ -1,4 +1,6 @@
 ## HEAD
+
+## 0.10.0
 * Fix E in visual mode @tony612
 * Implement `` @guanlun
 * Fix broken behavior when enabling/disabling @cadwallion
