@@ -33,6 +33,8 @@ keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
   dispatchKeyboardEvent = (target, eventArgs...) ->
     e = document.createEvent('KeyboardEvent')
     e.initKeyboardEvent eventArgs...
+    # 0 is the default, and it's valid ASCII, but it's wrong.
+    Object.defineProperty(e, 'keyCode', get: -> undefined) if e.keyCode is 0
     target.dispatchEvent e
 
   dispatchTextEvent = (target, eventArgs...) ->
