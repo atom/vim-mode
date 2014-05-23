@@ -1,6 +1,14 @@
 ## HEAD
+
+## 0.10.0
 * Fix E in visual mode @tony612
 * Implement `` @guanlun
+* Fix broken behavior when enabling/disabling @cadwallion
+* Enable search in visual mode @romankuznietsov
+* Fix end-of-line movement @abijr
+* Fix behavior of change current line `cc` in various corner cases. @jcurtis
+* Fix some corner cases of `w` @abijr
+* Don't hide cursor in visual mode @dyross
 
 ## 0.9.0 - Lots of new features
 * Enable arrow keys in visual mode @fholgado

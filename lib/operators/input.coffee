@@ -47,11 +47,24 @@ class Change extends Input
     @editor.beginTransaction() unless @typed
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
+
+    lastRow = @onLastRow()
+    onlyRow = @editor.getBuffer().getLineCount() is 1
     operator.execute(count)
+    if @motion.isLinewise?() and not onlyRow
+      if lastRow
+        @editor.insertNewlineBelow()
+      else
+        @editor.insertNewlineAbove()
+
     return super if @typed
 
     @vimState.activateInsertMode(transactionStarted = true)
     @typed = true
+
+  onLastRow: ->
+    {row, column} = @editor.getCursorBufferPosition()
+    row is @editor.getBuffer().getLastRow()
 
 # Takes a transaction and turns it into a string of what was typed.
 class TransactionBundler

@@ -91,6 +91,23 @@
   't': 'vim-mode:till'
   'T': 'vim-mode:till-backwards'
 
+  '/': 'vim-mode:search'
+  '?': 'vim-mode:reverse-search'
+  '*': 'vim-mode:search-current-word'
+  '#': 'vim-mode:reverse-search-current-word'
+  'n': 'vim-mode:repeat-search'
+  'N': 'vim-mode:repeat-search-backwards'
+
+  '1': 'vim-mode:repeat-prefix'
+  '2': 'vim-mode:repeat-prefix'
+  '3': 'vim-mode:repeat-prefix'
+  '4': 'vim-mode:repeat-prefix'
+  '5': 'vim-mode:repeat-prefix'
+  '6': 'vim-mode:repeat-prefix'
+  '7': 'vim-mode:repeat-prefix'
+  '8': 'vim-mode:repeat-prefix'
+  '9': 'vim-mode:repeat-prefix'
+
 '.vim-mode.command-mode':
   'i': 'vim-mode:activate-insert-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'
@@ -143,25 +160,6 @@
   '" +': 'vim-mode:register-prefix'
   '" %': 'vim-mode:register-prefix'
   '" _': 'vim-mode:register-prefix'
-
-'.vim-mode.command-mode, .vim-mode.operator-pending-mode':
-  '/': 'vim-mode:search'
-  '?': 'vim-mode:reverse-search'
-  '*': 'vim-mode:search-current-word'
-  '#': 'vim-mode:reverse-search-current-word'
-  'n': 'vim-mode:repeat-search'
-  'N': 'vim-mode:repeat-search-backwards'
-
-  '1': 'vim-mode:repeat-prefix'
-  '2': 'vim-mode:repeat-prefix'
-  '3': 'vim-mode:repeat-prefix'
-  '4': 'vim-mode:repeat-prefix'
-  '5': 'vim-mode:repeat-prefix'
-  '6': 'vim-mode:repeat-prefix'
-  '7': 'vim-mode:repeat-prefix'
-  '8': 'vim-mode:repeat-prefix'
-  '9': 'vim-mode:repeat-prefix'
-  '0': 'vim-mode:repeat-prefix'
 
 '.vim-mode.operator-pending-mode, .vim-mode.visual-mode':
   'i w': 'vim-mode:select-inside-word'

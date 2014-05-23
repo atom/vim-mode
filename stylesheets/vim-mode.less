@@ -7,7 +7,7 @@
   opacity: 0.5;
 }
 
-.vim-mode.command-mode, .vim-mode.operator-pending-mode {
+.vim-mode.command-mode, .vim-mode.operator-pending-mode, .vim-mode.visual-mode {
   .cursor, .cursor.blink-off {
     .block-cursor(hidden);
   }
@@ -18,6 +18,13 @@
     }
   }
 }
+
+.vim-mode.visual-mode {
+  .cursor.hidden-cursor {
+    display: block;
+  }
+}
+
 .command-mode-input .editor.mini {
   background-color: inherit;
   border: none;

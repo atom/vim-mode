@@ -77,7 +77,7 @@ describe "Motions", ->
     describe "as a motion", ->
       beforeEach -> editor.setCursorScreenPosition([0, 0])
 
-      xit "moves the cursor to the beginning of the next word", ->
+      it "moves the cursor to the beginning of the next word", ->
         keydown('w')
         expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
@@ -103,7 +103,11 @@ describe "Motions", ->
         expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
         keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [3, 2]
+        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+
+        # After cursor gets to the EOF, it should stay there.
+        keydown('w')
+        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
       it "moves the cursor to the end of the word if last word in file", ->
         editor.setText("abc")
@@ -492,14 +496,20 @@ describe "Motions", ->
 
   describe "the $ keybinding", ->
     beforeEach ->
-      editor.setText("  abcde\n")
+      editor.setText("  abcde\n\n")
       editor.setCursorScreenPosition([0, 4])
+
+    describe "as a motion from empty line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 0])
+
+      it "moves the cursor to the end of the line", ->
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
     describe "as a motion", ->
       beforeEach -> keydown('$')
 
       # FIXME: See atom/vim-mode#2
-      xit "moves the cursor to the end of the line", ->
+      it "moves the cursor to the end of the line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     describe "as a selection", ->
@@ -508,9 +518,8 @@ describe "Motions", ->
         keydown('$')
 
       it "selects to the beginning of the lines", ->
-        expect(editor.getText()).toBe "  ab\n"
-        # FIXME: See atom/vim-mode#2
-        #expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+        expect(editor.getText()).toBe "  ab\n\n"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
   # FIXME: this doesn't work as we can't determine if this is a motion
   # or part of a repeat prefix.
@@ -606,6 +615,30 @@ describe "Motions", ->
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
         keydown('n')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+      it 'works with selection in visual mode', ->
+        editor.setText('one two three')
+        keydown('v')
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'th'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 8]
+        keydown('d')
+        expect(editor.getText()).toBe 'three'
+
+      it 'extends selection when repeating search in visual mode', ->
+        editor.setText('line1\nline2\nline3')
+        keydown('v')
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'line'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        {start, end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 1
+        keydown('n')
+        {start,end} = editor.getSelectedBufferRange()
+        expect(start.row).toEqual 0
+        expect(end.row).toEqual 2
 
       describe "repeating", ->
         it "does nothing with no search history", ->
@@ -923,7 +956,7 @@ describe "Motions", ->
       keydown('`')
       commandModeInputKeydown('`')
       expect(editor.getCursorBufferPosition()).toEqual [1,5]
-      
+
 
   describe 'the f/F keybindings', ->
     beforeEach ->

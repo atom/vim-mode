@@ -167,7 +167,7 @@ class VimState
   registerCommands: (commands) ->
     for commandName, fn of commands
       do (fn) =>
-        @editorView.command "vim-mode:#{commandName}", fn
+        @editorView.command "vim-mode:#{commandName}.vim-mode", fn
 
   # Private: Register multiple operation-pushing Commands via an {Object} that
   # maps command names to functions that return operations to push.
@@ -428,10 +428,11 @@ class VimState
   #
   # e - The triggered event.
   #
-  # Returns nothing.
+  # Returns new motion or nothing.
   moveOrRepeat: (e) ->
     if @topOperation() instanceof Prefixes.Repeat
       @repeatPrefix(e)
+      null
     else
       new Motions.MoveToBeginningOfLine(@editor)
 
