@@ -320,7 +320,7 @@ class MoveToLine extends Motion
 
   # Options
   #  requireEOL - if true, ensure an end of line character is always selected
-  select: (count=1, {requireEOL}={}) ->
+  select: (count=@editor.getLineCount(), {requireEOL}={}) ->
     {row, column} = @editor.getCursorBufferPosition()
     @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
 
@@ -401,6 +401,11 @@ class MoveToLastCharacterOfLine extends Motion
 class MoveToStartOfFile extends MoveToLine
   getDestinationRow: (count=1) ->
     count - 1
+
+  select: (count=1) ->
+    {row, column} = @editor.getCursorBufferPosition()
+    bufferRange = new Range([row,column+1], [0,0])
+    @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
 class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
