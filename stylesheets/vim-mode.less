@@ -1,4 +1,5 @@
 @import "syntax-variables";
+@import "ui-variables";
 
 .block-cursor(@visibility: visible) {
   border: 0;
@@ -30,8 +31,7 @@
   border: none;
   width: 100%;
   font-weight: normal;
-  color: #aaaaaa;
-  text-shadow: 0 -1px 0 #333333;
+  color: @text-color;
   // see also the commandModeInputViewFontSize setting.
   line-height: 1.28;
   cursor: default;
