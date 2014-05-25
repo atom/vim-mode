@@ -9,6 +9,7 @@ TextObjects = require './text-objects'
 Utils = require './utils'
 Panes = require './panes'
 Scroll = require './scroll'
+{$$, Point, Range} = require 'atom'
 
 module.exports =
 class VimState
@@ -62,6 +63,66 @@ class VimState
   registerChangeHandler: (buffer) ->
     buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
       return unless @setRegister?
+      substr = '\n';
+      numNew = pos = 0
+      numNew++ while pos = 1 + newText.indexOf substr, pos
+      numOld = pos = 0
+      numOld++ while pos = 1 + oldText.indexOf substr, pos
+
+      diff = numNew - numOld
+      nrStart = newRange.start.toArray()
+      nrEnd = newRange.end.toArray()
+
+      orStart = oldRange.start.toArray()
+      orEnd = oldRange.end.toArray()
+
+      if oldRange.containsRange(newRange)
+        insert = false
+        rangeA = oldRange
+        rangeB = newRange
+        text = 'case1'
+      else
+        insert = true
+        rangeA = newRange
+        rangeB = oldRange
+        text = 'case2'
+      if not rangeA.isEmpty() && not rangeB.isEmpty()
+        alert 'both not empty ' + text
+
+      if rangeA.start.compare(rangeA.end) == -1
+        for k,v of @marks
+          #the change is entirely before the mark
+          q = v.toArray();
+          if insert
+            if rangeB.end.compare(v) != 1
+              if rangeB.end.toArray()[0] == q[0]
+                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.start.toArray()[1] + rangeA.end.toArray()[1])
+              else
+                @marks[k] = new Point(q[0] + diff,q[1])
+          else
+            if rangeA.end.compare(v) != 1
+              #the end of the range is on the same line as the mark
+              if rangeA.end.toArray()[0] == q[0]
+                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.end.toArray()[1] + rangeA.start.toArray()[1])
+              else
+                @marks[k] = new Point(q[0] + diff,q[1])
+      else
+        for k,v of @marks
+          #the change is entirely before the mark
+          q = v.toArray();
+          if insert
+            #the end of the range is on the same line as the mark
+            if rangeB.start.compare(v) != 1
+              if rangeB.start.toArray()[0] == q[0]
+                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.end.toArray()[1] + rangeA.start.toArray()[1])
+              else
+                @marks[k] = new Point(q[0] + diff,q[1])
+          else
+            if rangeA.start.compare(v) != 1
+              if rangeA.start.toArray()[0] == q[0]
+                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.start.toArray()[1] + rangeA.end.toArray()[1])
+              else
+                @marks[k] = new Point(q[0] + diff,q[1])
 
       if newText == ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
