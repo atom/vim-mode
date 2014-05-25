@@ -14,6 +14,9 @@ Sizable portions of Vim's command mode work as you'd expect, including
 many complex combinations. Even so, this package is far from finished (Vim
 wasn't built in a day).
 
+Currently, vim-mode requires soft line wraps to be disabled, and has some issues
+with international keyboard layouts.
+
 If there's a feature of Vim you're missing, it might just be that you use it
 more often than other developers. Adding a feature can be quick and easy. Check
 out the [closed pull requests](https://github.com/atom/vim-mode/pulls?direction=desc&page=1&sort=created&state=closed)
