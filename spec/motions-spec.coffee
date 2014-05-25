@@ -349,16 +349,13 @@ describe "Motions", ->
         keydown('b')
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
-        # FIXME: The definition of Cursor#getMovePreviousWordBoundaryBufferPosition
-        # will always stop on the last word in the buffer. The question is should
-        # we change this behavior.
-        #
-        # See atom/vim-mode#3
-        #keydown('b')
-        #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        # Go to start of the file, after moving past the first word
+        keydown('b')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-        #keydown('b')
-        #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        # Stay at the start of the file
+        keydown('b')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "as a selection", ->
       describe "within a word", ->
