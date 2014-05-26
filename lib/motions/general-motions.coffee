@@ -96,8 +96,7 @@ class MoveDown extends Motion
 class MoveToPrevious extends Motion
   ensureCharUnderCursorSelection: ->
     doEnsure = @isCharacterwise() and not @editor.getSelectedText().length
-    if doEnsure
-      @editor.moveCursorRight()
+    @editor.moveCursorRight() if doEnsure
     doEnsure
 
   isCharacterwise: ->
