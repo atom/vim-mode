@@ -531,6 +531,91 @@ describe "Motions", ->
       it "moves the cursor to the beginning of the line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
+  describe "the - keybinding", ->
+    beforeEach ->
+      editor.setText("abcdefg\n  abc\n  abc\n")
+
+    describe "from the middle of a line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 4])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('-')
+
+        it "moves the cursor to the first character of the previous line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('-')
+
+        it 'deletes the current and previous line', ->
+          expect(editor.getText()).toBe "  abc\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    describe "from the first character of a line indented the same as the previous one", ->
+      beforeEach -> editor.setCursorScreenPosition([2, 2])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('-')
+
+        it "moves to the first character of the previous line (directly above)", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('-')
+
+        it "selects to the first character of the previous line (directly above)", ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    describe "from the beginning of a line preceded by an indented line", ->
+      beforeEach -> editor.setCursorScreenPosition([2, 0])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('-')
+
+        it "moves the cursor to the first character of the previous line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('-')
+
+        it 'selects to the first character of the previous line', ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "with a count", ->
+      beforeEach ->
+        editor.setText("1\n2\n3\n4\n5\n6\n")
+        editor.setCursorScreenPosition([4, 0])
+
+      describe "as a motion", ->
+        beforeEach ->
+          keydown('3')
+          keydown('-')
+
+        it "moves the cursor to the first character of that many lines previous", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('3')
+          keydown('-')
+
+        it 'deletes the current line plus that many previous lines', ->
+          expect(editor.getText()).toBe "1\n6\n"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+  describe "the + keybinding (which should also be equivalent to the enter keybinding)", ->
+    # TODO copy the tests for the - keybinding into here, and then
+    #  change the values to expect downwards instead of upwards movement
+
   describe "the gg keybinding", ->
     beforeEach ->
       editor.setText(" 1abc\n 2\n3\n")
