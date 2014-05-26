@@ -168,26 +168,6 @@ describe "VimState", ->
       expect(editorView).not.toHaveClass 'insert-mode'
       expect(editorView).not.toHaveClass 'visual-mode'
 
-    it "allows undoing an entire batch of typing", ->
-      keydown 'i'
-      editor.setText("abc")
-      keydown 'escape'
-      keydown 'a'
-      editor.setText("abcdef")
-      keydown 'escape'
-      expect(editor.getText()).toBe "abcdef"
-      keydown 'u'
-      expect(editor.getText()).toBe "abc"
-      keydown 'u'
-      expect(editor.getText()).toBe ""
-
-    it "allows repeating typing", ->
-      keydown 'i'
-      editor.setText("abc")
-      keydown 'escape'
-      keydown '.'
-      editor.setText("ababcc")
-
   describe "visual-mode", ->
     beforeEach -> keydown('v')
 

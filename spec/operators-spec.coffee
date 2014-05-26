@@ -814,6 +814,46 @@ describe "Operators", ->
       expect(editor.getText()).toBe 'AbC'
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+  describe "the i keybinding", ->
+    beforeEach ->
+      editor.setText('')
+      editor.setCursorBufferPosition([0, 0])
+
+    it "allows undoing an entire batch of typing", ->
+      keydown 'i'
+      editor.setText("abc")
+      keydown 'escape'
+      keydown 'i'
+      editor.setText("abcdef")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abcdef"
+      keydown 'u'
+      expect(editor.getText()).toBe "abc"
+      keydown 'u'
+      expect(editor.getText()).toBe ""
+
+    it "allows repeating typing", ->
+      keydown 'i'
+      editor.setText("abc")
+      keydown 'escape'
+      keydown '.'
+      editor.setText("ababcc")
+
+    # This one doesn't work because we can't simulate typing correctly,
+    # and VimState#resetInputTransactions actually inspects buffer patches to
+    # build patches for repeating
+    xit "resets transactions for repeats after movement", ->
+      editor.setText("abc\n123")
+      keydown 'i'
+      editor.setText("defabc\n123")
+      editorView.trigger 'core:move-down'
+      expect(editor.getCursorBufferPosition()).toEqual [1, 3]
+      editor.setText("defabc\n456123")
+      keydown 'escape'
+      editor.setCursorBufferPosition([0, 0])
+      keydown '.'
+      expect(editor.getText()).toEqual "456defabc\n456123"
+
   describe 'the a keybinding', ->
     beforeEach ->
       editor.setText('')
