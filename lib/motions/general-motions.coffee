@@ -398,6 +398,24 @@ class MoveToLastCharacterOfLine extends Motion
       @editor.selectToEndOfLine()
       true
 
+class MoveToFirstCharacterOfLineUp extends Motion
+  execute: (count=1) ->
+    (new MoveUp(@editor)).execute(count)
+    (new MoveToFirstCharacterOfLine(@editor)).execute()
+
+  select: (count=1) ->
+    (new MoveUp(@editor)).select(count)
+    (new MoveToFirstCharacterOfLine(@editor)).select()
+
+class MoveToFirstCharacterOfLineDown extends Motion
+  execute: (count=1) ->
+    (new MoveDown(@editor)).execute(count)
+    (new MoveToFirstCharacterOfLine(@editor)).execute()
+
+  select: (count=1) ->
+    (new MoveDown(@editor)).select(count)
+    (new MoveToFirstCharacterOfLine(@editor)).select()
+
 class MoveToStartOfFile extends MoveToLine
   getDestinationRow: (count=1) ->
     count - 1
@@ -437,6 +455,7 @@ module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
   MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
 }
