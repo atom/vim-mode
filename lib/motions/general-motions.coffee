@@ -37,8 +37,9 @@ class MotionWithInput extends Motion
     @complete = true
 
 class MoveLeft extends Motion
-  @vimState.resetInputTransactions()
+
   execute: (count=1) ->
+    @vimState.resetInputTransactions()
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorLeft() if column > 0
