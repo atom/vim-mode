@@ -5,12 +5,6 @@ _ = require 'underscore-plus'
 # used as the user types, but is created when the user leaves insert mode,
 # and is available for repeating with the . operator (Replace)
 #
-# Currently, limitations with Transaction (from the text-buffer package)
-# prevent us from doing anything reasonable with text input if it is
-# anything but straight-up typed characters. No backspacing. It won't match
-# vim when using the substitution command. You'll regret using this code.
-# Never use this code.
-#
 class Input extends Operator
   standalone: true
 
