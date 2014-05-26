@@ -353,6 +353,33 @@ describe "Operators", ->
       it "saves the first word to the default register", ->
         expect(vimState.getRegister('"').text).toBe '345'
 
+  describe "the yy keybinding", ->
+    describe "on a single line file", ->
+      beforeEach ->
+        editor.getBuffer().setText "exclamation!\n"
+        editor.setCursorScreenPosition [0, 0]
+
+      it "copies the entire line and pastes it correctly", ->
+        keydown('y')
+        keydown('y')
+        keydown('p')
+
+        expect(vimState.getRegister('"').text).toBe "exclamation!\n"
+        expect(editor.getText()).toBe "exclamation!\nexclamation!\n"
+
+    describe "on a single line file with no newline", ->
+      beforeEach ->
+        editor.getBuffer().setText "no newline!"
+        editor.setCursorScreenPosition [0, 0]
+
+      it "copies the entire line and pastes it correctly", ->
+        keydown('y')
+        keydown('y')
+        keydown('p')
+
+        expect(vimState.getRegister('"').text).toBe "no newline!"
+        expect(editor.getText()).toBe "no newline!\nno newline!"
+
   describe "the Y keybinding", ->
     beforeEach ->
       editor.getBuffer().setText "012 345\nabc\n"

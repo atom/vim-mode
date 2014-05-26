@@ -1,4 +1,5 @@
 ## HEAD
+* Fix `gg` and `G` in visual mode @cadwallion
 
 ## 0.10.0
 * Fix E in visual mode @tony612

@@ -349,16 +349,13 @@ describe "Motions", ->
         keydown('b')
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
-        # FIXME: The definition of Cursor#getMovePreviousWordBoundaryBufferPosition
-        # will always stop on the last word in the buffer. The question is should
-        # we change this behavior.
-        #
-        # See atom/vim-mode#3
-        #keydown('b')
-        #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        # Go to start of the file, after moving past the first word
+        keydown('b')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-        #keydown('b')
-        #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        # Stay at the start of the file
+        keydown('b')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "as a selection", ->
       describe "within a word", ->
@@ -556,6 +553,19 @@ describe "Motions", ->
       it "moves the cursor to a specified line", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
+    describe "as a selection", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([1, 1])
+        vimState.activateVisualMode()
+        keydown('g')
+        keydown('g')
+
+      it "selects to the first line in the file", ->
+        expect(editor.getSelectedText()).toBe " 1abc\n 2"
+
+      it "moves the cursor to a specified line", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
   describe "the G keybinding", ->
     beforeEach ->
       editor.setText("1\n    2\n 3abc\n ")
@@ -574,6 +584,18 @@ describe "Motions", ->
 
       it "moves the cursor to a specified line", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+
+    describe "as a selection", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([1, 0])
+        vimState.activateVisualMode()
+        keydown('G', shift: true)
+
+      it "selects to the last line in the file", ->
+        expect(editor.getSelectedText()).toBe "    2\n 3abc\n "
+
+      it "moves the cursor to the last line after whitespace", ->
+        expect(editor.getCursorScreenPosition()).toEqual [3,1]
 
   describe "the / keybinding", ->
     beforeEach ->
