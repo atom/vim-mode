@@ -91,12 +91,12 @@ class VimState
       'repeat-prefix': (e) => @repeatPrefix(e)
 
     @registerOperationCommands
-      'activate-insert-mode': => new Operators.Input(@editor, @)
+      'activate-insert-mode': => new Operators.Insert(@editor, @)
       'substitute': => new Commands.Substitute(@editor, @)
       'substitute-line': => new Commands.SubstituteLine(@editor, @)
-      'insert-after': => new Commands.InsertAfter(@editor, @)
-      'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Commands.InsertAfter(@editor, @)]
-      'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Commands.Insert(@editor, @)]
+      'insert-after': => new Operators.InsertAfter(@editor, @)
+      'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Operators.InsertAfter(@editor, @)]
+      'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Operators.Insert(@editor, @)]
       'insert-above-with-newline': => new Commands.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new Commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(Operators.Delete)
@@ -114,10 +114,10 @@ class VimState
       'indent': => @linewiseAliasedOperator(Operators.Indent)
       'outdent': => @linewiseAliasedOperator(Operators.Outdent)
       'auto-indent': => @linewiseAliasedOperator(Operators.Autoindent)
-      'move-left': => new Motions.MoveLeft(@editor)
+      'move-left': => new Motions.MoveLeft(@editor, @)
       'move-up': => new Motions.MoveUp(@editor, @)
-      'move-down': => new Motions.MoveDown(@editor)
-      'move-right': => new Motions.MoveRight(@editor)
+      'move-down': => new Motions.MoveDown(@editor, @)
+      'move-right': => new Motions.MoveRight(@editor, @)
       'move-to-next-word': => new Motions.MoveToNextWord(@editor)
       'move-to-next-whole-word': => new Motions.MoveToNextWholeWord(@editor)
       'move-to-end-of-word': => new Motions.MoveToEndOfWord(@editor)

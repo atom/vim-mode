@@ -5,7 +5,7 @@ _ = require 'underscore-plus'
 # used as the user types, but is created when the user leaves insert mode,
 # and is available for repeating with the . operator (Replace)
 #
-class Input extends Operator
+class Insert extends Operator
   standalone: true
 
   isComplete: -> @standalone || super
@@ -24,10 +24,15 @@ class Input extends Operator
 
   inputOperator: -> true
 
+class InsertAfter extends Insert
+  execute: ->
+    @editor.moveCursorRight() unless @editor.getCursor().isAtEndOfLine()
+    super
+
 #
 # Delete the following motion and enter insert mode to replace it.
 #
-class Change extends Input
+class Change extends Insert
   standalone: false
 
   # Public: Changes the text selected by the given motion.
@@ -79,4 +84,4 @@ class TransactionBundler
   isBackspacedChar: (patch) ->
     patch.newText == "" and patch.oldText?.length == 1
 
-module.exports = {Input, Change}
+module.exports = {Insert, InsertAfter, Change}

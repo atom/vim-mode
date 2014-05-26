@@ -813,3 +813,24 @@ describe "Operators", ->
 
       expect(editor.getText()).toBe 'AbC'
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+  describe 'the a keybinding', ->
+    beforeEach ->
+      editor.setText('')
+      editor.setCursorBufferPosition([0, 0])
+
+    it "can be undone in one go", ->
+      keydown 'a'
+      editor.setText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abc"
+      keydown 'u'
+      expect(editor.getText()).toBe ""
+
+    it "repeats correctly", ->
+      keydown 'a'
+      editor.setText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abc"
+      keydown '.'
+      expect(editor.getText()).toBe "abcabc"
