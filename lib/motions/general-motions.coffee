@@ -37,6 +37,7 @@ class MotionWithInput extends Motion
     @complete = true
 
 class MoveLeft extends Motion
+  @vimState.resetInputTransactions()
   execute: (count=1) ->
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
@@ -54,6 +55,7 @@ class MoveLeft extends Motion
 
 class MoveRight extends Motion
   execute: (count=1) ->
+    @vimState.resetInputTransactions()
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
@@ -85,6 +87,7 @@ class MoveUp extends Motion
 
 class MoveDown extends Motion
   execute: (count=1) ->
+    @vimState.resetInputTransactions()
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
