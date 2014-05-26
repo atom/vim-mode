@@ -553,7 +553,7 @@ describe "Motions", ->
       it "moves the cursor to a specified line", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-    describe "as a selection", ->
+    describe "as a characterwise selection", ->
       beforeEach ->
         editor.setCursorScreenPosition([1, 1])
         vimState.activateVisualMode()
@@ -561,21 +561,48 @@ describe "Motions", ->
         keydown('g')
 
       it "selects to the first line in the file", ->
-        expect(editor.getSelectedText()).toBe " 1abc\n 2"
+        expect(editor.getSelectedText()).toBe "1abc\n 2"
+
+      it "moves the cursor to a specified line", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+    describe "as a linewise selection", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([1, 0])
+        vimState.activateVisualMode('linewise')
+        keydown('g')
+        keydown('g')
+
+      it "selects to the first line in the file", ->
+        expect(editor.getSelectedText()).toBe " 1abc\n 2\n"
 
       it "moves the cursor to a specified line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-    describe "as a repeated selection motion", ->
+    describe "as a repeated characterwise selection motion", ->
       beforeEach ->
-        editor.setCursorScreenPosition([2, 1])
+        editor.setCursorScreenPosition([2, 0])
         vimState.activateVisualMode()
         keydown('2')
         keydown('g')
         keydown('g')
 
+      it "selects to a first character of specified line", ->
+        expect(editor.getSelectedText()).toBe "2\n3"
+
+      it "moves the cursor to a specified line", ->
+        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+    describe "as a repeated linewise selection motion", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([2, 0])
+        vimState.activateVisualMode('linewise')
+        keydown('2')
+        keydown('g')
+        keydown('g')
+
       it "selects to a specified line", ->
-        expect(editor.getSelectedText()).toBe " 2\n3"
+        expect(editor.getSelectedText()).toBe " 2\n3\n"
 
       it "moves the cursor to a specified line", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
