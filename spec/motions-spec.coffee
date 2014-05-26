@@ -566,6 +566,20 @@ describe "Motions", ->
       it "moves the cursor to a specified line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
+    describe "as a repeated selection motion", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([2, 1])
+        vimState.activateVisualMode()
+        keydown('2')
+        keydown('g')
+        keydown('g')
+
+      it "selects to a specified line", ->
+        expect(editor.getSelectedText()).toBe " 2\n3"
+
+      it "moves the cursor to a specified line", ->
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
   describe "the G keybinding", ->
     beforeEach ->
       editor.setText("1\n    2\n 3abc\n ")

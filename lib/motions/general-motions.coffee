@@ -404,7 +404,7 @@ class MoveToStartOfFile extends MoveToLine
 
   select: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
-    bufferRange = new Range([row,column+1], [0,0])
+    bufferRange = new Range([row, column + 1], [@getDestinationRow(count), 0])
     @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
 class MoveToTopOfScreen extends MoveToScreenLine
