@@ -93,17 +93,28 @@ class MoveDown extends Motion
       @editor.selectDown()
       true
 
-class MoveToPreviousWord extends Motion
+class MoveToPrevious extends Motion
+  ensureCharUnderCursorSelection: ->
+    doEnsure = @isCharacterwise() and not @editor.getSelectedText().length
+    @editor.moveCursorRight() if doEnsure
+    doEnsure
+
+  isCharacterwise: ->
+    {mode, submode} = @vimState
+    mode is 'visual' and submode is 'characterwise'
+
+class MoveToPreviousWord extends MoveToPrevious
   execute: (count=1) ->
     _.times count, =>
       @editor.moveCursorToBeginningOfWord()
 
   select: (count=1) ->
     _.times count, =>
+      @ensureCharUnderCursorSelection()
       @editor.selectToBeginningOfWord()
       true
 
-class MoveToPreviousWholeWord extends Motion
+class MoveToPreviousWholeWord extends MoveToPrevious
   execute: (count=1) ->
     _.times count, =>
       @editor.moveCursorToBeginningOfWord()
@@ -111,6 +122,7 @@ class MoveToPreviousWholeWord extends Motion
 
   select: (count=1) ->
     _.times count, =>
+      @ensureCharUnderCursorSelection()
       @editor.selectToBeginningOfWord()
       @editor.selectToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
       true
@@ -120,7 +132,7 @@ class MoveToPreviousWholeWord extends Motion
     char is ' ' or char is '\n'
 
   isBeginningOfFile: ->
-    cur = @editor.getCursorBufferPosition();
+    cur = @editor.getCursorBufferPosition()
     not cur.row and not cur.column
 
 class MoveToNextWord extends Motion
@@ -287,13 +299,14 @@ class MoveToNextParagraph extends Motion
 
     @editor.screenPositionForBufferPosition(position)
 
-class MoveToPreviousParagraph extends Motion
+class MoveToPreviousParagraph extends MoveToPrevious
   execute: (count=1) ->
     _.times count, =>
       @editor.setCursorScreenPosition(@previousPosition())
 
   select: (count=1) ->
     _.times count, =>
+      @ensureCharUnderCursorSelection()
       @editor.selectToScreenPosition(@previousPosition())
       true
 

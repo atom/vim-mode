@@ -312,6 +312,26 @@ describe "Motions", ->
         keydown('{')
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
+      describe 'in characterwise visual mode', ->
+        beforeEach -> keydown('v')
+
+        it 'selects from the cursor up to the beginning of the previous paragraph', ->
+          keydown('{')
+          expect(editor.getCursorScreenPosition()).toEqual [7, 0]
+          expect(editor.getSelectedText()).toEqual '\n  \nt'
+
+          keydown('{')
+          expect(editor.getCursorScreenPosition()).toEqual [5, 0]
+          expect(editor.getSelectedText()).toEqual '\nzip\n\n  \nt'
+
+          keydown('{')
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+          expect(editor.getSelectedText()).toEqual '\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nt'
+
+          keydown('{')
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+          expect(editor.getSelectedText()).toEqual 'abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nt'
+
     describe "as a selection", ->
       beforeEach ->
         editor.setCursorScreenPosition([7, 0])
@@ -357,6 +377,42 @@ describe "Motions", ->
         keydown('b')
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
+      describe 'in characterwise visual mode', ->
+        beforeEach -> keydown('v')
+
+        it 'selects from the cursor up to the beginning of the previous word', ->
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [4, 1]
+          expect(editor.getSelectedText()).toEqual 'l'
+
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [3, 4]
+          expect(editor.getSelectedText()).toEqual '}\n l'
+
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+          expect(editor.getSelectedText()).toEqual 'zip }\n l'
+
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+          expect(editor.getSelectedText()).toEqual '\nzip }\n l'
+
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+          expect(editor.getSelectedText()).toEqual 'xyz\n\nzip }\n l'
+
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+          expect(editor.getSelectedText()).toBe '+- \n xyz\n\nzip }\n l'
+
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+          expect(editor.getSelectedText()).toBe 'cde1+- \n xyz\n\nzip }\n l'
+
+          keydown('b')
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+          expect(editor.getSelectedText()).toBe 'ab cde1+- \n xyz\n\nzip }\n l'
+
     describe "as a selection", ->
       describe "within a word", ->
         beforeEach ->
@@ -399,6 +455,30 @@ describe "Motions", ->
 
         keydown('B', shift:true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      describe 'in characterwise visual mode', ->
+        beforeEach -> keydown('v')
+
+        it 'selects from the cursor up to the beginning of the previous whole word', ->
+          keydown('B', shift: true)
+          expect(editor.getCursorScreenPosition()).toEqual [3, 1]
+          expect(editor.getSelectedText()).toEqual 'zip'
+
+          keydown('B', shift: true)
+          expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+          expect(editor.getSelectedText()).toEqual '\n zip'
+
+          keydown('B', shift: true)
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+          expect(editor.getSelectedText()).toEqual 'xyz-123\n\n zip'
+
+          keydown('B', shift: true)
+          expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+          expect(editor.getSelectedText()).toEqual 'ab \n xyz-123\n\n zip'
+
+          keydown('B', shift: true)
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+          expect(editor.getSelectedText()).toEqual 'cde1+- ab \n xyz-123\n\n zip'
 
     describe "as a selection", ->
       it "selects to the beginning of the whole word", ->
