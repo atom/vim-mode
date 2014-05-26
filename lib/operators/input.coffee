@@ -66,6 +66,7 @@ class Change extends Insert
     row is @editor.getBuffer().getLastRow()
 
 # Takes a transaction and turns it into a string of what was typed.
+# This class is an implementation detail of Insert
 class TransactionBundler
   constructor: (@transaction) ->
 
@@ -78,6 +79,8 @@ class TransactionBundler
     chars.join("")
 
   isTypedChar: (patch) ->
+    # Technically speaking, a typed char will be of length 1, but >= 1
+    # happens to let us test with editor.setText, so we'll look the other way.
     return false unless patch.newText?.length >= 1 and patch.oldText?.length == 0
     patch.newText
 
