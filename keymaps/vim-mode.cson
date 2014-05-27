@@ -116,6 +116,7 @@
   'escape': 'vim-mode:reset-command-mode'
   'ctrl-c': 'vim-mode:reset-command-mode'
   'ctrl-[': 'vim-mode:reset-command-mode'
+  '%': 'bracket-matcher:go-to-matching-bracket'
 
   'u': 'core:undo'
   'ctrl-r': 'core:redo'
