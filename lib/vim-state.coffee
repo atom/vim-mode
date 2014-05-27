@@ -56,6 +56,35 @@ class VimState
         @clearOpStack()
         false
 
+
+  # Private: handles adjusting the location of the marks
+  #
+  # Returns nothing. Adjusts @marks
+  handleMarks: (insert, diff, range, rangeB) ->
+    if range.start.compare(range.end) == -1
+      rangeA = new Range(range.start, range.end)
+    else
+      rangeA = new Range(range.end, range.start)
+
+    for k,v of @marks
+      #Get the location of the mark
+      q = v.toArray();
+      #Check to see what we're doing:
+      if insert
+        #The change is entirely before the mark
+        if rangeB.end.compare(v) != 1
+          if rangeB.end.toArray()[0] == q[0]
+            @marks[k] = new Point(q[0] + diff, q[1] - rangeA.start.toArray()[1] + rangeA.end.toArray()[1])
+          else
+            @marks[k] = new Point(q[0] + diff,q[1])
+      else
+        if rangeA.end.compare(v) != 1
+          #the end of the range is on the same line as the mark
+          if rangeA.end.toArray()[0] == q[0]
+            @marks[k] = new Point(q[0] + diff, q[1] - rangeA.end.toArray()[1] + rangeA.start.toArray()[1])
+          else
+            @marks[k] = new Point(q[0] + diff,q[1])
+
   # Private: Watches for any deletes on the current buffer and places it in the
   # last deleted buffer.
   #
@@ -70,59 +99,25 @@ class VimState
       numOld++ while pos = 1 + oldText.indexOf substr, pos
 
       diff = numNew - numOld
-      nrStart = newRange.start.toArray()
-      nrEnd = newRange.end.toArray()
 
-      orStart = oldRange.start.toArray()
-      orEnd = oldRange.end.toArray()
-
-      if oldRange.containsRange(newRange)
-        insert = false
+      #Check to see if it is a complex transaction or just an insertion/deletion
+      if not oldRange.isEmpty() && not newRange.isEmpty()
         rangeA = oldRange
         rangeB = newRange
-        text = 'case1'
+        tempRange = new Range(rangeA.start, rangeA.start)
+        @handleMarks(false, -numOld, rangeA, tempRange)
+        @handleMarks(true, numNew,  rangeB, tempRange)
       else
-        insert = true
-        rangeA = newRange
-        rangeB = oldRange
-        text = 'case2'
-      if not rangeA.isEmpty() && not rangeB.isEmpty()
-        alert 'both not empty ' + text
+        if oldRange.containsRange(newRange)
+          insert = false
+          rangeA = oldRange
+          rangeB = newRange
+        else
+          insert = true
+          rangeA = newRange
+          rangeB = oldRange
+        @handleMarks(insert, diff, rangeA, rangeB)
 
-      if rangeA.start.compare(rangeA.end) == -1
-        for k,v of @marks
-          #the change is entirely before the mark
-          q = v.toArray();
-          if insert
-            if rangeB.end.compare(v) != 1
-              if rangeB.end.toArray()[0] == q[0]
-                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.start.toArray()[1] + rangeA.end.toArray()[1])
-              else
-                @marks[k] = new Point(q[0] + diff,q[1])
-          else
-            if rangeA.end.compare(v) != 1
-              #the end of the range is on the same line as the mark
-              if rangeA.end.toArray()[0] == q[0]
-                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.end.toArray()[1] + rangeA.start.toArray()[1])
-              else
-                @marks[k] = new Point(q[0] + diff,q[1])
-      else
-        for k,v of @marks
-          #the change is entirely before the mark
-          q = v.toArray();
-          if insert
-            #the end of the range is on the same line as the mark
-            if rangeB.start.compare(v) != 1
-              if rangeB.start.toArray()[0] == q[0]
-                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.end.toArray()[1] + rangeA.start.toArray()[1])
-              else
-                @marks[k] = new Point(q[0] + diff,q[1])
-          else
-            if rangeA.start.compare(v) != 1
-              if rangeA.start.toArray()[0] == q[0]
-                @marks[k] = new Point(q[0] + diff, q[1] - rangeA.start.toArray()[1] + rangeA.end.toArray()[1])
-              else
-                @marks[k] = new Point(q[0] + diff,q[1])
 
       if newText == ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
