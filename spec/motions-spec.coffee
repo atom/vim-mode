@@ -1083,8 +1083,14 @@ describe "Motions", ->
       keydown('%')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-    it 'no-ops when no matching action is possible', ->
+    it 'it moves appropriately to find the nearest matching action', ->
       editor.setCursorScreenPosition([0, 3])
       keydown('%')
-      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      expect(editor.getText()).toEqual  "( ( ) )--{ text in here; and a function call(with parameters) }\n"
+
+    it 'it moves appropriately to find the nearest matching action', ->
+      editor.setCursorScreenPosition([0, 26])
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 60]
       expect(editor.getText()).toEqual  "( ( ) )--{ text in here; and a function call(with parameters) }\n"
