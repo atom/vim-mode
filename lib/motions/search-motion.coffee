@@ -143,6 +143,9 @@ class BracketMatchingMotion extends SearchBase
     super(@editorView, @vimState)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
+    @characters         = [')','(','}','{',']','[']
+    @charactersMatching = ['(',')','{','}','[',']']
+    @reverseSearch      = [true,false,true,false,true,false]
 
     # FIXME: This must depend on the current language
     @input = new Input(@getCurrentWordMatch())
@@ -151,26 +154,13 @@ class BracketMatchingMotion extends SearchBase
     cursor = @editor.getCursor()
     tempPoint = cursor.getBufferPosition().toArray()
     @character = @editor.getTextInBufferRange([cursor.getBufferPosition(),new Point(tempPoint[0],tempPoint[1] + 1)])
-    if @character == ']'
-      @matching = '['
-      @reverse = true
-    else if @character == '['
-      @matching = ']'
-      @reverse = false
-    else if @character == ')'
-      @matching = '('
-      @reverse = true
-    else if @character == '('
-      @matching = ')'
-      @reverse = false
-    else if @character == '}'
-      @matching = '{'
-      @reverse = true
-    else if @character == '{'
-      @matching = '}'
-      @reverse = false
+    @startUp = false;
+    index = @characters.indexOf(@character)
+    if index >= 0
+      @matching = @charactersMatching[index]
+      @reverse = @reverseSearch[index]
     else
-      @character = ''
+      @startUp = true
 
     @character
 
@@ -212,7 +202,11 @@ class BracketMatchingMotion extends SearchBase
 
   select: (count=1) ->
     @scan()
-    cur = @editor.getCursorBufferPosition()
+    if @startUp
+      cur = @startUpPos
+    else
+      cur = @editor.getCursorBufferPosition()
+
     @match count, (pos) =>
       if @reverse
         tempPoint = cur.toArray()
@@ -223,6 +217,25 @@ class BracketMatchingMotion extends SearchBase
     [true]
 
   scan: ->
+    if @startUp
+      @startUpPos = @editor.getCursorBufferPosition()
+      min = -1
+      iwin = -1
+      for i in [0..@characters.length - 1]
+        matchesCharacter = @searchFor(@characters[i])
+        if matchesCharacter.length > 0
+          dst = matchesCharacter[0].range.start.toArray()
+          if @startUpPos.toArray()[0] == dst[0] and @startUpPos.toArray()[1] < dst[1]
+            if dst[1] < min or min == -1
+              line = dst[0]
+              min = dst[1]
+              iwin = i
+      if iwin != -1
+        @editor.setCursorBufferPosition(new Point(line,min))
+        @character = @characters[iwin]
+        @matching = @charactersMatching[iwin]
+        @reverse = @reverseSearch[iwin]
+
     matchesCharacter = @searchFor(@character)
     matchesMatching = @searchFor(@matching)
     if matchesMatching.length == 0
@@ -256,6 +269,10 @@ class BracketMatchingMotion extends SearchBase
       if counter == 0
         retVal.push(matchesMatching[winner])
       @matches = retVal
+
+    if @matches.length == 0 and @startUp
+      @editor.setCursorBufferPosition(@startUpPos)
+
 
 
   execute: (count=1) ->
