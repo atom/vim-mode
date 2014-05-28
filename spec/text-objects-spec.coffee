@@ -45,3 +45,51 @@ describe "TextObjects", ->
       keydown('w')
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 11]]
+
+  describe "the 'i(' text object", ->
+    beforeEach ->
+      editor.setText("( something in here and in (here) )")
+      editor.setCursorScreenPosition([0, 9])
+
+    it "applies operators inside the current word in operator-pending mode", ->
+      keydown('d')
+      keydown('i')
+      keydown('(')
+      expect(editor.getText()).toBe "()"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+      expect(editorView).not.toHaveClass('operator-pending-mode')
+      expect(editorView).toHaveClass('command-mode')
+
+    it "applies operators inside the current word in operator-pending mode (second test)", ->
+      editor.setCursorScreenPosition([0, 29])
+      keydown('d')
+      keydown('i')
+      keydown('(')
+      expect(editor.getText()).toBe "( something in here and in () )"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 28]
+      expect(editorView).not.toHaveClass('operator-pending-mode')
+      expect(editorView).toHaveClass('command-mode')
+
+  describe "the 'i\'' text object", ->
+    beforeEach ->
+      editor.setText("' something in here and in 'here' '")
+      editor.setCursorScreenPosition([0, 9])
+
+    it "applies operators inside the current word in operator-pending mode", ->
+      keydown('d')
+      keydown('i')
+      keydown('\'')
+      expect(editor.getText()).toBe "''here' '"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+      expect(editorView).not.toHaveClass('operator-pending-mode')
+      expect(editorView).toHaveClass('command-mode')
+
+    it "applies operators inside the current word in operator-pending mode (second test)", ->
+      editor.setCursorScreenPosition([0, 29])
+      keydown('d')
+      keydown('i')
+      keydown('\'')
+      expect(editor.getText()).toBe "' something in here and in '' '"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 28]
+      expect(editorView).not.toHaveClass('operator-pending-mode')
+      expect(editorView).toHaveClass('command-mode')
