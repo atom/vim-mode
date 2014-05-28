@@ -1,5 +1,7 @@
 ## HEAD
 * Fix `gg` and `G` in visual mode @cadwallion
+* Implement `%` @carlosdcastillo
+* Add ctags keybindings @tmm1
 
 ## 0.10.0
 * Fix E in visual mode @tony612
