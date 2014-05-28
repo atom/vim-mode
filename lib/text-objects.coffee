@@ -14,7 +14,6 @@ class SelectInsideQuotes extends TextObject
   constructor: (@editor, @char) ->
 
   findOpeningQuote: (pos) ->
-
     pos = pos.copy()
     while pos.row >= 0
       line = @editor.lineForBufferRow(pos.row)
@@ -27,15 +26,14 @@ class SelectInsideQuotes extends TextObject
       -- pos.row
 
   select: ->
-
     start = @findOpeningQuote(@editor.getCursorBufferPosition())
     return [false] unless start?
-     
+
     ++ start.column  # skip the opening quote
-     
+
     end = start.copy()
     escaping = false
-     
+
     while end.row < @editor.getLineCount()
       endLine = @editor.lineForBufferRow(end.row)
       while end.column < endLine.length
@@ -49,14 +47,13 @@ class SelectInsideQuotes extends TextObject
         ++ end.column
       end.column = 0
       ++ end.row
-    
+
     [false]
 
 class SelectInsideBrackets extends TextObject
   constructor: (@editor, @beginChar, @endChar) ->
 
   findOpeningBracket: (pos) ->
-
     pos = pos.copy()
     depth = 0
     while pos.row >= 0
@@ -72,12 +69,11 @@ class SelectInsideBrackets extends TextObject
       -- pos.row
 
   select: ->
-
     start = @findOpeningBracket(@editor.getCursorBufferPosition())
     return [false] unless start?
 
     ++ start.column  # skip the opening bracket
-     
+
     end = start.copy()
     depth = 0
 
@@ -95,8 +91,7 @@ class SelectInsideBrackets extends TextObject
         ++ end.column
       end.column = 0
       ++ end.row
-    
+
     [false]
 
 module.exports = {SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets}
-
