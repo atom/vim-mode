@@ -98,6 +98,8 @@
   'n': 'vim-mode:repeat-search'
   'N': 'vim-mode:repeat-search-backwards'
 
+  '%': 'vim-mode:bracket-matching-motion'
+
   '1': 'vim-mode:repeat-prefix'
   '2': 'vim-mode:repeat-prefix'
   '3': 'vim-mode:repeat-prefix'
