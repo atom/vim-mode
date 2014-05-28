@@ -382,7 +382,7 @@ describe "Operators", ->
 
         it "inserts the contents", ->
           expect(editor.getText()).toBe "034512\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
       describe "from a specified register", ->
         beforeEach ->
@@ -392,7 +392,7 @@ describe "Operators", ->
 
         it "inserts the contents of the 'a' register", ->
           expect(editor.getText()).toBe "0a12\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
       describe "at the end of a line", ->
         it "inserts before the current line's newline", ->
@@ -481,7 +481,7 @@ describe "Operators", ->
 
       it "inserts the contents of the default register above", ->
         expect(editor.getText()).toBe "345012\n"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
   describe "the O keybinding", ->
     beforeEach ->
