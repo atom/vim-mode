@@ -129,6 +129,11 @@ class VimState
       'scroll-down': => new Scroll.ScrollDown(@editorView, @editor)
       'scroll-up': => new Scroll.ScrollUp(@editorView, @editor)
       'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
+      'select-inside-double-quotes': => new TextObjects.SelectInsideQuotes(@editor, '"')
+      'select-inside-single-quotes': => new TextObjects.SelectInsideQuotes(@editor, '\'')
+      'select-inside-curly-brackets': => new TextObjects.SelectInsideBrackets(@editor, '{', '}')
+      'select-inside-angle-brackets': => new TextObjects.SelectInsideBrackets(@editor, '<', '>')
+      'select-inside-parentheses': => new TextObjects.SelectInsideBrackets(@editor, '(', ')')
       'register-prefix': (e) => @registerPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
       'repeat-search': (e) => currentSearch.repeat() if (currentSearch = Motions.Search.currentSearch)?

@@ -168,6 +168,11 @@
 
 '.vim-mode.operator-pending-mode, .vim-mode.visual-mode':
   'i w': 'vim-mode:select-inside-word'
+  'i "': 'vim-mode:select-inside-double-quotes'
+  'i \'': 'vim-mode:select-inside-single-quotes'
+  'i {': 'vim-mode:select-inside-curly-brackets'
+  'i <': 'vim-mode:select-inside-angle-brackets'
+  'i (': 'vim-mode:select-inside-parentheses'
 
 '.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
