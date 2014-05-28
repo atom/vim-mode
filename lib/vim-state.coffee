@@ -10,6 +10,7 @@ Utils = require './utils'
 Panes = require './panes'
 Scroll = require './scroll'
 {$$, Point, Range} = require 'atom'
+Marker = require 'atom'
 
 module.exports =
 class VimState
@@ -23,6 +24,9 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
+    params = {}
+    params.manager = this;
+    params.id = 0;
 
     @setupCommandMode()
     @registerInsertIntercept()
@@ -56,35 +60,6 @@ class VimState
         @clearOpStack()
         false
 
-
-  # Private: handles adjusting the location of the marks
-  #
-  # Returns nothing. Adjusts @marks
-  handleMarks: (insert, diff, range, rangeB) ->
-    if range.start.compare(range.end) == -1
-      rangeA = new Range(range.start, range.end)
-    else
-      rangeA = new Range(range.end, range.start)
-
-    for k,v of @marks
-      #Get the location of the mark
-      q = v.toArray();
-      #Check to see what we're doing:
-      if insert
-        #The change is entirely before the mark
-        if rangeB.end.compare(v) != 1
-          if rangeB.end.toArray()[0] == q[0]
-            @marks[k] = new Point(q[0] + diff, q[1] - rangeA.start.toArray()[1] + rangeA.end.toArray()[1])
-          else
-            @marks[k] = new Point(q[0] + diff,q[1])
-      else
-        if rangeA.end.compare(v) != 1
-          #the end of the range is on the same line as the mark
-          if rangeA.end.toArray()[0] == q[0]
-            @marks[k] = new Point(q[0] + diff, q[1] - rangeA.end.toArray()[1] + rangeA.start.toArray()[1])
-          else
-            @marks[k] = new Point(q[0] + diff,q[1])
-
   # Private: Watches for any deletes on the current buffer and places it in the
   # last deleted buffer.
   #
@@ -92,33 +67,6 @@ class VimState
   registerChangeHandler: (buffer) ->
     buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
       return unless @setRegister?
-      substr = '\n';
-      numNew = pos = 0
-      numNew++ while pos = 1 + newText.indexOf substr, pos
-      numOld = pos = 0
-      numOld++ while pos = 1 + oldText.indexOf substr, pos
-
-      diff = numNew - numOld
-
-      #Check to see if it is a complex transaction or just an insertion/deletion
-      if not oldRange.isEmpty() && not newRange.isEmpty()
-        rangeA = oldRange
-        rangeB = newRange
-        tempRange = new Range(rangeA.start, rangeA.start)
-        @handleMarks(false, -numOld, rangeA, tempRange)
-        @handleMarks(true, numNew,  rangeB, tempRange)
-      else
-        if oldRange.containsRange(newRange)
-          insert = false
-          rangeA = oldRange
-          rangeB = newRange
-        else
-          insert = true
-          rangeA = newRange
-          rangeB = oldRange
-        @handleMarks(insert, diff, rangeA, rangeB)
-
-
       if newText == ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
 
@@ -315,7 +263,12 @@ class VimState
   #
   # Returns the value of the given mark or undefined if it hasn't
   # been set.
-  getMark: (name) -> @marks[name]
+  getMark: (name) ->
+    if @marks[name]
+      @marks[name].getBufferRange().start
+    else
+      undefined
+
 
   # Private: Sets the value of a given register.
   #
@@ -340,7 +293,8 @@ class VimState
   setMark: (name, pos) ->
     # check to make sure name is in [a-z] or is `
     if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
-      @marks[name] = pos
+      marker = @editor.markBufferRange(new Range(pos,pos),{invalidate:'never',persistent:false})
+      @marks[name] = marker
 
   # Public: Append a search to the search history.
   #
