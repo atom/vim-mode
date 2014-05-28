@@ -25,12 +25,7 @@ class SelectInsideQuotes extends TextObject
       pos.column = -1
       -- pos.row
 
-  select: ->
-    start = @findOpeningQuote(@editor.getCursorBufferPosition())
-    return [false] unless start?
-
-    ++ start.column  # skip the opening quote
-
+  findClosingQuote: (start) ->
     end = start.copy()
     escaping = false
 
@@ -43,12 +38,21 @@ class SelectInsideQuotes extends TextObject
           @editor.expandSelectionsForward (selection) =>
             selection.cursor.setBufferPosition start
             selection.selectToBufferPosition end
-          return [true]
+          return {select:[true], end:end}
         ++ end.column
       end.column = 0
       ++ end.row
 
-    [false]
+    {select:[false], end:end}
+
+  select: ->
+    start = @findOpeningQuote(@editor.getCursorBufferPosition())
+    return [false] unless start?
+
+    ++ start.column  # skip the opening quote
+
+    {select,end} = @findClosingQuote(start)
+    select
 
 class SelectInsideBrackets extends TextObject
   constructor: (@editor, @beginChar, @endChar) ->
@@ -68,15 +72,9 @@ class SelectInsideBrackets extends TextObject
       pos.column = -1
       -- pos.row
 
-  select: ->
-    start = @findOpeningBracket(@editor.getCursorBufferPosition())
-    return [false] unless start?
-
-    ++ start.column  # skip the opening bracket
-
+  findClosingBracket: (start) ->
     end = start.copy()
     depth = 0
-
     while end.row < @editor.getLineCount()
       endLine = @editor.lineForBufferRow(end.row)
       while end.column < endLine.length
@@ -87,11 +85,18 @@ class SelectInsideBrackets extends TextObject
               @editor.expandSelectionsForward (selection) =>
                 selection.cursor.setBufferPosition start
                 selection.selectToBufferPosition end
-              return [true]
+              return {select:[true], end:end}
         ++ end.column
       end.column = 0
       ++ end.row
 
-    [false]
+    {select:[false], end:end}
+
+  select: ->
+    start = @findOpeningBracket(@editor.getCursorBufferPosition())
+    return [false] unless start?
+    ++ start.column  # skip the opening bracket
+    {select,end} = @findClosingBracket(start)
+    select
 
 module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets}
