@@ -9,6 +9,8 @@ TextObjects = require './text-objects'
 Utils = require './utils'
 Panes = require './panes'
 Scroll = require './scroll'
+{$$, Point, Range} = require 'atom'
+Marker = require 'atom'
 
 module.exports =
 class VimState
@@ -22,6 +24,9 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
+    params = {}
+    params.manager = this;
+    params.id = 0;
 
     @setupCommandMode()
     @registerInsertIntercept()
@@ -62,7 +67,6 @@ class VimState
   registerChangeHandler: (buffer) ->
     buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
       return unless @setRegister?
-
       if newText == ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
 
@@ -260,7 +264,12 @@ class VimState
   #
   # Returns the value of the given mark or undefined if it hasn't
   # been set.
-  getMark: (name) -> @marks[name]
+  getMark: (name) ->
+    if @marks[name]
+      @marks[name].getBufferRange().start
+    else
+      undefined
+
 
   # Private: Sets the value of a given register.
   #
@@ -285,7 +294,8 @@ class VimState
   setMark: (name, pos) ->
     # check to make sure name is in [a-z] or is `
     if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
-      @marks[name] = pos
+      marker = @editor.markBufferRange(new Range(pos,pos),{invalidate:'never',persistent:false})
+      @marks[name] = marker
 
   # Public: Append a search to the search history.
   #
