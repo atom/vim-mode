@@ -202,10 +202,8 @@ class BracketMatchingMotion extends SearchBase
 
   select: (count=1) ->
     @scan()
-    if @startUp
-      cur = @startUpPos
-    else
-      cur = @editor.getCursorBufferPosition()
+
+    cur = if @startUp then @startUpPos else @editor.getCursorBufferPosition()
 
     @match count, (pos) =>
       if @reverse
