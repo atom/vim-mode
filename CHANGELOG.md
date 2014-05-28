@@ -1,5 +1,8 @@
 ## HEAD
 * Fix `gg` and `G` in visual mode @cadwallion
+* Implement `%` @carlosdcastillo
+* Add ctags keybindings @tmm1
+* Fix tracking of marks when buffer changes @carlosdcastillo
 
 ## 0.10.0
 * Fix E in visual mode @tony612

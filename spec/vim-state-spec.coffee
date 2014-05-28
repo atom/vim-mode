@@ -204,3 +204,39 @@ describe "VimState", ->
 
       it "operate on the current selection", ->
         expect(editor.getSelection().getText()).toEqual ''
+
+  describe "marks", ->
+    beforeEach ->  editor.setText("text in line 1\ntext in line 2\ntext in line 3")
+
+    it "basic marking functionality", ->
+      editor.setCursorScreenPosition([1, 1])
+      keydown('m')
+      commandModeInputKeydown('t')
+      expect(editor.getText()).toEqual "text in line 1\ntext in line 2\ntext in line 3"
+      editor.setCursorScreenPosition([2, 2])
+      keydown('`')
+      commandModeInputKeydown('t')
+      expect(editor.getCursorScreenPosition()).toEqual [1,1]
+
+    it "real (tracking) marking functionality", ->
+      editor.setCursorScreenPosition([2, 2])
+      keydown('m')
+      commandModeInputKeydown('q')
+      editor.setCursorScreenPosition([1, 2])
+      keydown('o')
+      keydown('escape')
+      keydown('`')
+      commandModeInputKeydown('q')
+      expect(editor.getCursorScreenPosition()).toEqual [3,2]
+
+    it "real (tracking) marking functionality", ->
+      editor.setCursorScreenPosition([2, 2])
+      keydown('m')
+      commandModeInputKeydown('q')
+      editor.setCursorScreenPosition([1, 2])
+      keydown('d')
+      keydown('d')
+      keydown('escape')
+      keydown('`')
+      commandModeInputKeydown('q')
+      expect(editor.getCursorScreenPosition()).toEqual [1,2]
