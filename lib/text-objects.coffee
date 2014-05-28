@@ -94,4 +94,4 @@ class SelectInsideBrackets extends TextObject
 
     [false]
 
-module.exports = {SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets}
+module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets}
