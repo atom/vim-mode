@@ -38,6 +38,7 @@ class MotionWithInput extends Motion
 
 class MoveLeft extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       @editor.moveCursorLeft() if column > 0
@@ -54,6 +55,7 @@ class MoveLeft extends Motion
 
 class MoveRight extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
@@ -71,22 +73,85 @@ class MoveRight extends Motion
       else
         false
 
-class MoveUp extends Motion
+class MoveVertically extends Motion
   execute: (count=1) ->
-    _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
-      @editor.moveCursorUp() if row > 0
+    {row, column} = @editor.getCursorScreenPosition()
+
+    nextRow = @nextValidRow(count)
+
+    if nextRow != row
+      nextLineLength = @editor.lineLengthForBufferRow(nextRow)
+
+      # The 'nextColumn' the cursor should be in is the
+      # 'desiredCursorColumn', if it exists. If it does
+      # not, the current column should be used.
+      nextColumn = @editor.desiredCursorColumn || column
+
+      # Check to see if the 'nextColumn' position of
+      # cursor is greater than or equal to the length
+      # of the next line.
+      if nextColumn >= nextLineLength
+        # When the 'nextColumn' is greater than the
+        # length of the next line, we should move the
+        # cursor to the end of the next line and save
+        # 'nextColumn' in 'desiredCursorColumn'.
+        @editor.setCursorBufferPosition([nextRow, nextLineLength-1])
+        @editor.desiredCursorColumn = nextColumn
+      else
+        # When the 'nextColumn' is a valid spot to
+        # move into, in the next line, simply move
+        # there and unset 'desiredCursorColumn'.
+        @editor.setCursorBufferPosition([nextRow, nextColumn])
+        @editor.desiredCursorColumn = null
+
+  # Internal: Finds the next valid row that can be moved
+  # to. This move takes folded lines into account when
+  # calculating the next valid row.
+  #
+  # count - The number of folded 'buffer' rows away from
+  #         the current row.
+  # increment - The direction to move the cursor. Use -1
+  #             for moving up, 1 for moving down.
+  #
+  # Returns an integer row index.
+  nextValidRowWithIncrement: (count, increment) ->
+    {row, column} = @editor.getCursorBufferPosition()
+    e = @editor
+
+    maxRow = @editor.getLineCount()
+    minRow = 0
+
+    # For each count, subtract 1 row. Folded rows
+    # count as a single row.
+    _.times count, ->
+      if e.isFoldedAtBufferRow(row)
+        while e.isFoldedAtBufferRow(row)
+          row += increment
+      else
+        row += increment
+
+    if row > maxRow
+      maxRow
+    else if row < minRow
+      minRow
+    else
+      row
+
+class MoveUp extends MoveVertically
+  nextValidRow: (count) ->
+    @nextValidRowWithIncrement(count, -1)
 
   select: (count=1) ->
     _.times count, =>
       @editor.selectUp()
       true
 
-class MoveDown extends Motion
-  execute: (count=1) ->
-    _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
-      @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
+class MoveDown extends MoveVertically
+  nextValidRow: (count) ->
+    @nextValidRowWithIncrement(count, 1)
+
+  move: (count) ->
+    @editor.moveCursorDown(count)
 
   select: (count=1) ->
     _.times count, =>
@@ -95,6 +160,7 @@ class MoveDown extends Motion
 
 class MoveToPreviousWord extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     _.times count, =>
       @editor.moveCursorToBeginningOfWord()
 
@@ -105,6 +171,7 @@ class MoveToPreviousWord extends Motion
 
 class MoveToPreviousWholeWord extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     _.times count, =>
       @editor.moveCursorToBeginningOfWord()
       @editor.moveCursorToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
@@ -125,6 +192,7 @@ class MoveToPreviousWholeWord extends Motion
 
 class MoveToNextWord extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     cursor = @editor.getCursor()
 
     _.times count, =>
@@ -165,6 +233,7 @@ class MoveToNextWord extends Motion
 
 class MoveToNextWholeWord extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     _.times count, =>
       @editor.moveCursorToBeginningOfNextWord()
       @editor.moveCursorToBeginningOfNextWord() while not @isWholeWord() and not @isEndOfFile()
@@ -195,6 +264,7 @@ class MoveToNextWholeWord extends Motion
 
 class MoveToEndOfWord extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     cursor = @editor.getCursor()
     _.times count, =>
       cursor.setBufferPosition(@nextBufferPosition(exclusive: true))
@@ -230,6 +300,7 @@ class MoveToEndOfWord extends Motion
 
 class MoveToEndOfWholeWord extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     cursor = @editor.getCursor()
     _.times count, =>
       cursor.setBufferPosition(@nextBufferPosition(exclusive: true))
@@ -262,6 +333,7 @@ class MoveToEndOfWholeWord extends Motion
 
 class MoveToNextParagraph extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     _.times count, =>
       @editor.setCursorScreenPosition(@nextPosition())
 
@@ -289,6 +361,7 @@ class MoveToNextParagraph extends Motion
 
 class MoveToPreviousParagraph extends Motion
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     _.times count, =>
       @editor.setCursorScreenPosition(@previousPosition())
 
@@ -315,12 +388,13 @@ class MoveToLine extends Motion
   isLinewise: -> true
 
   execute: (count) ->
+    @editor.desiredCursorColumn = null
     @setCursorPosition(count)
     @editor.getCursor().skipLeadingWhitespace()
 
   # Options
   #  requireEOL - if true, ensure an end of line character is always selected
-  select: (count=@editor.getLineCount(), {requireEOL}={}) ->
+  select: (count=1, {requireEOL}={}) ->
     {row, column} = @editor.getCursorBufferPosition()
     @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
 
@@ -389,6 +463,10 @@ class MoveToFirstCharacterOfLine extends Motion
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
+    # After moving to the end of the line, vertical motions
+    # should stay at the last column.
+    @editor.desiredCursorColumn = Infinity
+
     _.times count, =>
       @editor.moveCursorToEndOfLine()
       @editor.moveCursorLeft() unless @editor.getCursor().getBufferColumn() is 0
@@ -401,11 +479,6 @@ class MoveToLastCharacterOfLine extends Motion
 class MoveToStartOfFile extends MoveToLine
   getDestinationRow: (count=1) ->
     count - 1
-
-  select: (count=1) ->
-    {row, column} = @editor.getCursorBufferPosition()
-    bufferRange = new Range([row,column+1], [0,0])
-    @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
 class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
@@ -434,7 +507,7 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     Math.floor(firstScreenRow + (height / 2))
 
 module.exports = {
-  Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
+  Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveVertically, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,

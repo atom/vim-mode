@@ -24,6 +24,7 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
+    @desiredCursorColumn = null
     params = {}
     params.manager = this;
     params.id = 0;
