@@ -44,6 +44,21 @@ class InsertAboveWithNewline extends Insert
     @vimState.activateInsertMode(transactionStarted = true)
     @typingCompleted = true
 
+class InsertBelowWithNewline extends Insert
+  execute: (count=1) ->
+    @editor.beginTransaction() unless @typingCompleted
+    @editor.insertNewlineBelow()
+    @editor.getCursor().skipLeadingWhitespace()
+
+    if @typingCompleted
+      # We'll have captured the inserted newline, but we want to do that
+      # over again by hand, or differing indentations will be wrong.
+      @typedText = @typedText.trimLeft()
+      return super
+
+    @vimState.activateInsertMode(transactionStarted = true)
+    @typingCompleted = true
+
 #
 # Delete the following motion and enter insert mode to replace it.
 #
@@ -102,4 +117,10 @@ class TransactionBundler
   isBackspacedChar: (patch) ->
     patch.newText == "" and patch.oldText?.length == 1
 
-module.exports = {Insert, InsertAfter, InsertAboveWithNewline, Change}
+module.exports = {
+  Insert,
+  InsertAfter,
+  InsertAboveWithNewline,
+  InsertBelowWithNewline,
+  Change
+}

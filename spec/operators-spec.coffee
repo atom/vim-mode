@@ -550,12 +550,37 @@ describe "Operators", ->
 
       editor.getBuffer().setText("abc\n  012\n")
       editor.setCursorScreenPosition([1, 2])
-      keydown('o')
 
     it "switches to insert and adds a newline above the current one", ->
+      keydown('o')
       expect(editor.getText()).toBe "abc\n  012\n  \n"
       expect(editorView).toHaveClass 'insert-mode'
       expect(editor.getCursorScreenPosition()).toEqual [2, 2]
+
+    # This works in practice, but the editor doesn't respect the indentation
+    # rules without a syntax grammar. Need to set the editor's grammar
+    # to fix it.
+    xit "is repeatable", ->
+      editor.getBuffer().setText("  abc\n  012\n    4spaces\n")
+      editor.setCursorScreenPosition([1, 1])
+      keydown('o')
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "  abc\n  012\n  def\n    4spaces\n"
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  012\n  def\n  def\n    4spaces\n"
+      editor.setCursorScreenPosition([4, 1])
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  def\n  def\n  012\n    4spaces\n    def\n"
+
+    it "is undoable", ->
+      keydown('o')
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "abc\n  012\n  def\n"
+      keydown 'u'
+      expect(editor.getText()).toBe "abc\n  012\n"
+
 
   describe "the a keybinding", ->
     beforeEach ->
