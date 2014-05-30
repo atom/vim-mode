@@ -513,12 +513,34 @@ describe "Operators", ->
 
       editor.getBuffer().setText("  abc\n  012\n")
       editor.setCursorScreenPosition([1, 1])
-      keydown('O', shift: true)
 
     it "switches to insert and adds a newline above the current one", ->
+      keydown('O', shift: true)
       expect(editor.getText()).toBe "  abc\n  \n  012\n"
       expect(editor.getCursorScreenPosition()).toEqual [1, 2]
       expect(editorView).toHaveClass 'insert-mode'
+
+    it "is repeatable", ->
+      editor.getBuffer().setText("  abc\n  012\n    4spaces\n")
+      editor.setCursorScreenPosition([1, 1])
+      keydown('O', shift: true)
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "  abc\n  def\n  012\n    4spaces\n"
+      editor.setCursorScreenPosition([1, 1])
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  def\n  def\n  012\n    4spaces\n"
+      editor.setCursorScreenPosition([4, 1])
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  def\n  def\n  012\n    def\n    4spaces\n"
+
+    it "is undoable", ->
+      keydown('O', shift: true)
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "  abc\n  def\n  012\n"
+      keydown 'u'
+      expect(editor.getText()).toBe "  abc\n  012\n"
 
   describe "the o keybinding", ->
     beforeEach ->

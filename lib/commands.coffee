@@ -5,12 +5,6 @@ class Command
   isComplete: -> true
   isRecordable: -> false
 
-class InsertAboveWithNewline extends Command
-  execute: (count=1) ->
-    @vimState.activateInsertMode()
-    @editor.insertNewlineAbove()
-    @editor.getCursor().skipLeadingWhitespace()
-
 class InsertBelowWithNewline extends Command
   execute: (count=1) ->
     @vimState.activateInsertMode()
@@ -34,5 +28,5 @@ class SubstituteLine extends Command
     @editor.moveCursorUp()
     @vimState.activateInsertMode()
 
-module.exports = { InsertAboveWithNewline, InsertBelowWithNewline,
+module.exports = { InsertBelowWithNewline,
   Substitute, SubstituteLine }

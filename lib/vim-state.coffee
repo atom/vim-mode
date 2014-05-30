@@ -101,7 +101,7 @@ class VimState
       'insert-after': => new Operators.InsertAfter(@editor, @)
       'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Operators.InsertAfter(@editor, @)]
       'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Operators.Insert(@editor, @)]
-      'insert-above-with-newline': => new Commands.InsertAboveWithNewline(@editor, @)
+      'insert-above-with-newline': => new Operators.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new Commands.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(Operators.Delete)
       'change': => @linewiseAliasedOperator(Operators.Change)
