@@ -1,10 +1,10 @@
 {Operator, Delete} = require './general-operators'
 _ = require 'underscore-plus'
 
-# The operation for text entered in input mode. This operator is not
-# used as the user types, but is created when the user leaves insert mode,
-# and is available for repeating with the . operator (Replace)
-#
+# The operation for text entered in input mode. Broadly speaking, input
+# operators manage an undo transaction and set a @typed variable when it's done.
+# When the input operation is completed, the typed variable tells the operation
+# to repeat itself instead of enter insert mode.
 class Insert extends Operator
   standalone: true
 
