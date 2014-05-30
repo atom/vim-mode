@@ -2,9 +2,9 @@
 _ = require 'underscore-plus'
 
 # The operation for text entered in input mode. Broadly speaking, input
-# operators manage an undo transaction and set a @typed variable when it's done.
-# When the input operation is completed, the typed variable tells the operation
-# to repeat itself instead of enter insert mode.
+# operators manage an undo transaction and set a @typingCompleted variable when
+# it's done. When the input operation is completed, the typingCompleted variable
+# tells the operation to repeat itself instead of enter insert mode.
 class Insert extends Operator
   standalone: true
 
@@ -15,12 +15,12 @@ class Insert extends Operator
     @typedText = bundler.buildInsertText()
 
   execute: ->
-    if @typed
+    if @typingCompleted
       @undoTransaction =>
         @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
     else
       @vimState.activateInsertMode()
-      @typed = true
+      @typingCompleted = true
 
   inputOperator: -> true
 
@@ -43,7 +43,7 @@ class Change extends Insert
   execute: (count=1) ->
     # If we've typed, we're being repeated. If we're being repeated,
     # undo transactions are already handled.
-    @editor.beginTransaction() unless @typed
+    @editor.beginTransaction() unless @typingCompleted
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
 
@@ -56,10 +56,10 @@ class Change extends Insert
       else
         @editor.insertNewlineAbove()
 
-    return super if @typed
+    return super if @typingComplete
 
     @vimState.activateInsertMode(transactionStarted = true)
-    @typed = true
+    @typingComplete = true
 
   onLastRow: ->
     {row, column} = @editor.getCursorBufferPosition()
