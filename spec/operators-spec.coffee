@@ -821,12 +821,12 @@ describe "Operators", ->
 
     it "allows undoing an entire batch of typing", ->
       keydown 'i'
-      editor.setText("abc")
+      editor.insertText("abc")
       keydown 'escape'
       keydown 'i'
-      editor.setText("abcdef")
+      editor.insertText("def")
       keydown 'escape'
-      expect(editor.getText()).toBe "abcdef"
+      expect(editor.getText()).toBe "abdefc"
       keydown 'u'
       expect(editor.getText()).toBe "abc"
       keydown 'u'
@@ -834,21 +834,22 @@ describe "Operators", ->
 
     it "allows repeating typing", ->
       keydown 'i'
-      editor.setText("abc")
+      editor.insertText("abc")
       keydown 'escape'
       keydown '.'
-      editor.setText("ababcc")
+      editor.insertText("ababcc")
 
     # This one doesn't work because we can't simulate typing correctly,
     # and VimState#resetInputTransactions actually inspects buffer patches to
     # build patches for repeating
     xit "resets transactions for repeats after movement", ->
-      editor.setText("abc\n123")
+      editor.setCursorBufferPosition([0, 0])
+      editor.insertText("abc\n123")
       keydown 'i'
-      editor.setText("defabc\n123")
+      editor.insertText("def")
       editorView.trigger 'core:move-down'
       expect(editor.getCursorBufferPosition()).toEqual [1, 3]
-      editor.setText("defabc\n456123")
+      editor.insertText("456")
       keydown 'escape'
       editor.setCursorBufferPosition([0, 0])
       keydown '.'
@@ -861,7 +862,7 @@ describe "Operators", ->
 
     it "can be undone in one go", ->
       keydown 'a'
-      editor.setText("abc")
+      editor.insertText("abc")
       keydown 'escape'
       expect(editor.getText()).toBe "abc"
       keydown 'u'
@@ -869,7 +870,7 @@ describe "Operators", ->
 
     it "repeats correctly", ->
       keydown 'a'
-      editor.setText("abc")
+      editor.insertText("abc")
       keydown 'escape'
       expect(editor.getText()).toBe "abc"
       keydown '.'
