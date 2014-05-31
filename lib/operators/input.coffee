@@ -95,6 +95,20 @@ class Change extends Insert
     {row, column} = @editor.getCursorBufferPosition()
     row is @editor.getBuffer().getLastRow()
 
+class Substitute extends Insert
+  execute: (count=1) ->
+    @editor.beginTransaction() unless @typingCompleted
+    _.times count, =>
+      @editor.selectRight()
+    @editor.delete()
+
+    if @typingCompleted
+      @typedText = @typedText.trimLeft()
+      return super
+
+    @vimState.activateInsertMode(transactionStarated = true)
+    @typingCompleted = true
+
 # Takes a transaction and turns it into a string of what was typed.
 # This class is an implementation detail of Insert
 class TransactionBundler
@@ -122,5 +136,6 @@ module.exports = {
   InsertAfter,
   InsertAboveWithNewline,
   InsertBelowWithNewline,
-  Change
+  Change,
+  Substitute
 }

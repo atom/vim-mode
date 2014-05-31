@@ -5,13 +5,6 @@ class Command
   isComplete: -> true
   isRecordable: -> false
 
-class Substitute extends Command
-  execute: (count=1) ->
-    _.times count, =>
-      @editor.selectRight()
-    @editor.delete()
-    @vimState.activateInsertMode()
-
 class SubstituteLine extends Command
   execute: (count=1) ->
     @editor.moveCursorToBeginningOfLine()
@@ -22,4 +15,4 @@ class SubstituteLine extends Command
     @editor.moveCursorUp()
     @vimState.activateInsertMode()
 
-module.exports = { Substitute, SubstituteLine }
+module.exports = { SubstituteLine }

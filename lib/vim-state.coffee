@@ -96,7 +96,7 @@ class VimState
 
     @registerOperationCommands
       'activate-insert-mode': => new Operators.Insert(@editor, @)
-      'substitute': => new Commands.Substitute(@editor, @)
+      'substitute': => new Operators.Substitute(@editor, @)
       'substitute-line': => new Commands.SubstituteLine(@editor, @)
       'insert-after': => new Operators.InsertAfter(@editor, @)
       'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Operators.InsertAfter(@editor, @)]
@@ -367,9 +367,18 @@ class VimState
     return unless @mode == 'insert'
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
-    if @history[0]?.inputOperator?() and transaction?
-      # give transaction to this input-like operation (such as change)
-      @history[0].confirmTransaction(transaction)
+    item = @inputOperator(@history[0])
+    if item? and transaction?
+      item.confirmTransaction(transaction)
+
+  # Private: Get the input operator that needs to be told about about the
+  # typed undo transaction in a recently completed operation, if there
+  # is one.
+  inputOperator: (item) ->
+    return item unless item?
+    return item if item.inputOperator?()
+    return item.composedObject if item.composedObject?.inputOperator?()
+
 
   # Private: Used to enable visual mode.
   #

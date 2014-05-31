@@ -97,6 +97,27 @@ describe "Operators", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
       expect(vimState.getRegister('"').text).toBe '1'
 
+    it "is repeatable", ->
+      editor.setCursorScreenPosition([0, 0])
+      keydown('3')
+      keydown('s')
+      editor.insertText("ab")
+      keydown('escape')
+      expect(editor.getText()).toBe 'ab345'
+      editor.setCursorScreenPosition([0, 2])
+      keydown('.')
+      expect(editor.getText()).toBe 'abab'
+
+    it "is undoable", ->
+      editor.setCursorScreenPosition([0, 0])
+      keydown('3')
+      keydown('s')
+      editor.insertText("ab")
+      keydown('escape')
+      expect(editor.getText()).toBe 'ab345'
+      keydown('u')
+      expect(editor.getText()).toBe '012345'
+
     describe "in visual mode", ->
       beforeEach ->
         keydown('v')
