@@ -37,6 +37,7 @@ class MotionWithInput extends Motion
     @complete = true
 
 class MoveLeft extends Motion
+
   execute: (count=1) ->
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()

@@ -128,34 +128,6 @@ class ToggleCase extends Operator
           @editor.moveCursorRight()
 
     @vimState.activateCommandMode()
-#
-# It changes everything selected by the following motion.
-#
-class Change extends Operator
-  # Public: Changes the text selected by the given motion.
-  #
-  # count - The number of times to execute.
-  #
-  # Returns nothing.
-  execute: (count=1) ->
-    operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
-    operator.compose(@motion)
-
-    @editor.transact =>
-      lastRow = @onLastRow()
-      onlyRow = @editor.getBuffer().getLineCount() is 1
-      operator.execute(count)
-      if @motion.isLinewise?() and not onlyRow
-        if lastRow
-          @editor.insertNewlineBelow()
-        else
-          @editor.insertNewlineAbove()
-
-    @vimState.activateInsertMode()
-
-  onLastRow: ->
-    {row, column} = @editor.getCursorBufferPosition()
-    row is @editor.getBuffer().getLastRow()
 
 #
 # It copies everything selected by the following motion.
@@ -233,6 +205,6 @@ class Mark extends OperatorWithInput
     @vimState.activateCommandMode()
 
 module.exports = {
-  Operator, OperatorWithInput, OperatorError, Delete, ToggleCase, Change,
+  Operator, OperatorWithInput, OperatorError, Delete, ToggleCase,
   Yank, Join, Repeat, Mark
 }

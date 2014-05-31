@@ -128,7 +128,8 @@ describe "VimState", ->
         expect(editor.getText()).toBe '012345\nabcdef'
 
   describe "insert-mode", ->
-    beforeEach -> keydown('i')
+    beforeEach ->
+      keydown('i')
 
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
@@ -158,12 +159,14 @@ describe "VimState", ->
 
       expect(editorView).toHaveClass 'command-mode'
       expect(editorView).not.toHaveClass 'insert-mode'
+      expect(editorView).not.toHaveClass 'visual-mode'
 
     it "puts the editor into command mode when <ctrl-c> is pressed", ->
       keydown('c', ctrl: true)
 
       expect(editorView).toHaveClass 'command-mode'
       expect(editorView).not.toHaveClass 'insert-mode'
+      expect(editorView).not.toHaveClass 'visual-mode'
 
   describe "visual-mode", ->
     beforeEach -> keydown('v')

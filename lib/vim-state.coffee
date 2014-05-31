@@ -3,8 +3,8 @@ _ = require 'underscore-plus'
 
 Operators = require './operators/index'
 Prefixes = require './prefixes'
-Commands = require './commands'
 Motions = require './motions/index'
+
 TextObjects = require './text-objects'
 Utils = require './utils'
 Panes = require './panes'
@@ -30,6 +30,7 @@ class VimState
 
     @setupCommandMode()
     @registerInsertIntercept()
+    @registerInsertTransactionResets()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
@@ -60,6 +61,17 @@ class VimState
         @clearOpStack()
         false
 
+  # Private: Reset transactions on input for undo/redo/repeat on several
+  # core and vim-mode events
+  registerInsertTransactionResets: ->
+    events = [ 'core:move-up'
+               'core:move-down'
+               'core:move-right'
+               'core:move-left' ]
+    @editorView.on events.join(' '), =>
+      @resetInputTransactions()
+
+
   # Private: Watches for any deletes on the current buffer and places it in the
   # last deleted buffer.
   #
@@ -70,13 +82,12 @@ class VimState
       if newText == ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
 
-  # Private: Creates the plugin's Commands
+  # Private: Creates the plugin's bindings
   #
   # Returns nothing.
   setupCommandMode: ->
     @registerCommands
       'activate-command-mode': => @activateCommandMode()
-      'activate-insert-mode': => @activateInsertMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
       'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
       'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
@@ -84,13 +95,14 @@ class VimState
       'repeat-prefix': (e) => @repeatPrefix(e)
 
     @registerOperationCommands
-      'substitute': => new Commands.Substitute(@editor, @)
-      'substitute-line': => new Commands.SubstituteLine(@editor, @)
-      'insert-after': => new Commands.InsertAfter(@editor, @)
-      'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Commands.InsertAfter(@editor, @)]
-      'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Commands.Insert(@editor, @)]
-      'insert-above-with-newline': => new Commands.InsertAboveWithNewline(@editor, @)
-      'insert-below-with-newline': => new Commands.InsertBelowWithNewline(@editor, @)
+      'activate-insert-mode': => new Operators.Insert(@editor, @)
+      'substitute': => new Operators.Substitute(@editor, @)
+      'substitute-line': => new Operators.SubstituteLine(@editor, @)
+      'insert-after': => new Operators.InsertAfter(@editor, @)
+      'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Operators.InsertAfter(@editor, @)]
+      'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Operators.Insert(@editor, @)]
+      'insert-above-with-newline': => new Operators.InsertAboveWithNewline(@editor, @)
+      'insert-below-with-newline': => new Operators.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(Operators.Delete)
       'change': => @linewiseAliasedOperator(Operators.Change)
       'change-to-last-character-of-line': => [new Operators.Change(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor)]
@@ -106,10 +118,10 @@ class VimState
       'indent': => @linewiseAliasedOperator(Operators.Indent)
       'outdent': => @linewiseAliasedOperator(Operators.Outdent)
       'auto-indent': => @linewiseAliasedOperator(Operators.Autoindent)
-      'move-left': => new Motions.MoveLeft(@editor)
-      'move-up': => new Motions.MoveUp(@editor)
-      'move-down': => new Motions.MoveDown(@editor)
-      'move-right': => new Motions.MoveRight(@editor)
+      'move-left': => new Motions.MoveLeft(@editor, @)
+      'move-up': => new Motions.MoveUp(@editor, @)
+      'move-down': => new Motions.MoveDown(@editor, @)
+      'move-right': => new Motions.MoveRight(@editor, @)
       'move-to-next-word': => new Motions.MoveToNextWord(@editor)
       'move-to-next-whole-word': => new Motions.MoveToNextWholeWord(@editor)
       'move-to-end-of-word': => new Motions.MoveToEndOfWord(@editor)
@@ -162,7 +174,7 @@ class VimState
       do (fn) =>
         @editorView.command "vim-mode:#{commandName}.vim-mode", fn
 
-  # Private: Register multiple operation-pushing Commands via an {Object} that
+  # Private: Register multiple Operators via an {Object} that
   # maps command names to functions that return operations to push.
   #
   # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
@@ -313,14 +325,20 @@ class VimState
   getSearchHistoryItem: (index) ->
     atom.workspace.vimState.searchHistory[index]
 
+  resetInputTransactions: ->
+    return unless @mode == 'insert' && @history[0]?.inputOperator?()
+    @deactivateInsertMode()
+    @activateInsertMode()
+
   ##############################################################################
-  # Commands
+  # Mode Switching
   ##############################################################################
 
   # Private: Used to enable command mode.
   #
   # Returns nothing.
   activateCommandMode: ->
+    @deactivateInsertMode()
     @mode = 'command'
     @submode = null
 
@@ -338,12 +356,29 @@ class VimState
   # Private: Used to enable insert mode.
   #
   # Returns nothing.
-  activateInsertMode: ->
+  activateInsertMode: (transactionStarted = false)->
     @mode = 'insert'
+    @editor.beginTransaction() unless transactionStarted
     @submode = null
     @changeModeClass('insert-mode')
-
     @updateStatusBar()
+
+  deactivateInsertMode: ->
+    return unless @mode == 'insert'
+    @editor.commitTransaction()
+    transaction = _.last(@editor.buffer.history.undoStack)
+    item = @inputOperator(@history[0])
+    if item? and transaction?
+      item.confirmTransaction(transaction)
+
+  # Private: Get the input operator that needs to be told about about the
+  # typed undo transaction in a recently completed operation, if there
+  # is one.
+  inputOperator: (item) ->
+    return item unless item?
+    return item if item.inputOperator?()
+    return item.composedObject if item.composedObject?.inputOperator?()
+
 
   # Private: Used to enable visual mode.
   #
@@ -351,6 +386,7 @@ class VimState
   #
   # Returns nothing.
   activateVisualMode: (type) ->
+    @deactivateInsertMode()
     @mode = 'visual'
     @submode = type
     @changeModeClass('visual-mode')
@@ -362,6 +398,7 @@ class VimState
 
   # Private: Used to enable operator-pending mode.
   activateOperatorPendingMode: ->
+    @deactivateInsertMode()
     @mode = 'operator-pending'
     @submodule = null
     @changeModeClass('operator-pending-mode')

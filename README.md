@@ -27,7 +27,6 @@ to see examples of community contributions. We're looking forward to yours, too.
 * [Overview](https://github.com/atom/vim-mode/blob/master/docs/overview.md)
 * [Motions](https://github.com/atom/vim-mode/blob/master/docs/motions.md)
 * [Operators](https://github.com/atom/vim-mode/blob/master/docs/operators.md)
-* [Commands](https://github.com/atom/vim-mode/blob/master/docs/commands.md)
 * [Windows](https://github.com/atom/vim-mode/blob/master/docs/windows.md)
 * [Scrolling](https://github.com/atom/vim-mode/blob/master/docs/scrolling.md)
 
