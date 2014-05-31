@@ -3,8 +3,8 @@ _ = require 'underscore-plus'
 
 Operators = require './operators/index'
 Prefixes = require './prefixes'
-Commands = require './commands'
 Motions = require './motions/index'
+
 TextObjects = require './text-objects'
 Utils = require './utils'
 Panes = require './panes'
@@ -82,7 +82,7 @@ class VimState
       if newText == ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
 
-  # Private: Creates the plugin's Commands
+  # Private: Creates the plugin's bindings
   #
   # Returns nothing.
   setupCommandMode: ->
@@ -174,7 +174,7 @@ class VimState
       do (fn) =>
         @editorView.command "vim-mode:#{commandName}.vim-mode", fn
 
-  # Private: Register multiple operation-pushing Commands via an {Object} that
+  # Private: Register multiple Operators via an {Object} that
   # maps command names to functions that return operations to push.
   #
   # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
@@ -331,7 +331,7 @@ class VimState
     @activateInsertMode()
 
   ##############################################################################
-  # Commands
+  # Mode Switching
   ##############################################################################
 
   # Private: Used to enable command mode.
