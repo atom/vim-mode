@@ -135,14 +135,34 @@ describe "Operators", ->
     beforeEach ->
       editor.setText("12345\nabcde\nABCDE")
       editor.setCursorScreenPosition([1, 3])
-      keydown('S', shift: true)
 
     it "deletes the entire line and enters insert mode", ->
+      keydown('S', shift: true)
       expect(editorView).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe "12345\n\nABCDE"
       expect(editor.getCursorScreenPosition()).toEqual [1, 0]
       expect(vimState.getRegister('"').text).toBe "abcde\n"
       expect(vimState.getRegister('"').type).toBe 'linewise'
+
+    it "is repeatable", ->
+      keydown('S', shift: true)
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "12345\nabc\nABCDE"
+      editor.setCursorScreenPosition([2, 3])
+      keydown '.'
+      expect(editor.getText()).toBe "12345\nabc\nabc\n"
+
+    it "is undoable", ->
+      keydown('S', shift: true)
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "12345\nabc\nABCDE"
+      keydown 'u'
+      expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+
+    # Can't be tested without setting grammar of test buffer
+    xit "respects indentation", ->
 
   describe "the d keybinding", ->
     it "enters operator-pending mode", ->

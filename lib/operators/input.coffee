@@ -109,6 +109,23 @@ class Substitute extends Insert
     @vimState.activateInsertMode(transactionStarated = true)
     @typingCompleted = true
 
+class SubstituteLine extends Insert
+  execute: (count=1) ->
+    @editor.beginTransaction() unless @typingCompleted
+    @editor.moveCursorToBeginningOfLine()
+    _.times count, =>
+      @editor.selectDown()
+    @editor.delete()
+    @editor.insertNewlineAbove()
+    @editor.getCursor().skipLeadingWhitespace()
+
+    if @typingCompleted
+      @typedText = @typedText.trimLeft()
+      return super
+
+    @vimState.activateInsertMode(transactionStarated = true)
+    @typingCompleted = true
+
 # Takes a transaction and turns it into a string of what was typed.
 # This class is an implementation detail of Insert
 class TransactionBundler
@@ -137,5 +154,6 @@ module.exports = {
   InsertAboveWithNewline,
   InsertBelowWithNewline,
   Change,
-  Substitute
+  Substitute,
+  SubstituteLine
 }

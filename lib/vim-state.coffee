@@ -97,7 +97,7 @@ class VimState
     @registerOperationCommands
       'activate-insert-mode': => new Operators.Insert(@editor, @)
       'substitute': => new Operators.Substitute(@editor, @)
-      'substitute-line': => new Commands.SubstituteLine(@editor, @)
+      'substitute-line': => new Operators.SubstituteLine(@editor, @)
       'insert-after': => new Operators.InsertAfter(@editor, @)
       'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Operators.InsertAfter(@editor, @)]
       'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Operators.Insert(@editor, @)]
