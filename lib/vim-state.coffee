@@ -431,15 +431,18 @@ class VimState
     else
       new constructor(@editor, @)
 
-  # Private: Check if there is a pending operation of a certain type
+  # Private: Check if there is a pending operation of a certain type, or
+  # if there is any pending operation, if no type given.
   #
   # constructor - The constructor of the object type you're looking for.
   #
-  # Returns nothing.
   isOperatorPending: (constructor) ->
-    for op in @opStack
-      return op if op instanceof constructor
-    false
+    if constructor?
+      for op in @opStack
+        return op if op instanceof constructor
+      false
+    else
+      @opStack.length > 0
 
   updateStatusBar: ->
     if !$('#status-bar-vim-mode').length
