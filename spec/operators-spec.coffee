@@ -97,6 +97,27 @@ describe "Operators", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
       expect(vimState.getRegister('"').text).toBe '1'
 
+    it "is repeatable", ->
+      editor.setCursorScreenPosition([0, 0])
+      keydown('3')
+      keydown('s')
+      editor.insertText("ab")
+      keydown('escape')
+      expect(editor.getText()).toBe 'ab345'
+      editor.setCursorScreenPosition([0, 2])
+      keydown('.')
+      expect(editor.getText()).toBe 'abab'
+
+    it "is undoable", ->
+      editor.setCursorScreenPosition([0, 0])
+      keydown('3')
+      keydown('s')
+      editor.insertText("ab")
+      keydown('escape')
+      expect(editor.getText()).toBe 'ab345'
+      keydown('u')
+      expect(editor.getText()).toBe '012345'
+
     describe "in visual mode", ->
       beforeEach ->
         keydown('v')
@@ -114,14 +135,34 @@ describe "Operators", ->
     beforeEach ->
       editor.setText("12345\nabcde\nABCDE")
       editor.setCursorScreenPosition([1, 3])
-      keydown('S', shift: true)
 
     it "deletes the entire line and enters insert mode", ->
+      keydown('S', shift: true)
       expect(editorView).toHaveClass 'insert-mode'
       expect(editor.getText()).toBe "12345\n\nABCDE"
       expect(editor.getCursorScreenPosition()).toEqual [1, 0]
       expect(vimState.getRegister('"').text).toBe "abcde\n"
       expect(vimState.getRegister('"').type).toBe 'linewise'
+
+    it "is repeatable", ->
+      keydown('S', shift: true)
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "12345\nabc\nABCDE"
+      editor.setCursorScreenPosition([2, 3])
+      keydown '.'
+      expect(editor.getText()).toBe "12345\nabc\nabc\n"
+
+    it "is undoable", ->
+      keydown('S', shift: true)
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "12345\nabc\nABCDE"
+      keydown 'u'
+      expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+
+    # Can't be tested without setting grammar of test buffer
+    xit "respects indentation", ->
 
   describe "the d keybinding", ->
     it "enters operator-pending mode", ->
@@ -226,10 +267,10 @@ describe "Operators", ->
       expect(editor.getText()).toBe "0\n"
 
   describe "the c keybinding", ->
-    describe "when followed by a c", ->
-      beforeEach ->
-        editor.setText("12345\nabcde\nABCDE")
+    beforeEach ->
+      editor.setText("12345\nabcde\nABCDE")
 
+    describe "when followed by a c", ->
       it "deletes the current line and enters insert mode", ->
         editor.setCursorScreenPosition([1, 1])
 
@@ -265,6 +306,28 @@ describe "Operators", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 0]
           expect(editorView).not.toHaveClass 'command-mode'
           expect(editorView).toHaveClass 'insert-mode'
+
+    describe "when followed by i w", ->
+      it "undo's and redo's completely", ->
+        editor.setCursorScreenPosition([1, 1])
+
+        keydown('c')
+        keydown('i')
+        keydown('w')
+        expect(editor.getText()).toBe "12345\n\nABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+        expect(editorView).toHaveClass 'insert-mode'
+
+        # Just cannot get "typing" to work correctly in test.
+        editor.setText("12345\nfg\nABCDE")
+        keydown('escape')
+        expect(editorView).toHaveClass 'command-mode'
+        expect(editor.getText()).toBe "12345\nfg\nABCDE"
+
+        keydown('u')
+        expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+        keydown('r', ctrl: true)
+        expect(editor.getText()).toBe "12345\nfg\nABCDE"
 
   describe "the C keybinding", ->
     beforeEach ->
@@ -382,7 +445,7 @@ describe "Operators", ->
 
         it "inserts the contents", ->
           expect(editor.getText()).toBe "034512\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
       describe "from a specified register", ->
         beforeEach ->
@@ -392,7 +455,7 @@ describe "Operators", ->
 
         it "inserts the contents of the 'a' register", ->
           expect(editor.getText()).toBe "0a12\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
       describe "at the end of a line", ->
         it "inserts before the current line's newline", ->
@@ -481,7 +544,7 @@ describe "Operators", ->
 
       it "inserts the contents of the default register above", ->
         expect(editor.getText()).toBe "345012\n"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
   describe "the O keybinding", ->
     beforeEach ->
@@ -491,12 +554,34 @@ describe "Operators", ->
 
       editor.getBuffer().setText("  abc\n  012\n")
       editor.setCursorScreenPosition([1, 1])
-      keydown('O', shift: true)
 
     it "switches to insert and adds a newline above the current one", ->
+      keydown('O', shift: true)
       expect(editor.getText()).toBe "  abc\n  \n  012\n"
       expect(editor.getCursorScreenPosition()).toEqual [1, 2]
       expect(editorView).toHaveClass 'insert-mode'
+
+    it "is repeatable", ->
+      editor.getBuffer().setText("  abc\n  012\n    4spaces\n")
+      editor.setCursorScreenPosition([1, 1])
+      keydown('O', shift: true)
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "  abc\n  def\n  012\n    4spaces\n"
+      editor.setCursorScreenPosition([1, 1])
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  def\n  def\n  012\n    4spaces\n"
+      editor.setCursorScreenPosition([4, 1])
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  def\n  def\n  012\n    def\n    4spaces\n"
+
+    it "is undoable", ->
+      keydown('O', shift: true)
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "  abc\n  def\n  012\n"
+      keydown 'u'
+      expect(editor.getText()).toBe "  abc\n  012\n"
 
   describe "the o keybinding", ->
     beforeEach ->
@@ -506,12 +591,37 @@ describe "Operators", ->
 
       editor.getBuffer().setText("abc\n  012\n")
       editor.setCursorScreenPosition([1, 2])
-      keydown('o')
 
     it "switches to insert and adds a newline above the current one", ->
+      keydown('o')
       expect(editor.getText()).toBe "abc\n  012\n  \n"
       expect(editorView).toHaveClass 'insert-mode'
       expect(editor.getCursorScreenPosition()).toEqual [2, 2]
+
+    # This works in practice, but the editor doesn't respect the indentation
+    # rules without a syntax grammar. Need to set the editor's grammar
+    # to fix it.
+    xit "is repeatable", ->
+      editor.getBuffer().setText("  abc\n  012\n    4spaces\n")
+      editor.setCursorScreenPosition([1, 1])
+      keydown('o')
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "  abc\n  012\n  def\n    4spaces\n"
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  012\n  def\n  def\n    4spaces\n"
+      editor.setCursorScreenPosition([4, 1])
+      keydown '.'
+      expect(editor.getText()).toBe "  abc\n  def\n  def\n  012\n    4spaces\n    def\n"
+
+    it "is undoable", ->
+      keydown('o')
+      editor.insertText "def"
+      keydown 'escape'
+      expect(editor.getText()).toBe "abc\n  012\n  def\n"
+      keydown 'u'
+      expect(editor.getText()).toBe "abc\n  012\n"
+
 
   describe "the a keybinding", ->
     beforeEach ->
@@ -791,3 +901,65 @@ describe "Operators", ->
 
       expect(editor.getText()).toBe 'AbC'
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+  describe "the i keybinding", ->
+    beforeEach ->
+      editor.setText('')
+      editor.setCursorBufferPosition([0, 0])
+
+    it "allows undoing an entire batch of typing", ->
+      keydown 'i'
+      editor.insertText("abc")
+      keydown 'escape'
+      keydown 'i'
+      editor.insertText("def")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abdefc"
+      keydown 'u'
+      expect(editor.getText()).toBe "abc"
+      keydown 'u'
+      expect(editor.getText()).toBe ""
+
+    it "allows repeating typing", ->
+      keydown 'i'
+      editor.insertText("abc")
+      keydown 'escape'
+      keydown '.'
+      editor.insertText("ababcc")
+
+    # This one doesn't work because we can't simulate typing correctly,
+    # and VimState#resetInputTransactions actually inspects buffer patches to
+    # build patches for repeating
+    xit "resets transactions for repeats after movement", ->
+      editor.setCursorBufferPosition([0, 0])
+      editor.insertText("abc\n123")
+      keydown 'i'
+      editor.insertText("def")
+      editorView.trigger 'core:move-down'
+      expect(editor.getCursorBufferPosition()).toEqual [1, 3]
+      editor.insertText("456")
+      keydown 'escape'
+      editor.setCursorBufferPosition([0, 0])
+      keydown '.'
+      expect(editor.getText()).toEqual "456defabc\n456123"
+
+  describe 'the a keybinding', ->
+    beforeEach ->
+      editor.setText('')
+      editor.setCursorBufferPosition([0, 0])
+
+    it "can be undone in one go", ->
+      keydown 'a'
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abc"
+      keydown 'u'
+      expect(editor.getText()).toBe ""
+
+    it "repeats correctly", ->
+      keydown 'a'
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abc"
+      keydown '.'
+      expect(editor.getText()).toBe "abcabc"
