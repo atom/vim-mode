@@ -1,4 +1,3 @@
-
 class TextObject
   constructor: (@editor, @state) ->
 
@@ -9,6 +8,10 @@ class SelectInsideWord extends TextObject
   select: ->
     @editor.selectWord()
     [true]
+
+#SelectInsideQuotes and the next class defined (SelectInsideBrackets) are
+#almost-but-not-quite-repeated code, they are different is because of the depth
+#checks in the bracket matcher.
 
 class SelectInsideQuotes extends TextObject
   constructor: (@editor, @char) ->
@@ -53,6 +56,10 @@ class SelectInsideQuotes extends TextObject
 
     {select,end} = @findClosingQuote(start)
     select
+
+#SelectInsideBrackets and the previous class defined (SelectInsideQuotes) are
+#almost-but-not-quite-repeated code, they are different is because of the depth
+#checks in the bracket matcher.
 
 class SelectInsideBrackets extends TextObject
   constructor: (@editor, @beginChar, @endChar) ->
