@@ -31,6 +31,7 @@ class VimState
     @setupCommandMode()
     @registerInsertIntercept()
     @registerInsertTransactionResets()
+    @registerPastEndOfLineHandler()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
@@ -81,6 +82,27 @@ class VimState
       return unless @setRegister?
       if newText == ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
+
+  # Private: Keeps Atom from placing your cursor past the EOL
+  # when you click in the right gutter.
+  #
+  # Returns nothing.
+  registerPastEndOfLineHandler: ->
+   @editorView.on 'mousedown', =>
+     if @mode != 'insert'
+       {row, column} = @editor.getCursorBufferPosition()
+       lineLength = @editor.lineLengthForBufferRow(row)
+       if column >= lineLength
+         callback = =>
+           @editor.setCursorBufferPosition([row, lineLength-1])
+           $('.cursor', @editorView).show()
+
+         # I'm not sure why, but giving a small timeout here
+         # helps the cursor to actually be hidden before
+         # moving it, leading to no to appearance of the cursor
+         # 'jumping'.
+         setTimeout callback, 20
+         $('.cursor', @editorView).hide()
 
   # Private: Creates the plugin's bindings
   #
