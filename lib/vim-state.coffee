@@ -122,6 +122,7 @@ class VimState
       'move-up': => new Motions.MoveUp(@editor, @)
       'move-down': => new Motions.MoveDown(@editor, @)
       'move-right': => new Motions.MoveRight(@editor, @)
+      'move-to-next-char': => new Motions.MoveToNextChar(@editor)
       'move-to-next-word': => new Motions.MoveToNextWord(@editor)
       'move-to-next-whole-word': => new Motions.MoveToNextWholeWord(@editor)
       'move-to-end-of-word': => new Motions.MoveToEndOfWord(@editor)

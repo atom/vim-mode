@@ -94,6 +94,24 @@ class MoveDown extends Motion
       @editor.selectDown()
       true
 
+class MoveToNextChar extends Motion
+  execute: (count=1) ->
+    _.times count, =>
+      {row, column} = @editor.getCursorScreenPosition()
+      buffer = @editor.getBuffer()
+      lastRow = buffer.getLastRow()
+      lastCharIndex = buffer.lineForRow(row).length - 1
+      if column < lastCharIndex
+        @editor.moveCursorRight()
+      else if row isnt lastRow
+        @editor.moveCursorDown()
+        @editor.moveCursorToBeginningOfLine()
+
+  select: (count=1) ->
+    _.times count, =>
+      @editor.selectRight()
+      return true
+
 class MoveToPreviousWord extends Motion
   execute: (count=1) ->
     _.times count, =>
@@ -436,7 +454,7 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
 
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
-  MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
+  MoveToNextChar, MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
   MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
