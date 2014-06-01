@@ -9,6 +9,7 @@
   'backspace': 'core:move-left'
   'l': 'vim-mode:move-right'
   'right': 'vim-mode:move-right'
+  'space': 'vim-mode:move-to-next-char'
   'k': 'vim-mode:move-up'
   'up': 'vim-mode:move-up'
   'j': 'vim-mode:move-down'

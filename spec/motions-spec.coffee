@@ -71,6 +71,63 @@ describe "Motions", ->
         keydown('l')
         expect(editor.getCursorScreenPosition()).toEqual [1, 4]
 
+    describe "the space keybinding", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 3])
+
+      describe "as a motion", ->
+
+        it "moves the cursor right and can go to the next line", ->
+          keydown(' ')
+          expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+
+          keydown(' ')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+          keydown(' ')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+
+        it "stops moving the cursor if its reached the last row and before the last column", ->
+          editor.setCursorScreenPosition([2, 4])
+
+          keydown(' ')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 4]
+
+          keydown(' ')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 4]
+
+      describe "as a selection", ->
+        beforeEach -> keydown('v')
+
+        it "selects the character to right and can select up to the next line", ->
+          keydown(' ')
+          expect(editor.getSelectedText()).toEqual("d")
+
+          keydown(' ')
+          expect(editor.getSelectedText()).toEqual("de")
+
+          keydown(' ')
+          expect(editor.getSelectedText()).toEqual("de\n")
+
+          keydown(' ')
+          expect(editor.getSelectedText()).toEqual("de\nA")
+
+          keydown(' ')
+          expect(editor.getSelectedText()).toEqual("de\nAB")
+
+        it "selects the character at the last column of the last row and stops", ->
+          editor.setCursorScreenPosition([2, 4])
+          keydown('v')
+
+          # FIXME: this isn't the correct behavior since going into
+          # visual characterwise mode currently doesnt select the character
+          # right away. pressing 'v' should have selected it right away
+          # without having to press space one.
+          keydown(' ')
+          expect(editor.getSelectedText()).toEqual("E")
+
+          keydown(' ')
+          expect(editor.getSelectedText()).toEqual("E")
+
   describe "the w keybinding", ->
     beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
 
