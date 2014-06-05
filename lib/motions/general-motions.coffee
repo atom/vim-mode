@@ -156,9 +156,6 @@ class MoveDown extends MoveVertically
   directionIncrement: ->
     1
 
-  move: (count) ->
-    @editor.moveCursorDown(count)
-
   select: (count=1) ->
     _.times count, =>
       @editor.selectDown()
