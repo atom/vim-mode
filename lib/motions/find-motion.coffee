@@ -36,6 +36,7 @@ class Find extends MotionWithInput
     @
 
   execute: (count=1) ->
+    @editor.desiredCursorColumn = null
     if (match = @match(count))?
       @editorView.editor.setCursorBufferPosition(match.point)
 
