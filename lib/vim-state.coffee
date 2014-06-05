@@ -481,11 +481,16 @@ class VimState
   updateStatusBar: ->
     if !$('#status-bar-vim-mode').length
       atom.packages.once 'activated', ->
-        atom.workspaceView.statusBar?.prependRight("<div id='status-bar-vim-mode' class='inline-block'>Command</div>")
+        atom.workspaceView.statusBar?.prependRight("<div id='status-bar-vim-mode' class='inline-block status-bar-vim-mode-command'>Command</div>")
 
     if @mode is "insert"
-      $('#status-bar-vim-mode').html("Insert")
+      @removeStatusBarClass()
+      $('#status-bar-vim-mode').addClass('status-bar-vim-mode-insert').html("Insert")
     else if @mode is "command"
-      $('#status-bar-vim-mode').html("Command")
+      @removeStatusBarClass()
+      $('#status-bar-vim-mode').addClass('status-bar-vim-mode-command').html("Command")
     else if @mode is "visual"
-      $('#status-bar-vim-mode').html("Visual")
+      @removeStatusBarClass()
+      $('#status-bar-vim-mode').addClass('status-bar-vim-mode-visual').html("Visual")
+
+  removeStatusBarClass: -> $('#status-bar-vim-mode').removeClass('status-bar-vim-mode-insert').removeClass('status-bar-vim-mode-command').removeClass('status-bar-vim-mode-visual')
