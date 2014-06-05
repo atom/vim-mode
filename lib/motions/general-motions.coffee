@@ -76,7 +76,7 @@ class MoveRight extends Motion
 
 class MoveVertically extends Motion
   execute: (count=1) ->
-    {row, column} = @editor.getCursorScreenPosition()
+    {row, column} = @editor.getCursorBufferPosition()
 
     nextRow = @nextValidRow(count)
 
@@ -111,25 +111,22 @@ class MoveVertically extends Motion
   #
   # count - The number of folded 'buffer' rows away from
   #         the current row.
-  # increment - The direction to move the cursor. Use -1
-  #             for moving up, 1 for moving down.
   #
   # Returns an integer row index.
-  nextValidRowWithIncrement: (count, increment) ->
+  nextValidRow: (count) ->
     {row, column} = @editor.getCursorBufferPosition()
-    e = @editor
 
-    maxRow = @editor.getLineCount()
+    maxRow = @editor.getLastBufferRow()
     minRow = 0
 
-    # For each count, subtract 1 row. Folded rows
-    # count as a single row.
-    _.times count, ->
-      if e.isFoldedAtBufferRow(row)
-        while e.isFoldedAtBufferRow(row)
-          row += increment
+    # For each count, add 1 'directionIncrement' to
+    # row. Folded rows count as a single row.
+    _.times count, =>
+      if @editor.isFoldedAtBufferRow(row)
+        while @editor.isFoldedAtBufferRow(row)
+          row += @directionIncrement()
       else
-        row += increment
+        row += @directionIncrement()
 
     if row > maxRow
       maxRow
@@ -139,8 +136,12 @@ class MoveVertically extends Motion
       row
 
 class MoveUp extends MoveVertically
-  nextValidRow: (count) ->
-    @nextValidRowWithIncrement(count, -1)
+  # Internal: The direction to move the cursor. Use -1
+  # for moving up, 1 for moving down.
+  #
+  # Returns -1
+  directionIncrement: ->
+    -1
 
   select: (count=1) ->
     _.times count, =>
@@ -148,8 +149,12 @@ class MoveUp extends MoveVertically
       true
 
 class MoveDown extends MoveVertically
-  nextValidRow: (count) ->
-    @nextValidRowWithIncrement(count, 1)
+  # Internal: The direction to move the cursor. Use -1
+  # for moving up, 1 for moving down.
+  #
+  # Returns 1
+  directionIncrement: ->
+    1
 
   move: (count) ->
     @editor.moveCursorDown(count)
