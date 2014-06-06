@@ -53,6 +53,23 @@ describe "Motions", ->
         keydown('j')
         expect(editor.getCursorScreenPosition()).toEqual [2, 1]
 
+      describe "when visual mode", ->
+        beforeEach ->
+          keydown('v')
+
+        it "moves the cursor down", ->
+          keydown('j')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+
+        it "don't go over after the last line", ->
+          keydown('j')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+
+        it "selects the text while moving", ->
+          keydown('j')
+          expect(editor.getSelectedText()).toBe "bcde\nA"
+
+
     describe "the k keybinding", ->
       it "moves the cursor up, but not to the beginning of the first line", ->
         keydown('k')
