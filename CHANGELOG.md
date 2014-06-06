@@ -5,6 +5,7 @@
 * Fix tracking of marks when buffer changes @carlosdcastillo
 * Fix off-by-one error for characterwise puts @carlosdcastillo
 * Add support for undo and repeat to typing operations @bhuga
+* Fix keybindings for some OSes @mcnicholls
 
 ## 0.10.0
 * Fix E in visual mode @tony612
