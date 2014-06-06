@@ -24,7 +24,6 @@ class SearchBase extends MotionWithInput
     @
 
   execute: (count=1) ->
-    @editor.desiredCursorColumn = null
     @scan()
     @match count, (pos) =>
       @editor.setCursorBufferPosition(pos.range.start)

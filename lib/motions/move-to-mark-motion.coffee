@@ -11,7 +11,6 @@ class MoveToMark extends MotionWithInput
   isLinewise: -> @linewise
 
   execute: ->
-    @editor.desiredCursorColumn = null
     markPosition = @vimState.getMark(@input.characters)
 
     if @input.characters == '`' # double '`' pressed
