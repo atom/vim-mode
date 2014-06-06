@@ -79,6 +79,7 @@ class MoveUp extends Motion
       @editor.moveCursorUp() if row > 0
 
   select: (count=1) ->
+    @editor.selectLine()
     _.times count, =>
       @editor.selectUp()
       true
@@ -90,6 +91,7 @@ class MoveDown extends Motion
       @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
 
   select: (count=1) ->
+    @editor.selectLine()
     _.times count, =>
       @editor.selectDown()
       true
