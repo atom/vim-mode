@@ -494,4 +494,4 @@ class VimState
       @removeStatusBarClass()
       $('#status-bar-vim-mode').addClass('status-bar-vim-mode-visual').html("Visual")
 
-  removeStatusBarClass: -> $('#status-bar-vim-mode').removeClass('status-bar-vim-mode-insert').removeClass('status-bar-vim-mode-command').removeClass('status-bar-vim-mode-visual')
+  removeStatusBarClass: -> $('#status-bar-vim-mode').removeClass('status-bar-vim-mode-insert status-bar-vim-mode-command status-bar-vim-mode-visual')
