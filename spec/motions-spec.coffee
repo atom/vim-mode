@@ -668,12 +668,26 @@ describe "Motions", ->
 
     describe "as a selection", ->
       beforeEach ->
-        editor.setCursorScreenPosition([1, 0])
+        editor.setCursorScreenPosition([1, 2])
         vimState.activateVisualMode()
         keydown('G', shift: true)
 
-      it "selects to the last line in the file", ->
-        expect(editor.getSelectedText()).toBe "    2\n 3abc\n "
+      describe 'linewise', ->
+        it "selects the current row up to the last line in the file", ->
+          editor.setCursorScreenPosition([1, 2])
+          vimState.activateVisualMode('linewise')
+          keydown('G', shift: true)
+          expect(editor.getSelectedText()).toBe "    2\n 3abc\n "
+
+      it "selects from the current cursor column to the last line in the file", ->
+        expect(editor.getSelectedText()).toBe "  2\n 3abc\n "
+
+      it "selects up to the first character of the last line", ->
+        editor.setText(" 1\n    2\n 3abc\n hello world")
+        editor.setCursorScreenPosition([0, 1])
+        vimState.activateVisualMode()
+        keydown('G', shift: true)
+        expect(editor.getSelectedText()).toBe "1\n    2\n 3abc\n h"
 
       it "moves the cursor to the last line after whitespace", ->
         expect(editor.getCursorScreenPosition()).toEqual [3,1]

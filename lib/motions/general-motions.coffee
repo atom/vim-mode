@@ -502,6 +502,24 @@ class MoveToStartOfFile extends MoveToLine
     bufferRange = new Range([row, startingCol], [destinationRow, destinationCol])
     @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
+class MoveToEndOfFile extends MoveToLine
+  isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
+
+  getDestinationRow: (count=null) ->
+    return count - 1 if count?
+    @editor.getEofBufferPosition().row
+
+  select: (count=1) ->
+    {row, column} = @editor.getCursorBufferPosition()
+    eofRow = @editor.getEofBufferPosition().row
+    if @isLinewise()
+      bufferRange = new Range([row - 1, 0], [eofRow, 0])
+    else
+      bufferRange = new Range([row, column], [eofRow, 0])
+    @editor.setSelectedBufferRange(bufferRange)
+    @editor.selectToFirstCharacterOfLine()
+    @editor.selectRight()
+
 class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow()
@@ -532,6 +550,6 @@ module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
-  MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
+  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToEndOfFile,
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
 }

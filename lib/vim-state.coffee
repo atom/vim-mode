@@ -136,6 +136,7 @@ class VimState
       'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
       'move-to-start-of-file': => new Motions.MoveToStartOfFile(@editor, @)
       'move-to-line': => new Motions.MoveToLine(@editor, @)
+      'move-to-end-of-file': => new Motions.MoveToEndOfFile(@editor, @)
       'move-to-top-of-screen': => new Motions.MoveToTopOfScreen(@editor, @, @editorView)
       'move-to-bottom-of-screen': => new Motions.MoveToBottomOfScreen(@editor, @, @editorView)
       'move-to-middle-of-screen': => new Motions.MoveToMiddleOfScreen(@editor, @, @editorView)

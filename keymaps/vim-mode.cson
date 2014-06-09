@@ -34,7 +34,7 @@
   'ctrl-f': 'core:page-down'
   'ctrl-e': 'vim-mode:scroll-down'
   'ctrl-y': 'vim-mode:scroll-up'
-  'G': 'vim-mode:move-to-line'
+  'G': 'vim-mode:move-to-end-of-file'
   'H': 'vim-mode:move-to-top-of-screen'
   'L': 'vim-mode:move-to-bottom-of-screen'
   'M': 'vim-mode:move-to-middle-of-screen'
