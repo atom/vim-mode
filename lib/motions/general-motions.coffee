@@ -400,12 +400,23 @@ class MoveToLastCharacterOfLine extends Motion
       true
 
 class MoveToStartOfFile extends MoveToLine
+  isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
+
   getDestinationRow: (count=1) ->
     count - 1
 
+  getDestinationColumn: (row) ->
+    if @isLinewise() then 0 else @editor.lineForBufferRow(row).search(/\S/)
+
+  getStartingColumn: (column) ->
+    if @isLinewise() then column else column + 1
+
   select: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
-    bufferRange = new Range([row,column+1], [0,0])
+    startingCol = @getStartingColumn(column)
+    destinationRow = @getDestinationRow(count)
+    destinationCol = @getDestinationColumn(destinationRow)
+    bufferRange = new Range([row, startingCol], [destinationRow, destinationCol])
     @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
 class MoveToTopOfScreen extends MoveToScreenLine

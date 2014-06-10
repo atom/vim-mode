@@ -537,34 +537,77 @@ describe "Motions", ->
       editor.setCursorScreenPosition([0, 2])
 
     describe "as a motion", ->
-      beforeEach ->
-        keydown('g')
-        keydown('g')
+      describe "in command mode", ->
+        beforeEach ->
+          keydown('g')
+          keydown('g')
 
-      it "moves the cursor to the beginning of the first line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        it "moves the cursor to the beginning of the first line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+      describe "in linewise visual mode", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([1, 0])
+          vimState.activateVisualMode('linewise')
+          keydown('g')
+          keydown('g')
+
+        it "selects to the first line in the file", ->
+          expect(editor.getSelectedText()).toBe " 1abc\n 2\n"
+
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      describe "in characterwise visual mode", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([1, 1])
+          vimState.activateVisualMode()
+          keydown('g')
+          keydown('g')
+
+        it "selects to the first line in the file", ->
+          expect(editor.getSelectedText()).toBe "1abc\n 2"
+
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
     describe "as a repeated motion", ->
-      beforeEach ->
-        keydown('2')
-        keydown('g')
-        keydown('g')
+      describe "in command mode", ->
+        beforeEach ->
+          keydown('2')
+          keydown('g')
+          keydown('g')
 
-      it "moves the cursor to a specified line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-    describe "as a selection", ->
-      beforeEach ->
-        editor.setCursorScreenPosition([1, 1])
-        vimState.activateVisualMode()
-        keydown('g')
-        keydown('g')
+      describe "in linewise visual motion", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([2, 0])
+          vimState.activateVisualMode('linewise')
+          keydown('2')
+          keydown('g')
+          keydown('g')
 
-      it "selects to the first line in the file", ->
-        expect(editor.getSelectedText()).toBe " 1abc\n 2"
+        it "selects to a specified line", ->
+          expect(editor.getSelectedText()).toBe " 2\n3\n"
 
-      it "moves the cursor to a specified line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+      describe "in characterwise visual motion", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([2, 0])
+          vimState.activateVisualMode()
+          keydown('2')
+          keydown('g')
+          keydown('g')
+
+        it "selects to a first character of specified line", ->
+          expect(editor.getSelectedText()).toBe "2\n3"
+
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
   describe "the G keybinding", ->
     beforeEach ->
