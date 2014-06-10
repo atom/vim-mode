@@ -9,6 +9,7 @@
 * Fix visual `ngg` @tony612
 * Implement i{, i(, and i" @carlosdcastillo
 * Fix off by one errors while selecting with j and k @fotanus
+* Implement 'desired cursor column' behavior @iamjwc
 
 ## 0.10.0
 * Fix E in visual mode @tony612
