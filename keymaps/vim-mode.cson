@@ -8,6 +8,7 @@
   'left': 'vim-mode:move-left'
   'backspace': 'core:move-left'
   'l': 'vim-mode:move-right'
+  'space': 'vim-mode:move-right'
   'right': 'vim-mode:move-right'
   'k': 'vim-mode:move-up'
   'up': 'vim-mode:move-up'
