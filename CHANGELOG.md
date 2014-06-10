@@ -7,6 +7,7 @@
 * Add support for undo and repeat to typing operations @bhuga
 * Fix keybindings for some OSes @mcnicholls
 * Fix visual `ngg` @tony612
+* Implement i{, i(, and i" @carlosdcastillo
 
 ## 0.10.0
 * Fix E in visual mode @tony612
