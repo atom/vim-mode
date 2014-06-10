@@ -133,6 +133,7 @@ class TransactionBundler
   constructor: (@transaction) ->
 
   buildInsertText: ->
+    return "" unless @transaction.patches
     chars = []
     for patch in @transaction.patches
       switch
