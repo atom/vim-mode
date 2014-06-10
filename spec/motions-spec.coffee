@@ -25,7 +25,7 @@ describe "Motions", ->
 
   describe "simple motions", ->
     beforeEach ->
-      editor.setText("12345\nabcde\nABCDE")
+      editor.setText("12345\nabcd\nABCDE")
       editor.setCursorScreenPosition([1, 1])
 
     describe "the h keybinding", ->
@@ -53,6 +53,21 @@ describe "Motions", ->
         keydown('j')
         expect(editor.getCursorScreenPosition()).toEqual [2, 1]
 
+      it "moves the cursor to the end of the line, not past it", ->
+        editor.setCursorScreenPosition([0,4])
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+      it "remembers the position it column it was in after moving to shorter line", ->
+        editor.setCursorScreenPosition([0,4])
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [2, 4]
+
       describe "when visual mode", ->
         beforeEach ->
           keydown('v')
@@ -67,8 +82,7 @@ describe "Motions", ->
 
         it "selects the text while moving", ->
           keydown('j')
-          expect(editor.getSelectedText()).toBe "bcde\nA"
-
+          expect(editor.getSelectedText()).toBe "bcd\nA"
 
     describe "the k keybinding", ->
       it "moves the cursor up, but not to the beginning of the first line", ->
@@ -79,14 +93,14 @@ describe "Motions", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
     describe "the l keybinding", ->
-      beforeEach -> editor.setCursorScreenPosition([1, 3])
+      beforeEach -> editor.setCursorScreenPosition([1, 2])
 
       it "moves the cursor right, but not to the next line", ->
         keydown('l')
-        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
         keydown('l')
-        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
   describe "the w keybinding", ->
     beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
@@ -510,7 +524,7 @@ describe "Motions", ->
 
   describe "the $ keybinding", ->
     beforeEach ->
-      editor.setText("  abcde\n\n")
+      editor.setText("  abcde\n\n1234567890")
       editor.setCursorScreenPosition([0, 4])
 
     describe "as a motion from empty line", ->
@@ -526,13 +540,20 @@ describe "Motions", ->
       it "moves the cursor to the end of the line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
+      it "should remain in the last column when moving down", ->
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [2, 9]
+
     describe "as a selection", ->
       beforeEach ->
         keydown('d')
         keydown('$')
 
       it "selects to the beginning of the lines", ->
-        expect(editor.getText()).toBe "  ab\n\n"
+        expect(editor.getText()).toBe "  ab\n\n1234567890"
         expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
   # FIXME: this doesn't work as we can't determine if this is a motion
