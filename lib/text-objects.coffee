@@ -10,7 +10,7 @@ class SelectInsideWord extends TextObject
     [true]
 
 # SelectInsideQuotes and the next class defined (SelectInsideBrackets) are
-# almost-but-not-quite-repeated code. They are different is because of the depth
+# almost-but-not-quite-repeated code. They are different because of the depth
 # checks in the bracket matcher.
 
 class SelectInsideQuotes extends TextObject
@@ -58,7 +58,7 @@ class SelectInsideQuotes extends TextObject
     select
 
 # SelectInsideBrackets and the previous class defined (SelectInsideQuotes) are
-# almost-but-not-quite-repeated code. They are different is because of the depth
+# almost-but-not-quite-repeated code. They are different because of the depth
 # checks in the bracket matcher.
 
 class SelectInsideBrackets extends TextObject
