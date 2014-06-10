@@ -10,6 +10,7 @@ class Motion
 
   isComplete: -> true
   isRecordable: -> false
+  inVisualMode: -> @vimState.mode == "visual"
 
 class CurrentSelection extends Motion
   execute: (count=1) ->
@@ -79,6 +80,11 @@ class MoveUp extends Motion
       @editor.moveCursorUp() if row > 0
 
   select: (count=1) ->
+    unless @inVisualMode()
+      @editor.moveCursorToBeginningOfLine()
+      @editor.moveCursorDown()
+      @editor.selectUp()
+
     _.times count, =>
       @editor.selectUp()
       true
@@ -90,6 +96,7 @@ class MoveDown extends Motion
       @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
 
   select: (count=1) ->
+    @editor.selectLine() unless @inVisualMode()
     _.times count, =>
       @editor.selectDown()
       true
