@@ -23,8 +23,8 @@ describe "Operators", ->
     opts.raw = true
     keydown(key, opts)
 
-  describe "cancel operation", ->
-    it "cannot cancel operation if no operator pending", ->
+  describe "cancel operation is robust", ->
+    it "can call cancel operation, even if no operator pending", ->
       expect(-> vimState.pushOperations(new Input(''))).toThrow()
 
       # make sure commandModeInputView is created
