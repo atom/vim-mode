@@ -30,6 +30,7 @@ class VimState
     params.id = 0;
 
     @setupCommandMode()
+    @editorView.setInputEnabled?(false)
     @registerInsertIntercept()
     @registerInsertTransactionResets()
     if atom.config.get 'vim-mode.startInInsertMode'
@@ -364,6 +365,7 @@ class VimState
   # Returns nothing.
   activateInsertMode: (transactionStarted = false)->
     @mode = 'insert'
+    @editorView.setInputEnabled?(true)
     @editor.beginTransaction() unless transactionStarted
     @submode = null
     @changeModeClass('insert-mode')
@@ -371,6 +373,7 @@ class VimState
 
   deactivateInsertMode: ->
     return unless @mode == 'insert'
+    @editorView.setInputEnabled?(false)
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
     item = @inputOperator(@history[0])
