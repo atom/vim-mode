@@ -1,13 +1,14 @@
-'.vim-mode:not(.command-mode)':
+'.editor.vim-mode:not(.command-mode)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-c': 'vim-mode:activate-command-mode'
   'ctrl-[': 'vim-mode:activate-command-mode'
 
-'.vim-mode:not(.insert-mode)':
+'.editor.vim-mode:not(.insert-mode)':
   'h': 'vim-mode:move-left'
   'left': 'vim-mode:move-left'
   'backspace': 'core:move-left'
   'l': 'vim-mode:move-right'
+  'space': 'vim-mode:move-right'
   'right': 'vim-mode:move-right'
   'k': 'vim-mode:move-up'
   'up': 'vim-mode:move-up'
@@ -110,7 +111,7 @@
   '8': 'vim-mode:repeat-prefix'
   '9': 'vim-mode:repeat-prefix'
 
-'.vim-mode.command-mode':
+'.editor.vim-mode.command-mode':
   'i': 'vim-mode:activate-insert-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'
   'V': 'vim-mode:activate-linewise-visual-mode'
@@ -166,9 +167,14 @@
   '" %': 'vim-mode:register-prefix'
   '" _': 'vim-mode:register-prefix'
 
-'.vim-mode.operator-pending-mode, .vim-mode.visual-mode':
+'.editor.vim-mode.operator-pending-mode, .editor.vim-mode.visual-mode':
   'i w': 'vim-mode:select-inside-word'
+  'i "': 'vim-mode:select-inside-double-quotes'
+  'i \'': 'vim-mode:select-inside-single-quotes'
+  'i {': 'vim-mode:select-inside-curly-brackets'
+  'i <': 'vim-mode:select-inside-angle-brackets'
+  'i (': 'vim-mode:select-inside-parentheses'
 
-'.vim-mode.visual-mode':
+'.editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
   's': 'vim-mode:change'

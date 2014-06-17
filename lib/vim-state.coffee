@@ -24,11 +24,13 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
+    @desiredCursorColumn = null
     params = {}
     params.manager = this;
     params.id = 0;
 
     @setupCommandMode()
+    @editorView.setInputEnabled?(false)
     @registerInsertIntercept()
     @registerInsertTransactionResets()
     if atom.config.get 'vim-mode.startInInsertMode'
@@ -99,19 +101,19 @@ class VimState
       'substitute': => new Operators.Substitute(@editor, @)
       'substitute-line': => new Operators.SubstituteLine(@editor, @)
       'insert-after': => new Operators.InsertAfter(@editor, @)
-      'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor), new Operators.InsertAfter(@editor, @)]
-      'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor), new Operators.Insert(@editor, @)]
+      'insert-after-end-of-line': => [new Motions.MoveToLastCharacterOfLine(@editor, @), new Operators.InsertAfter(@editor, @)]
+      'insert-at-beginning-of-line': => [new Motions.MoveToFirstCharacterOfLine(@editor, @), new Operators.Insert(@editor, @)]
       'insert-above-with-newline': => new Operators.InsertAboveWithNewline(@editor, @)
       'insert-below-with-newline': => new Operators.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(Operators.Delete)
       'change': => @linewiseAliasedOperator(Operators.Change)
-      'change-to-last-character-of-line': => [new Operators.Change(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor)]
-      'delete-right': => [new Operators.Delete(@editor, @), new Motions.MoveRight(@editor)]
-      'delete-left': => [new Operators.Delete(@editor, @), new Motions.MoveLeft(@editor)]
-      'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor)]
+      'change-to-last-character-of-line': => [new Operators.Change(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor, @)]
+      'delete-right': => [new Operators.Delete(@editor, @), new Motions.MoveRight(@editor, @)]
+      'delete-left': => [new Operators.Delete(@editor, @), new Motions.MoveLeft(@editor, @)]
+      'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor, @)]
       'toggle-case': => new Operators.ToggleCase(@editor, @)
       'yank': => @linewiseAliasedOperator(Operators.Yank)
-      'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToLine(@editor)]
+      'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToLine(@editor, @)]
       'put-before': => new Operators.Put(@editor, @, location: 'before')
       'put-after': => new Operators.Put(@editor, @, location: 'after')
       'join': => new Operators.Join(@editor, @)
@@ -122,25 +124,30 @@ class VimState
       'move-up': => new Motions.MoveUp(@editor, @)
       'move-down': => new Motions.MoveDown(@editor, @)
       'move-right': => new Motions.MoveRight(@editor, @)
-      'move-to-next-word': => new Motions.MoveToNextWord(@editor)
-      'move-to-next-whole-word': => new Motions.MoveToNextWholeWord(@editor)
-      'move-to-end-of-word': => new Motions.MoveToEndOfWord(@editor)
-      'move-to-end-of-whole-word': => new Motions.MoveToEndOfWholeWord(@editor)
-      'move-to-previous-word': => new Motions.MoveToPreviousWord(@editor)
-      'move-to-previous-whole-word': => new Motions.MoveToPreviousWholeWord(@editor)
-      'move-to-next-paragraph': => new Motions.MoveToNextParagraph(@editor)
-      'move-to-previous-paragraph': => new Motions.MoveToPreviousParagraph(@editor)
-      'move-to-first-character-of-line': => new Motions.MoveToFirstCharacterOfLine(@editor)
-      'move-to-last-character-of-line': => new Motions.MoveToLastCharacterOfLine(@editor)
+      'move-to-next-word': => new Motions.MoveToNextWord(@editor, @)
+      'move-to-next-whole-word': => new Motions.MoveToNextWholeWord(@editor, @)
+      'move-to-end-of-word': => new Motions.MoveToEndOfWord(@editor, @)
+      'move-to-end-of-whole-word': => new Motions.MoveToEndOfWholeWord(@editor, @)
+      'move-to-previous-word': => new Motions.MoveToPreviousWord(@editor, @)
+      'move-to-previous-whole-word': => new Motions.MoveToPreviousWholeWord(@editor, @)
+      'move-to-next-paragraph': => new Motions.MoveToNextParagraph(@editor, @)
+      'move-to-previous-paragraph': => new Motions.MoveToPreviousParagraph(@editor, @)
+      'move-to-first-character-of-line': => new Motions.MoveToFirstCharacterOfLine(@editor, @)
+      'move-to-last-character-of-line': => new Motions.MoveToLastCharacterOfLine(@editor, @)
       'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
-      'move-to-start-of-file': => new Motions.MoveToStartOfFile(@editor)
-      'move-to-line': => new Motions.MoveToLine(@editor)
-      'move-to-top-of-screen': => new Motions.MoveToTopOfScreen(@editor, @editorView)
-      'move-to-bottom-of-screen': => new Motions.MoveToBottomOfScreen(@editor, @editorView)
-      'move-to-middle-of-screen': => new Motions.MoveToMiddleOfScreen(@editor, @editorView)
+      'move-to-start-of-file': => new Motions.MoveToStartOfFile(@editor, @)
+      'move-to-line': => new Motions.MoveToLine(@editor, @)
+      'move-to-top-of-screen': => new Motions.MoveToTopOfScreen(@editor, @, @editorView)
+      'move-to-bottom-of-screen': => new Motions.MoveToBottomOfScreen(@editor, @, @editorView)
+      'move-to-middle-of-screen': => new Motions.MoveToMiddleOfScreen(@editor, @, @editorView)
       'scroll-down': => new Scroll.ScrollDown(@editorView, @editor)
       'scroll-up': => new Scroll.ScrollUp(@editorView, @editor)
       'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
+      'select-inside-double-quotes': => new TextObjects.SelectInsideQuotes(@editor, '"')
+      'select-inside-single-quotes': => new TextObjects.SelectInsideQuotes(@editor, '\'')
+      'select-inside-curly-brackets': => new TextObjects.SelectInsideBrackets(@editor, '{', '}')
+      'select-inside-angle-brackets': => new TextObjects.SelectInsideBrackets(@editor, '<', '>')
+      'select-inside-parentheses': => new TextObjects.SelectInsideBrackets(@editor, '(', ')')
       'register-prefix': (e) => @registerPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
       'repeat-search': (e) => currentSearch.repeat() if (currentSearch = Motions.Search.currentSearch)?
@@ -209,7 +216,7 @@ class VimState
       # If we've received an operator in visual mode, mark the current
       # selection as the motion to operate on.
       if @mode is 'visual' and operation instanceof Operators.Operator
-        @opStack.push(new Motions.CurrentSelection(@))
+        @opStack.push(new Motions.CurrentSelection(@editor, @))
 
       @processOpStack()
 
@@ -358,6 +365,7 @@ class VimState
   # Returns nothing.
   activateInsertMode: (transactionStarted = false)->
     @mode = 'insert'
+    @editorView.setInputEnabled?(true)
     @editor.beginTransaction() unless transactionStarted
     @submode = null
     @changeModeClass('insert-mode')
@@ -365,6 +373,7 @@ class VimState
 
   deactivateInsertMode: ->
     return unless @mode == 'insert'
+    @editorView.setInputEnabled?(false)
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
     item = @inputOperator(@history[0])
@@ -454,7 +463,7 @@ class VimState
       @repeatPrefix(e)
       null
     else
-      new Motions.MoveToBeginningOfLine(@editor)
+      new Motions.MoveToBeginningOfLine(@editor, @)
 
   # Private: A generic way to handle Operators that can be repeated for
   # their linewise form.
@@ -464,7 +473,7 @@ class VimState
   # Returns nothing.
   linewiseAliasedOperator: (constructor) ->
     if @isOperatorPending(constructor)
-      new Motions.MoveToLine(@editor)
+      new Motions.MoveToLine(@editor, @)
     else
       new constructor(@editor, @)
 

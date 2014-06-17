@@ -257,6 +257,59 @@ describe "Operators", ->
         expect(editorView).not.toHaveClass('operator-pending-mode')
         expect(editorView).toHaveClass('command-mode')
 
+    describe "when followed by an j", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+        describe "on the beginning of the file", ->
+          editor.setCursorScreenPosition([0, 0])
+          it "deletes the next two lines", ->
+            keydown('d')
+            keydown('j')
+            expect(editor.getText()).toBe("ABCDE")
+
+        describe "on the end of the file", ->
+          editor.setCursorScreenPosition([4,2])
+          it "deletes nothing", ->
+            keydown('d')
+            keydown('j')
+            expect(editor.getText()).toBe(originalText)
+
+        describe "on the middle of second line", ->
+          editor.setCursorScreenPosition([2,1])
+          it "deletes the last two lines", ->
+            keydown('d')
+            keydown('j')
+            expect(editor.getText()).toBe("12345")
+
+    describe "when followed by an k", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+        describe "on the end of the file", ->
+          editor.setCursorScreenPosition([4, 2])
+          it "deletes the bottom two lines", ->
+            keydown('d')
+            keydown('k')
+            expect(editor.getText()).toBe("ABCDE")
+
+        describe "on the beginning of the file", ->
+          editor.setCursorScreenPosition([0,0])
+          it "deletes nothing", ->
+            keydown('d')
+            keydown('k')
+            expect(editor.getText()).toBe(originalText)
+
+        describe "when on the middle of second line", ->
+          editor.setCursorScreenPosition([2,1])
+          it "deletes the first two lines", ->
+            keydown('d')
+            keydown('k')
+            expect(editor.getText()).toBe("12345")
+
+
   describe "the D keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n")

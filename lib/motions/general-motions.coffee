@@ -7,9 +7,11 @@ class MotionError
 
 class Motion
   constructor: (@editor, @vimState) ->
+    @vimState.desiredCursorColumn = null
 
   isComplete: -> true
   isRecordable: -> false
+  inVisualMode: -> @vimState.mode == "visual"
 
 class CurrentSelection extends Motion
   execute: (count=1) ->
@@ -18,7 +20,7 @@ class CurrentSelection extends Motion
   select: (count=1) ->
     _.times(count, -> true)
 
-  isLinewise: -> @editor.mode == 'visual' and @editor.submode == 'linewise'
+  isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
 
 # Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
@@ -37,7 +39,6 @@ class MotionWithInput extends Motion
     @complete = true
 
 class MoveLeft extends Motion
-
   execute: (count=1) ->
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
@@ -72,24 +73,102 @@ class MoveRight extends Motion
       else
         false
 
-class MoveUp extends Motion
+class MoveVertically extends Motion
+  constructor: (@editor, @vimState) ->
+    # 'desiredCursorColumn' gets overwritten in the Motion constructor,
+    # so we need to re-set it after calling super.
+    column = @vimState.desiredCursorColumn
+    super(@editor, @vimState)
+    @vimState.desiredCursorColumn = column
+
   execute: (count=1) ->
+    {row, column} = @editor.getCursorBufferPosition()
+
+    nextRow = @nextValidRow(count)
+
+    if nextRow != row
+      nextLineLength = @editor.lineLengthForBufferRow(nextRow)
+
+      # The 'nextColumn' the cursor should be in is the
+      # 'desiredCursorColumn', if it exists. If it does
+      # not, the current column should be used.
+      nextColumn = @vimState.desiredCursorColumn || column
+
+      # Check to see if the 'nextColumn' position of
+      # cursor is greater than or equal to the length
+      # of the next line.
+      if nextColumn >= nextLineLength
+        # When the 'nextColumn' is greater than the
+        # length of the next line, we should move the
+        # cursor to the end of the next line and save
+        # 'nextColumn' in 'desiredCursorColumn'.
+        @editor.setCursorBufferPosition([nextRow, nextLineLength-1])
+        @vimState.desiredCursorColumn = nextColumn
+      else
+        # When the 'nextColumn' is a valid spot to
+        # move into, in the next line, simply move
+        # there and unset 'desiredCursorColumn'.
+        @editor.setCursorBufferPosition([nextRow, nextColumn])
+        @vimState.desiredCursorColumn = null
+
+  # Internal: Finds the next valid row that can be moved
+  # to. This move takes folded lines into account when
+  # calculating the next valid row.
+  #
+  # count - The number of folded 'buffer' rows away from
+  #         the current row.
+  #
+  # Returns an integer row index.
+  nextValidRow: (count) ->
+    {row, column} = @editor.getCursorBufferPosition()
+
+    maxRow = @editor.getLastBufferRow()
+    minRow = 0
+
+    # For each count, add 1 'directionIncrement' to
+    # row. Folded rows count as a single row.
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
-      @editor.moveCursorUp() if row > 0
+      if @editor.isFoldedAtBufferRow(row)
+        while @editor.isFoldedAtBufferRow(row)
+          row += @directionIncrement()
+      else
+        row += @directionIncrement()
+
+    if row > maxRow
+      maxRow
+    else if row < minRow
+      minRow
+    else
+      row
+
+class MoveUp extends MoveVertically
+  # Internal: The direction to move the cursor. Use -1
+  # for moving up, 1 for moving down.
+  #
+  # Returns -1
+  directionIncrement: ->
+    -1
 
   select: (count=1) ->
+    unless @inVisualMode()
+      @editor.moveCursorToBeginningOfLine()
+      @editor.moveCursorDown()
+      @editor.selectUp()
+
     _.times count, =>
       @editor.selectUp()
       true
 
-class MoveDown extends Motion
-  execute: (count=1) ->
-    _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
-      @editor.moveCursorDown() if row < (@editor.getBuffer().getLineCount() - 1)
+class MoveDown extends MoveVertically
+  # Internal: The direction to move the cursor. Use -1
+  # for moving up, 1 for moving down.
+  #
+  # Returns 1
+  directionIncrement: ->
+    1
 
   select: (count=1) ->
+    @editor.selectLine() unless @inVisualMode()
     _.times count, =>
       @editor.selectDown()
       true
@@ -355,9 +434,9 @@ class MoveToLine extends Motion
     if count? then count - 1 else (@editor.getLineCount() - 1)
 
 class MoveToScreenLine extends MoveToLine
-  constructor: (@editor, @editorView, @scrolloff) ->
+  constructor: (@editor, @vimState, @editorView, @scrolloff) ->
     @scrolloff = 2 # atom default
-    super(@editor)
+    super(@editor, @vimState)
 
   setCursorPosition: (count) ->
     @editor.setCursorScreenPosition([@getDestinationRow(count), 0])
@@ -372,9 +451,9 @@ class MoveToBeginningOfLine extends Motion
       true
 
 class MoveToFirstCharacterOfLine extends Motion
-  constructor:(@editor) ->
+  constructor:(@editor, @vimState) ->
     @cursor = @editor.getCursor()
-    super(@editor)
+    super(@editor, @vimState)
 
   execute: () ->
     @editor.setCursorBufferPosition([@cursor.getBufferRow(), @getDestinationColumn()])
@@ -390,6 +469,10 @@ class MoveToFirstCharacterOfLine extends Motion
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
+    # After moving to the end of the line, vertical motions
+    # should stay at the last column.
+    @vimState.desiredCursorColumn = Infinity
+
     _.times count, =>
       @editor.moveCursorToEndOfLine()
       @editor.moveCursorLeft() unless @editor.getCursor().getBufferColumn() is 0
@@ -400,12 +483,23 @@ class MoveToLastCharacterOfLine extends Motion
       true
 
 class MoveToStartOfFile extends MoveToLine
+  isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
+
   getDestinationRow: (count=1) ->
     count - 1
 
+  getDestinationColumn: (row) ->
+    if @isLinewise() then 0 else @editor.lineForBufferRow(row).search(/\S/)
+
+  getStartingColumn: (column) ->
+    if @isLinewise() then column else column + 1
+
   select: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
-    bufferRange = new Range([row,column+1], [0,0])
+    startingCol = @getStartingColumn(column)
+    destinationRow = @getDestinationRow(count)
+    destinationCol = @getDestinationColumn(destinationRow)
+    bufferRange = new Range([row, startingCol], [destinationRow, destinationCol])
     @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
 class MoveToTopOfScreen extends MoveToScreenLine

@@ -16,6 +16,7 @@ class Insert extends Operator
 
   execute: ->
     if @typingCompleted
+      return unless @typedText? and @typedText.length > 0
       @undoTransaction =>
         @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
     else
@@ -132,6 +133,7 @@ class TransactionBundler
   constructor: (@transaction) ->
 
   buildInsertText: ->
+    return "" unless @transaction.patches
     chars = []
     for patch in @transaction.patches
       switch
