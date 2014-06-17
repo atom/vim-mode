@@ -488,8 +488,8 @@ class VimState
     false
 
   updateStatusBar: ->
-    if !$('#status-bar-vim-mode').length
-      atom.packages.once 'activated', =>
+    atom.packages.once 'activated', =>
+      if !$('#status-bar-vim-mode').length
         atom.workspaceView.statusBar?.prependRight("<div id='status-bar-vim-mode' class='inline-block'>Command</div>")
         @updateStatusBar()
 
