@@ -1,4 +1,7 @@
-## HEAD
+## 0.11.1
+* Fix interaction with autocomplete-plus @klorenz
+
+## 0.11.0
 * Fix `gg` and `G` in visual mode @cadwallion
 * Implement `%` @carlosdcastillo
 * Add ctags keybindings @tmm1
