@@ -23,6 +23,24 @@ describe "Operators", ->
     opts.raw = true
     keydown(key, opts)
 
+  describe "cancel operation is robust", ->
+    it "can call cancel operation, even if no operator pending", ->
+      # cancel operation pushes an empty input operation
+      # doing this without a pending operation throws an exception
+      expect(-> vimState.pushOperations(new Input(''))).toThrow()
+
+      # make sure commandModeInputView is created
+      keydown('/')
+      expect(vimState.isOperatorPending()).toBe true
+      editor.commandModeInputView.viewModel.cancel()
+
+      # now again cancel op, although there is none pending
+      expect(vimState.isOperatorPending()).toBe false
+
+      # which should not raise an exception
+      expect(-> editor.commandModeInputView.viewModel.cancel()).not.toThrow()
+
+
   describe "the x keybinding", ->
     describe "on a line with content", ->
       beforeEach ->

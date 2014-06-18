@@ -53,7 +53,8 @@ class ViewModel
   #
   # Returns nothing.
   cancel: (view) ->
-    @vimState.pushOperations(new Input(''))
+    if @vimState.isOperatorPending()
+      @vimState.pushOperations(new Input(''))
 
 class Input
   constructor: (@characters) ->
