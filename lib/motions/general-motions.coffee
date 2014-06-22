@@ -405,7 +405,6 @@ class MoveToFirstCharacterOfLineUp extends Motion
 
   select: (count=1) ->
     (new MoveUp(@editor)).select(count)
-    (new MoveToFirstCharacterOfLine(@editor)).select()
 
 class MoveToFirstCharacterOfLineDown extends Motion
   execute: (count=1) ->
@@ -414,7 +413,6 @@ class MoveToFirstCharacterOfLineDown extends Motion
 
   select: (count=1) ->
     (new MoveDown(@editor)).select(count)
-    (new MoveToFirstCharacterOfLine(@editor)).select()
 
 class MoveToStartOfFile extends MoveToLine
   getDestinationRow: (count=1) ->
