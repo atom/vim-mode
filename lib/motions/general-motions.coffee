@@ -402,7 +402,12 @@ class MoveToLine extends Motion
   #  requireEOL - if true, ensure an end of line character is always selected
   select: (count=@editor.getLineCount(), {requireEOL}={}) ->
     {row, column} = @editor.getCursorBufferPosition()
-    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
+    min = row
+    max = count - 1;
+    if (min > max)
+        min = max
+        max = row
+    @editor.setSelectedBufferRange(@selectRows(min, max, requireEOL: requireEOL))
 
     _.times count, ->
       true
