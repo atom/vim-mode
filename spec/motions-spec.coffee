@@ -25,7 +25,7 @@ describe "Motions", ->
 
   describe "simple motions", ->
     beforeEach ->
-      editor.setText("12345\nabcde\nABCDE")
+      editor.setText("12345\nabcd\nABCDE")
       editor.setCursorScreenPosition([1, 1])
 
     describe "the h keybinding", ->
@@ -53,6 +53,37 @@ describe "Motions", ->
         keydown('j')
         expect(editor.getCursorScreenPosition()).toEqual [2, 1]
 
+      it "moves the cursor to the end of the line, not past it", ->
+        editor.setCursorScreenPosition([0,4])
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+      it "remembers the position it column it was in after moving to shorter line", ->
+        editor.setCursorScreenPosition([0,4])
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [2, 4]
+
+      describe "when visual mode", ->
+        beforeEach ->
+          keydown('v')
+
+        it "moves the cursor down", ->
+          keydown('j')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+
+        it "don't go over after the last line", ->
+          keydown('j')
+          expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+
+        it "selects the text while moving", ->
+          keydown('j')
+          expect(editor.getSelectedText()).toBe "bcd\nA"
+
     describe "the k keybinding", ->
       it "moves the cursor up, but not to the beginning of the first line", ->
         keydown('k')
@@ -62,14 +93,14 @@ describe "Motions", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
     describe "the l keybinding", ->
-      beforeEach -> editor.setCursorScreenPosition([1, 3])
+      beforeEach -> editor.setCursorScreenPosition([1, 2])
 
       it "moves the cursor right, but not to the next line", ->
         keydown('l')
-        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
         keydown('l')
-        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
   describe "the w keybinding", ->
     beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
@@ -493,7 +524,7 @@ describe "Motions", ->
 
   describe "the $ keybinding", ->
     beforeEach ->
-      editor.setText("  abcde\n\n")
+      editor.setText("  abcde\n\n1234567890")
       editor.setCursorScreenPosition([0, 4])
 
     describe "as a motion from empty line", ->
@@ -509,13 +540,20 @@ describe "Motions", ->
       it "moves the cursor to the end of the line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
+      it "should remain in the last column when moving down", ->
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+        keydown('j')
+        expect(editor.getCursorScreenPosition()).toEqual [2, 9]
+
     describe "as a selection", ->
       beforeEach ->
         keydown('d')
         keydown('$')
 
       it "selects to the beginning of the lines", ->
-        expect(editor.getText()).toBe "  ab\n\n"
+        expect(editor.getText()).toBe "  ab\n\n1234567890"
         expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
   # FIXME: this doesn't work as we can't determine if this is a motion
@@ -627,34 +665,77 @@ describe "Motions", ->
       editor.setCursorScreenPosition([0, 2])
 
     describe "as a motion", ->
-      beforeEach ->
-        keydown('g')
-        keydown('g')
+      describe "in command mode", ->
+        beforeEach ->
+          keydown('g')
+          keydown('g')
 
-      it "moves the cursor to the beginning of the first line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+        it "moves the cursor to the beginning of the first line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+      describe "in linewise visual mode", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([1, 0])
+          vimState.activateVisualMode('linewise')
+          keydown('g')
+          keydown('g')
+
+        it "selects to the first line in the file", ->
+          expect(editor.getSelectedText()).toBe " 1abc\n 2\n"
+
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      describe "in characterwise visual mode", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([1, 1])
+          vimState.activateVisualMode()
+          keydown('g')
+          keydown('g')
+
+        it "selects to the first line in the file", ->
+          expect(editor.getSelectedText()).toBe "1abc\n 2"
+
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
     describe "as a repeated motion", ->
-      beforeEach ->
-        keydown('2')
-        keydown('g')
-        keydown('g')
+      describe "in command mode", ->
+        beforeEach ->
+          keydown('2')
+          keydown('g')
+          keydown('g')
 
-      it "moves the cursor to a specified line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-    describe "as a selection", ->
-      beforeEach ->
-        editor.setCursorScreenPosition([1, 1])
-        vimState.activateVisualMode()
-        keydown('g')
-        keydown('g')
+      describe "in linewise visual motion", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([2, 0])
+          vimState.activateVisualMode('linewise')
+          keydown('2')
+          keydown('g')
+          keydown('g')
 
-      it "selects to the first line in the file", ->
-        expect(editor.getSelectedText()).toBe " 1abc\n 2"
+        it "selects to a specified line", ->
+          expect(editor.getSelectedText()).toBe " 2\n3\n"
 
-      it "moves the cursor to a specified line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+      describe "in characterwise visual motion", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([2, 0])
+          vimState.activateVisualMode()
+          keydown('2')
+          keydown('g')
+          keydown('g')
+
+        it "selects to a first character of specified line", ->
+          expect(editor.getSelectedText()).toBe "2\n3"
+
+        it "moves the cursor to a specified line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
   describe "the G keybinding", ->
     beforeEach ->
@@ -1167,3 +1248,46 @@ describe "Motions", ->
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcabc\n'
+
+  describe 'the % motion', ->
+    beforeEach ->
+      editor.setText("( ( ) )--{ text in here; and a function call(with parameters) }\n")
+      editor.setCursorScreenPosition([0, 0])
+
+    it 'matches the correct parenthesis', ->
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+    it 'matches the correct brace', ->
+      editor.setCursorScreenPosition([0, 9])
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 62]
+
+    it 'composes correctly with d', ->
+      editor.setCursorScreenPosition([0, 9])
+      keydown('d')
+      keydown('%')
+      expect(editor.getText()).toEqual  "( ( ) )--\n"
+
+    it 'moves correctly when composed with v going forward', ->
+      keydown('v')
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it 'moves correctly when composed with v going backward', ->
+      editor.setCursorScreenPosition([0, 6])
+      keydown('v')
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    it 'it moves appropriately to find the nearest matching action', ->
+      editor.setCursorScreenPosition([0, 3])
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      expect(editor.getText()).toEqual  "( ( ) )--{ text in here; and a function call(with parameters) }\n"
+
+    it 'it moves appropriately to find the nearest matching action', ->
+      editor.setCursorScreenPosition([0, 26])
+      keydown('%')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 60]
+      expect(editor.getText()).toEqual  "( ( ) )--{ text in here; and a function call(with parameters) }\n"

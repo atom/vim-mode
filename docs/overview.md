@@ -6,7 +6,7 @@
 * Registers are a work in progress
   * What Exists:
     * `a-z` - Lowercase named registers
-    * `*,` `+` - System clipboard registers, although there's no distinction between the two currently.
+    * `*`, `+` - System clipboard registers, although there's no distinction between the two currently.
     * `%`   - Current filename read-only register
     * `_` - Blackhole register
   * What Doesn't Exist:

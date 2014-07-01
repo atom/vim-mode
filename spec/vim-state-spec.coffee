@@ -128,7 +128,8 @@ describe "VimState", ->
         expect(editor.getText()).toBe '012345\nabcdef'
 
   describe "insert-mode", ->
-    beforeEach -> keydown('i')
+    beforeEach ->
+      keydown('i')
 
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
@@ -158,12 +159,14 @@ describe "VimState", ->
 
       expect(editorView).toHaveClass 'command-mode'
       expect(editorView).not.toHaveClass 'insert-mode'
+      expect(editorView).not.toHaveClass 'visual-mode'
 
     it "puts the editor into command mode when <ctrl-c> is pressed", ->
       keydown('c', ctrl: true)
 
       expect(editorView).toHaveClass 'command-mode'
       expect(editorView).not.toHaveClass 'insert-mode'
+      expect(editorView).not.toHaveClass 'visual-mode'
 
   describe "visual-mode", ->
     beforeEach -> keydown('v')
@@ -201,3 +204,39 @@ describe "VimState", ->
 
       it "operate on the current selection", ->
         expect(editor.getSelection().getText()).toEqual ''
+
+  describe "marks", ->
+    beforeEach ->  editor.setText("text in line 1\ntext in line 2\ntext in line 3")
+
+    it "basic marking functionality", ->
+      editor.setCursorScreenPosition([1, 1])
+      keydown('m')
+      commandModeInputKeydown('t')
+      expect(editor.getText()).toEqual "text in line 1\ntext in line 2\ntext in line 3"
+      editor.setCursorScreenPosition([2, 2])
+      keydown('`')
+      commandModeInputKeydown('t')
+      expect(editor.getCursorScreenPosition()).toEqual [1,1]
+
+    it "real (tracking) marking functionality", ->
+      editor.setCursorScreenPosition([2, 2])
+      keydown('m')
+      commandModeInputKeydown('q')
+      editor.setCursorScreenPosition([1, 2])
+      keydown('o')
+      keydown('escape')
+      keydown('`')
+      commandModeInputKeydown('q')
+      expect(editor.getCursorScreenPosition()).toEqual [3,2]
+
+    it "real (tracking) marking functionality", ->
+      editor.setCursorScreenPosition([2, 2])
+      keydown('m')
+      commandModeInputKeydown('q')
+      editor.setCursorScreenPosition([1, 2])
+      keydown('d')
+      keydown('d')
+      keydown('escape')
+      keydown('`')
+      commandModeInputKeydown('q')
+      expect(editor.getCursorScreenPosition()).toEqual [1,2]

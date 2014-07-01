@@ -1,5 +1,4 @@
 {EditorView} = require 'atom'
-
 VimState = require '../lib/vim-state'
 VimMode  = require '../lib/vim-mode'
 
@@ -24,7 +23,11 @@ cacheEditor = (existingEditorView) ->
     editorView.addClass('vim-mode')
     editorView.vimState = new VimState(editorView)
 
-  existingEditorView or editorView
+  view = existingEditorView or editorView
+  history = view.editor.buffer.history
+  history.abortTransaction() if history.currentTransaction?
+  history.clearUndoStack()
+  view
 
 keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
   dispatchKeyboardEvent = (target, eventArgs...) ->
