@@ -574,7 +574,7 @@ describe "Motions", ->
       editor.setText("abcdefg\n  abc\n  abc\n")
 
     describe "from the middle of a line", ->
-      beforeEach -> editor.setCursorScreenPosition([1, 4])
+      beforeEach -> editor.setCursorScreenPosition([1, 3])
 
       describe "as a motion", ->
         beforeEach -> keydown('-')
@@ -590,7 +590,7 @@ describe "Motions", ->
 
         it 'deletes the current and previous line', ->
           expect(editor.getText()).toBe "  abc\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
     describe "from the first character of a line indented the same as the previous one", ->
       beforeEach -> editor.setCursorScreenPosition([2, 2])
@@ -655,9 +655,89 @@ describe "Motions", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the + keybinding (which should also be equivalent to the enter keybinding)", ->
-    # TODO copy the tests for the - keybinding into here, and then
-    #  change the values to expect downwards instead of upwards movement
-    # to ease editing, copy the tests only after enabling all disabled tests for -
+    beforeEach ->
+      editor.setText("  abc\n  abc\nabcdefg\n")
+
+    describe "from the middle of a line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 3])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('+')
+
+        it "moves the cursor to the first character of the next line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
+      xdescribe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('+')
+
+        it 'deletes the current and next line', ->
+          expect(editor.getText()).toBe "  abc\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+    describe "from the first character of a line indented the same as the next one", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 2])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('+')
+
+        it "moves to the first character of the next line (directly below)", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
+      xdescribe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('+')
+
+        it "selects to the first character of the next line (directly below)", ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    describe "from the beginning of a line followed by an indented line", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 0])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('+')
+
+        it "moves the cursor to the first character of the next line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
+      xdescribe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('+')
+
+        it 'selects to the first character of the next line', ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "with a count", ->
+      beforeEach ->
+        editor.setText("1\n2\n3\n4\n5\n6\n")
+        editor.setCursorScreenPosition([1, 0])
+
+      describe "as a motion", ->
+        beforeEach ->
+          keydown('3')
+          keydown('+')
+
+        it "moves the cursor to the first character of that many lines following", ->
+          expect(editor.getCursorScreenPosition()).toEqual [4, 0]
+
+      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
+      xdescribe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('3')
+          keydown('+')
+
+        it 'deletes the current line plus that many following lines', ->
+          expect(editor.getText()).toBe "1\n6\n"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the gg keybinding", ->
     beforeEach ->
