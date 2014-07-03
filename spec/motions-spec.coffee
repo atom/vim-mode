@@ -582,15 +582,15 @@ describe "Motions", ->
         it "moves the cursor to the first character of the previous line", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
-      # commented out because this fails due to a bug in `k`; re-enable when `k` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('-')
 
         it "deletes the current and previous line", ->
           expect(editor.getText()).toBe "  abc\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
     describe "from the first character of a line indented the same as the previous one", ->
       beforeEach -> editor.setCursorScreenPosition([2, 2])
@@ -601,15 +601,15 @@ describe "Motions", ->
         it "moves to the first character of the previous line (directly above)", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 2]
 
-      # commented out because this fails due to a bug in `k`; re-enable when `k` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('-')
 
         it "selects to the first character of the previous line (directly above)", ->
           expect(editor.getText()).toBe "abcdefg\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     describe "from the beginning of a line preceded by an indented line", ->
       beforeEach -> editor.setCursorScreenPosition([2, 0])
@@ -620,15 +620,15 @@ describe "Motions", ->
         it "moves the cursor to the first character of the previous line", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 2]
 
-      # commented out because this fails due to a bug in `k`; re-enable when `k` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('-')
 
         it "selects to the first character of the previous line", ->
           expect(editor.getText()).toBe "abcdefg\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "with a count", ->
       beforeEach ->
@@ -643,8 +643,7 @@ describe "Motions", ->
         it "moves the cursor to the first character of that many lines previous", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
-      # commented out because this fails due to a bug in `k`; re-enable when `k` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('3')
@@ -652,7 +651,8 @@ describe "Motions", ->
 
         it "deletes the current line plus that many previous lines", ->
           expect(editor.getText()).toBe "1\n6\n"
-          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the + keybinding", ->
     beforeEach ->
@@ -667,15 +667,15 @@ describe "Motions", ->
         it "moves the cursor to the first character of the next line", ->
           expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('+')
 
         it "deletes the current and next line", ->
           expect(editor.getText()).toBe "  abc\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
     describe "from the first character of a line indented the same as the next one", ->
       beforeEach -> editor.setCursorScreenPosition([0, 2])
@@ -686,15 +686,15 @@ describe "Motions", ->
         it "moves to the first character of the next line (directly below)", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 2]
 
-      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('+')
 
         it "selects to the first character of the next line (directly below)", ->
           expect(editor.getText()).toBe "abcdefg\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     describe "from the beginning of a line followed by an indented line", ->
       beforeEach -> editor.setCursorScreenPosition([0, 0])
@@ -705,15 +705,15 @@ describe "Motions", ->
         it "moves the cursor to the first character of the next line", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 2]
 
-      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('+')
 
         it "selects to the first character of the next line", ->
           expect(editor.getText()).toBe "abcdefg\n"
-          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "with a count", ->
       beforeEach ->
@@ -728,8 +728,7 @@ describe "Motions", ->
         it "moves the cursor to the first character of that many lines following", ->
           expect(editor.getCursorScreenPosition()).toEqual [4, 0]
 
-      # commented out because this fails due to a bug in `j`; re-enable when `j` is fixed
-      xdescribe "as a selection", ->
+      describe "as a selection", ->
         beforeEach ->
           keydown('d')
           keydown('3')
@@ -737,7 +736,8 @@ describe "Motions", ->
 
         it "deletes the current line plus that many following lines", ->
           expect(editor.getText()).toBe "1\n6\n"
-          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the enter keybinding", ->
     keydownCodeForEnter = '\r' # 'enter' does not work
