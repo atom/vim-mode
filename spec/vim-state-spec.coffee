@@ -162,7 +162,9 @@ describe "VimState", ->
       expect(editorView).not.toHaveClass 'visual-mode'
 
     it "puts the editor into command mode when <ctrl-c> is pressed", ->
+      helpers.mockPlatform(editorView, 'platform-darwin')
       keydown('c', ctrl: true)
+      helpers.unmockPlatform(editorView)
 
       expect(editorView).toHaveClass 'command-mode'
       expect(editorView).not.toHaveClass 'insert-mode'
