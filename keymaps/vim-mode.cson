@@ -16,7 +16,6 @@
   'up': 'vim-mode:move-up'
   'j': 'vim-mode:move-down'
   'down': 'vim-mode:move-down'
-  'enter': 'vim-mode:move-down'
 
   'w': 'vim-mode:move-to-next-word'
   'W': 'vim-mode:move-to-next-whole-word'
@@ -29,6 +28,9 @@
   '0': 'vim-mode:move-to-beginning-of-line'
   '^': 'vim-mode:move-to-first-character-of-line'
   '$': 'vim-mode:move-to-last-character-of-line'
+  '-': 'vim-mode:move-to-first-character-of-line-up'
+  '+': 'vim-mode:move-to-first-character-of-line-down'
+  'enter': 'vim-mode:move-to-first-character-of-line-down'
   'g g': 'vim-mode:move-to-start-of-file'
   'ctrl-u': 'core:page-up'
   'ctrl-b': 'core:page-up'

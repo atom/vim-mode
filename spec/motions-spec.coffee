@@ -569,6 +569,213 @@ describe "Motions", ->
       it "moves the cursor to the beginning of the line", ->
         expect(editor.getCursorScreenPosition()).toEqual [0,0]
 
+  describe "the - keybinding", ->
+    beforeEach ->
+      editor.setText("abcdefg\n  abc\n  abc\n")
+
+    describe "from the middle of a line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 3])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('-')
+
+        it "moves the cursor to the first character of the previous line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('-')
+
+        it "deletes the current and previous line", ->
+          expect(editor.getText()).toBe "  abc\n"
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+    describe "from the first character of a line indented the same as the previous one", ->
+      beforeEach -> editor.setCursorScreenPosition([2, 2])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('-')
+
+        it "moves to the first character of the previous line (directly above)", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('-')
+
+        it "selects to the first character of the previous line (directly above)", ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    describe "from the beginning of a line preceded by an indented line", ->
+      beforeEach -> editor.setCursorScreenPosition([2, 0])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('-')
+
+        it "moves the cursor to the first character of the previous line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('-')
+
+        it "selects to the first character of the previous line", ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "with a count", ->
+      beforeEach ->
+        editor.setText("1\n2\n3\n4\n5\n6\n")
+        editor.setCursorScreenPosition([4, 0])
+
+      describe "as a motion", ->
+        beforeEach ->
+          keydown('3')
+          keydown('-')
+
+        it "moves the cursor to the first character of that many lines previous", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('3')
+          keydown('-')
+
+        it "deletes the current line plus that many previous lines", ->
+          expect(editor.getText()).toBe "1\n6\n"
+          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+  describe "the + keybinding", ->
+    beforeEach ->
+      editor.setText("  abc\n  abc\nabcdefg\n")
+
+    describe "from the middle of a line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 3])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('+')
+
+        it "moves the cursor to the first character of the next line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('+')
+
+        it "deletes the current and next line", ->
+          expect(editor.getText()).toBe "  abc\n"
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+    describe "from the first character of a line indented the same as the next one", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 2])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('+')
+
+        it "moves to the first character of the next line (directly below)", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('+')
+
+        it "selects to the first character of the next line (directly below)", ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    describe "from the beginning of a line followed by an indented line", ->
+      beforeEach -> editor.setCursorScreenPosition([0, 0])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('+')
+
+        it "moves the cursor to the first character of the next line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('+')
+
+        it "selects to the first character of the next line", ->
+          expect(editor.getText()).toBe "abcdefg\n"
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "with a count", ->
+      beforeEach ->
+        editor.setText("1\n2\n3\n4\n5\n6\n")
+        editor.setCursorScreenPosition([1, 0])
+
+      describe "as a motion", ->
+        beforeEach ->
+          keydown('3')
+          keydown('+')
+
+        it "moves the cursor to the first character of that many lines following", ->
+          expect(editor.getCursorScreenPosition()).toEqual [4, 0]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('3')
+          keydown('+')
+
+        it "deletes the current line plus that many following lines", ->
+          expect(editor.getText()).toBe "1\n6\n"
+          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
+          #expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+  describe "the enter keybinding", ->
+    keydownCodeForEnter = '\r' # 'enter' does not work
+    startingText = "  abc\n  abc\nabcdefg\n"
+
+    describe "from the middle of a line", ->
+      startingCursorPosition = [1, 3]
+
+      describe "as a motion", ->
+        it "acts the same as the + keybinding", ->
+          # do it with + and save the results
+          editor.setText(startingText)
+          editor.setCursorScreenPosition(startingCursorPosition)
+          keydown('+')
+          referenceCursorPosition = editor.getCursorScreenPosition()
+          # do it again with enter and compare the results
+          editor.setText(startingText)
+          editor.setCursorScreenPosition(startingCursorPosition)
+          keydown(keydownCodeForEnter)
+          expect(editor.getCursorScreenPosition()).toEqual referenceCursorPosition
+
+      describe "as a selection", ->
+        it "acts the same as the + keybinding", ->
+          # do it with + and save the results
+          editor.setText(startingText)
+          editor.setCursorScreenPosition(startingCursorPosition)
+          keydown('d')
+          keydown('+')
+          referenceText = editor.getText()
+          referenceCursorPosition = editor.getCursorScreenPosition()
+          # do it again with enter and compare the results
+          editor.setText(startingText)
+          editor.setCursorScreenPosition(startingCursorPosition)
+          keydown('d')
+          keydown(keydownCodeForEnter)
+          expect(editor.getText()).toEqual referenceText
+          expect(editor.getCursorScreenPosition()).toEqual referenceCursorPosition
+
   describe "the gg keybinding", ->
     beforeEach ->
       editor.setText(" 1abc\n 2\n3\n")

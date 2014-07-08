@@ -482,6 +482,22 @@ class MoveToLastCharacterOfLine extends Motion
       @editor.selectToEndOfLine()
       true
 
+class MoveToFirstCharacterOfLineUp extends Motion
+  execute: (count=1) ->
+    (new MoveUp(@editor, @vimState)).execute(count)
+    (new MoveToFirstCharacterOfLine(@editor, @vimState)).execute()
+
+  select: (count=1) ->
+    (new MoveUp(@editor, @vimState)).select(count)
+
+class MoveToFirstCharacterOfLineDown extends Motion
+  execute: (count=1) ->
+    (new MoveDown(@editor, @vimState)).execute(count)
+    (new MoveToFirstCharacterOfLine(@editor, @vimState)).execute()
+
+  select: (count=1) ->
+    (new MoveDown(@editor, @vimState)).select(count)
+
 class MoveToStartOfFile extends MoveToLine
   isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
 
@@ -532,6 +548,7 @@ module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
   MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
 }
