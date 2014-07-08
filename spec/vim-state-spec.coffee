@@ -170,6 +170,14 @@ describe "VimState", ->
       expect(editorView).not.toHaveClass 'insert-mode'
       expect(editorView).not.toHaveClass 'visual-mode'
 
+    it "puts the editor into command mode before undoing, saving work", ->
+      editor.setText("012345\n\nabcdef")
+      editorView.trigger("core:undo")
+      expect(editorView).toHaveClass "command-mode"
+      expect(editor.getText()).toEqual("")
+      editorView.trigger("core:redo")
+      expect(editor.getText()).toEqual("012345\n\nabcdef")
+
   describe "visual-mode", ->
     beforeEach -> keydown('v')
 

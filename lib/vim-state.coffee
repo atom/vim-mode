@@ -33,6 +33,7 @@ class VimState
     @editorView.setInputEnabled?(false)
     @registerInsertIntercept()
     @registerInsertTransactionResets()
+    @registerUndoIntercept()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
@@ -62,6 +63,18 @@ class VimState
       else
         @clearOpStack()
         false
+
+  # Private: Intercept undo in insert mode.
+  #
+  # Undo in insert mode will blow up the previous transaction, but not
+  # put it into the redo stack anywhere correctly, as it hasn't been
+  # completed. As a workaround, we exit insert mode first and then
+  # bubble the event up
+  registerUndoIntercept: ->
+    @editorView.preempt 'core:undo', (e) =>
+      return true unless @mode == 'insert'
+      @activateCommandMode()
+      return true
 
   # Private: Reset transactions on input for undo/redo/repeat on several
   # core and vim-mode events
