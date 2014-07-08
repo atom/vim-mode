@@ -1,7 +1,9 @@
 '.editor.vim-mode:not(.command-mode)':
   'escape': 'vim-mode:activate-command-mode'
-  'ctrl-c': 'vim-mode:activate-command-mode'
   'ctrl-[': 'vim-mode:activate-command-mode'
+
+'.platform-darwin .editor.vim-mode:not(.command-mode)':
+  'ctrl-c': 'vim-mode:activate-command-mode'
 
 '.editor.vim-mode:not(.insert-mode)':
   'h': 'vim-mode:move-left'

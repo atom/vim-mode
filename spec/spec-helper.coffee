@@ -29,6 +29,14 @@ cacheEditor = (existingEditorView) ->
   history.clearUndoStack()
   view
 
+mockPlatform = (editorView, platform) ->
+  wrapper = document.createElement('div')
+  wrapper.className = platform
+  wrapper.appendChild(editorView[0])
+
+unmockPlatform = (editorView) ->
+  editorView[0].parentNode.removeChild(editorView[0])
+
 keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
   dispatchKeyboardEvent = (target, eventArgs...) ->
     e = document.createEvent('KeyboardEvent')
@@ -53,4 +61,4 @@ keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
        element.value += key
   dispatchKeyboardEvent(element, 'keyup', eventArgs...)
 
-module.exports = { keydown, cacheEditor }
+module.exports = { keydown, cacheEditor, mockPlatform, unmockPlatform }
