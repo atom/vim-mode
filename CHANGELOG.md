@@ -1,3 +1,6 @@
+## HEAD
+* Ctrl-c for command mode on mac only @sgtpepper43
+
 ## 0.11.1
 * Fix interaction with autocomplete-plus @klorenz
 
