@@ -176,8 +176,13 @@
   'i "': 'vim-mode:select-inside-double-quotes'
   'i \'': 'vim-mode:select-inside-single-quotes'
   'i {': 'vim-mode:select-inside-curly-brackets'
+  'i [': 'vim-mode:select-inside-square-brackets'
   'i <': 'vim-mode:select-inside-angle-brackets'
   'i (': 'vim-mode:select-inside-parentheses'
+  'i }': 'vim-mode:select-inside-curly-brackets'
+  'i ]': 'vim-mode:select-inside-square-brackets'
+  'i >': 'vim-mode:select-inside-angle-brackets'
+  'i )': 'vim-mode:select-inside-parentheses'
 
 '.editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
