@@ -161,6 +161,7 @@ class VimState
       'select-inside-double-quotes': => new TextObjects.SelectInsideQuotes(@editor, '"')
       'select-inside-single-quotes': => new TextObjects.SelectInsideQuotes(@editor, '\'')
       'select-inside-curly-brackets': => new TextObjects.SelectInsideBrackets(@editor, '{', '}')
+      'select-inside-square-brackets': => new TextObjects.SelectInsideBrackets(@editor, '[', ']')
       'select-inside-angle-brackets': => new TextObjects.SelectInsideBrackets(@editor, '<', '>')
       'select-inside-parentheses': => new TextObjects.SelectInsideBrackets(@editor, '(', ')')
       'register-prefix': (e) => @registerPrefix(e)
