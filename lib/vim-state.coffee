@@ -94,7 +94,7 @@ class VimState
   registerChangeHandler: (buffer) ->
     buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
       return unless @setRegister?
-      if newText == ''
+      if newText == '' and oldText != ''
         @setRegister('"', text: oldText, type: Utils.copyType(oldText))
 
   # Private: Creates the plugin's bindings
