@@ -59,6 +59,10 @@ class MoveRight extends Motion
     _.times count, =>
       {row, column} = @editor.getCursorScreenPosition()
       lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
+
+      tabCount = @editor.getBuffer().lineForRow(row).split('\t').length
+      lastCharIndex += (tabCount * @editor.getTabLength())
+
       unless column >= lastCharIndex
         @editor.moveCursorRight()
 
