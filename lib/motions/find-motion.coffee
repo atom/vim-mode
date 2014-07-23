@@ -5,7 +5,7 @@
 class Find extends MotionWithInput
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
-    Find.currentFind = @
+    @vimState.currentFind = @
     @viewModel = new ViewModel(@, class: 'find', singleChar: true, hidden: true)
     @backwards = false
     @repeatReversed = false
