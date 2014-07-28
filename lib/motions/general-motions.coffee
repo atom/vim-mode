@@ -74,12 +74,15 @@ class MoveRight extends Motion
         false
 
 class MoveVertically extends Motion
+
   constructor: (@editor, @vimState) ->
     # 'desiredCursorColumn' gets overwritten in the Motion constructor,
     # so we need to re-set it after calling super.
     column = @vimState.desiredCursorColumn
     super(@editor, @vimState)
     @vimState.desiredCursorColumn = column
+
+  isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
 
   execute: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
@@ -156,7 +159,23 @@ class MoveUp extends MoveVertically
       @editor.selectUp()
 
     _.times count, =>
-      @editor.selectUp()
+      #bug 219, entering linewise visual mode "V" causes the first line to be omitted.
+      #The fix is to incrementally add or subtract a new range with each line.
+      #The initial selected range is built through the vim-state file. It is used to know whether to reference the start or end of a range.
+      if @isLinewise()
+        selection = @editor.getSelection()
+        range = selection.getBufferRange().copy()
+        if range.coversSameRows(@vimState.InitialSelectedRange)
+          range.start.row--
+        else
+          if range.start.row < @vimState.InitialSelectedRange.start.row
+            range.start.row--
+          else
+            range.end.row--
+
+        selection.setBufferRange(range)
+      else
+        @editor.selectUp()
       true
 
 class MoveDown extends MoveVertically
@@ -168,9 +187,29 @@ class MoveDown extends MoveVertically
     1
 
   select: (count=1) ->
+
     @editor.selectLine() unless @inVisualMode()
+
     _.times count, =>
-      @editor.selectDown()
+
+      #bug 219, entering linewise visual mode "V" causes the first line to be omitted.
+      #The fix is to incrementally add or subtract a new range with each line. 
+      #The initial selected range is built through the vim-state file. It is used to know whether to reference the start or end of a range.
+      if @isLinewise()
+        selection = @editor.getSelection()
+        range = selection.getBufferRange().copy()
+        if range.coversSameRows(@vimState.InitialSelectedRange)
+          range.end.row++
+        else
+          if range.start.row < @vimState.InitialSelectedRange.start.row
+            range.start.row++
+          else
+            range.end.row++
+
+        selection.setBufferRange(range)
+      else
+        @editor.selectDown()
+
       true
 
 class MoveToPreviousWord extends Motion

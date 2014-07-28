@@ -18,6 +18,7 @@ class VimState
   opStack: null
   mode: null
   submode: null
+  InitialSelectedRange: null
 
   constructor: (@editorView) ->
     @editor = @editorView.editor
@@ -416,7 +417,9 @@ class VimState
     @changeModeClass('visual-mode')
 
     if @submode == 'linewise'
+
       @editor.selectLine()
+      @InitialSelectedRange = @editor.getSelection().getBufferRange()
 
     @updateStatusBar()
 
