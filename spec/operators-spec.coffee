@@ -436,6 +436,8 @@ describe "Operators", ->
 
       it "saves the line to the default register", ->
         expect(vimState.getRegister('"').text).toBe "012 345\n"
+
+      it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
     describe "when followed with a repeated y", ->
@@ -446,6 +448,9 @@ describe "Operators", ->
 
       it "copies n lines, starting from the current", ->
         expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
+
+      it "leaves the cursor at the starting position", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
     describe "with a register", ->
       beforeEach ->
@@ -464,6 +469,31 @@ describe "Operators", ->
 
       it "saves the first word to the default register", ->
         expect(vimState.getRegister('"').text).toBe '345'
+
+      it "leaves the cursor at the starting position", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    describe "with a left motion", ->
+      beforeEach ->
+        keydown('y')
+        keydown('h')
+
+        it "saves the left letter to the default register", ->
+          expect(vimState.getRegister('"').text).toBe " "
+
+        it "moves the cursor position to the left", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+    describe "with a down motion", ->
+      beforeEach ->
+        keydown 'y'
+        keydown 'j'
+
+      it "saves both full lines to the default register", ->
+        expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
+
+      it "leaves the cursor at the starting position", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
   describe "the yy keybinding", ->
     describe "on a single line file", ->
