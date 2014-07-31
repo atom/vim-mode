@@ -926,6 +926,33 @@ describe "Motions", ->
         keydown('n')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
+      it "works in case sensitive mode", ->
+        editor.setText("abc\nABC\n")
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'ABC'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        keydown('n')
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+      it "works in case insensitive mode", ->
+        editor.setText("\nabc\nABC\n")
+        keydown('/')
+        editor.commandModeInputView.editor.setText '\\cAbC'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        keydown('n')
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+      it "works in case insensitive mode wherever \\c is", ->
+        editor.setText("\nabc\nABC\n")
+        keydown('/')
+        editor.commandModeInputView.editor.setText 'AbC\\c'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        keydown('n')
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
       it 'works with selection in visual mode', ->
         editor.setText('one two three')
         keydown('v')
