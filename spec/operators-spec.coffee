@@ -541,6 +541,14 @@ describe "Operators", ->
 
           expect(editor.getText()).toBe "abcdetwo three\none "
 
+      describe "with a selection", ->
+        beforeEach ->
+          editor.selectRight()
+          keydown('p')
+
+        it "replaces the current selection", ->
+          expect(editor.getText()).toBe "34512\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     describe "with linewise contents", ->
       beforeEach ->
@@ -552,6 +560,18 @@ describe "Operators", ->
       it "inserts the contents of the default register", ->
         expect(editor.getText()).toBe "012\n 345"
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+    describe "with linewise contents", ->
+      beforeEach ->
+        editor.getBuffer().setText("012")
+        editor.setCursorScreenPosition([0, 1])
+        editor.selectRight()
+        vimState.setRegister('"', text: " 345\n", type: 'linewise')
+        keydown('p')
+
+      it "replaces the current selection", ->
+        expect(editor.getText()).toBe "0 345\n2"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     describe "with linewise contents", ->
       beforeEach ->
