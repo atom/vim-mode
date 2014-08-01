@@ -571,7 +571,7 @@ describe "Operators", ->
 
       it "replaces the current selection", ->
         expect(editor.getText()).toBe "0 345\n2"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
     describe "with linewise contents", ->
       beforeEach ->
