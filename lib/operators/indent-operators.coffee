@@ -19,9 +19,8 @@ class Indent extends Operator
   #
   # Returns nothing.
   indent: (count, direction='indent') ->
-    row = @editor.getCursorScreenRow()
-
     @motion.select(count)
+    {start} = @editor.getSelectedBufferRange()
     if direction == 'indent'
       @editor.indentSelectedRows()
     else if direction == 'outdent'
@@ -29,7 +28,7 @@ class Indent extends Operator
     else if direction == 'auto'
       @editor.autoIndentSelectedRows()
 
-    @editor.setCursorScreenPosition([row, 0])
+    @editor.setCursorBufferPosition([start.row, 0])
     @editor.moveCursorToFirstCharacterOfLine()
 
 #
