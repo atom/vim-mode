@@ -178,6 +178,12 @@
   'i {': 'vim-mode:select-inside-curly-brackets'
   'i <': 'vim-mode:select-inside-angle-brackets'
   'i (': 'vim-mode:select-inside-parentheses'
+  'a w': 'vim-mode:select-a-word'
+  'a "': 'vim-mode:select-a-double-quotes'
+  'a \'': 'vim-mode:select-a-single-quotes'
+  'a {': 'vim-mode:select-a-curly-brackets'
+  'a <': 'vim-mode:select-a-angle-brackets'
+  'a (': 'vim-mode:select-a-parentheses'
 
 '.editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
