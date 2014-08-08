@@ -112,7 +112,7 @@ class SelectInsideBrackets extends TextObject
 
 class SelectAWord extends TextObject
   select: ->
-    @editor.moveCursorToBeginningOfWord()
+    @editor.selectWord()
     @editor.selectToBeginningOfNextWord()
     [true]
 
