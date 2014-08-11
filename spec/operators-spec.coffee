@@ -816,6 +816,17 @@ describe "Operators", ->
           it "outdents all three lines", ->
             expect(editor.getText()).toBe "12345\nabcde\nABCDE"
 
+    describe "in visual mode", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([0, 0])
+        keydown('v', shift: true)
+        keydown('>')
+
+      it "indents the current line and remains in visual mode", ->
+        expect(editorView).toHaveClass 'visual-mode'
+        expect(editor.getText()).toBe "  12345\nabcde\nABCDE"
+        expect(editor.getSelectedText()).toBe "  12345\n"
+
   describe "the < keybinding", ->
     beforeEach ->
       editor.setText("  12345\n  abcde\nABCDE")
@@ -845,6 +856,16 @@ describe "Operators", ->
 
         it "indents both lines", ->
           expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
+
+    describe "in visual mode", ->
+      beforeEach ->
+        keydown('v', shift: true)
+        keydown('<')
+
+      it "indents the current line and remains in visual mode", ->
+        expect(editorView).toHaveClass 'visual-mode'
+        expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
+        expect(editor.getSelectedText()).toBe "12345\n"
 
   describe "the = keybinding", ->
     oldGrammar = []

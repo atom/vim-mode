@@ -10,7 +10,6 @@ class Indent extends Operator
   # Returns nothing.
   execute: (count=1) ->
     @indent(count)
-    @vimState.activateCommandMode()
 
   # Protected: Indents or outdents the text selected by the given motion.
   #
@@ -20,6 +19,7 @@ class Indent extends Operator
   # Returns nothing.
   indent: (count, direction='indent') ->
     row = @editor.getCursorScreenRow()
+    mode = @vimState.mode
 
     @motion.select(count)
     if direction == 'indent'
@@ -29,8 +29,10 @@ class Indent extends Operator
     else if direction == 'auto'
       @editor.autoIndentSelectedRows()
 
-    @editor.setCursorScreenPosition([row, 0])
-    @editor.moveCursorToFirstCharacterOfLine()
+    if mode != 'visual'
+      @editor.setCursorScreenPosition([row, 0])
+      @editor.moveCursorToFirstCharacterOfLine()
+      @vimState.activateCommandMode()
 
 #
 # It outdents everything selected by the following motion.
@@ -43,7 +45,6 @@ class Outdent extends Indent
   # Returns nothing.
   execute: (count=1) ->
     @indent(count, 'outdent')
-    @vimState.activateCommandMode()
 
 #
 # It autoindents everything selected by the following motion.
@@ -56,6 +57,5 @@ class Autoindent extends Indent
   # Returns nothing.
   execute: (count=1) ->
     @indent(count, 'auto')
-    @vimState.activateCommandMode()
 
 module.exports = {Indent, Outdent, Autoindent}
