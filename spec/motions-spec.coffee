@@ -950,6 +950,33 @@ describe "Motions", ->
         expect(start.row).toEqual 0
         expect(end.row).toEqual 2
 
+      describe "case sensitivity", ->
+        beforeEach ->
+          editor.setText("\nabc\nABC\n")
+          editor.setCursorBufferPosition([0, 0])
+          keydown('/')
+
+        it "works in case sensitive mode", ->
+          editor.commandModeInputView.editor.setText 'ABC'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        it "works in case insensitive mode", ->
+          editor.commandModeInputView.editor.setText '\\cAbC'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        it "works in case insensitive mode wherever \\c is", ->
+          editor.commandModeInputView.editor.setText 'AbC\\c'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
       describe "repeating", ->
         it "does nothing with no search history", ->
           # This tests that no exception is raised

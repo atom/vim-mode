@@ -50,11 +50,15 @@ class SearchBase extends MotionWithInput
 
   scan: ->
     term = @input.characters
+    mod = 'g'
+    if term.indexOf('\\c') != -1
+      term = term.replace('\\c','')
+      mod += 'i'
     regexp =
       try
-        new RegExp(term, 'g')
+        new RegExp(term, mod)
       catch
-        new RegExp(_.escapeRegExp(term), 'g')
+        new RegExp(_.escapeRegExp(term), mod)
 
     cur = @editor.getCursorBufferPosition()
     matchPoints = []
