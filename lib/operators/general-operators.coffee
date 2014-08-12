@@ -149,6 +149,9 @@ class Yank extends Operator
       text = ''
     type = if @motion.isLinewise?() then 'linewise' else 'character'
 
+    if @motion.isLinewise?() and text[-1..] isnt '\n'
+      text += '\n'
+
     @vimState.setRegister(@register, {text, type})
 
     if @motion.isLinewise?()

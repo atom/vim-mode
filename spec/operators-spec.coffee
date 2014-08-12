@@ -489,8 +489,17 @@ describe "Operators", ->
         keydown('y')
         keydown('p')
 
-        expect(vimState.getRegister('"').text).toBe "no newline!"
+        expect(vimState.getRegister('"').text).toBe "no newline!\n"
         expect(editor.getText()).toBe "no newline!\nno newline!"
+
+      it "copies the entire line and pastes it respecting count and new lines", ->
+        keydown('y')
+        keydown('y')
+        keydown('2')
+        keydown('p')
+
+        expect(vimState.getRegister('"').text).toBe "no newline!\n"
+        expect(editor.getText()).toBe "no newline!\nno newline!\nno newline!"
 
   describe "the Y keybinding", ->
     beforeEach ->
