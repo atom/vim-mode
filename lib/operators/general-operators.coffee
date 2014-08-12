@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$$, Range} = require 'atom'
+{$$, Point, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
 
 class OperatorError
@@ -142,9 +142,10 @@ class Yank extends Operator
   # Returns nothing.
   execute: (count=1) ->
     originalPosition = @editor.getCursorScreenPosition()
-
     if _.contains(@motion.select(count), true)
+      selectedPosition = @editor.getCursorScreenPosition()
       text = @editor.getSelection().getText()
+      originalPosition = Point.min(originalPosition, selectedPosition)
     else
       text = ''
     type = if @motion.isLinewise?() then 'linewise' else 'character'
@@ -154,11 +155,7 @@ class Yank extends Operator
 
     @vimState.setRegister(@register, {text, type})
 
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition(originalPosition)
-    else
-      @editor.clearSelections()
-
+    @editor.setCursorScreenPosition(originalPosition)
     @vimState.activateCommandMode()
 
 #
