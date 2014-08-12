@@ -14,7 +14,7 @@ class SelectInsideWord extends TextObject
 # checks in the bracket matcher.
 
 class SelectInsideQuotes extends TextObject
-  constructor: (@editor, @char) ->
+  constructor: (@editor, @char, @includeQuotes) ->
 
   findOpeningQuote: (pos) ->
     pos = pos.copy()
@@ -38,6 +38,8 @@ class SelectInsideQuotes extends TextObject
         if endLine[end.column] == '\\'
           ++ end.column
         else if endLine[end.column] == @char
+          -- start.column if @includeQuotes
+          ++ end.column if @includeQuotes
           @editor.expandSelectionsForward (selection) =>
             selection.cursor.setBufferPosition start
             selection.selectToBufferPosition end
@@ -62,7 +64,7 @@ class SelectInsideQuotes extends TextObject
 # checks in the bracket matcher.
 
 class SelectInsideBrackets extends TextObject
-  constructor: (@editor, @beginChar, @endChar) ->
+  constructor: (@editor, @beginChar, @endChar, @includeBrackets) ->
 
   findOpeningBracket: (pos) ->
     pos = pos.copy()
@@ -89,6 +91,8 @@ class SelectInsideBrackets extends TextObject
           when @beginChar then ++ depth
           when @endChar
             if -- depth < 0
+              -- start.column if @includeBrackets
+              ++ end.column if @includeBrackets
               @editor.expandSelectionsForward (selection) =>
                 selection.cursor.setBufferPosition start
                 selection.selectToBufferPosition end
@@ -106,4 +110,10 @@ class SelectInsideBrackets extends TextObject
     {select,end} = @findClosingBracket(start)
     select
 
-module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets}
+class SelectAWord extends TextObject
+  select: ->
+    @editor.selectWord()
+    @editor.selectToBeginningOfNextWord()
+    [true]
+
+module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets, SelectAWord}
