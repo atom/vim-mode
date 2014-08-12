@@ -953,6 +953,7 @@ describe "Motions", ->
       describe "case sensitivity", ->
         beforeEach ->
           editor.setText("\nabc\nABC\n")
+          editor.setCursorBufferPosition([0, 0])
           keydown('/')
 
         it "works in case sensitive mode", ->
