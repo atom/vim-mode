@@ -580,39 +580,53 @@ describe "Operators", ->
 
           expect(editor.getText()).toBe "abcdetwo three\none "
 
+      describe "with a selection", ->
+        beforeEach ->
+          editor.selectRight()
+          keydown('p')
+
+        it "replaces the current selection", ->
+          expect(editor.getText()).toBe "34512\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     describe "with linewise contents", ->
-      beforeEach ->
-        editor.getBuffer().setText("012")
-        editor.setCursorScreenPosition([0, 1])
-        vimState.setRegister('"', text: " 345\n", type: 'linewise')
-        keydown('p')
+      describe "on a single line", ->
+        beforeEach ->
+          editor.getBuffer().setText("012")
+          editor.setCursorScreenPosition([0, 1])
+          vimState.setRegister('"', text: " 345\n", type: 'linewise')
 
-      it "inserts the contents of the default register", ->
-        expect(editor.getText()).toBe "012\n 345"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+        it "inserts the contents of the default register", ->
+          keydown('p')
 
-    describe "with linewise contents", ->
-      beforeEach ->
-        editor.getBuffer().setText("012\n 345")
-        editor.setCursorScreenPosition([0, 1])
-        vimState.setRegister('"', text: " 456\n", type: 'linewise')
-        keydown('p')
+          expect(editor.getText()).toBe "012\n 345"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-      it "inserts the contents of the default register at middle line", ->
-        expect(editor.getText()).toBe "012\n 456\n 345"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+        it "replaces the current selection", ->
+          editor.selectRight()
+          keydown('p')
 
-    describe "with linewise contents", ->
-      beforeEach ->
-        editor.getBuffer().setText("012\n 345")
-        editor.setCursorScreenPosition([1, 1])
-        vimState.setRegister('"', text: " 456", type: 'linewise')
-        keydown('p')
+          expect(editor.getText()).toBe "0 345\n2"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
-      it "inserts the contents of the default register at end of line", ->
-        expect(editor.getText()).toBe "012\n 345\n 456"
-        expect(editor.getCursorScreenPosition()).toEqual [2, 1]
+      describe "on multiple lines", ->
+        beforeEach ->
+          editor.getBuffer().setText("012\n 345")
+          vimState.setRegister('"', text: " 456\n", type: 'linewise')
+
+        it "inserts the contents of the default register at middle line", ->
+          editor.setCursorScreenPosition([0, 1])
+          keydown('p')
+
+          expect(editor.getText()).toBe "012\n 456\n 345"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+        it "inserts the contents of the default register at end of line", ->
+          editor.setCursorScreenPosition([1, 1])
+          keydown('p')
+
+          expect(editor.getText()).toBe "012\n 345\n 456"
+          expect(editor.getCursorScreenPosition()).toEqual [2, 1]
 
     describe "with multiple linewise contents", ->
       beforeEach ->

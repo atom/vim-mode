@@ -23,30 +23,32 @@ class Put extends Operator
 
     textToInsert = _.times(count, -> text).join('')
 
-    # Clean up some corner cases on the last line of the file
-    if type == 'linewise'
-      textToInsert = textToInsert.replace(/\n$/, '')
-      if @location == 'after' and @onLastRow()
-        textToInsert = "\n#{textToInsert}"
-      else
-        textToInsert = "#{textToInsert}\n"
-
-    if @location == 'after'
+    selection = @editor.getSelectedBufferRange()
+    if selection.isEmpty()
+      # Clean up some corner cases on the last line of the file
       if type == 'linewise'
-        if @onLastRow()
-          @editor.moveCursorToEndOfLine()
-
-          originalPosition = @editor.getCursorScreenPosition()
-          originalPosition.row += 1
+        textToInsert = textToInsert.replace(/\n$/, '')
+        if @location == 'after' and @onLastRow()
+          textToInsert = "\n#{textToInsert}"
         else
-          @editor.moveCursorDown()
-      else
-        unless @onLastColumn()
-          @editor.moveCursorRight()
+          textToInsert = "#{textToInsert}\n"
 
-    if type == 'linewise' and !originalPosition?
-      @editor.moveCursorToBeginningOfLine()
-      originalPosition = @editor.getCursorScreenPosition()
+      if @location == 'after'
+        if type == 'linewise'
+          if @onLastRow()
+            @editor.moveCursorToEndOfLine()
+
+            originalPosition = @editor.getCursorScreenPosition()
+            originalPosition.row += 1
+          else
+            @editor.moveCursorDown()
+        else
+          unless @onLastColumn()
+            @editor.moveCursorRight()
+
+      if type == 'linewise' and !originalPosition?
+        @editor.moveCursorToBeginningOfLine()
+        originalPosition = @editor.getCursorScreenPosition()
 
     @editor.insertText(textToInsert)
 
