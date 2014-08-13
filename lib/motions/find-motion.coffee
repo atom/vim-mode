@@ -5,14 +5,16 @@
 class Find extends MotionWithInput
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)
+    @vimState.currentFind = @
     @viewModel = new ViewModel(@, class: 'find', singleChar: true, hidden: true)
-    @reversed = false
+    @backwards = false
+    @repeatReversed = false
     @offset = 0
 
   match: (count) ->
     currentPosition = @editorView.editor.getCursorBufferPosition()
     line = @editorView.editor.lineForBufferRow(currentPosition.row)
-    if @reversed
+    if @backwards
       index = currentPosition.column
       for i in [0..count-1]
         index = line.lastIndexOf(@input.characters, index-1)
@@ -32,7 +34,7 @@ class Find extends MotionWithInput
           range: new Range(currentPosition, point.translate([0,1]))
 
   reverse: ->
-    @reversed = !@reversed
+    @backwards = !@backwards
     @
 
   execute: (count=1) ->
@@ -44,6 +46,13 @@ class Find extends MotionWithInput
       @editorView.editor.setSelectedBufferRange(match.range)
       return [true]
     [false]
+
+  repeat: (opts={}) ->
+    opts.reverse = !!opts.reverse
+    if opts.reverse isnt @repeatReversed
+      @reverse()
+      @repeatReversed = opts.reverse
+    @
 
 class Till extends Find
   constructor: (@editorView, @vimState) ->

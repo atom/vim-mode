@@ -1393,6 +1393,122 @@ describe "Motions", ->
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcabc\n'
 
+  describe 'the ; and , keybindings', ->
+    beforeEach ->
+      editor.setText("abcabcabcabc\n")
+      editor.setCursorScreenPosition([0, 0])
+
+    it "repeat f in same direction", ->
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "repeat F in same direction", ->
+      editor.setCursorScreenPosition([0,10])
+      keydown('F', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "repeat f in opposite direction", ->
+      editor.setCursorScreenPosition([0,6])
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "repeat F in opposite direction", ->
+      editor.setCursorScreenPosition([0,4])
+      keydown('F', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "alternate repeat f in same direction and reverse", ->
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "alternate repeat F in same direction and reverse", ->
+      editor.setCursorScreenPosition([0,10])
+      keydown('F', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "repeat t in same direction (won't move)", ->
+      keydown('t')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+    it "repeat T in same direction (won't move)", ->
+      editor.setCursorScreenPosition([0,10])
+      keydown('T', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+
+    it "repeat t in opposite direction first, and then reverse", ->
+      editor.setCursorScreenPosition([0,3])
+      keydown('t')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    it "repeat T in opposite direction first, and then reverse", ->
+      editor.setCursorScreenPosition([0,4])
+      keydown('T', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+    it "repeat with count in same direction", ->
+      editor.setCursorScreenPosition([0,0])
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown('2')
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "repeat with count in reverse direction", ->
+      editor.setCursorScreenPosition([0,6])
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown('2')
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
   describe 'the % motion', ->
     beforeEach ->
       editor.setText("( ( ) )--{ text in here; and a function call(with parameters) }\n")

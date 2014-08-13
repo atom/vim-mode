@@ -95,6 +95,8 @@
   'F': 'vim-mode:find-backwards'
   't': 'vim-mode:till'
   'T': 'vim-mode:till-backwards'
+  ';': 'vim-mode:repeat-find'
+  ',': 'vim-mode:repeat-find-reverse'
 
   '/': 'vim-mode:search'
   '?': 'vim-mode:reverse-search'

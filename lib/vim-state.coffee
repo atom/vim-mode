@@ -189,6 +189,8 @@ class VimState
       'find-backwards': (e) => new Motions.Find(@editorView, @).reverse()
       'till': (e) => new Motions.Till(@editorView, @)
       'till-backwards': (e) => new Motions.Till(@editorView, @).reverse()
+      'repeat-find': (e) => @currentFind.repeat() if @currentFind?
+      'repeat-find-reverse': (e) => @currentFind.repeat(reverse: true) if @currentFind?
       'replace': (e) => new Operators.Replace(@editorView, @)
       'search': (e) => new Motions.Search(@editorView, @)
       'reverse-search': (e) => (new Motions.Search(@editorView, @)).reversed()
