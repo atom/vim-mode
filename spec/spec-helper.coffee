@@ -8,26 +8,32 @@ beforeEach ->
   atom.workspace ||= {}
   VimMode._initializeWorkspaceState()
 
-cacheEditor = (existingEditorView) ->
-  session = atom.project.openSync()
-  if existingEditorView?
-    existingEditorView.edit(session)
-    existingEditorView.vimState = new VimState(existingEditorView)
-    existingEditorView.bindKeys()
-    existingEditorView.enableKeymap()
-  else
-    editorView = new EditorView(session)
-    editorView.simulateDomAttachment()
-    editorView.enableKeymap()
+cacheEditor = (existingEditorView, callback) ->
+  session = null
 
-    editorView.addClass('vim-mode')
-    editorView.vimState = new VimState(editorView)
+  waitsForPromise ->
+    atom.project.open().then (o) -> session = o
 
-  view = existingEditorView or editorView
-  history = view.editor.buffer.history
-  history.abortTransaction() if history.currentTransaction?
-  history.clearUndoStack()
-  view
+  runs ->
+    if existingEditorView?
+      existingEditorView.edit(session)
+      existingEditorView.vimState = new VimState(existingEditorView)
+      existingEditorView.bindKeys()
+      existingEditorView.enableKeymap()
+    else
+      editorView = new EditorView(session)
+      editorView.simulateDomAttachment()
+      editorView.enableKeymap()
+
+      editorView.addClass('vim-mode')
+      editorView.vimState = new VimState(editorView)
+
+    view = existingEditorView or editorView
+    history = view.editor.buffer.history
+    history.abortTransaction() if history.currentTransaction?
+    history.clearUndoStack()
+
+    callback(view)
 
 mockPlatform = (editorView, platform) ->
   wrapper = document.createElement('div')

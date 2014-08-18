@@ -7,12 +7,13 @@ describe "Scrolling", ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    editorView = helpers.cacheEditor(editorView)
-    editor = editorView.editor
+    helpers.cacheEditor editorView, (view) ->
+      editorView = view
+      editor = editorView.editor
 
-    vimState = editorView.vimState
-    vimState.activateCommandMode()
-    vimState.resetCommandMode()
+      vimState = editorView.vimState
+      vimState.activateCommandMode()
+      vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
     options.element ?= editorView[0]
