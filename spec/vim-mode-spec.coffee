@@ -5,8 +5,12 @@ describe "VimMode", ->
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView
-    atom.workspaceView.openSync()
-    atom.workspaceView.simulateDomAttachment()
+
+    waitsForPromise ->
+      atom.workspace.open()
+
+    runs ->
+      atom.workspaceView.simulateDomAttachment()
 
     waitsForPromise ->
       atom.packages.activatePackage('vim-mode')
