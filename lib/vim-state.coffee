@@ -460,7 +460,8 @@ class VimState
   #
   # Returns nothing.
   registerPrefix: (e) ->
-    name = atom.keymap.keystrokeStringForEvent(e.originalEvent)
+    keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
+    name = atom.keymap.keystrokeForKeyboardEvent(keyboardEvent)
     new Prefixes.Register(name)
 
   # Private: A generic way to create a Number prefix based on the event.
@@ -469,7 +470,8 @@ class VimState
   #
   # Returns nothing.
   repeatPrefix: (e) ->
-    num = parseInt(atom.keymap.keystrokeStringForEvent(e.originalEvent))
+    keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
+    num = parseInt(atom.keymap.keystrokeForKeyboardEvent(keyboardEvent))
     if @topOperation() instanceof Prefixes.Repeat
       @topOperation().addDigit(num)
     else
