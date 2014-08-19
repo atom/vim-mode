@@ -7,12 +7,12 @@ describe "Motions", ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    editorView = helpers.cacheEditor(editorView)
-    editor = editorView.editor
-
-    vimState = editorView.vimState
-    vimState.activateCommandMode()
-    vimState.resetCommandMode()
+    helpers.cacheEditor editorView, (view) ->
+      editorView = view
+      editor = editorView.editor
+      vimState = editorView.vimState
+      vimState.activateCommandMode()
+      vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
     options.element ?= editorView[0]

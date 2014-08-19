@@ -4,7 +4,7 @@ class FocusAction
   isRecordable: -> false
 
   focusCursor: ->
-    editor = atom.workspaceView.getActivePaneItem()
+    editor = atom.workspace.getActivePaneItem()
     editorView = atom.workspaceView.getActiveView()
     if editor? and editorView?
       cursorPosition = editor.getCursorBufferPosition()
