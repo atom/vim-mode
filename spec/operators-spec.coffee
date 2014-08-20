@@ -278,55 +278,61 @@ describe "Operators", ->
 
     describe "when followed by an j", ->
       beforeEach ->
-        originalText = "12345\nabcde\nABCDE"
-        editor.setText(originalText)
+        @originalText = "12345\nabcde\nABCDE"
+        editor.setText(@originalText)
 
-        describe "on the beginning of the file", ->
+      describe "on the beginning of the file", ->
+        beforeEach ->
           editor.setCursorScreenPosition([0, 0])
-          it "deletes the next two lines", ->
-            keydown('d')
-            keydown('j')
-            expect(editor.getText()).toBe("ABCDE")
+        it "deletes the next two lines", ->
+          keydown('d')
+          keydown('j')
+          expect(editor.getText()).toBe("ABCDE")
 
-        describe "on the end of the file", ->
-          editor.setCursorScreenPosition([4,2])
-          it "deletes nothing", ->
-            keydown('d')
-            keydown('j')
-            expect(editor.getText()).toBe(originalText)
+      describe "on the end of the file", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([2, 4])
+        it "deletes nothing", ->
+          keydown('d')
+          keydown('j')
+          expect(editor.getText()).toBe(@originalText)
 
-        describe "on the middle of second line", ->
-          editor.setCursorScreenPosition([2,1])
-          it "deletes the last two lines", ->
-            keydown('d')
-            keydown('j')
-            expect(editor.getText()).toBe("12345")
+      describe "on the middle of second line", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([1,2])
+        it "deletes the last two lines", ->
+          keydown('d')
+          keydown('j')
+          expect(editor.getText()).toBe("12345")
 
     describe "when followed by an k", ->
       beforeEach ->
-        originalText = "12345\nabcde\nABCDE"
-        editor.setText(originalText)
+        @originalText = "12345\nabcde\nABCDE"
+        editor.setText(@originalText)
 
-        describe "on the end of the file", ->
-          editor.setCursorScreenPosition([4, 2])
-          it "deletes the bottom two lines", ->
-            keydown('d')
-            keydown('k')
-            expect(editor.getText()).toBe("ABCDE")
+      describe "on the end of the file", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([2,4])
+        it "deletes the bottom two lines", ->
+          keydown('d')
+          keydown('k')
+          expect(editor.getText()).toBe("ABCDE")
 
-        describe "on the beginning of the file", ->
+      describe "on the beginning of the file", ->
+        beforeEach ->
           editor.setCursorScreenPosition([0,0])
-          it "deletes nothing", ->
-            keydown('d')
-            keydown('k')
-            expect(editor.getText()).toBe(originalText)
+        it "deletes nothing", ->
+          keydown('d')
+          keydown('k')
+          expect(editor.getText()).toBe(@originalText)
 
-        describe "when on the middle of second line", ->
-          editor.setCursorScreenPosition([2,1])
-          it "deletes the first two lines", ->
-            keydown('d')
-            keydown('k')
-            expect(editor.getText()).toBe("12345")
+      describe "when on the middle of second line", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([1,2])
+        it "deletes the first two lines", ->
+          keydown('d')
+          keydown('k')
+          expect(editor.getText()).toBe("12345")
 
 
   describe "the D keybinding", ->
@@ -479,11 +485,11 @@ describe "Operators", ->
         keydown('y')
         keydown('h')
 
-        it "saves the left letter to the default register", ->
-          expect(vimState.getRegister('"').text).toBe " "
+      it "saves the left letter to the default register", ->
+        expect(vimState.getRegister('"').text).toBe " "
 
-        it "moves the cursor position to the left", ->
-          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      it "moves the cursor position to the left", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
     describe "with a down motion", ->
       beforeEach ->
