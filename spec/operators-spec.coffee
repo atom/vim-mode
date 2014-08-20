@@ -316,7 +316,7 @@ describe "Operators", ->
         it "deletes the bottom two lines", ->
           keydown('d')
           keydown('k')
-          expect(editor.getText()).toBe("ABCDE")
+          expect(editor.getText()).toBe("12345")
 
       describe "on the beginning of the file", ->
         beforeEach ->
@@ -332,7 +332,7 @@ describe "Operators", ->
         it "deletes the first two lines", ->
           keydown('d')
           keydown('k')
-          expect(editor.getText()).toBe("12345")
+          expect(editor.getText()).toBe("ABCDE")
 
 
   describe "the D keybinding", ->
