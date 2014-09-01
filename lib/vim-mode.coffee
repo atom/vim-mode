@@ -1,4 +1,5 @@
 VimState = require './vim-state'
+JumpList = require './jumplist'
 
 module.exports =
   configDefaults:
@@ -9,6 +10,7 @@ module.exports =
     atom.workspace.vimState ||= {}
     atom.workspace.vimState.registers ||= {}
     atom.workspace.vimState.searchHistory ||= []
+    atom.workspace.vimState.jumpList ||= new JumpList()
 
   activate: (state) ->
     @_initializeWorkspaceState()

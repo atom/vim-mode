@@ -33,3 +33,5 @@
 * [T](http://vimhelp.appspot.com/motion.txt.html#T)
 * [;](http://vimhelp.appspot.com/motion.txt.html#%3B)
 * [,](http://vimhelp.appspot.com/motion.txt.html#%2C)
+* [ctrl-o](http://vimhelp.appspot.com/motion.txt.html#CTRL-O)
+* [ctrl-i](http://vimhelp.appspot.com/motion.txt.html#CTRL-I)

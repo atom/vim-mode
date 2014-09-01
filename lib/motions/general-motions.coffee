@@ -342,6 +342,7 @@ class MoveToEndOfWholeWord extends Motion
 
 class MoveToNextParagraph extends Motion
   execute: (count=1) ->
+    atom.workspace.vimState.jumpList.addJump @editor
     _.times count, =>
       @editor.setCursorScreenPosition(@nextPosition())
 
@@ -369,6 +370,7 @@ class MoveToNextParagraph extends Motion
 
 class MoveToPreviousParagraph extends Motion
   execute: (count=1) ->
+    atom.workspace.vimState.jumpList.addJump @editor
     _.times count, =>
       @editor.setCursorScreenPosition(@previousPosition())
 
@@ -428,6 +430,7 @@ class MoveToLine extends Motion
       new Range(startPoint, endPoint)
 
   setCursorPosition: (count) ->
+    atom.workspace.vimState.jumpList.addJump @editor
     @editor.setCursorBufferPosition([@getDestinationRow(count), 0])
 
   getDestinationRow: (count) ->
@@ -439,6 +442,7 @@ class MoveToScreenLine extends MoveToLine
     super(@editor, @vimState)
 
   setCursorPosition: (count) ->
+    atom.workspace.vimState.jumpList.addJump @editor
     @editor.setCursorScreenPosition([@getDestinationRow(count), 0])
 
 class MoveToBeginningOfLine extends Motion
@@ -544,11 +548,21 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
+class MoveToOlderJumpPos extends Motion
+  execute: (count=1) ->
+    atom.workspace.vimState.jumpList.moveToOlderPos @editor, count
+
+class MoveToNewerJumpPos extends Motion
+  execute: (count=1) ->
+    atom.workspace.vimState.jumpList.moveToNewerPos @editor, count
+
+
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
-  MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
+  MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError,
+  MoveToOlderJumpPos, MoveToNewerJumpPos
 }
