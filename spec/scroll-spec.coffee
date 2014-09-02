@@ -7,7 +7,7 @@ describe "Scrolling", ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    helpers.cacheEditor editorView, (view) ->
+    helpers.getEditorView editorView, (view) ->
       editorView = view
       editor = editorView.editor
 
