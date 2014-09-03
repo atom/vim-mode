@@ -57,7 +57,7 @@ class MoveLeft extends Motion
 class MoveRight extends Motion
   execute: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
+      {row, column} = @editor.getCursorBufferPosition()
       lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
       unless column >= lastCharIndex
         @editor.moveCursorRight()
