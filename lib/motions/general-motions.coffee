@@ -41,12 +41,12 @@ class MotionWithInput extends Motion
 class MoveLeft extends Motion
   execute: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
+      {column} = @editor.getCursorBufferPosition()
       @editor.moveCursorLeft() if column > 0
 
   select: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
+      {column} = @editor.getCursorBufferPosition()
 
       if column > 0
         @editor.selectLeft()
@@ -57,9 +57,8 @@ class MoveLeft extends Motion
 class MoveRight extends Motion
   execute: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
-      lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
-      unless column >= lastCharIndex
+      {row, column} = @editor.getCursorBufferPosition()
+      if column < @editor.lineLengthForBufferRow(row) - 1
         @editor.moveCursorRight()
 
   select: (count=1) ->
