@@ -995,6 +995,13 @@ describe "Operators", ->
       commandModeInputKeydown('x')
       expect(editor.getText()).toBe 'x2\n34\n\n'
 
+    it "replaces a single character with a line break", ->
+      keydown('r')
+      # TODO: Is this how you input a CR?
+      commandModeInputKeydown('\n')
+      expect(editor.getText()).toBe '\n2\n34\n\n'
+      expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
     it "composes properly with motions", ->
       keydown('2')
       keydown('r')
