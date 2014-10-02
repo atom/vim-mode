@@ -56,6 +56,10 @@ class VimCommandModeInputView extends View
 
   confirm: =>
     @value = @editor.getText()
+    # HACK! Adding "\n" to on key events
+    # Useful for norm r<CR>
+    if not @value and event?.originalEvent?.which is 13
+      @value = "\n"
     @viewModel.confirm(@)
     @remove()
 
