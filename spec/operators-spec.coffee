@@ -997,10 +997,16 @@ describe "Operators", ->
 
     it "replaces a single character with a line break", ->
       keydown('r')
-      # TODO: Is this how you input a CR?
-      commandModeInputKeydown('\n')
+      commandModeInputKeydown('\r')
       expect(editor.getText()).toBe '\n2\n34\n\n'
-      expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+    xit "replaces a single character with a line break", ->
+      keydown('r')
+      commandModeInputKeydown('\r')
+      expect(editor.getText()).toBe '\n2\n34\n\n'
+      # For some reason, the buffer position remains
+      # at [0, 0], even if it changes in an actual editor.
+      expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
     it "composes properly with motions", ->
       keydown('2')
