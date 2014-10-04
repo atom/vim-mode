@@ -26,4 +26,11 @@ class Replace extends OperatorWithInput
         @editor.moveCursorRight()
       @editor.setCursorBufferPosition(start)
 
+      # Special case: when replaced with a newline move to the start of
+      # the next row.
+      if @input.characters is "\n"
+        _.times count, =>
+          @editor.moveCursorDown()
+        @editor.moveToFirstCharacterOfLine()
+
     @vimState.activateCommandMode()
