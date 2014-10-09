@@ -51,6 +51,8 @@ class SearchBase extends MotionWithInput
   scan: ->
     term = @input.characters
     mod = 'g'
+    if !term.match('[A-Z]')
+      mod += 'i'
     if term.indexOf('\\c') != -1
       term = term.replace('\\c','')
       mod += 'i'
