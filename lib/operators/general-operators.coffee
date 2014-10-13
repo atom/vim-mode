@@ -141,11 +141,11 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
-    originalPosition = @editor.getCursorScreenPosition()
+    selection = @editor.getLastSelection()
     if _.contains(@motion.select(count), true)
-      selectedPosition = @editor.getCursorScreenPosition()
-      text = @editor.getSelection().getText()
-      originalPosition = Point.min(originalPosition, selectedPosition)
+      text = @editor.getLastSelection().getText()
+      selectionRange = selection.getScreenRange()
+      newPosition = selectionRange.start
     else
       text = ''
     type = if @motion.isLinewise?() then 'linewise' else 'character'
@@ -155,7 +155,7 @@ class Yank extends Operator
 
     @vimState.setRegister(@register, {text, type})
 
-    @editor.setCursorScreenPosition(originalPosition)
+    @editor.setCursorScreenPosition(newPosition)
     @vimState.activateCommandMode()
 
 #
