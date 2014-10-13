@@ -51,7 +51,8 @@ class SearchBase extends MotionWithInput
   scan: ->
     term = @input.characters
     mod = 'g'
-    if atom.config.get 'vim-mode.useSmartcaseForSearch'
+    usingSmartcase = atom.config.get 'vim-mode.useSmartcaseForSearch'
+    if usingSmartcase && !term.match('[A-Z]')
       mod += 'i'
     if term.indexOf('\\c') != -1
       term = term.replace('\\c','')
