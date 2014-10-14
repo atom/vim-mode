@@ -19,27 +19,31 @@ class SelectInsideQuotes extends TextObject
   findOpeningQuote: (pos) ->
     start = pos.copy()
     pos = pos.copy()
-    numQuotes = 0
     while pos.row >= 0
       line = @editor.lineForBufferRow(pos.row)
       pos.column = line.length - 1 if pos.column == -1
       while pos.column >= 0
         if line[pos.column] == @char
-          unEscaped = pos.column == 0 or line[pos.column - 1] != '\\'
-          if unEscaped
-            numQuotes++
-          result = pos.copy() if not result and unEscaped
+          if pos.column == 0 or line[pos.column - 1] != '\\'
+            return if @isStartQuote(pos) then pos else @lookForwardOnLine(start)
         -- pos.column
       pos.column = -1
       -- pos.row
-     if numQuotes % 2 then result else @lookForwardOnLine(start)
+    @lookForwardOnLine(start)
+
+  isStartQuote: (end) ->
+    range = new Range([0,0],end)
+    numQuotes = range.toString().replace('\''+@char,'').split(@char).length-1
+    return numQuotes % 2
+
 
   lookForwardOnLine: (pos) ->
     line = @editor.lineForBufferRow(pos.row)
-    while pos.column < line.length
-      if line[pos.column] == @char
-        return pos
-      pos.column++
+    idx = line.indexOf @char
+    if idx >= 0
+      pos.column = idx
+      return pos
+    null
 
   findClosingQuote: (start) ->
     end = start.copy()
