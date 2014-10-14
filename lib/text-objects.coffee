@@ -17,16 +17,29 @@ class SelectInsideQuotes extends TextObject
   constructor: (@editor, @char, @includeQuotes) ->
 
   findOpeningQuote: (pos) ->
+    start = pos.copy()
     pos = pos.copy()
+    numQuotes = 0
     while pos.row >= 0
       line = @editor.lineForBufferRow(pos.row)
       pos.column = line.length - 1 if pos.column == -1
       while pos.column >= 0
         if line[pos.column] == @char
-          return pos if pos.column == 0 or line[pos.column - 1] != '\\'
+          unEscaped = pos.column == 0 or line[pos.column - 1] != '\\'
+          if unEscaped
+            numQuotes++
+          result = pos.copy() if not result and unEscaped
         -- pos.column
       pos.column = -1
       -- pos.row
+     if numQuotes % 2 then result else @lookForwardOnLine(start)
+
+  lookForwardOnLine: (pos) ->
+    line = @editor.lineForBufferRow(pos.row)
+    while pos.column < line.length
+      if line[pos.column] == @char
+        return pos
+      pos.column++
 
   findClosingQuote: (start) ->
     end = start.copy()
