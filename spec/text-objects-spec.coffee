@@ -13,7 +13,7 @@ describe "TextObjects", ->
 
       vimState = editorView.vimState
       vimState.activateCommandMode()
-      vimState.resetCommandMode()jj
+      vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
     options.element ?= editorView[0]

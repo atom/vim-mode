@@ -32,16 +32,17 @@ class SelectInsideQuotes extends TextObject
     @lookForwardOnLine(start)
 
   isStartQuote: (end) ->
-    range = new Range([0,0],end)
-    numQuotes = range.toString().replace('\''+@char,'').split(@char).length-1
+    line = @editor.lineForBufferRow(end.row)
+    numQuotes = line.substring(0,end.column + 1).replace('\''+@char,'').split(@char).length-1
     return numQuotes % 2
 
 
   lookForwardOnLine: (pos) ->
     line = @editor.lineForBufferRow(pos.row)
-    idx = line.indexOf @char
+
+    idx = line.substring(pos.column).indexOf @char
     if idx >= 0
-      pos.column = idx
+      pos.column += idx
       return pos
     null
 
