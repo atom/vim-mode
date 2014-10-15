@@ -49,14 +49,19 @@ class SearchBase extends MotionWithInput
       atom.beep()
 
   scan: ->
+    addToMod = (modifier) =>
+      if mod.indexOf(modifier) == -1
+        return mod += modifier
+      else return
     term = @input.characters
-    mod = 'g'
+    mod = ''
+    addToMod('g')
     usingSmartcase = atom.config.get 'vim-mode.useSmartcaseForSearch'
     if usingSmartcase && !term.match('[A-Z]')
-      mod += 'i'
+      addToMod('i')
     if term.indexOf('\\c') != -1
       term = term.replace('\\c','')
-      mod += 'i'
+      addToMod('i')
     regexp =
       try
         new RegExp(term, mod)
