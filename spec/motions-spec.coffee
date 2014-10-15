@@ -985,7 +985,7 @@ describe "Motions", ->
           keydown('n')
           expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
-        it "uses Smartcase sensitive search if useSmartcaseForSearch is true and searching uppercase", ->
+        it "uses case sensitive search if useSmartcaseForSearch is true and searching uppercase", ->
           atom.config.set 'vim-mode.useSmartcaseForSearch', true
           editor.commandModeInputView.editor.setText 'ABC'
           editor.commandModeInputView.editor.trigger 'core:confirm'
