@@ -97,10 +97,13 @@ class Change extends Insert
     row is @editor.getBuffer().getLastRow()
 
 class Substitute extends Insert
+  register: '"'
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
     _.times count, =>
       @editor.selectRight()
+    text = @editor.getSelection().getText()
+    @setTextRegister(@register, text)
     @editor.delete()
 
     if @typingCompleted
@@ -111,11 +114,14 @@ class Substitute extends Insert
     @typingCompleted = true
 
 class SubstituteLine extends Insert
+  register: '"'
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
     @editor.moveCursorToBeginningOfLine()
     _.times count, =>
       @editor.selectDown()
+    text = @editor.getSelection().getText()
+    @setTextRegister(@register, text)
     @editor.delete()
     @editor.insertNewlineAbove()
     @editor.getCursor().skipLeadingWhitespace()

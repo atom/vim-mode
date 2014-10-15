@@ -50,6 +50,18 @@ class Operator
   undoTransaction: (fn) ->
     @editor.getBuffer().transact(fn)
 
+  # Public: Preps text and sets the text register
+  #
+  # Returns nothing
+  setTextRegister: (register, text) ->
+    if @motion? and @motion.isLinewise?()
+      type = 'linewise'
+      if text[-1..] isnt '\n'
+        text += '\n'
+    else
+      type = 'character'
+    @vimState.setRegister(register, {text, type})
+
 # Public: Generic class for an operator that requires extra input
 class OperatorWithInput extends Operator
   constructor: (@editorView, @vimState) ->
@@ -92,12 +104,7 @@ class Delete extends Operator
 
     if validSelection?
       text = @editor.getSelection().getText()
-
-      # Prep text for register
-      type = if @motion.isLinewise?() then 'linewise' else 'character'
-      if @motion.isLinewise?() and text[-1..] isnt '\n'
-        text += '\n'
-      @vimState.setRegister(@register, {text, type})
+      @setTextRegister(@register, text)
 
       @editor.delete()
       if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
@@ -143,7 +150,6 @@ class ToggleCase extends Operator
 #
 class Yank extends Operator
   register: '"'
-
   # Public: Copies the text selected by the given motion.
   #
   # count - The number of times to execute.
@@ -158,11 +164,7 @@ class Yank extends Operator
     else
       text = ''
 
-    # Prep text for register
-    type = if @motion.isLinewise?() then 'linewise' else 'character'
-    if @motion.isLinewise?() and text[-1..] isnt '\n'
-      text += '\n'
-    @vimState.setRegister(@register, {text, type})
+    @setTextRegister(@register, text)
 
     @editor.setCursorScreenPosition(originalPosition)
     @vimState.activateCommandMode()
