@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
+Utils = require '../utils'
 
 class OperatorError
   constructor: (@message) ->
@@ -59,7 +60,7 @@ class Operator
       if text[-1..] isnt '\n'
         text += '\n'
     else
-      type = 'character'
+      type = Utils.copyType(text)
     @vimState.setRegister(register, {text, type})
 
 # Public: Generic class for an operator that requires extra input
