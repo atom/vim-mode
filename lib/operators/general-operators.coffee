@@ -69,6 +69,7 @@ class OperatorWithInput extends Operator
 # It deletes everything selected by the following motion.
 #
 class Delete extends Operator
+  register: '"'
   allowEOL: null
 
   # allowEOL - Determines whether the cursor should be allowed to rest on the
@@ -90,6 +91,14 @@ class Delete extends Operator
       validSelection = true
 
     if validSelection?
+      text = @editor.getSelection().getText()
+
+      # Prep text for register
+      type = if @motion.isLinewise?() then 'linewise' else 'character'
+      if @motion.isLinewise?() and text[-1..] isnt '\n'
+        text += '\n'
+      @vimState.setRegister(@register, {text, type})
+
       @editor.delete()
       if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
         @editor.moveCursorLeft()
@@ -148,11 +157,11 @@ class Yank extends Operator
       originalPosition = Point.min(originalPosition, selectedPosition)
     else
       text = ''
-    type = if @motion.isLinewise?() then 'linewise' else 'character'
 
+    # Prep text for register
+    type = if @motion.isLinewise?() then 'linewise' else 'character'
     if @motion.isLinewise?() and text[-1..] isnt '\n'
       text += '\n'
-
     @vimState.setRegister(@register, {text, type})
 
     @editor.setCursorScreenPosition(originalPosition)
