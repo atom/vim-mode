@@ -977,6 +977,22 @@ describe "Motions", ->
           keydown('n')
           expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
+        it "uses case insensitive search if useSmartcaseForSearch is true and searching lowercase", ->
+          atom.config.set 'vim-mode.useSmartcaseForSearch', true
+          editor.commandModeInputView.editor.setText 'abc'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        it "uses case sensitive search if useSmartcaseForSearch is true and searching uppercase", ->
+          atom.config.set 'vim-mode.useSmartcaseForSearch', true
+          editor.commandModeInputView.editor.setText 'ABC'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
       describe "repeating", ->
         it "does nothing with no search history", ->
           # This tests that no exception is raised

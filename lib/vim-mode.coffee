@@ -4,6 +4,7 @@ module.exports =
   configDefaults:
     'commandModeInputViewFontSize': 11
     'startInInsertMode': false
+    'useSmartcaseForSearch': false
 
   _initializeWorkspaceState: ->
     atom.workspace.vimState ||= {}
