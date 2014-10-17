@@ -708,6 +708,17 @@ describe "Operators", ->
       keydown 'u'
       expect(editor.getText()).toBe "  abc\n  012\n"
 
+    it 'does not clear the " register', ->
+      editor.getBuffer().setText("abc\n\n012\n\ndef")
+      editor.setCursorScreenPosition([2, 0])
+      keydown('y')
+      keydown('y')
+      expect(vimState.getRegister('"').text).toBe "012\n"
+      keydown('k')
+      keydown('O')
+      keydown 'escape'
+      expect(vimState.getRegister('"').text).toBe "012\n"
+
   describe "the o keybinding", ->
     beforeEach ->
       spyOn(editor, 'shouldAutoIndent').andReturn(true)
@@ -747,6 +758,16 @@ describe "Operators", ->
       keydown 'u'
       expect(editor.getText()).toBe "abc\n  012\n"
 
+    it 'does not clear the " register', ->
+      editor.getBuffer().setText("abc\n\n012\n\ndef")
+      editor.setCursorScreenPosition([2, 0])
+      keydown('y')
+      keydown('y')
+      expect(vimState.getRegister('"').text).toBe "012\n"
+      keydown('j')
+      keydown('o')
+      keydown 'escape'
+      expect(vimState.getRegister('"').text).toBe "012\n"
 
   describe "the a keybinding", ->
     beforeEach ->
