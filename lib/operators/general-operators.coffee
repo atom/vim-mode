@@ -55,7 +55,7 @@ class Operator
   #
   # Returns nothing
   setTextRegister: (register, text) ->
-    if @motion? and @motion.isLinewise?()
+    if @motion?.isLinewise?()
       type = 'linewise'
       if text[-1..] isnt '\n'
         text += '\n'
@@ -104,7 +104,7 @@ class Delete extends Operator
       validSelection = true
 
     if validSelection?
-      text = @editor.getSelection().getText()
+      text = @editor.getSelectedText()
       @setTextRegister(@register, text)
 
       @editor.delete()
