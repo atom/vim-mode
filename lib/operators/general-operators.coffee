@@ -37,6 +37,11 @@ class Operator
     if not motion.select
       throw new OperatorError('Must compose with a motion')
 
+    # Take on the composed object's isLinewise function if this object
+    # doesn't have one.
+    if !motion.isLinewise and motion.composedObject?.isLinewise
+      motion.isLinewise = motion.composedObject.isLinewise
+
     @motion = motion
     @complete = true
 
@@ -83,7 +88,7 @@ class Delete extends Operator
   # count - The number of times to execute.
   #
   # Returns nothing.
-  execute: (count=1) ->
+  execute: (count) ->
     cursor = @editor.getCursor()
 
     if _.contains(@motion.select(count, @selectOptions), true)
@@ -140,7 +145,7 @@ class Yank extends Operator
   # count - The number of times to execute.
   #
   # Returns nothing.
-  execute: (count=1) ->
+  execute: (count) ->
     originalPosition = @editor.getCursorScreenPosition()
     if _.contains(@motion.select(count), true)
       selectedPosition = @editor.getCursorScreenPosition()

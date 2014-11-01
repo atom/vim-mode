@@ -126,7 +126,7 @@ class VimState
       'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor, @)]
       'toggle-case': => new Operators.ToggleCase(@editor, @)
       'yank': => @linewiseAliasedOperator(Operators.Yank)
-      'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToLine(@editor, @)]
+      'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToRelativeLine(@editor, @)]
       'put-before': => new Operators.Put(@editor, @, location: 'before')
       'put-after': => new Operators.Put(@editor, @, location: 'after')
       'join': => new Operators.Join(@editor, @)
@@ -502,7 +502,7 @@ class VimState
   # Returns nothing.
   linewiseAliasedOperator: (constructor) ->
     if @isOperatorPending(constructor)
-      new Motions.MoveToLine(@editor, @)
+      new Motions.MoveToRelativeLine(@editor, @)
     else
       new constructor(@editor, @)
 

@@ -71,7 +71,7 @@ class Change extends Insert
   # count - The number of times to execute.
   #
   # Returns nothing.
-  execute: (count=1) ->
+  execute: (count) ->
     # If we've typed, we're being repeated. If we're being repeated,
     # undo transactions are already handled.
     @editor.beginTransaction() unless @typingCompleted
@@ -79,13 +79,14 @@ class Change extends Insert
     operator.compose(@motion)
 
     lastRow = @onLastRow()
-    onlyRow = @editor.getBuffer().getLineCount() is 1
+    lastRowEmpty = @emptyLastRow()
     operator.execute(count)
-    if @motion.isLinewise?() and not onlyRow
-      if lastRow
-        @editor.insertNewlineBelow()
-      else
-        @editor.insertNewlineAbove()
+    if @motion.isLinewise?()
+      if lastRowEmpty or not @onLastRow() or not @emptyLastRow()
+        if lastRow and @motion.selectRows
+          @editor.insertNewlineBelow()
+        else
+          @editor.insertNewlineAbove()
 
     return super if @typingCompleted
 
@@ -95,6 +96,9 @@ class Change extends Insert
   onLastRow: ->
     {row, column} = @editor.getCursorBufferPosition()
     row is @editor.getBuffer().getLastRow()
+
+  emptyLastRow: ->
+    @editor.getBuffer().lineLengthForRow(@editor.getBuffer().getLastRow()) == 0
 
 class Substitute extends Insert
   execute: (count=1) ->
