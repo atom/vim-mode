@@ -24,9 +24,16 @@ class SearchBase extends MotionWithInput
     @
 
   execute: (count=1) ->
+    flashDuration = 500
     @scan()
     @match count, (pos) =>
       @editor.setCursorBufferPosition(pos.range.start)
+      marker = @editor.markBufferRange(pos.range)
+      flashDecoration = @editor.decorateMarker(marker, type: 'highlight', class: 'selection')
+      flashDecoration.flash('flash', flashDuration)
+      setTimeout( ->
+        marker.destroy()
+      , flashDuration*2/3)
 
   select: (count=1) ->
     @scan()
