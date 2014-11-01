@@ -328,6 +328,45 @@ describe "Operators", ->
             keydown('k')
             expect(editor.getText()).toBe("12345")
 
+    describe "when followed by a G", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+      describe "on the beginning of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,0])
+          keydown('d')
+          keydown('G', shift: true)
+          expect(editor.getText()).toBe("12345\n")
+
+      describe "on the middle of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('d')
+          keydown('G', shift: true)
+          expect(editor.getText()).toBe("12345\n")
+
+    describe "when followed by a goto line G", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+      describe "on the beginning of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,0])
+          keydown('d')
+          keydown('2')
+          keydown('G', shift: true)
+          expect(editor.getText()).toBe("12345\nABCDE")
+
+      describe "on the middle of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('d')
+          keydown('2')
+          keydown('G', shift: true)
+          expect(editor.getText()).toBe("12345\nABCDE")
 
   describe "the D keybinding", ->
     beforeEach ->
@@ -400,6 +439,50 @@ describe "Operators", ->
         expect(editor.getText()).toBe "12345\nabcde\nABCDE"
         keydown('r', ctrl: true)
         expect(editor.getText()).toBe "12345\nfg\nABCDE"
+
+    describe "when followed by a G", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+      describe "on the beginning of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,0])
+          keydown('c')
+          keydown('G', shift: true)
+          keydown('escape');
+          expect(editor.getText()).toBe("12345\n");
+
+      describe "on the middle of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('c')
+          keydown('G', shift: true)
+          keydown('escape');
+          expect(editor.getText()).toBe("12345\n");
+
+    describe "when followed by a goto line G", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+      describe "on the beginning of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,0])
+          keydown('c')
+          keydown('2')
+          keydown('G', shift: true)
+          keydown('escape');
+          expect(editor.getText()).toBe("12345\n\nABCDE")
+
+      describe "on the middle of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('c')
+          keydown('2')
+          keydown('G', shift: true)
+          keydown('escape');
+          expect(editor.getText()).toBe("12345\n\nABCDE")
 
   describe "the C keybinding", ->
     beforeEach ->
@@ -495,6 +578,50 @@ describe "Operators", ->
 
       it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    describe "when followed by a G", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+      describe "on the beginning of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,0])
+          keydown('y')
+          keydown('G', shift: true)
+          keydown('P', shift: true)
+          expect(editor.getText()).toBe("12345\nabcde\nABCDE\nabcde\nABCDE")
+
+      describe "on the middle of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('y')
+          keydown('G', shift: true)
+          keydown('P', shift: true)
+          expect(editor.getText()).toBe("12345\nabcde\nABCDE\nabcde\nABCDE")
+
+    describe "when followed by a goto line G", ->
+      beforeEach ->
+        originalText = "12345\nabcde\nABCDE"
+        editor.setText(originalText)
+
+      describe "on the beginning of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,0])
+          keydown('y')
+          keydown('2')
+          keydown('G', shift: true)
+          keydown('P', shift: true)
+          expect(editor.getText()).toBe("12345\nabcde\nabcde\nABCDE")
+
+      describe "on the middle of the second line", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('y')
+          keydown('2')
+          keydown('G', shift: true)
+          keydown('P', shift: true)
+          expect(editor.getText()).toBe("12345\nabcde\nabcde\nABCDE")
 
   describe "the yy keybinding", ->
     describe "on a single line file", ->
