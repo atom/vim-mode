@@ -39,9 +39,6 @@ class VimState
     else
       @activateCommandMode()
 
-    atom.project.eachBuffer (buffer) =>
-      @registerChangeHandler(buffer)
-
   # Private: Creates a handle to block insertion while in command mode.
   #
   # This is currently a bit of a hack. If a user is in command mode they
@@ -85,17 +82,6 @@ class VimState
                'core:move-left' ]
     @editorView.on events.join(' '), =>
       @resetInputTransactions()
-
-
-  # Private: Watches for any deletes on the current buffer and places it in the
-  # last deleted buffer.
-  #
-  # Returns nothing.
-  registerChangeHandler: (buffer) ->
-    buffer.on 'changed', ({newRange, newText, oldRange, oldText}) =>
-      return unless @setRegister?
-      if newText == ''
-        @setRegister('"', text: oldText, type: Utils.copyType(oldText))
 
   # Private: Creates the plugin's bindings
   #

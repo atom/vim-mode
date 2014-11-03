@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {$$, Point, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
+Utils = require '../utils'
 
 class OperatorError
   constructor: (@message) ->
@@ -50,6 +51,18 @@ class Operator
   undoTransaction: (fn) ->
     @editor.getBuffer().transact(fn)
 
+  # Public: Preps text and sets the text register
+  #
+  # Returns nothing
+  setTextRegister: (register, text) ->
+    if @motion?.isLinewise?()
+      type = 'linewise'
+      if text[-1..] isnt '\n'
+        text += '\n'
+    else
+      type = Utils.copyType(text)
+    @vimState.setRegister(register, {text, type})
+
 # Public: Generic class for an operator that requires extra input
 class OperatorWithInput extends Operator
   constructor: (@editorView, @vimState) ->
@@ -69,6 +82,7 @@ class OperatorWithInput extends Operator
 # It deletes everything selected by the following motion.
 #
 class Delete extends Operator
+  register: '"'
   allowEOL: null
 
   # allowEOL - Determines whether the cursor should be allowed to rest on the
@@ -90,6 +104,9 @@ class Delete extends Operator
       validSelection = true
 
     if validSelection?
+      text = @editor.getSelectedText()
+      @setTextRegister(@register, text)
+
       @editor.delete()
       if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
         @editor.moveCursorLeft()
@@ -134,7 +151,6 @@ class ToggleCase extends Operator
 #
 class Yank extends Operator
   register: '"'
-
   # Public: Copies the text selected by the given motion.
   #
   # count - The number of times to execute.
@@ -148,12 +164,8 @@ class Yank extends Operator
       originalPosition = Point.min(originalPosition, selectedPosition)
     else
       text = ''
-    type = if @motion.isLinewise?() then 'linewise' else 'character'
 
-    if @motion.isLinewise?() and text[-1..] isnt '\n'
-      text += '\n'
-
-    @vimState.setRegister(@register, {text, type})
+    @setTextRegister(@register, text)
 
     @editor.setCursorScreenPosition(originalPosition)
     @vimState.activateCommandMode()
