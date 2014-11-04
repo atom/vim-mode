@@ -40,8 +40,7 @@ class Operator
 
     # Take on the composed object's isLinewise function if this object
     # doesn't have one.
-    if !motion.isLinewise and motion.composedObject?.isLinewise
-      motion.isLinewise = motion.composedObject.isLinewise
+    motion.isLinewise ?= motion.composedObject?.isLinewise
 
     @motion = motion
     @complete = true

@@ -412,7 +412,7 @@ class MoveToLine extends Motion
     else
       start = row
       end = count - 1
-    @editor.setSelectedBufferRange(@selectRows(start, end, requireEOL: requireEOL))
+    @editor.setSelectedBufferRange(@selectRows(start, end, {requireEOL}))
 
     _.times count, ->
       true
@@ -449,7 +449,7 @@ class MoveToRelativeLine extends MoveToLine
   #  requireEOL - if true, ensure an end of line character is always selected
   select: (count=1, {requireEOL}={}) ->
     {row, column} = @editor.getCursorBufferPosition()
-    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
+    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), {requireEOL}))
 
     _.times count, ->
       true
