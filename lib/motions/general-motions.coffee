@@ -406,7 +406,13 @@ class MoveToLine extends Motion
   #  requireEOL - if true, ensure an end of line character is always selected
   select: (count=@editor.getLineCount(), {requireEOL}={}) ->
     {row, column} = @editor.getCursorBufferPosition()
-    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
+    if row >= count
+      start = count - 1
+      end = row
+    else
+      start = row
+      end = count - 1
+    @editor.setSelectedBufferRange(@selectRows(start, end, requireEOL: requireEOL))
 
     _.times count, ->
       true
@@ -419,8 +425,9 @@ class MoveToLine extends Motion
      startPoint = null
      endPoint = null
      buffer = @editor.getBuffer()
-     if end == buffer.getLastRow()
-       if start > 0 and requireEOL
+     if end >= buffer.getLastRow()
+       end = buffer.getLastRow()
+       if start > 0 and requireEOL and start == end
          startPoint = [start - 1, buffer.lineLengthForRow(start - 1)]
        else
          startPoint = [start, 0]
@@ -436,6 +443,16 @@ class MoveToLine extends Motion
 
   getDestinationRow: (count) ->
     if count? then count - 1 else (@editor.getLineCount() - 1)
+
+class MoveToRelativeLine extends MoveToLine
+  # Options
+  #  requireEOL - if true, ensure an end of line character is always selected
+  select: (count=1, {requireEOL}={}) ->
+    {row, column} = @editor.getCursorBufferPosition()
+    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
+
+    _.times count, ->
+      true
 
 class MoveToScreenLine extends MoveToLine
   constructor: (@editor, @vimState, @editorView, @scrolloff) ->
@@ -551,7 +568,7 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
-  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
   MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
