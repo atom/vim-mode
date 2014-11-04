@@ -36,29 +36,29 @@ class Put extends Operator
       if @location == 'after'
         if type == 'linewise'
           if @onLastRow()
-            @editor.moveCursorToEndOfLine()
+            @editor.moveToEndOfLine()
 
             originalPosition = @editor.getCursorScreenPosition()
             originalPosition.row += 1
           else
-            @editor.moveCursorDown()
+            @editor.moveDown()
         else
           unless @onLastColumn()
-            @editor.moveCursorRight()
+            @editor.moveRight()
 
       if type == 'linewise' and !originalPosition?
-        @editor.moveCursorToBeginningOfLine()
+        @editor.moveToBeginningOfLine()
         originalPosition = @editor.getCursorScreenPosition()
 
     @editor.insertText(textToInsert)
 
     if originalPosition?
       @editor.setCursorScreenPosition(originalPosition)
-      @editor.moveCursorToFirstCharacterOfLine()
+      @editor.moveToFirstCharacterOfLine()
 
     @vimState.activateCommandMode()
     if type != 'linewise'
-      @editor.moveCursorLeft()
+      @editor.moveLeft()
 
   # Private: Helper to determine if the editor is currently on the last row.
   #
@@ -68,4 +68,4 @@ class Put extends Operator
     row == @editor.getBuffer().getLastRow()
 
   onLastColumn: ->
-    @editor.getCursor().isAtEndOfLine()
+    @editor.getLastCursor().isAtEndOfLine()

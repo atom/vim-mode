@@ -27,14 +27,14 @@ class Insert extends Operator
 
 class InsertAfter extends Insert
   execute: ->
-    @editor.moveCursorRight() unless @editor.getCursor().isAtEndOfLine()
+    @editor.moveRight() unless @editor.getLastCursor().isAtEndOfLine()
     super
 
 class InsertAboveWithNewline extends Insert
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
     @editor.insertNewlineAbove()
-    @editor.getCursor().skipLeadingWhitespace()
+    @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       # We'll have captured the inserted newline, but we want to do that
@@ -49,7 +49,7 @@ class InsertBelowWithNewline extends Insert
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
     @editor.insertNewlineBelow()
-    @editor.getCursor().skipLeadingWhitespace()
+    @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       # We'll have captured the inserted newline, but we want to do that
@@ -106,7 +106,7 @@ class Substitute extends Insert
     @editor.beginTransaction() unless @typingCompleted
     _.times count, =>
       @editor.selectRight()
-    text = @editor.getSelection().getText()
+    text = @editor.getLastSelection().getText()
     @setTextRegister(@register, text)
     @editor.delete()
 
@@ -121,14 +121,14 @@ class SubstituteLine extends Insert
   register: '"'
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
-    @editor.moveCursorToBeginningOfLine()
+    @editor.moveToBeginningOfLine()
     _.times count, =>
       @editor.selectDown()
-    text = @editor.getSelection().getText()
+    text = @editor.getLastSelection().getText()
     @setTextRegister(@register, text)
     @editor.delete()
     @editor.insertNewlineAbove()
-    @editor.getCursor().skipLeadingWhitespace()
+    @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       @typedText = @typedText.trimLeft()

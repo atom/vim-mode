@@ -46,7 +46,7 @@ class ScrollCursor extends Scroll
 
 class ScrollCursorToTop extends ScrollCursor
   execute: ->
-    @moveCursorToFirstNonBlank() unless @opts.leaveCursor
+    @moveToFirstNonBlank() unless @opts.leaveCursor
     @scrollUp()
 
   scrollUp: ->
@@ -54,24 +54,24 @@ class ScrollCursorToTop extends ScrollCursor
     @pixel -= (@editorView.lineHeight * @scrolloff)
     @editorView.scrollTop(@pixel)
 
-  moveCursorToFirstNonBlank: ->
+  moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
 
 class ScrollCursorToMiddle extends ScrollCursor
   execute: ->
-    @moveCursorToFirstNonBlank() unless @opts.leaveCursor
+    @moveToFirstNonBlank() unless @opts.leaveCursor
     @scrollMiddle()
 
   scrollMiddle: ->
     @pixel -= (@editorView.height() / 2)
     @editorView.scrollTop(@pixel)
 
-  moveCursorToFirstNonBlank: ->
+  moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
 
 class ScrollCursorToBottom extends ScrollCursor
   execute: ->
-    @moveCursorToFirstNonBlank() unless @opts.leaveCursor
+    @moveToFirstNonBlank() unless @opts.leaveCursor
     @scrollDown()
 
   scrollDown: ->
@@ -80,7 +80,7 @@ class ScrollCursorToBottom extends ScrollCursor
     @pixel -= (@editorView.height() - offset)
     @editorView.scrollTop(@pixel)
 
-  moveCursorToFirstNonBlank: ->
+  moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
 
 module.exports = { ScrollDown, ScrollUp, ScrollCursorToTop, ScrollCursorToMiddle, ScrollCursorToBottom }

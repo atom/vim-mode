@@ -31,7 +31,7 @@ class Indent extends Operator
 
     if mode != 'visual'
       @editor.setCursorScreenPosition([start.row, 0])
-      @editor.moveCursorToFirstCharacterOfLine()
+      @editor.moveToFirstCharacterOfLine()
       @vimState.activateCommandMode()
 
 #

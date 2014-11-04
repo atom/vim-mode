@@ -1,4 +1,4 @@
-{EditorView} = require 'atom'
+{TextEditorView} = require 'atom'
 VimState = require '../lib/vim-state'
 VimMode  = require '../lib/vim-mode'
 
@@ -15,7 +15,7 @@ getEditorView = (existingEditorView, callback) ->
     atom.project.open().then (o) -> session = o
 
   runs ->
-    editorView = new EditorView(session)
+    editorView = new TextEditorView(session)
     editorView.simulateDomAttachment()
     editorView.enableKeymap()
 

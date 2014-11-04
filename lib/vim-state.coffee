@@ -369,7 +369,7 @@ class VimState
     @submode = null
 
     if @editorView.is(".insert-mode")
-      cursor = @editor.getCursor()
+      cursor = @editor.getLastCursor()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
     @changeModeClass('command-mode')
@@ -420,7 +420,7 @@ class VimState
     @changeModeClass('visual-mode')
 
     if @submode == 'linewise'
-      @editor.selectLine()
+      @editor.selectLinesContainingCursors()
 
     @updateStatusBar()
 
@@ -512,7 +512,7 @@ class VimState
       @opStack.length > 0
 
   updateStatusBar: ->
-    atom.packages.once 'activated', =>
+    atom.packages.onDidActivateAll =>
       if !$('#status-bar-vim-mode').length
         atom.workspaceView.statusBar?.prependRight("<div id='status-bar-vim-mode' class='inline-block'>Command</div>")
         @updateStatusBar()

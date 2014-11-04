@@ -11,7 +11,7 @@ class Replace extends OperatorWithInput
 
   execute: (count=1) ->
     pos = @editor.getCursorBufferPosition()
-    currentRowLength = @editor.lineLengthForBufferRow(pos.row)
+    currentRowLength = @editor.lineTextForBufferRow(pos.row).length
 
     # Do nothing on an empty line
     return unless currentRowLength > 0
@@ -23,14 +23,14 @@ class Replace extends OperatorWithInput
       _.times count, =>
         point = @editor.getCursorBufferPosition()
         @editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @input.characters)
-        @editor.moveCursorRight()
+        @editor.moveRight()
       @editor.setCursorBufferPosition(start)
 
       # Special case: when replaced with a newline move to the start of
       # the next row.
       if @input.characters is "\n"
         _.times count, =>
-          @editor.moveCursorDown()
+          @editor.moveDown()
         @editor.moveToFirstCharacterOfLine()
 
     @vimState.activateCommandMode()

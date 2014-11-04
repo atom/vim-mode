@@ -13,7 +13,7 @@ class Find extends MotionWithInput
 
   match: (count) ->
     currentPosition = @editorView.editor.getCursorBufferPosition()
-    line = @editorView.editor.lineForBufferRow(currentPosition.row)
+    line = @editorView.editor.lineTextForBufferRow(currentPosition.row)
     if @backwards
       index = currentPosition.column
       for i in [0..count-1]
@@ -31,7 +31,7 @@ class Find extends MotionWithInput
         point = new Point(currentPosition.row, index-@offset)
         return {} =
           point: point
-          range: new Range(currentPosition, point.translate([0,1]))
+          range: new Range(currentPosition, point.add([0,1]))
 
   reverse: ->
     @backwards = !@backwards

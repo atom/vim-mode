@@ -1,11 +1,11 @@
-{View, EditorView} = require 'atom'
+{View, TextEditorView} = require 'atom'
 
 module.exports =
 class VimCommandModeInputView extends View
   @content: ->
     @div class: 'command-mode-input', =>
       @div class: 'editor-container', outlet: 'editorContainer', =>
-        @subview 'editor', new EditorView(mini: true)
+        @subview 'editor', new TextEditorView(mini: true)
 
   initialize: (@viewModel, opts = {})->
     @editor.setFontSize(atom.config.get('vim-mode.commandModeInputViewFontSize'))

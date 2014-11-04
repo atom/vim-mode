@@ -83,7 +83,7 @@ describe "VimState", ->
         expect(editorView).not.toHaveClass 'command-mode'
 
       it "selects the current line", ->
-        expect(editor.getSelection().getText()).toEqual '012345\n'
+        expect(editor.getLastSelection().getText()).toEqual '012345\n'
 
     describe "the ctrl-v keybinding", ->
       beforeEach -> keydown('v', ctrl: true)
@@ -195,13 +195,13 @@ describe "VimState", ->
         keydown('w')
 
       it "execute instead of select", ->
-        expect(editor.getSelection().getText()).toEqual '012345'
+        expect(editor.getLastSelection().getText()).toEqual '012345'
 
     describe "operators", ->
       beforeEach ->
         editor.setText("012345\n\nabcdef")
         editor.setCursorScreenPosition([0, 0])
-        editor.selectLine()
+        editor.selectLinesContainingCursors()
         keydown('d')
 
       it "operate on the current selection", ->
@@ -210,11 +210,11 @@ describe "VimState", ->
     describe "returning to command-mode", ->
       beforeEach ->
         editor.setText("012345\n\nabcdef")
-        editor.selectLine()
+        editor.selectLinesContainingCursors()
         keydown('escape')
 
       it "operate on the current selection", ->
-        expect(editor.getSelection().getText()).toEqual ''
+        expect(editor.getLastSelection().getText()).toEqual ''
 
   describe "marks", ->
     beforeEach ->  editor.setText("text in line 1\ntext in line 2\ntext in line 3")
