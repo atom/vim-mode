@@ -20,6 +20,8 @@ class VimCommandModeInputView extends View
     if opts.singleChar?
       @singleChar = true
 
+    @defaultText = opts.defaultText ? ''
+
     unless atom.workspaceView?
       # We're in test mode. Don't append to anything, just initialize.
       @focus()
@@ -55,11 +57,7 @@ class VimCommandModeInputView extends View
     @confirm()
 
   confirm: =>
-    @value = @editor.getText()
-    # HACK! Adding "\n" to on key events
-    # Useful for norm r<CR>
-    if not @value and event?.originalEvent?.which is 13
-      @value = "\n"
+    @value = @editor.getText() or @defaultText
     @viewModel.confirm(@)
     @remove()
 

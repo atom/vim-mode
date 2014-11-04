@@ -7,7 +7,7 @@ module.exports =
 class Replace extends OperatorWithInput
   constructor: (@editorView, @vimState, {@selectOptions}={}) ->
     super(@editorView, @vimState)
-    @viewModel = new ViewModel(@, class: 'replace', hidden: true, singleChar: true)
+    @viewModel = new ViewModel(@, class: 'replace', hidden: true, singleChar: true, defaultText: '\n')
 
   execute: (count=1) ->
     pos = @editor.getCursorBufferPosition()
