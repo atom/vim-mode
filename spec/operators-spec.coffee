@@ -881,6 +881,12 @@ describe "Operators", ->
         expect(editor.getText()).toBe "  12345\nabcde\nABCDE"
         expect(editor.getSelectedText()).toBe "  12345\n"
 
+      it "allows repeating the operation", ->
+        keydown("escape")
+        keydown(".")
+        expect(editorView).toHaveClass 'command-mode'
+        expect(editor.getText()).toBe "    12345\nabcde\nABCDE"
+
   describe "the < keybinding", ->
     beforeEach ->
       editor.setText("  12345\n  abcde\nABCDE")
