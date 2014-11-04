@@ -1,7 +1,6 @@
 {View, EditorView} = require 'atom'
 
 module.exports =
-
 class VimCommandModeInputView extends View
   @content: ->
     @div class: 'command-mode-input', =>
@@ -14,11 +13,10 @@ class VimCommandModeInputView extends View
     if opts.class?
       @editorContainer.addClass opts.class
 
-    if opts.hidden?
+    if opts.hidden
       @editorContainer.addClass 'hidden-input'
 
-    if opts.singleChar?
-      @singleChar = true
+    @singleChar = opts.singleChar
 
     @defaultText = opts.defaultText ? ''
 
@@ -31,7 +29,7 @@ class VimCommandModeInputView extends View
     statusBar = atom.workspaceView.find('.status-bar')
 
     if statusBar.length > 0
-      @.insertBefore(statusBar)
+      @insertBefore(statusBar)
     else
       atom.workspace.getActivePane().append(@)
 
