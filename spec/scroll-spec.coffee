@@ -22,8 +22,8 @@ describe "Scrolling", ->
   describe "scrolling keybindings", ->
     beforeEach ->
       editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10")
-      spyOn(editorView, 'getFirstVisibleScreenRow').andReturn(2)
-      spyOn(editorView, 'getLastVisibleScreenRow').andReturn(8)
+      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(2)
+      spyOn(editor, 'getLastVisibleScreenRow').andReturn(8)
       spyOn(editorView, 'scrollToScreenPosition')
 
     describe "the ctrl-e keybinding", ->
@@ -57,8 +57,8 @@ describe "Scrolling", ->
       spyOn(editor, 'getLineHeightInPixels').andReturn(20)
       spyOn(editorView, 'scrollTop')
       spyOn(editorView, 'height').andReturn(200)
-      spyOn(editorView, 'getFirstVisibleScreenRow').andReturn(90)
-      spyOn(editorView, 'getLastVisibleScreenRow').andReturn(110)
+      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(90)
+      spyOn(editor, 'getLastVisibleScreenRow').andReturn(110)
 
     describe "the z<CR> keybinding", ->
       keydownCodeForEnter = '\r'

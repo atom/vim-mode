@@ -4,8 +4,8 @@ class Scroll
   constructor: (@editorView, @editor) ->
     @scrolloff = 2 # atom default
     @rows =
-      first: @editorView.getFirstVisibleScreenRow()
-      last: @editorView.getLastVisibleScreenRow()
+      first: @editor.getFirstVisibleScreenRow()
+      last: @editor.getLastVisibleScreenRow()
       final: @editor.getLastScreenRow()
 
 class ScrollDown extends Scroll
