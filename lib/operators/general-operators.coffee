@@ -97,7 +97,7 @@ class Delete extends Operator
   # count - The number of times to execute.
   #
   # Returns nothing.
-  execute: (count=1) ->
+  execute: (count) ->
     cursor = @editor.getCursor()
 
     if _.contains(@motion.select(count, @selectOptions), true)
