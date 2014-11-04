@@ -25,7 +25,10 @@ class SelectInsideQuotes extends TextObject
       while pos.column >= 0
         if line[pos.column] == @char
           if pos.column == 0 or line[pos.column - 1] != '\\'
-            return if @isStartQuote(pos) then pos else @lookForwardOnLine(start)
+            if @isStartQuote(pos)
+              return pos
+            else
+              return @lookForwardOnLine(start)
         -- pos.column
       pos.column = -1
       -- pos.row
@@ -33,16 +36,15 @@ class SelectInsideQuotes extends TextObject
 
   isStartQuote: (end) ->
     line = @editor.lineForBufferRow(end.row)
-    numQuotes = line.substring(0,end.column + 1).replace('\''+@char,'').split(@char).length-1
-    return numQuotes % 2
-
+    numQuotes = line.substring(0, end.column + 1).replace( "'#{@char}", '').split(@char).length - 1
+    numQuotes % 2
 
   lookForwardOnLine: (pos) ->
     line = @editor.lineForBufferRow(pos.row)
 
-    idx = line.substring(pos.column).indexOf @char
-    if idx >= 0
-      pos.column += idx
+    index = line.substring(pos.column).indexOf(@char)
+    if index >= 0
+      pos.column += index
       return pos
     null
 
