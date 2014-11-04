@@ -157,17 +157,17 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
-    originalPosition = @editor.getCursorScreenPosition()
+    selection = @editor.getLastSelection()
     if _.contains(@motion.select(count), true)
-      selectedPosition = @editor.getCursorScreenPosition()
-      text = @editor.getSelection().getText()
-      originalPosition = Point.min(originalPosition, selectedPosition)
+      text = @editor.getLastSelection().getText()
+      selectionRange = selection.getScreenRange()
+      newPosition = selectionRange.start
     else
       text = ''
 
     @setTextRegister(@register, text)
 
-    @editor.setCursorScreenPosition(originalPosition)
+    @editor.setCursorScreenPosition(newPosition)
     @vimState.activateCommandMode()
 
 #
