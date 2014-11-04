@@ -14,10 +14,15 @@ class Motion
   inVisualMode: -> @vimState.mode == "visual"
 
 class CurrentSelection extends Motion
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState)
+    @selection = @editor.getSelectedBufferRanges()
+
   execute: (count=1) ->
     _.times(count, -> true)
 
   select: (count=1) ->
+    @editor.setSelectedBufferRanges(@selection)
     _.times(count, -> true)
 
   isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
