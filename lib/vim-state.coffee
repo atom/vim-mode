@@ -263,7 +263,10 @@ class VimState
         @topOperation().compose(poppedOperation)
         @processOpStack()
       catch e
-        ((e instanceof Operators.OperatorError) or (e instanceof Motions.MotionError)) and @resetCommandMode() or throw e
+        if (e instanceof Operators.OperatorError) or (e instanceof Motions.MotionError)
+          @resetCommandMode()
+        else
+          throw e
     else
       @history.unshift(poppedOperation) if poppedOperation.isRecordable()
       poppedOperation.execute()

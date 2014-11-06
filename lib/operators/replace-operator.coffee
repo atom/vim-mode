@@ -13,24 +13,31 @@ class Replace extends OperatorWithInput
     pos = @editor.getCursorBufferPosition()
     currentRowLength = @editor.lineTextForBufferRow(pos.row).length
 
-    # Do nothing on an empty line
-    return unless currentRowLength > 0
-    # Do nothing if asked to replace more characters than there are on a line
-    return unless currentRowLength - pos.column >= count
-
     @undoTransaction =>
-      start = @editor.getCursorBufferPosition()
-      _.times count, =>
-        point = @editor.getCursorBufferPosition()
-        @editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @input.characters)
-        @editor.moveRight()
-      @editor.setCursorBufferPosition(start)
+      if @motion?
+        if _.contains(@motion.select(1), true)
+          @editor.replaceSelectedText null, (text) =>
+            Array(text.length + 1).join(@input.characters)
+          @editor.setCursorBufferPosition(@editor.getLastSelection().getBufferRange().start)
+      else
+        # Do nothing on an empty line
+        return unless currentRowLength > 0
 
-      # Special case: when replaced with a newline move to the start of
-      # the next row.
-      if @input.characters is "\n"
+        # Do nothing if asked to replace more characters than there are on a line
+        return unless currentRowLength - pos.column >= count
+
+        start = @editor.getCursorBufferPosition()
         _.times count, =>
-          @editor.moveDown()
-        @editor.moveToFirstCharacterOfLine()
+          point = @editor.getCursorBufferPosition()
+          @editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @input.characters)
+          @editor.moveRight()
+        @editor.setCursorBufferPosition(start)
+
+        # Special case: when replaced with a newline move to the start of
+        # the next row.
+        if @input.characters is "\n"
+          _.times count, =>
+            @editor.moveDown()
+          @editor.moveToFirstCharacterOfLine()
 
     @vimState.activateCommandMode()

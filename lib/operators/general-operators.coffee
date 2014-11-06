@@ -73,14 +73,14 @@ class OperatorWithInput extends Operator
     @editor = @editorView.editor
     @complete = false
 
-  canComposeWith: (operation) -> operation.characters?
+  canComposeWith: (operation) -> operation.characters? or operation.select?
 
-  compose: (input) ->
-    if not input.characters
-      throw new OperatorError('Must compose with an Input')
-
-    @input = input
-    @complete = true
+  compose: (operation) ->
+    if operation.select?
+      @motion = operation
+    if operation.characters?
+      @input = operation
+      @complete = true
 
 #
 # It deletes everything selected by the following motion.

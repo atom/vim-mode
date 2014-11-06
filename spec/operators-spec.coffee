@@ -1152,6 +1152,21 @@ describe "Operators", ->
       commandModeInputKeydown('x')
       expect(editor.getText()).toBe '12\n34\n\n'
 
+    describe "when in visual mode", ->
+      beforeEach ->
+        keydown('v')
+        keydown('$')
+
+      it "replaces the entire selection with the given character", ->
+        keydown('r')
+        commandModeInputKeydown('x')
+        expect(editor.getText()).toBe 'xx\n34\n\n'
+
+      it "leaves the cursor at the beginning of the selection", ->
+        keydown('r')
+        commandModeInputKeydown('x')
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
   describe 'the m keybinding', ->
     beforeEach ->
       editor.setText('12\n34\n56\n')
