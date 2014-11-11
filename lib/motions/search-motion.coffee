@@ -132,7 +132,7 @@ class SearchCurrentWord extends SearchBase
 
   cursorIsOnEOF: ->
     cursor = @editor.getLastCursor()
-    pos = cursor.getMoveNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
+    pos = cursor.getNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
     eofPos = @editor.getEofBufferPosition()
     pos.row == eofPos.row && pos.column == eofPos.column
 
