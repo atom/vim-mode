@@ -7,12 +7,12 @@ describe "Motions", ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    editorView = helpers.cacheEditor(editorView)
-    editor = editorView.editor
-
-    vimState = editorView.vimState
-    vimState.activateCommandMode()
-    vimState.resetCommandMode()
+    helpers.getEditorView editorView, (view) ->
+      editorView = view
+      editor = editorView.editor
+      vimState = editorView.vimState
+      vimState.activateCommandMode()
+      vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
     options.element ?= editorView[0]
@@ -950,6 +950,49 @@ describe "Motions", ->
         expect(start.row).toEqual 0
         expect(end.row).toEqual 2
 
+      describe "case sensitivity", ->
+        beforeEach ->
+          editor.setText("\nabc\nABC\n")
+          editor.setCursorBufferPosition([0, 0])
+          keydown('/')
+
+        it "works in case sensitive mode", ->
+          editor.commandModeInputView.editor.setText 'ABC'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        it "works in case insensitive mode", ->
+          editor.commandModeInputView.editor.setText '\\cAbC'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        it "works in case insensitive mode wherever \\c is", ->
+          editor.commandModeInputView.editor.setText 'AbC\\c'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        it "uses case insensitive search if useSmartcaseForSearch is true and searching lowercase", ->
+          atom.config.set 'vim-mode.useSmartcaseForSearch', true
+          editor.commandModeInputView.editor.setText 'abc'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        it "uses case sensitive search if useSmartcaseForSearch is true and searching uppercase", ->
+          atom.config.set 'vim-mode.useSmartcaseForSearch', true
+          editor.commandModeInputView.editor.setText 'ABC'
+          editor.commandModeInputView.editor.trigger 'core:confirm'
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
       describe "repeating", ->
         it "does nothing with no search history", ->
           # This tests that no exception is raised
@@ -1365,6 +1408,122 @@ describe "Motions", ->
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcabc\n'
+
+  describe 'the ; and , keybindings', ->
+    beforeEach ->
+      editor.setText("abcabcabcabc\n")
+      editor.setCursorScreenPosition([0, 0])
+
+    it "repeat f in same direction", ->
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "repeat F in same direction", ->
+      editor.setCursorScreenPosition([0,10])
+      keydown('F', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "repeat f in opposite direction", ->
+      editor.setCursorScreenPosition([0,6])
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "repeat F in opposite direction", ->
+      editor.setCursorScreenPosition([0,4])
+      keydown('F', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "alternate repeat f in same direction and reverse", ->
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "alternate repeat F in same direction and reverse", ->
+      editor.setCursorScreenPosition([0,10])
+      keydown('F', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "repeat t in same direction (won't move)", ->
+      keydown('t')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+    it "repeat T in same direction (won't move)", ->
+      editor.setCursorScreenPosition([0,10])
+      keydown('T', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+
+    it "repeat t in opposite direction first, and then reverse", ->
+      editor.setCursorScreenPosition([0,3])
+      keydown('t')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    it "repeat T in opposite direction first, and then reverse", ->
+      editor.setCursorScreenPosition([0,4])
+      keydown('T', shift: true)
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+    it "repeat with count in same direction", ->
+      editor.setCursorScreenPosition([0,0])
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      keydown('2')
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+    it "repeat with count in reverse direction", ->
+      editor.setCursorScreenPosition([0,6])
+      keydown('f')
+      commandModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+      keydown('2')
+      keydown(',')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
   describe 'the % motion', ->
     beforeEach ->

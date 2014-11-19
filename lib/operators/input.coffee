@@ -27,14 +27,14 @@ class Insert extends Operator
 
 class InsertAfter extends Insert
   execute: ->
-    @editor.moveCursorRight() unless @editor.getCursor().isAtEndOfLine()
+    @editor.moveRight() unless @editor.getLastCursor().isAtEndOfLine()
     super
 
 class InsertAboveWithNewline extends Insert
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
     @editor.insertNewlineAbove()
-    @editor.getCursor().skipLeadingWhitespace()
+    @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       # We'll have captured the inserted newline, but we want to do that
@@ -49,7 +49,7 @@ class InsertBelowWithNewline extends Insert
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
     @editor.insertNewlineBelow()
-    @editor.getCursor().skipLeadingWhitespace()
+    @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       # We'll have captured the inserted newline, but we want to do that
@@ -71,7 +71,7 @@ class Change extends Insert
   # count - The number of times to execute.
   #
   # Returns nothing.
-  execute: (count=1) ->
+  execute: (count) ->
     # If we've typed, we're being repeated. If we're being repeated,
     # undo transactions are already handled.
     @editor.beginTransaction() unless @typingCompleted
@@ -79,13 +79,14 @@ class Change extends Insert
     operator.compose(@motion)
 
     lastRow = @onLastRow()
-    onlyRow = @editor.getBuffer().getLineCount() is 1
+    lastRowEmpty = @emptyLastRow()
     operator.execute(count)
-    if @motion.isLinewise?() and not onlyRow
-      if lastRow
-        @editor.insertNewlineBelow()
-      else
-        @editor.insertNewlineAbove()
+    if @motion.isLinewise?()
+      if lastRowEmpty or not @onLastRow() or not @emptyLastRow()
+        if lastRow and @motion.selectRows
+          @editor.insertNewlineBelow()
+        else
+          @editor.insertNewlineAbove()
 
     return super if @typingCompleted
 
@@ -96,11 +97,17 @@ class Change extends Insert
     {row, column} = @editor.getCursorBufferPosition()
     row is @editor.getBuffer().getLastRow()
 
+  emptyLastRow: ->
+    @editor.getBuffer().lineLengthForRow(@editor.getBuffer().getLastRow()) == 0
+
 class Substitute extends Insert
+  register: '"'
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
     _.times count, =>
       @editor.selectRight()
+    text = @editor.getLastSelection().getText()
+    @setTextRegister(@register, text)
     @editor.delete()
 
     if @typingCompleted
@@ -111,14 +118,17 @@ class Substitute extends Insert
     @typingCompleted = true
 
 class SubstituteLine extends Insert
+  register: '"'
   execute: (count=1) ->
     @editor.beginTransaction() unless @typingCompleted
-    @editor.moveCursorToBeginningOfLine()
+    @editor.moveToBeginningOfLine()
     _.times count, =>
       @editor.selectDown()
+    text = @editor.getLastSelection().getText()
+    @setTextRegister(@register, text)
     @editor.delete()
     @editor.insertNewlineAbove()
-    @editor.getCursor().skipLeadingWhitespace()
+    @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       @typedText = @typedText.trimLeft()

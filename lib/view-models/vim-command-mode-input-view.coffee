@@ -1,12 +1,11 @@
-{View, EditorView} = require 'atom'
+{View, TextEditorView} = require 'atom'
 
 module.exports =
-
 class VimCommandModeInputView extends View
   @content: ->
     @div class: 'command-mode-input', =>
       @div class: 'editor-container', outlet: 'editorContainer', =>
-        @subview 'editor', new EditorView(mini: true)
+        @subview 'editor', new TextEditorView(mini: true)
 
   initialize: (@viewModel, opts = {})->
     @editor.setFontSize(atom.config.get('vim-mode.commandModeInputViewFontSize'))
@@ -14,11 +13,12 @@ class VimCommandModeInputView extends View
     if opts.class?
       @editorContainer.addClass opts.class
 
-    if opts.hidden?
+    if opts.hidden
       @editorContainer.addClass 'hidden-input'
 
-    if opts.singleChar?
-      @singleChar = true
+    @singleChar = opts.singleChar
+
+    @defaultText = opts.defaultText ? ''
 
     unless atom.workspaceView?
       # We're in test mode. Don't append to anything, just initialize.
@@ -29,7 +29,7 @@ class VimCommandModeInputView extends View
     statusBar = atom.workspaceView.find('.status-bar')
 
     if statusBar.length > 0
-      @.insertBefore(statusBar)
+      @insertBefore(statusBar)
     else
       atom.workspace.getActivePane().append(@)
 
@@ -55,7 +55,7 @@ class VimCommandModeInputView extends View
     @confirm()
 
   confirm: =>
-    @value = @editor.getText()
+    @value = @editor.getText() or @defaultText
     @viewModel.confirm(@)
     @remove()
 

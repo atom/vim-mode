@@ -7,23 +7,37 @@ module.exports =
 class Replace extends OperatorWithInput
   constructor: (@editorView, @vimState, {@selectOptions}={}) ->
     super(@editorView, @vimState)
-    @viewModel = new ViewModel(@, class: 'replace', hidden: true, singleChar: true)
+    @viewModel = new ViewModel(@, class: 'replace', hidden: true, singleChar: true, defaultText: '\n')
 
   execute: (count=1) ->
     pos = @editor.getCursorBufferPosition()
-    currentRowLength = @editor.lineLengthForBufferRow(pos.row)
-
-    # Do nothing on an empty line
-    return unless currentRowLength > 0
-    # Do nothing if asked to replace more characters than there are on a line
-    return unless currentRowLength - pos.column >= count
+    currentRowLength = @editor.lineTextForBufferRow(pos.row).length
 
     @undoTransaction =>
-      start = @editor.getCursorBufferPosition()
-      _.times count, =>
-        point = @editor.getCursorBufferPosition()
-        @editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @input.characters)
-        @editor.moveCursorRight()
-      @editor.setCursorBufferPosition(start)
+      if @motion?
+        if _.contains(@motion.select(1), true)
+          @editor.replaceSelectedText null, (text) =>
+            Array(text.length + 1).join(@input.characters)
+          @editor.setCursorBufferPosition(@editor.getLastSelection().getBufferRange().start)
+      else
+        # Do nothing on an empty line
+        return unless currentRowLength > 0
+
+        # Do nothing if asked to replace more characters than there are on a line
+        return unless currentRowLength - pos.column >= count
+
+        start = @editor.getCursorBufferPosition()
+        _.times count, =>
+          point = @editor.getCursorBufferPosition()
+          @editor.setTextInBufferRange(Range.fromPointWithDelta(point, 0, 1), @input.characters)
+          @editor.moveRight()
+        @editor.setCursorBufferPosition(start)
+
+        # Special case: when replaced with a newline move to the start of
+        # the next row.
+        if @input.characters is "\n"
+          _.times count, =>
+            @editor.moveDown()
+          @editor.moveToFirstCharacterOfLine()
 
     @vimState.activateCommandMode()

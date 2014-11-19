@@ -14,10 +14,15 @@ class Motion
   inVisualMode: -> @vimState.mode == "visual"
 
 class CurrentSelection extends Motion
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState)
+    @selection = @editor.getSelectedBufferRanges()
+
   execute: (count=1) ->
     _.times(count, -> true)
 
   select: (count=1) ->
+    @editor.setSelectedBufferRanges(@selection)
     _.times(count, -> true)
 
   isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
@@ -41,12 +46,12 @@ class MotionWithInput extends Motion
 class MoveLeft extends Motion
   execute: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
-      @editor.moveCursorLeft() if column > 0
+      {column} = @editor.getCursorBufferPosition()
+      @editor.moveLeft() if column > 0
 
   select: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
+      {column} = @editor.getCursorBufferPosition()
 
       if column > 0
         @editor.selectLeft()
@@ -57,15 +62,14 @@ class MoveLeft extends Motion
 class MoveRight extends Motion
   execute: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorScreenPosition()
-      lastCharIndex = @editor.getBuffer().lineForRow(row).length - 1
-      unless column >= lastCharIndex
-        @editor.moveCursorRight()
+      {row, column} = @editor.getCursorBufferPosition()
+      if column < @editor.lineTextForBufferRow(row).length - 1
+        @editor.moveRight()
 
   select: (count=1) ->
     _.times count, =>
       {start, end} = @editor.getSelectedBufferRange()
-      rowLength = @editor.getCursor().getCurrentBufferLine().length
+      rowLength = @editor.getLastCursor().getCurrentBufferLine().length
 
       if end.column < rowLength
         @editor.selectRight()
@@ -90,7 +94,7 @@ class MoveVertically extends Motion
     nextRow = @nextValidRow(count)
 
     if nextRow != row
-      nextLineLength = @editor.lineLengthForBufferRow(nextRow)
+      nextLineLength = @editor.lineTextForBufferRow(nextRow).length
 
       # The 'nextColumn' the cursor should be in is the
       # 'desiredCursorColumn', if it exists. If it does
@@ -154,8 +158,8 @@ class MoveUp extends MoveVertically
 
   select: (count=1) ->
     unless @inVisualMode()
-      @editor.moveCursorToBeginningOfLine()
-      @editor.moveCursorDown()
+      @editor.moveToBeginningOfLine()
+      @editor.moveDown()
       @editor.selectUp()
 
     _.times count, =>
@@ -187,8 +191,7 @@ class MoveDown extends MoveVertically
     1
 
   select: (count=1) ->
-
-    @editor.selectLine() unless @inVisualMode()
+    @editor.selectLinesContainingCursors() unless @inVisualMode()
 
     _.times count, =>
 
@@ -215,7 +218,7 @@ class MoveDown extends MoveVertically
 class MoveToPreviousWord extends Motion
   execute: (count=1) ->
     _.times count, =>
-      @editor.moveCursorToBeginningOfWord()
+      @editor.moveToBeginningOfWord()
 
   select: (count=1) ->
     _.times count, =>
@@ -225,8 +228,8 @@ class MoveToPreviousWord extends Motion
 class MoveToPreviousWholeWord extends Motion
   execute: (count=1) ->
     _.times count, =>
-      @editor.moveCursorToBeginningOfWord()
-      @editor.moveCursorToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
+      @editor.moveToBeginningOfWord()
+      @editor.moveToBeginningOfWord() while not @isWholeWord() and not @isBeginningOfFile()
 
   select: (count=1) ->
     _.times count, =>
@@ -235,7 +238,7 @@ class MoveToPreviousWholeWord extends Motion
       true
 
   isWholeWord: ->
-    char = @editor.getCursor().getCurrentWordPrefix().slice(-1)
+    char = @editor.getLastCursor().getCurrentWordPrefix().slice(-1)
     char is ' ' or char is '\n'
 
   isBeginningOfFile: ->
@@ -244,7 +247,7 @@ class MoveToPreviousWholeWord extends Motion
 
 class MoveToNextWord extends Motion
   execute: (count=1) ->
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
 
     _.times count, =>
       current = cursor.getBufferPosition()
@@ -264,7 +267,7 @@ class MoveToNextWord extends Motion
   # Options
   #  excludeWhitespace - if true, whitespace shouldn't be selected
   select: (count=1, {excludeWhitespace}={}) ->
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
 
     _.times count, =>
       current = cursor.getBufferPosition()
@@ -278,18 +281,18 @@ class MoveToNextWord extends Motion
       true
 
   isEndOfFile: ->
-    cur = @editor.getCursor().getBufferPosition()
+    cur = @editor.getLastCursor().getBufferPosition()
     eof = @editor.getEofBufferPosition()
     cur.row is eof.row and cur.column is eof.column
 
 class MoveToNextWholeWord extends Motion
   execute: (count=1) ->
     _.times count, =>
-      @editor.moveCursorToBeginningOfNextWord()
-      @editor.moveCursorToBeginningOfNextWord() while not @isWholeWord() and not @isEndOfFile()
+      @editor.moveToBeginningOfNextWord()
+      @editor.moveToBeginningOfNextWord() while not @isWholeWord() and not @isEndOfFile()
 
   select: (count=1, {excludeWhitespace}={}) ->
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
 
     _.times count, =>
       current = cursor.getBufferPosition()
@@ -304,7 +307,7 @@ class MoveToNextWholeWord extends Motion
       true
 
   isWholeWord: ->
-    char = @editor.getCursor().getCurrentWordPrefix().slice(-1)
+    char = @editor.getLastCursor().getCurrentWordPrefix().slice(-1)
     char is ' ' or char is '\n'
 
   isEndOfFile: ->
@@ -314,12 +317,12 @@ class MoveToNextWholeWord extends Motion
 
 class MoveToEndOfWord extends Motion
   execute: (count=1) ->
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
     _.times count, =>
       cursor.setBufferPosition(@nextBufferPosition(exclusive: true))
 
   select: (count=1) ->
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
 
     _.times count, =>
       bufferPosition = @nextBufferPosition()
@@ -335,7 +338,7 @@ class MoveToEndOfWord extends Motion
   # The reason this is implemented here is that Atom always stops on the
   # character after the word which is only sometimes what vim means.
   nextBufferPosition: ({exclusive}={})->
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
     current = cursor.getBufferPosition()
     next = cursor.getEndOfCurrentWordBufferPosition()
     next.column -= 1 if exclusive
@@ -349,7 +352,7 @@ class MoveToEndOfWord extends Motion
 
 class MoveToEndOfWholeWord extends Motion
   execute: (count=1) ->
-    cursor = @editor.getCursor()
+    cursor = @editor.getLastCursor()
     _.times count, =>
       cursor.setBufferPosition(@nextBufferPosition(exclusive: true))
 
@@ -435,13 +438,19 @@ class MoveToLine extends Motion
 
   execute: (count) ->
     @setCursorPosition(count)
-    @editor.getCursor().skipLeadingWhitespace()
+    @editor.getLastCursor().skipLeadingWhitespace()
 
   # Options
   #  requireEOL - if true, ensure an end of line character is always selected
   select: (count=@editor.getLineCount(), {requireEOL}={}) ->
     {row, column} = @editor.getCursorBufferPosition()
-    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), requireEOL: requireEOL))
+    if row >= count
+      start = count - 1
+      end = row
+    else
+      start = row
+      end = count - 1
+    @editor.setSelectedBufferRange(@selectRows(start, end, {requireEOL}))
 
     _.times count, ->
       true
@@ -454,8 +463,9 @@ class MoveToLine extends Motion
      startPoint = null
      endPoint = null
      buffer = @editor.getBuffer()
-     if end == buffer.getLastRow()
-       if start > 0 and requireEOL
+     if end >= buffer.getLastRow()
+       end = buffer.getLastRow()
+       if start > 0 and requireEOL and start == end
          startPoint = [start - 1, buffer.lineLengthForRow(start - 1)]
        else
          startPoint = [start, 0]
@@ -472,6 +482,16 @@ class MoveToLine extends Motion
   getDestinationRow: (count) ->
     if count? then count - 1 else (@editor.getLineCount() - 1)
 
+class MoveToRelativeLine extends MoveToLine
+  # Options
+  #  requireEOL - if true, ensure an end of line character is always selected
+  select: (count=1, {requireEOL}={}) ->
+    {row, column} = @editor.getCursorBufferPosition()
+    @editor.setSelectedBufferRange(@selectRows(row, row + (count - 1), {requireEOL}))
+
+    _.times count, ->
+      true
+
 class MoveToScreenLine extends MoveToLine
   constructor: (@editor, @vimState, @editorView, @scrolloff) ->
     @scrolloff = 2 # atom default
@@ -482,7 +502,7 @@ class MoveToScreenLine extends MoveToLine
 
 class MoveToBeginningOfLine extends Motion
   execute: (count=1) ->
-    @editor.moveCursorToBeginningOfLine()
+    @editor.moveToBeginningOfLine()
 
   select: (count=1) ->
     _.times count, =>
@@ -491,7 +511,7 @@ class MoveToBeginningOfLine extends Motion
 
 class MoveToFirstCharacterOfLine extends Motion
   constructor:(@editor, @vimState) ->
-    @cursor = @editor.getCursor()
+    @cursor = @editor.getLastCursor()
     super(@editor, @vimState)
 
   execute: () ->
@@ -504,7 +524,7 @@ class MoveToFirstCharacterOfLine extends Motion
         true
 
   getDestinationColumn: ->
-    @editor.lineForBufferRow(@cursor.getBufferRow()).search(/\S/)
+    @editor.lineTextForBufferRow(@cursor.getBufferRow()).search(/\S/)
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
@@ -513,8 +533,8 @@ class MoveToLastCharacterOfLine extends Motion
     @vimState.desiredCursorColumn = Infinity
 
     _.times count, =>
-      @editor.moveCursorToEndOfLine()
-      @editor.moveCursorLeft() unless @editor.getCursor().getBufferColumn() is 0
+      @editor.moveToEndOfLine()
+      @editor.moveLeft() unless @editor.getLastCursor().getBufferColumn() is 0
 
   select: (count=1) ->
     _.times count, =>
@@ -544,7 +564,7 @@ class MoveToStartOfFile extends MoveToLine
     count - 1
 
   getDestinationColumn: (row) ->
-    if @isLinewise() then 0 else @editor.lineForBufferRow(row).search(/\S/)
+    if @isLinewise() then 0 else @editor.lineTextForBufferRow(row).search(/\S/)
 
   getStartingColumn: (column) ->
     if @isLinewise() then column else column + 1
@@ -586,7 +606,7 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
-  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToBeginningOfLine,
+  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
   MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError

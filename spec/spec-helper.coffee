@@ -1,4 +1,4 @@
-{EditorView} = require 'atom'
+{TextEditorView} = require 'atom'
 VimState = require '../lib/vim-state'
 VimMode  = require '../lib/vim-mode'
 
@@ -8,26 +8,21 @@ beforeEach ->
   atom.workspace ||= {}
   VimMode._initializeWorkspaceState()
 
-cacheEditor = (existingEditorView) ->
-  session = atom.project.openSync()
-  if existingEditorView?
-    existingEditorView.edit(session)
-    existingEditorView.vimState = new VimState(existingEditorView)
-    existingEditorView.bindKeys()
-    existingEditorView.enableKeymap()
-  else
-    editorView = new EditorView(session)
+getEditorView = (existingEditorView, callback) ->
+  session = null
+
+  waitsForPromise ->
+    atom.project.open().then (o) -> session = o
+
+  runs ->
+    editorView = new TextEditorView(session)
     editorView.simulateDomAttachment()
     editorView.enableKeymap()
 
     editorView.addClass('vim-mode')
     editorView.vimState = new VimState(editorView)
 
-  view = existingEditorView or editorView
-  history = view.editor.buffer.history
-  history.abortTransaction() if history.currentTransaction?
-  history.clearUndoStack()
-  view
+    callback(editorView)
 
 mockPlatform = (editorView, platform) ->
   wrapper = document.createElement('div')
@@ -61,4 +56,4 @@ keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
        element.value += key
   dispatchKeyboardEvent(element, 'keyup', eventArgs...)
 
-module.exports = { keydown, cacheEditor, mockPlatform, unmockPlatform }
+module.exports = { keydown, getEditorView, mockPlatform, unmockPlatform }

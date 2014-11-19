@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
-{$$, Range} = require 'atom'
+{$$, Point, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
+Utils = require '../utils'
 
 class OperatorError
   constructor: (@message) ->
@@ -37,6 +38,10 @@ class Operator
     if not motion.select
       throw new OperatorError('Must compose with a motion')
 
+    # Take on the composed object's isLinewise function if this object
+    # doesn't have one.
+    motion.isLinewise ?= motion.composedObject?.isLinewise
+
     @motion = motion
     @complete = true
 
@@ -50,25 +55,38 @@ class Operator
   undoTransaction: (fn) ->
     @editor.getBuffer().transact(fn)
 
+  # Public: Preps text and sets the text register
+  #
+  # Returns nothing
+  setTextRegister: (register, text) ->
+    if @motion?.isLinewise?()
+      type = 'linewise'
+      if text[-1..] isnt '\n'
+        text += '\n'
+    else
+      type = Utils.copyType(text)
+    @vimState.setRegister(register, {text, type})
+
 # Public: Generic class for an operator that requires extra input
 class OperatorWithInput extends Operator
   constructor: (@editorView, @vimState) ->
     @editor = @editorView.editor
     @complete = false
 
-  canComposeWith: (operation) -> operation.characters?
+  canComposeWith: (operation) -> operation.characters? or operation.select?
 
-  compose: (input) ->
-    if not input.characters
-      throw new OperatorError('Must compose with an Input')
-
-    @input = input
-    @complete = true
+  compose: (operation) ->
+    if operation.select?
+      @motion = operation
+    if operation.characters?
+      @input = operation
+      @complete = true
 
 #
 # It deletes everything selected by the following motion.
 #
 class Delete extends Operator
+  register: '"'
   allowEOL: null
 
   # allowEOL - Determines whether the cursor should be allowed to rest on the
@@ -83,16 +101,19 @@ class Delete extends Operator
   # count - The number of times to execute.
   #
   # Returns nothing.
-  execute: (count=1) ->
-    cursor = @editor.getCursor()
+  execute: (count) ->
+    cursor = @editor.getLastCursor()
 
     if _.contains(@motion.select(count, @selectOptions), true)
       validSelection = true
 
     if validSelection?
+      text = @editor.getSelectedText()
+      @setTextRegister(@register, text)
+
       @editor.delete()
       if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
-        @editor.moveCursorLeft()
+        @editor.moveLeft()
 
     if @motion.isLinewise?()
       @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
@@ -107,8 +128,8 @@ class ToggleCase extends Operator
 
   execute: (count=1) ->
     pos = @editor.getCursorBufferPosition()
-    lastCharIndex = @editor.lineLengthForBufferRow(pos.row) - 1
-    count = Math.min count, @editor.lineLengthForBufferRow(pos.row) - pos.column
+    lastCharIndex = @editor.lineTextForBufferRow(pos.row).length - 1
+    count = Math.min count, @editor.lineTextForBufferRow(pos.row).length - pos.column
 
     # Do nothing on an empty line
     return if @editor.getBuffer().isRowBlank(pos.row)
@@ -125,7 +146,7 @@ class ToggleCase extends Operator
           @editor.setTextInBufferRange(range, char.toLowerCase())
 
         unless point.column >= lastCharIndex
-          @editor.moveCursorRight()
+          @editor.moveRight()
 
     @vimState.activateCommandMode()
 
@@ -134,28 +155,23 @@ class ToggleCase extends Operator
 #
 class Yank extends Operator
   register: '"'
-
   # Public: Copies the text selected by the given motion.
   #
   # count - The number of times to execute.
   #
   # Returns nothing.
-  execute: (count=1) ->
+  execute: (count) ->
     originalPosition = @editor.getCursorScreenPosition()
-
     if _.contains(@motion.select(count), true)
-      text = @editor.getSelection().getText()
+      selectedPosition = @editor.getCursorScreenPosition()
+      text = @editor.getLastSelection().getText()
+      originalPosition = Point.min(originalPosition, selectedPosition)
     else
       text = ''
-    type = if @motion.isLinewise?() then 'linewise' else 'character'
 
-    @vimState.setRegister(@register, {text, type})
+    @setTextRegister(@register, text)
 
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition(originalPosition)
-    else
-      @editor.clearSelections()
-
+    @editor.setCursorScreenPosition(originalPosition)
     @vimState.activateCommandMode()
 
 #

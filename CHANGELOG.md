@@ -1,9 +1,12 @@
 ## HEAD
+
+## 0.14
 * Ctrl-c for command mode on mac only @sgtpepper43
 * Add css to status bar mode for optional custom styling @e-jigsaw
 * Implement `-`, `+`, and `enter` @roryokane
 * Fix problem undo'ing in insert mode @bhuga
- 
+* Remove use of deprecated APIs
+
 ## 0.11.1
 * Fix interaction with autocomplete-plus @klorenz
 
