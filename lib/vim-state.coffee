@@ -31,35 +31,12 @@ class VimState
 
     @setupCommandMode()
     @editorView.setInputEnabled?(false)
-    @registerInsertIntercept()
     @registerInsertTransactionResets()
     @registerUndoIntercept()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
       @activateCommandMode()
-
-  # Private: Creates a handle to block insertion while in command mode.
-  #
-  # This is currently a bit of a hack. If a user is in command mode they
-  # won't be able to type in any of Atom's dialogs (such as the command
-  # palette). This also doesn't block non-printable characters such as
-  # backspace.
-  #
-  # There should probably be a better API on the editor to handle this
-  # but the requirements aren't clear yet, so this will have to suffice
-  # for now.
-  #
-  # Returns nothing.
-  registerInsertIntercept: ->
-    @editorView.preempt 'textInput', (e) =>
-      return if $(e.currentTarget).hasClass('mini')
-
-      if @mode == 'insert'
-        true
-      else
-        @clearOpStack()
-        false
 
   # Private: Intercept undo in insert mode.
   #
@@ -447,6 +424,7 @@ class VimState
   #
   # Returns nothing.
   resetCommandMode: ->
+    @clearOpStack()
     @activateCommandMode()
 
   # Private: A generic way to create a Register prefix based on the event.

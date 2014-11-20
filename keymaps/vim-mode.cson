@@ -1,3 +1,8 @@
+'.editor.vim-mode':
+  'escape': 'vim-mode:reset-command-mode'
+  'ctrl-c': 'vim-mode:reset-command-mode'
+  'ctrl-[': 'vim-mode:reset-command-mode'
+
 '.editor.vim-mode:not(.command-mode)':
   'escape': 'vim-mode:activate-command-mode'
   'ctrl-[': 'vim-mode:activate-command-mode'
@@ -128,9 +133,6 @@
   'v': 'vim-mode:activate-characterwise-visual-mode'
   'V': 'vim-mode:activate-linewise-visual-mode'
   'ctrl-v': 'vim-mode:activate-blockwise-visual-mode'
-  'escape': 'vim-mode:reset-command-mode'
-  'ctrl-c': 'vim-mode:reset-command-mode'
-  'ctrl-[': 'vim-mode:reset-command-mode'
 
   'u': 'core:undo'
   'ctrl-r': 'core:redo'
@@ -208,6 +210,7 @@
   'a (': 'vim-mode:select-around-parentheses'
   'a )': 'vim-mode:select-around-parentheses'
   'a b': 'vim-mode:select-around-parentheses'
+  'x': 'vim-mode:reset-command-mode'
 
 '.editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
