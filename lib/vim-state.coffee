@@ -1,5 +1,6 @@
 _ = require 'underscore-plus'
 {$} = require 'atom'
+{Disposable, CompositeDisposable} = require 'event-kit'
 
 Operators = require './operators/index'
 Prefixes = require './prefixes'
@@ -20,6 +21,7 @@ class VimState
   submode: null
 
   constructor: (@editorView) ->
+    @subscriptions = new CompositeDisposable
     @editor = @editorView.editor
     @opStack = []
     @history = []
@@ -30,13 +32,19 @@ class VimState
     params.id = 0;
 
     @setupCommandMode()
-    @editorView.setInputEnabled?(false)
     @registerInsertTransactionResets()
     @registerUndoIntercept()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
       @activateCommandMode()
+
+  destroy: ->
+    @subscriptions.dispose()
+    @deactivateInsertMode()
+    @editorView.setInputEnabled(true)
+    @editorView.removeClass("command-mode")
+    @editorView.off('.vim-mode')
 
   # Private: Intercept undo in insert mode.
   #
@@ -45,10 +53,11 @@ class VimState
   # completed. As a workaround, we exit insert mode first and then
   # bubble the event up
   registerUndoIntercept: ->
-    @editorView.preempt 'core:undo', (e) =>
+    preempt = @editorView.preempt 'core:undo', (e) =>
       return true unless @mode == 'insert'
       @activateCommandMode()
       return true
+    @subscriptions.add(new Disposable -> preempt.off())
 
   # Private: Reset transactions on input for undo/redo/repeat on several
   # core and vim-mode events
@@ -371,8 +380,8 @@ class VimState
     @updateStatusBar()
 
   deactivateInsertMode: ->
-    return unless @mode == 'insert'
     @editorView.setInputEnabled?(false)
+    return unless @mode == 'insert'
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
     item = @inputOperator(@history[0])

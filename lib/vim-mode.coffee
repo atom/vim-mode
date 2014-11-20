@@ -22,4 +22,6 @@ module.exports =
 
   deactivate: ->
     atom.workspaceView?.eachEditorView (editorView) =>
-      editorView.off('.vim-mode')
+      editorView.removeClass("vim-mode")
+      editorView.vimState?.destroy()
+      delete editorView.vimState

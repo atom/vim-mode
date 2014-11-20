@@ -10,6 +10,7 @@
     "atom": ">0.99.0"
   },
   "dependencies": {
-    "underscore-plus": "1.x"
+    "underscore-plus": "1.x",
+    "event-kit": "^0.7.2"
   }
 }

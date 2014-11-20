@@ -35,6 +35,24 @@ describe "VimState", ->
       editorView.vimState = new VimState(editorView) # Reload vim-mode
       expect(editorView).toHaveClass 'insert-mode'
 
+  describe "::destroy", ->
+    it "re-enables text input on the editor", ->
+      expect(editorView.isInputEnabled()).toBeFalsy()
+      vimState.destroy()
+      expect(editorView.isInputEnabled()).toBeTruthy()
+
+    it "removes the mode classes from the editor", ->
+      expect(editorView.hasClass("command-mode")).toBeTruthy()
+      vimState.destroy()
+      expect(editorView.hasClass("command-mode")).toBeFalsy()
+
+    it "removes the vim-mode undo handler from the editor", ->
+      keydown("i")
+      vimState.destroy()
+      editorView.trigger("core:undo")
+      expect(editorView.isInputEnabled()).toBeTruthy()
+      expect(editorView.hasClass("command-mode")).toBeFalsy()
+
   describe "command-mode", ->
     describe "when entering an insertable character", ->
       beforeEach -> keydown('\\')
