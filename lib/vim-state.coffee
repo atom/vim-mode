@@ -32,7 +32,6 @@ class VimState
     params.id = 0;
 
     @setupCommandMode()
-    @registerInsertTransactionResets()
     @registerUndoIntercept()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
@@ -58,16 +57,6 @@ class VimState
       @activateCommandMode()
       return true
     @subscriptions.add(new Disposable -> preempt.off())
-
-  # Private: Reset transactions on input for undo/redo/repeat on several
-  # core and vim-mode events
-  registerInsertTransactionResets: ->
-    events = [ 'core:move-up'
-               'core:move-down'
-               'core:move-right'
-               'core:move-left' ]
-    @editorView.on events.join(' '), =>
-      @resetInputTransactions()
 
   # Private: Creates the plugin's bindings
   #
@@ -339,11 +328,6 @@ class VimState
   # Returns a search motion
   getSearchHistoryItem: (index) ->
     atom.workspace.vimState.searchHistory[index]
-
-  resetInputTransactions: ->
-    return unless @mode == 'insert' && @history[0]?.inputOperator?()
-    @deactivateInsertMode()
-    @activateInsertMode()
 
   ##############################################################################
   # Mode Switching

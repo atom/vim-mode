@@ -1227,22 +1227,6 @@ describe "Operators", ->
       keydown '.'
       editor.insertText("ababcc")
 
-    # This one doesn't work because we can't simulate typing correctly,
-    # and VimState#resetInputTransactions actually inspects buffer patches to
-    # build patches for repeating
-    xit "resets transactions for repeats after movement", ->
-      editor.setCursorBufferPosition([0, 0])
-      editor.insertText("abc\n123")
-      keydown 'i'
-      editor.insertText("def")
-      editorView.trigger 'core:move-down'
-      expect(editor.getCursorBufferPosition()).toEqual [1, 3]
-      editor.insertText("456")
-      keydown 'escape'
-      editor.setCursorBufferPosition([0, 0])
-      keydown '.'
-      expect(editor.getText()).toEqual "456defabc\n456123"
-
   describe 'the a keybinding', ->
     beforeEach ->
       editor.setText('')
