@@ -361,18 +361,22 @@ class VimState
   # Private: Used to enable insert mode.
   #
   # Returns nothing.
-  activateInsertMode: (transactionStarted = false)->
+  activateInsertMode: ->
     @mode = 'insert'
     @editorElement.component.setInputEnabled(true)
-    @editor.beginTransaction() unless transactionStarted
+    @setInsertionCheckpoint()
     @submode = null
     @changeModeClass('insert-mode')
     @updateStatusBar()
 
+  setInsertionCheckpoint: ->
+    @insertionCheckpoint = @editor.createCheckpoint() unless @insertionCheckpoint?
+
   deactivateInsertMode: ->
     @editorElement.component.setInputEnabled(false)
     return unless @mode == 'insert'
-    @editor.commitTransaction()
+    @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
+    @insertionCheckpoint = null
     transaction = _.last(@editor.buffer.history.undoStack)
     item = @inputOperator(@history[0])
     if item? and transaction?
