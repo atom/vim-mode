@@ -126,6 +126,8 @@ class VimState
       'scroll-cursor-to-middle-leave': => new Scroll.ScrollCursorToMiddle(@editorView, @editor, {leaveCursor: true})
       'scroll-cursor-to-bottom': => new Scroll.ScrollCursorToBottom(@editorView, @editor)
       'scroll-cursor-to-bottom-leave': => new Scroll.ScrollCursorToBottom(@editorView, @editor, {leaveCursor: true})
+      'scroll-half-screen-up': => new Scroll.ScrollHalfScreenUp(@editorView, @editor)
+      'scroll-half-screen-down': => new Scroll.ScrollHalfScreenDown(@editorView, @editor)
       'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
       'select-inside-double-quotes': => new TextObjects.SelectInsideQuotes(@editor, '"', false)
       'select-inside-single-quotes': => new TextObjects.SelectInsideQuotes(@editor, '\'', false)
