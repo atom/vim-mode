@@ -98,6 +98,9 @@
   'g t': 'pane:show-next-item'
   'g T': 'pane:show-previous-item'
 
+  'ctrl-o': 'vim-mode:jump-older-pos'
+  'ctrl-i': 'vim-mode:jump-newer-pos'
+
   'm': 'vim-mode:mark'
   '`': 'vim-mode:move-to-mark-literal'
   '\'': 'vim-mode:move-to-mark'

@@ -26,6 +26,7 @@ class SearchBase extends MotionWithInput
   execute: (count=1) ->
     @scan()
     @match count, (pos) =>
+      atom.workspace.vimState.jumpList.addJump @editor
       @editor.setCursorBufferPosition(pos.range.start)
 
   select: (count=1) ->

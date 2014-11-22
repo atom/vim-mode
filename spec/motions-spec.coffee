@@ -1567,3 +1567,147 @@ describe "Motions", ->
       keydown('%')
       expect(editor.getCursorScreenPosition()).toEqual [0, 60]
       expect(editor.getText()).toEqual  "( ( ) )--{ text in here; and a function call(with parameters) }\n"
+
+
+  describe 'jumplist behaviour', ->
+
+    keydownSeq = (seq) -> keydown(k) for k in seq
+
+    describe 'empty jumplist', ->
+
+      beforeEach ->
+        editor.setText( ('01234567890' for i in [1..10]).join('\n') )
+        editor.setCursorScreenPosition([5, 5])
+
+      it 'does nothing, ctrl-o', ->
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [5, 5]
+
+      it 'does nothing, ctrl-i', ->
+        keydown('i', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [5, 5]
+
+    describe 'ctrl-o / ctrl-i', ->
+
+      beforeEach ->
+        editor.setText( ('01234567890' for i in [1..10]).join('\n') )
+        editor.setCursorScreenPosition([5, 5])
+        # add some jumps to jumplist (it doesn't matter how)
+        keydownSeq('7gg')
+        keydownSeq('gg')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      it 'jumps to older positions', ->
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [6, 0]
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [5, 5]
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [5, 5]
+
+      it 'jumps to newer positions', ->
+        keydown('o', ctrl:true)
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [5, 5]
+        keydown('i', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [6, 0]
+        keydown('i', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+        keydown('i', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      it 'jumps to older positions by count', ->
+        keydown('2')
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [5, 5]
+
+      it 'jumps to older positions by count (count bigger than list)', ->
+        keydown('999')
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [5, 5]
+
+      it 'jumps to newer positions by count', ->
+        keydown('o', ctrl:true)
+        keydown('o', ctrl:true)
+        keydown('2')
+        keydown('i', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+      it 'jumps to newer positions by count (count bigger than list)', ->
+        keydown('o', ctrl:true)
+        keydown('o', ctrl:true)
+        keydown('999')
+        keydown('i', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+
+    describe 'an entry is created in the jumplist', ->
+
+      beforeEach ->
+        editor.setText( ('01234567890' for i in [1..10]).join('\n') )
+        editor.setCursorScreenPosition([5, 5])
+
+      expectJumpAdded = (positionBeforeJump = [5, 5]) ->
+        expect(editor.getCursorScreenPosition()).not.toEqual positionBeforeJump
+        keydown('o', ctrl:true)
+        expect(editor.getCursorScreenPosition()).toEqual positionBeforeJump
+
+      it 'before moving to a line', ->
+        keydownSeq('2gg')
+        expectJumpAdded()
+
+      it 'before moving to the top of the buffer', ->
+        keydownSeq('gg')
+        expectJumpAdded()
+
+      it 'before moving to the bottom of the buffer', ->
+        keydown('G', {shift:true})
+        expectJumpAdded()
+
+      it 'before moving to the bottom of the screen', ->
+        keydown('L', {shift:true})
+        expectJumpAdded()
+
+      it 'before moving to the top of the screen', ->
+        keydown('L', {shift:true})
+        expectJumpAdded()
+
+      it 'before moving to the middle of the screen', ->
+        keydown('M', {shift:true})
+        expectJumpAdded()
+
+      it 'before doing a text search', ->
+        keydown('/')
+        editor.commandModeInputView.editor.setText '0123'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expectJumpAdded()
+
+      it 'before doing a reverse text search', ->
+        keydown('?')
+        editor.commandModeInputView.editor.setText '0123'
+        editor.commandModeInputView.editor.trigger 'core:confirm'
+        expectJumpAdded()
+
+      it 'before moving to the next paragraph', ->
+        keydown('}')
+        expectJumpAdded()
+
+      it 'before moving to the prevous paragraph', ->
+        keydown('{')
+        expectJumpAdded()
+
+      it 'before moving to the matching bracket', ->
+        editor.setText('a(c)b')
+        editor.setCursorScreenPosition([0, 3])
+        keydown('%')
+        expectJumpAdded([0, 3])
+
+
+    describe 'jumplist between buffers', ->
+
+      beforeEach ->
+
+      it 'jumps back to position in other buffer', -> throw 'TODO test'
+      it 'jumps forward to position in other buffer', -> throw 'TODO test'
+      it 'adds jump to jumplist when switching or opening buffers', -> throw 'TODO test and implementation'
+      it 'jumps between new unsaved buffers (no editor uri)', -> throw 'TODO test and implementation'

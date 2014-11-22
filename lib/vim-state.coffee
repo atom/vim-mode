@@ -151,6 +151,8 @@ class VimState
       'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new Panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
+      'jump-older-pos': (e) => new Motions.MoveToOlderJumpPos(@editor, @)
+      'jump-newer-pos': (e) => new Motions.MoveToNewerJumpPos(@editor, @)
       'move-to-mark': (e) => new Motions.MoveToMark(@editorView, @)
       'move-to-mark-literal': (e) => new Motions.MoveToMark(@editorView, @, false)
       'mark': (e) => new Operators.Mark(@editorView, @)
