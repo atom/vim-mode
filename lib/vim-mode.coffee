@@ -18,7 +18,7 @@ module.exports =
       return if editorView.mini
 
       editorView.addClass('vim-mode')
-      editorView.vimState = new VimState(editorView)
+      editorView.vimState ?= new VimState(editorView)
 
   deactivate: ->
     atom.workspaceView?.eachEditorView (editorView) =>
