@@ -1409,6 +1409,23 @@ describe "Motions", ->
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcabc\n'
 
+  describe 'the V keybinding', ->
+    beforeEach ->
+      editor.setText("01\n002\n0003\n00004\n000005\n")
+      editor.setCursorScreenPosition([1, 1])
+
+    it "selects down a line", ->
+      keydown('V', shift: true)
+      keydown('j')
+      keydown('j')
+      expect(editor.getSelectedText()).toBe "002\n0003\n00004\n"
+
+    it "selects up a line", ->
+      # Should select the current line, as well as the ones above it
+      keydown('V', shift: true)
+      keydown('k')
+      expect(editor.getSelectedText()).toBe "01\n002\n"
+
   describe 'the ; and , keybindings', ->
     beforeEach ->
       editor.setText("abcabcabcabc\n")

@@ -163,16 +163,14 @@ class MoveUp extends MoveVertically
       @editor.selectUp()
 
     _.times count, =>
-      #bug 219, entering linewise visual mode "V" causes the first line to be omitted.
-      #The fix is to incrementally add or subtract a new range with each line.
-      #The initial selected range is built through the vim-state file. It is used to know whether to reference the start or end of a range.
+      # Handle linewise selection similar to vim
       if @isLinewise()
         selection = @editor.getSelection()
         range = selection.getBufferRange().copy()
-        if range.coversSameRows(@vimState.InitialSelectedRange)
+        if range.coversSameRows(@vimState.initialSelectedRange)
           range.start.row--
         else
-          if range.start.row < @vimState.InitialSelectedRange.start.row
+          if range.start.row < @vimState.initialSelectedRange.start.row
             range.start.row--
           else
             range.end.row--
@@ -194,20 +192,14 @@ class MoveDown extends MoveVertically
     @editor.selectLinesContainingCursors() unless @inVisualMode()
 
     _.times count, =>
-
-      #bug 219, entering linewise visual mode "V" causes the first line to be omitted.
-      #The fix is to incrementally add or subtract a new range with each line. 
-      #The initial selected range is built through the vim-state file. It is used to know whether to reference the start or end of a range.
+      # Handle linewise selection similar to vim
       if @isLinewise()
         selection = @editor.getSelection()
         range = selection.getBufferRange().copy()
-        if range.coversSameRows(@vimState.InitialSelectedRange)
-          range.end.row++
+        if range.start.row < @vimState.initialSelectedRange.start.row
+          range.start.row++
         else
-          if range.start.row < @vimState.InitialSelectedRange.start.row
-            range.start.row++
-          else
-            range.end.row++
+          range.end.row++
 
         selection.setBufferRange(range)
       else
