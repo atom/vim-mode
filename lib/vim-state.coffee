@@ -19,6 +19,7 @@ class VimState
   opStack: null
   mode: null
   submode: null
+  initialSelectedRange: null
 
   constructor: (@editorView) ->
     @subscriptions = new CompositeDisposable
@@ -396,6 +397,7 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLinesContainingCursors()
+      @initialSelectedRange = @editor.getSelection().getBufferRange()
 
     @updateStatusBar()
 

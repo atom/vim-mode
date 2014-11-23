@@ -78,12 +78,15 @@ class MoveRight extends Motion
         false
 
 class MoveVertically extends Motion
+
   constructor: (@editor, @vimState) ->
     # 'desiredCursorColumn' gets overwritten in the Motion constructor,
     # so we need to re-set it after calling super.
     column = @vimState.desiredCursorColumn
     super(@editor, @vimState)
     @vimState.desiredCursorColumn = column
+
+  isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
 
   execute: (count=1) ->
     {row, column} = @editor.getCursorBufferPosition()
@@ -160,7 +163,21 @@ class MoveUp extends MoveVertically
       @editor.selectUp()
 
     _.times count, =>
-      @editor.selectUp()
+      # Handle linewise selection similar to vim
+      if @isLinewise()
+        selection = @editor.getSelection()
+        range = selection.getBufferRange().copy()
+        if range.coversSameRows(@vimState.initialSelectedRange)
+          range.start.row--
+        else
+          if range.start.row < @vimState.initialSelectedRange.start.row
+            range.start.row--
+          else
+            range.end.row--
+
+        selection.setBufferRange(range)
+      else
+        @editor.selectUp()
       true
 
 class MoveDown extends MoveVertically
@@ -173,8 +190,21 @@ class MoveDown extends MoveVertically
 
   select: (count=1) ->
     @editor.selectLinesContainingCursors() unless @inVisualMode()
+
     _.times count, =>
-      @editor.selectDown()
+      # Handle linewise selection similar to vim
+      if @isLinewise()
+        selection = @editor.getSelection()
+        range = selection.getBufferRange().copy()
+        if range.start.row < @vimState.initialSelectedRange.start.row
+          range.start.row++
+        else
+          range.end.row++
+
+        selection.setBufferRange(range)
+      else
+        @editor.selectDown()
+
       true
 
 class MoveToPreviousWord extends Motion
