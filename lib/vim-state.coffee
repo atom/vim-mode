@@ -21,11 +21,10 @@ class VimState
   submode: null
   initialSelectedRange: null
 
-  constructor: (editorView) ->
+  constructor: (@editorElement) ->
     @emitter = new Emitter
     @subscriptions = new CompositeDisposable
-    @editorElement = editorView.element
-    @editor = editorView.editor
+    @editor = @editorElement.getModel()
     @opStack = []
     @history = []
     @marks = {}

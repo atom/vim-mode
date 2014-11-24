@@ -16,7 +16,7 @@ describe "VimMode", ->
       atom.packages.activatePackage('vim-mode')
 
     runs ->
-      editorElement = atom.workspaceView.getActiveView().element
+      editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
 
   describe ".activate", ->
     it "puts the editor in command-mode initially by default", ->
