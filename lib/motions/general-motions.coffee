@@ -485,7 +485,7 @@ class MoveToRelativeLine extends MoveToLine
       true
 
 class MoveToScreenLine extends MoveToLine
-  constructor: (@editor, @vimState, @editorView, @scrolloff) ->
+  constructor: (@editor, @vimState, @scrolloff) ->
     @scrolloff = 2 # atom default
     super(@editor, @vimState)
 
@@ -571,7 +571,7 @@ class MoveToStartOfFile extends MoveToLine
 
 class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
-    firstScreenRow = @editorView.getFirstVisibleScreenRow()
+    firstScreenRow = @editor.getFirstVisibleScreenRow()
     if firstScreenRow > 0
       offset = Math.max(count - 1, @scrolloff)
     else
@@ -580,7 +580,7 @@ class MoveToTopOfScreen extends MoveToScreenLine
 
 class MoveToBottomOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
-    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    lastScreenRow = @editor.getLastVisibleScreenRow()
     lastRow = @editor.getBuffer().getLastRow()
     if lastScreenRow != lastRow
       offset = Math.max(count - 1, @scrolloff)
@@ -590,8 +590,8 @@ class MoveToBottomOfScreen extends MoveToScreenLine
 
 class MoveToMiddleOfScreen extends MoveToScreenLine
   getDestinationRow: (count) ->
-    firstScreenRow = @editorView.getFirstVisibleScreenRow()
-    lastScreenRow = @editorView.getLastVisibleScreenRow()
+    firstScreenRow = @editor.getFirstVisibleScreenRow()
+    lastScreenRow = @editor.getLastVisibleScreenRow()
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
