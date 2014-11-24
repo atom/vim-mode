@@ -1,16 +1,13 @@
-{WorkspaceView} = require 'atom'
+{Workspace} = require 'atom'
 
 describe "VimMode", ->
-  [editorElement] = []
+  editorElement = null
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
+    atom.workspace = new Workspace
 
     waitsForPromise ->
       atom.workspace.open()
-
-    runs ->
-      atom.workspaceView.simulateDomAttachment()
 
     waitsForPromise ->
       atom.packages.activatePackage('vim-mode')
