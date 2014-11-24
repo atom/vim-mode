@@ -6,8 +6,8 @@ SearchViewModel = require '../view-models/search-view-model'
 
 class SearchBase extends MotionWithInput
   @currentSearch: null
-  constructor: (@editorView, @vimState) ->
-    super(@editorView, @vimState)
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
 
@@ -90,8 +90,8 @@ class SearchBase extends MotionWithInput
     @matches = after
 
 class Search extends SearchBase
-  constructor: (@editorView, @vimState) ->
-    super(@editorView, @vimState)
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState)
     @viewModel = new SearchViewModel(@)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
@@ -102,8 +102,8 @@ class Search extends SearchBase
 
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null
-  constructor: (@editorView, @vimState) ->
-    super(@editorView, @vimState)
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
 
@@ -151,8 +151,8 @@ class SearchCurrentWord extends SearchBase
 
 class BracketMatchingMotion extends SearchBase
   @keywordRegex: null
-  constructor: (@editorView, @vimState) ->
-    super(@editorView, @vimState)
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
     @characters         = [')','(','}','{',']','[']

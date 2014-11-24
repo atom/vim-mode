@@ -27,13 +27,11 @@ class ViewModel
   #            - singleChar {Boolean} - tells the view whether it should only listen for a single
   #                                      character or an entire string
   constructor: (@operation, opts={}) ->
-    @editorView = @operation.editorView
-    @vimState   = @operation.vimState
+    {@editor, @vimState} = @operation
 
     @view = new VimCommandModeInputView(@, opts)
-    @editorView.editor.commandModeInputView = @view
-    # when the opStack is prematurely cleared we need to remove the view
-    @editorView.on 'vim-mode:compose-failure', => @view.remove()
+    @editor.commandModeInputView = @view
+    @vimState.onDidFailToCompose => @view.remove()
 
   # Public: Overriding this isn't usually necessary in subclasses, this pushes another operation
   #         to the `opStack` in `vim-stack.coffee` which causes the opStack to collapse and

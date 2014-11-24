@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {$} = require 'atom'
-{Disposable, CompositeDisposable} = require 'event-kit'
+{Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 
 Operators = require './operators/index'
 Prefixes = require './prefixes'
@@ -22,6 +22,7 @@ class VimState
   initialSelectedRange: null
 
   constructor: (@editorView) ->
+    @emitter = new Emitter
     @subscriptions = new CompositeDisposable
     @editor = @editorView.editor
     @opStack = []
@@ -152,21 +153,21 @@ class VimState
       'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
       'focus-pane-view-below': => new Panes.FocusPaneViewBelow()
       'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
-      'move-to-mark': (e) => new Motions.MoveToMark(@editorView, @)
-      'move-to-mark-literal': (e) => new Motions.MoveToMark(@editorView, @, false)
+      'move-to-mark': (e) => new Motions.MoveToMark(@editor, @)
+      'move-to-mark-literal': (e) => new Motions.MoveToMark(@editor, @, false)
       'mark': (e) => new Operators.Mark(@editorView, @)
-      'find': (e) => new Motions.Find(@editorView, @)
-      'find-backwards': (e) => new Motions.Find(@editorView, @).reverse()
-      'till': (e) => new Motions.Till(@editorView, @)
-      'till-backwards': (e) => new Motions.Till(@editorView, @).reverse()
+      'find': (e) => new Motions.Find(@editor, @)
+      'find-backwards': (e) => new Motions.Find(@editor, @).reverse()
+      'till': (e) => new Motions.Till(@editor, @)
+      'till-backwards': (e) => new Motions.Till(@editor, @).reverse()
       'repeat-find': (e) => @currentFind.repeat() if @currentFind?
       'repeat-find-reverse': (e) => @currentFind.repeat(reverse: true) if @currentFind?
       'replace': (e) => new Operators.Replace(@editorView, @)
-      'search': (e) => new Motions.Search(@editorView, @)
-      'reverse-search': (e) => (new Motions.Search(@editorView, @)).reversed()
-      'search-current-word': (e) => new Motions.SearchCurrentWord(@editorView, @)
-      'bracket-matching-motion': (e) => new Motions.BracketMatchingMotion(@editorView,@)
-      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editorView, @)).reversed()
+      'search': (e) => new Motions.Search(@editor, @)
+      'reverse-search': (e) => (new Motions.Search(@editor, @)).reversed()
+      'search-current-word': (e) => new Motions.SearchCurrentWord(@editor, @)
+      'bracket-matching-motion': (e) => new Motions.BracketMatchingMotion(@editor,@)
+      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editor, @)).reversed()
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
@@ -204,7 +205,7 @@ class VimState
       # if we have started an operation that responds to canComposeWith check if it can compose
       # with the operation we're going to push onto the stack
       if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
-        @editorView.trigger 'vim-mode:compose-failure'
+        @emitter.emit('failed-to-compose')
         @resetCommandMode()
         break
 
@@ -216,6 +217,9 @@ class VimState
         @opStack.push(new Motions.CurrentSelection(@editor, @))
 
       @processOpStack()
+
+  onDidFailToCompose: (fn) ->
+    @emitter.on('failed-to-compose', fn)
 
   # Private: Removes all operations from the stack.
   #

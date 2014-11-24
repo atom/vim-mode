@@ -29,8 +29,8 @@ class CurrentSelection extends Motion
 
 # Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
-  constructor: (@editorView, @vimState) ->
-    super(@editorView.editor, @vimState)
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState)
     @complete = false
 
   isComplete: -> @complete
@@ -163,7 +163,6 @@ class MoveUp extends MoveVertically
       @editor.selectUp()
 
     _.times count, =>
-      # Handle linewise selection similar to vim
       if @isLinewise()
         selection = @editor.getSelection()
         range = selection.getBufferRange().copy()

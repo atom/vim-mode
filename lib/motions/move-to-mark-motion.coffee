@@ -1,11 +1,11 @@
-{MotionWithInput} = require './general-motions'
+{MotionWithInput, MoveToFirstCharacterOfLine} = require './general-motions'
 {ViewModel} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
 
 module.exports =
 class MoveToMark extends MotionWithInput
-  constructor: (@editorView, @vimState, @linewise=true) ->
-    super(@editorView, @vimState)
+  constructor: (@editor, @vimState, @linewise=true) ->
+    super(@editor, @vimState)
     @viewModel = new ViewModel(@, class: 'move-to-mark', singleChar: true, hidden: true)
 
   isLinewise: -> @linewise
@@ -15,11 +15,11 @@ class MoveToMark extends MotionWithInput
 
     if @input.characters == '`' # double '`' pressed
       markPosition ?= [0, 0] # if markPosition not set, go to the beginning of the file
-      @vimState.setMark('`', @editorView.editor.getCursorBufferPosition())
+      @vimState.setMark('`', @editor.getCursorBufferPosition())
 
     @editor.setCursorBufferPosition(markPosition) if markPosition?
     if @linewise
-      @editorView.trigger 'vim-mode:move-to-first-character-of-line'
+      new MoveToFirstCharacterOfLine(@editor, @vimState).execute()
 
   select: (count=1, {requireEOL}={}) ->
     markPosition = @vimState.getMark(@input.characters)
