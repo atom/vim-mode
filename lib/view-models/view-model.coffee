@@ -7,9 +7,6 @@ VimCommandModeInputView = require './vim-command-mode-input-view'
 #
 # Ivars:
 #
-#   @completionCommand - if set will automatically be triggered on the editorView
-#                        when the `confirm` method is called on the view model
-#
 #   @value - automatically set to the value of typed into the `VimCommandModeInputView`
 #            when the `confirm` method is called
 #
