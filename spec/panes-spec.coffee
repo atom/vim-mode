@@ -19,53 +19,47 @@ describe "Panes", ->
     helpers.keydown(key, options)
 
   describe "switch panes", ->
+    paneContainer = null
     beforeEach ->
+      paneContainer = atom.views.getView(atom.workspace.paneContainer)
       editor.setText("abcde\n")
-      atom.workspaceView = {
-        focusPaneViewOnRight: ->
-        focusPaneViewOnLeft: ->
-        focusPaneViewBelow: ->
-        focusPaneViewAbove: ->
-        getActivePaneItem: -> editor
-        getActiveView: -> {element: editorElement}
-      }
 
     describe "the ctrl-w l keybinding", ->
       beforeEach ->
-        spyOn(atom.workspaceView, 'focusPaneViewOnRight')
+        spyOn(paneContainer, 'focusPaneViewOnRight')
 
       it "focuses the pane on the right", ->
         keydown('w', ctrl: true)
         keydown('l')
 
-        expect(atom.workspaceView.focusPaneViewOnRight).toHaveBeenCalled()
+        expect(paneContainer.focusPaneViewOnRight).toHaveBeenCalled()
 
     describe "the ctrl-w h keybinding", ->
       beforeEach ->
-        spyOn(atom.workspaceView, 'focusPaneViewOnLeft')
+        spyOn(paneContainer, 'focusPaneViewOnLeft')
 
       it "focuses the pane on the left", ->
         keydown('w', ctrl: true)
         keydown('h')
 
-        expect(atom.workspaceView.focusPaneViewOnLeft).toHaveBeenCalled()
+        expect(paneContainer.focusPaneViewOnLeft).toHaveBeenCalled()
 
     describe "the ctrl-w j keybinding", ->
       beforeEach ->
-        spyOn(atom.workspaceView, 'focusPaneViewBelow')
+        spyOn(paneContainer, 'focusPaneViewBelow')
 
       it "focuses the pane on the below", ->
         keydown('w', ctrl: true)
         keydown('j')
 
-        expect(atom.workspaceView.focusPaneViewBelow).toHaveBeenCalled()
+        expect(paneContainer.focusPaneViewBelow).toHaveBeenCalled()
 
     describe "the ctrl-w k keybinding", ->
       beforeEach ->
-        spyOn(atom.workspaceView, 'focusPaneViewAbove')
+        spyOn(paneContainer, 'focusPaneViewAbove')
 
       it "focuses the pane on the above", ->
         keydown('w', ctrl: true)
         keydown('k')
 
-        expect(atom.workspaceView.focusPaneViewAbove).toHaveBeenCalled()
+        expect(paneContainer.focusPaneViewAbove).toHaveBeenCalled()
