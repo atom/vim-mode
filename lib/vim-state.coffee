@@ -21,10 +21,11 @@ class VimState
   submode: null
   initialSelectedRange: null
 
-  constructor: (@editorView) ->
+  constructor: (editorView) ->
     @emitter = new Emitter
     @subscriptions = new CompositeDisposable
-    @editor = @editorView.editor
+    @editorElement = editorView.element
+    @editor = editorView.editor
     @opStack = []
     @history = []
     @marks = {}
@@ -43,9 +44,8 @@ class VimState
   destroy: ->
     @subscriptions.dispose()
     @deactivateInsertMode()
-    @editorView.setInputEnabled(true)
-    @editorView.removeClass("command-mode")
-    @editorView.off('.vim-mode')
+    @editorElement.component.setInputEnabled(true)
+    @editorElement.classList.remove("command-mode")
 
   # Private: Intercept undo in insert mode.
   #
@@ -54,7 +54,7 @@ class VimState
   # completed. As a workaround, we exit insert mode first and then
   # bubble the event up
   registerUndoIntercept: ->
-    preempt = @editorView.preempt 'core:undo', (e) =>
+    preempt = $(@editorElement).preempt 'core:undo', (e) =>
       return true unless @mode == 'insert'
       @activateCommandMode()
       return true
@@ -177,7 +177,7 @@ class VimState
   registerCommands: (commands) ->
     for commandName, fn of commands
       do (fn) =>
-        @editorView.command "vim-mode:#{commandName}.vim-mode", fn
+        @subscriptions.add(atom.commands.add(@editorElement, "vim-mode:#{commandName}", fn))
 
   # Private: Register multiple Operators via an {Object} that
   # maps command names to functions that return operations to push.
@@ -348,7 +348,7 @@ class VimState
     @mode = 'command'
     @submode = null
 
-    if @editorView.is(".insert-mode")
+    if @editorElement.classList.contains("insert-mode")
       cursor = @editor.getLastCursor()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
@@ -364,14 +364,14 @@ class VimState
   # Returns nothing.
   activateInsertMode: (transactionStarted = false)->
     @mode = 'insert'
-    @editorView.setInputEnabled?(true)
+    @editorElement.component.setInputEnabled(true)
     @editor.beginTransaction() unless transactionStarted
     @submode = null
     @changeModeClass('insert-mode')
     @updateStatusBar()
 
   deactivateInsertMode: ->
-    @editorView.setInputEnabled?(false)
+    @editorElement.component.setInputEnabled(false)
     return unless @mode == 'insert'
     @editor.commitTransaction()
     transaction = _.last(@editor.buffer.history.undoStack)
@@ -417,9 +417,9 @@ class VimState
   changeModeClass: (targetMode) ->
     for mode in ['command-mode', 'insert-mode', 'visual-mode', 'operator-pending-mode']
       if mode is targetMode
-        @editorView.addClass(mode)
+        @editorElement.classList.add(mode)
       else
-        @editorView.removeClass(mode)
+        @editorElement.classList.remove(mode)
 
   # Private: Resets the command mode back to it's initial state.
   #

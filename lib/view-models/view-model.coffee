@@ -16,7 +16,7 @@ VimCommandModeInputView = require './vim-command-mode-input-view'
 class ViewModel
   # Public: Override this in subclasses for custom initialization
   #
-  # operator - An operator, motion, prefix, etc with `@editorView` and `@state` set
+  # operator - An operator, motion, prefix, etc with `@editor` and `@state` set
   #
   # opts - the options to be passed to `VimCommandModeInputView`. Possible options are:
   #
