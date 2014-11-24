@@ -69,8 +69,8 @@ class Operator
 
 # Public: Generic class for an operator that requires extra input
 class OperatorWithInput extends Operator
-  constructor: (@editorView, @vimState) ->
-    @editor = @editorView.editor
+  constructor: (@editor, @vimState) ->
+    @editor = @editor
     @complete = false
 
   canComposeWith: (operation) -> operation.characters? or operation.select?
@@ -208,8 +208,8 @@ class Repeat extends Operator
 # It creates a mark at the current cursor position
 #
 class Mark extends OperatorWithInput
-  constructor: (@editorView, @vimState, {@selectOptions}={}) ->
-    super(@editorView, @vimState)
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    super(@editor, @vimState)
     @viewModel = new ViewModel(@, class: 'mark', singleChar: true, hidden: true)
 
   # Public: Creates the mark in the specified mark register (from user input)
@@ -217,7 +217,7 @@ class Mark extends OperatorWithInput
   #
   # Returns nothing.
   execute: () ->
-    @vimState.setMark(@input.characters, @editorView.editor.getCursorBufferPosition())
+    @vimState.setMark(@input.characters, @editor.getCursorBufferPosition())
     @vimState.activateCommandMode()
 
 module.exports = {

@@ -155,14 +155,14 @@ class VimState
       'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
       'move-to-mark': (e) => new Motions.MoveToMark(@editor, @)
       'move-to-mark-literal': (e) => new Motions.MoveToMark(@editor, @, false)
-      'mark': (e) => new Operators.Mark(@editorView, @)
+      'mark': (e) => new Operators.Mark(@editor, @)
       'find': (e) => new Motions.Find(@editor, @)
       'find-backwards': (e) => new Motions.Find(@editor, @).reverse()
       'till': (e) => new Motions.Till(@editor, @)
       'till-backwards': (e) => new Motions.Till(@editor, @).reverse()
       'repeat-find': (e) => @currentFind.repeat() if @currentFind?
       'repeat-find-reverse': (e) => @currentFind.repeat(reverse: true) if @currentFind?
-      'replace': (e) => new Operators.Replace(@editorView, @)
+      'replace': (e) => new Operators.Replace(@editor, @)
       'search': (e) => new Motions.Search(@editor, @)
       'reverse-search': (e) => (new Motions.Search(@editor, @)).reversed()
       'search-current-word': (e) => new Motions.SearchCurrentWord(@editor, @)
