@@ -7,16 +7,13 @@ VimCommandModeInputView = require './vim-command-mode-input-view'
 #
 # Ivars:
 #
-#   @completionCommand - if set will automatically be triggered on the editorView
-#                        when the `confirm` method is called on the view model
-#
 #   @value - automatically set to the value of typed into the `VimCommandModeInputView`
 #            when the `confirm` method is called
 #
 class ViewModel
   # Public: Override this in subclasses for custom initialization
   #
-  # operator - An operator, motion, prefix, etc with `@editorView` and `@state` set
+  # operator - An operator, motion, prefix, etc with `@editor` and `@state` set
   #
   # opts - the options to be passed to `VimCommandModeInputView`. Possible options are:
   #
@@ -27,13 +24,11 @@ class ViewModel
   #            - singleChar {Boolean} - tells the view whether it should only listen for a single
   #                                      character or an entire string
   constructor: (@operation, opts={}) ->
-    @editorView = @operation.editorView
-    @vimState   = @operation.vimState
+    {@editor, @vimState} = @operation
 
     @view = new VimCommandModeInputView(@, opts)
-    @editorView.editor.commandModeInputView = @view
-    # when the opStack is prematurely cleared we need to remove the view
-    @editorView.on 'vim-mode:compose-failure', => @view.remove()
+    @editor.commandModeInputView = @view
+    @vimState.onDidFailToCompose => @view.remove()
 
   # Public: Overriding this isn't usually necessary in subclasses, this pushes another operation
   #         to the `opStack` in `vim-stack.coffee` which causes the opStack to collapse and

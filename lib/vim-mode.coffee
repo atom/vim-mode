@@ -13,15 +13,17 @@ module.exports =
 
   activate: (state) ->
     @_initializeWorkspaceState()
-    atom.workspaceView.eachEditorView (editorView) =>
-      return unless editorView.attached
-      return if editorView.mini
+    @editorObservation = atom.workspace.observeTextEditors (editor) =>
+      return if editor.mini
 
-      editorView.addClass('vim-mode')
-      editorView.vimState = new VimState(editorView)
+      element = atom.views.getView(editor)
+      element.classList.add('vim-mode')
+      element.vimState = new VimState(element)
 
   deactivate: ->
-    atom.workspaceView?.eachEditorView (editorView) =>
-      editorView.removeClass("vim-mode")
-      editorView.vimState?.destroy()
-      delete editorView.vimState
+    @editorObservation.dispose()
+    for editor in atom.workspace.getTextEditors()
+      element = atom.views.getView(editor)
+      element.classList.remove("vim-mode")
+      element.vimState?.destroy()
+      delete element.vimState

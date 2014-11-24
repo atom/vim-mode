@@ -1,7 +1,7 @@
 class Scroll
   isComplete: -> true
   isRecordable: -> false
-  constructor: (@editorView, @editor) ->
+  constructor: (@editor) ->
     @scrolloff = 2 # atom default
     @rows =
       first: @editor.getFirstVisibleScreenRow()
@@ -21,7 +21,7 @@ class ScrollDown extends Scroll
 
   scrollUp: (count) ->
     lastScreenRow = @rows.last - @scrolloff
-    @editorView.scrollToScreenPosition([lastScreenRow + count, 0])
+    @editor.scrollToScreenPosition([lastScreenRow + count, 0])
 
 class ScrollUp extends Scroll
   execute: (count=1) ->
@@ -36,13 +36,13 @@ class ScrollUp extends Scroll
 
   scrollDown: (count) ->
     firstScreenRow = @rows.first + @scrolloff
-    @editorView.scrollToScreenPosition([firstScreenRow - count, 0])
+    @editor.scrollToScreenPosition([firstScreenRow - count, 0])
 
 class ScrollCursor extends Scroll
-  constructor: (@editorView, @editor, @opts={}) ->
+  constructor: (@editor, @opts={}) ->
     super
     cursor = @editor.getCursorScreenPosition()
-    @pixel = @editorView.pixelPositionForScreenPosition(cursor).top
+    @pixel = @editor.pixelPositionForScreenPosition(cursor).top
 
 class ScrollCursorToTop extends ScrollCursor
   execute: ->
@@ -51,8 +51,8 @@ class ScrollCursorToTop extends ScrollCursor
 
   scrollUp: ->
     return if @rows.last is @rows.final
-    @pixel -= (@editorView.lineHeight * @scrolloff)
-    @editorView.scrollTop(@pixel)
+    @pixel -= (@editor.getLineHeightInPixels() * @scrolloff)
+    @editor.setScrollTop(@pixel)
 
   moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
@@ -63,8 +63,8 @@ class ScrollCursorToMiddle extends ScrollCursor
     @scrollMiddle()
 
   scrollMiddle: ->
-    @pixel -= (@editorView.height() / 2)
-    @editorView.scrollTop(@pixel)
+    @pixel -= (@editor.getHeight() / 2)
+    @editor.setScrollTop(@pixel)
 
   moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
@@ -76,9 +76,9 @@ class ScrollCursorToBottom extends ScrollCursor
 
   scrollDown: ->
     return if @rows.first is 0
-    offset = (@editorView.lineHeight * (@scrolloff + 1))
-    @pixel -= (@editorView.height() - offset)
-    @editorView.scrollTop(@pixel)
+    offset = (@editor.getLineHeightInPixels() * (@scrolloff + 1))
+    @pixel -= (@editor.getHeight() - offset)
+    @editor.setScrollTop(@pixel)
 
   moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
@@ -97,7 +97,7 @@ class ScrollHalfScreenUp extends Scroll
 
   scrollDown: ->
     dest = @editor.getScrollTop() - Math.floor(@editor.getHeight() / 2)
-    @editorView.scrollTop(dest)
+    @editor.setScrollTop(dest)
 
 class ScrollHalfScreenDown extends Scroll
   execute: ->
@@ -113,7 +113,7 @@ class ScrollHalfScreenDown extends Scroll
 
   scrollUp: ->
     dest = @editor.getScrollTop() + Math.floor(@editor.getHeight() / 2)
-    @editorView.scrollTop(dest)
+    @editor.setScrollTop(dest)
 
-module.exports = { ScrollDown, ScrollUp, ScrollCursorToTop, ScrollCursorToMiddle, 
+module.exports = { ScrollDown, ScrollUp, ScrollCursorToTop, ScrollCursorToMiddle,
   ScrollCursorToBottom, ScrollHalfScreenUp, ScrollHalfScreenDown }

@@ -1,22 +1,21 @@
 helpers = require './spec-helper'
 
 describe "Panes", ->
-  [editor, editorView, vimState] = []
+  [editor, editorElement, vimState] = []
 
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
     vimMode.activateResources()
 
-    helpers.getEditorView editorView, (view) ->
-      editorView = view
-      editor = editorView.editor
-
-      vimState = editorView.vimState
+    helpers.getEditorElement (element) ->
+      editorElement = element
+      editor = editorElement.getModel()
+      vimState = editorElement.vimState
       vimState.activateCommandMode()
       vimState.resetCommandMode()
 
   keydown = (key, options={}) ->
-    options.element ?= editorView[0]
+    options.element ?= editorElement
     helpers.keydown(key, options)
 
   describe "switch panes", ->
@@ -28,7 +27,7 @@ describe "Panes", ->
         focusPaneViewBelow: ->
         focusPaneViewAbove: ->
         getActivePaneItem: -> editor
-        getActiveView: -> editorView
+        getActiveView: -> {element: editorElement}
       }
 
     describe "the ctrl-w l keybinding", ->

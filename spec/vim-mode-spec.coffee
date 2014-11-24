@@ -1,7 +1,7 @@
 {WorkspaceView} = require 'atom'
 
 describe "VimMode", ->
-  [editorView] = []
+  [editorElement] = []
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView
@@ -16,25 +16,24 @@ describe "VimMode", ->
       atom.packages.activatePackage('vim-mode')
 
     runs ->
-      editorView = atom.workspaceView.getActiveView()
-      editorView.enableKeymap()
+      editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
 
-  describe "initialize", ->
+  describe ".activate", ->
     it "puts the editor in command-mode initially by default", ->
-      expect(editorView).toHaveClass 'vim-mode'
-      expect(editorView).toHaveClass 'command-mode'
+      expect(editorElement.classList.contains('vim-mode')).toBe(true)
+      expect(editorElement.classList.contains('command-mode')).toBe(true)
 
-  describe 'deactivate', ->
-    beforeEach ->
+  describe ".deactivate", ->
+    it "removes the vim classes from the editor", ->
       atom.packages.deactivatePackage('vim-mode')
+      expect(editorElement.classList.contains("vim-mode")).toBe(false)
+      expect(editorElement.classList.contains("command-mode")).toBe(false)
 
-      waitsForPromise ->
-        atom.packages.activatePackage('vim-mode')
+    it "removes the vim commands from the editor element", ->
+      vimCommands = ->
+        atom.commands.findCommands(target: editorElement).filter (cmd) ->
+          cmd.name.startsWith("vim-mode:")
 
-      runs ->
-        editorView = atom.workspaceView.getActiveView()
-        editorView.enableKeymap()
-
-    it 'clears the vim namespaced events from the editorView', ->
-      handlers = editorView.handlers()
-      expect(handlers['vim-mode:move-down'].length).toEqual(1)
+      expect(vimCommands().length).toBeGreaterThan(0)
+      atom.packages.deactivatePackage('vim-mode')
+      expect(vimCommands().length).toBe(0)
