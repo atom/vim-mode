@@ -1,3 +1,6 @@
+{CompositeDisposable} = require 'event-kit'
+StatusBarManager = require './status-bar-manager'
+GlobalVimState = require './global-vim-state'
 VimState = require './vim-state'
 
 module.exports =
@@ -9,22 +12,23 @@ module.exports =
       type: 'boolean'
       default: false
 
-  _initializeWorkspaceState: ->
-    atom.workspace.vimState ||= {}
-    atom.workspace.vimState.registers ||= {}
-    atom.workspace.vimState.searchHistory ||= []
-
   activate: (state) ->
-    @_initializeWorkspaceState()
-    @editorObservation = atom.workspace.observeTextEditors (editor) =>
-      return if editor.mini
+    @disposables = new CompositeDisposable
 
+    globalVimState = new GlobalVimState
+    statusBarManager = new StatusBarManager
+
+    @disposables.add statusBarManager.initialize()
+
+    @disposables.add atom.workspace.observeTextEditors (editor) =>
+      return if editor.mini
       element = atom.views.getView(editor)
       element.classList.add('vim-mode')
-      element.vimState = new VimState(element)
+      element.vimState = new VimState(element, statusBarManager, globalVimState)
 
   deactivate: ->
-    @editorObservation.dispose()
+    @disposables.dispose()
+
     for editor in atom.workspace.getTextEditors()
       element = atom.views.getView(editor)
       element.classList.remove("vim-mode")

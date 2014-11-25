@@ -1,5 +1,6 @@
 helpers = require './spec-helper'
 VimState = require '../lib/vim-state'
+StatusBarManager = require '../lib/status-bar-manager'
 
 describe "VimState", ->
   [editor, editorElement, vimState] = []
@@ -31,7 +32,7 @@ describe "VimState", ->
 
     it "puts the editor in insert-mode if startInInsertMode is true", ->
       atom.config.set 'vim-mode.startInInsertMode', true
-      editor.vimState = new VimState(editorElement) # Reload vim-mode
+      editor.vimState = new VimState(editorElement, new StatusBarManager)
       expect(editorElement.classList.contains('insert-mode')).toBe(true)
 
   describe "::destroy", ->

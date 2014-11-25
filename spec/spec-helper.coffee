@@ -1,9 +1,10 @@
 VimState = require '../lib/vim-state'
+GlobalVimState = require '../lib/global-vim-state'
 VimMode  = require '../lib/vim-mode'
+StatusBarManager = require '../lib/status-bar-manager'
 
 beforeEach ->
   atom.workspace ||= {}
-  VimMode._initializeWorkspaceState()
 
 getEditorElement = (callback) ->
   textEditor = null
@@ -16,7 +17,7 @@ getEditorElement = (callback) ->
     element = document.createElement("atom-text-editor")
     element.setModel(textEditor)
     element.classList.add('vim-mode')
-    element.vimState = new VimState(element)
+    element.vimState = new VimState(element, new StatusBarManager, new GlobalVimState)
 
     element.addEventListener "keydown", (e) ->
       atom.keymaps.handleKeyboardEvent(e)

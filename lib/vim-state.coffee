@@ -11,11 +11,6 @@ Utils = require './utils'
 Panes = require './panes'
 Scroll = require './scroll'
 
-StatusBarContents =
-  insert:  ["status-bar-vim-mode-insert", "Insert"]
-  command: ["status-bar-vim-mode-command", "Command"]
-  visual:  ["status-bar-vim-mode-visual", "Visual"]
-
 module.exports =
 class VimState
   editor: null
@@ -24,7 +19,7 @@ class VimState
   submode: null
   initialSelectedRange: null
 
-  constructor: (@editorElement) ->
+  constructor: (@editorElement, @statusBarManager, @globalVimState) ->
     @emitter = new Emitter
     @subscriptions = new CompositeDisposable
     @editor = @editorElement.getModel()
@@ -267,7 +262,7 @@ class VimState
       type = Utils.copyType(text)
       {text, type}
     else
-      atom.workspace.vimState.registers[name]
+      @globalVimState.registers[name]
 
   # Private: Fetches the value of a given mark.
   #
@@ -294,7 +289,7 @@ class VimState
     else if name == '_'
       # Blackhole register, nothing to do
     else
-      atom.workspace.vimState.registers[name] = value
+      @globalVimState.registers[name] = value
 
   # Private: Sets the value of a given mark.
   #
@@ -314,7 +309,7 @@ class VimState
   #
   # Returns nothing
   pushSearchHistory: (search) ->
-    atom.workspace.vimState.searchHistory.unshift search
+    @globalVimState.searchHistory.unshift search
 
   # Public: Get the search history item at the given index.
   #
@@ -322,7 +317,7 @@ class VimState
   #
   # Returns a search motion
   getSearchHistoryItem: (index) ->
-    atom.workspace.vimState.searchHistory[index]
+    @globalVimState.searchHistory[index]
 
   ##############################################################################
   # Mode Switching
@@ -486,26 +481,4 @@ class VimState
       @opStack.length > 0
 
   updateStatusBar: ->
-    atom.packages.onDidActivateAll =>
-      unless @statusBarItem?
-        @statusBarItem = document.createElement("div")
-        @statusBarItem.id = "status-bar-vim-mode"
-        @statusBarItem.classList.add("inline-block")
-        @statusBarItem.innerHTML = "Command"
-        atom.workspaceView.statusBar?.prependRight(@statusBarItem)
-        @updateStatusBar()
-
-    return unless @statusBarItem
-
-    @statusBarItem.classList.remove(
-      "status-bar-vim-mode-insert",
-      "status-bar-vim-mode-command",
-      "status-bar-vim-mode-visual",
-    )
-
-    for mode, [klass, html] of StatusBarContents
-      if mode is @mode
-        @statusBarItem.classList.add(klass)
-        @statusBarItem.innerHTML = html
-      else
-        @statusBarItem.classList.remove(klass)
+    @statusBarManager.update(@mode)
