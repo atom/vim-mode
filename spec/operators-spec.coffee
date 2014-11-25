@@ -1061,7 +1061,7 @@ describe "Operators", ->
 
     describe "when used in a scope that supports auto-indent", ->
       beforeEach ->
-        jsGrammar = atom.syntax.grammarForScopeName('source.js')
+        jsGrammar = atom.grammars.grammarForScopeName('source.js')
         editor.setGrammar(jsGrammar)
 
       afterEach ->
