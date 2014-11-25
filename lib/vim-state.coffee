@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$} = require 'atom'
+{Point, Range} = require 'atom'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 
 Operators = require './operators/index'
@@ -10,8 +10,11 @@ TextObjects = require './text-objects'
 Utils = require './utils'
 Panes = require './panes'
 Scroll = require './scroll'
-{$$, Point, Range} = require 'atom'
-Marker = require 'atom'
+
+StatusBarContents =
+  insert:  ["status-bar-vim-mode-insert", "Insert"]
+  command: ["status-bar-vim-mode-command", "Command"]
+  visual:  ["status-bar-vim-mode-visual", "Visual"]
 
 module.exports =
 class VimState
@@ -484,14 +487,25 @@ class VimState
 
   updateStatusBar: ->
     atom.packages.onDidActivateAll =>
-      if !$('#status-bar-vim-mode').length
-        atom.workspaceView.statusBar?.prependRight("<div id='status-bar-vim-mode' class='inline-block'>Command</div>")
+      unless @statusBarItem?
+        @statusBarItem = document.createElement("div")
+        @statusBarItem.id = "status-bar-vim-mode"
+        @statusBarItem.classList.add("inline-block")
+        @statusBarItem.innerHTML = "Command"
+        atom.workspaceView.statusBar?.prependRight(@statusBarItem)
         @updateStatusBar()
 
-    @removeStatusBarClass()
-    switch @mode
-      when 'insert'  then $('#status-bar-vim-mode').addClass('status-bar-vim-mode-insert').html("Insert")
-      when 'command' then $('#status-bar-vim-mode').addClass('status-bar-vim-mode-command').html("Command")
-      when 'visual'  then $('#status-bar-vim-mode').addClass('status-bar-vim-mode-visual').html("Visual")
+    return unless @statusBarItem
 
-  removeStatusBarClass: -> $('#status-bar-vim-mode').removeClass('status-bar-vim-mode-insert status-bar-vim-mode-command status-bar-vim-mode-visual')
+    @statusBarItem.classList.remove(
+      "status-bar-vim-mode-insert",
+      "status-bar-vim-mode-command",
+      "status-bar-vim-mode-visual",
+    )
+
+    for mode, [klass, html] of StatusBarContents
+      if mode is @mode
+        @statusBarItem.classList.add(klass)
+        @statusBarItem.innerHTML = html
+      else
+        @statusBarItem.classList.remove(klass)
