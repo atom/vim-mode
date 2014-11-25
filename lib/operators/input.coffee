@@ -32,7 +32,7 @@ class InsertAfter extends Insert
 
 class InsertAboveWithNewline extends Insert
   execute: (count=1) ->
-    @editor.beginTransaction() unless @typingCompleted
+    @vimState.setInsertionCheckpoint() unless @typingCompleted
     @editor.insertNewlineAbove()
     @editor.getLastCursor().skipLeadingWhitespace()
 
@@ -47,7 +47,7 @@ class InsertAboveWithNewline extends Insert
 
 class InsertBelowWithNewline extends Insert
   execute: (count=1) ->
-    @editor.beginTransaction() unless @typingCompleted
+    @vimState.setInsertionCheckpoint() unless @typingCompleted
     @editor.insertNewlineBelow()
     @editor.getLastCursor().skipLeadingWhitespace()
 
@@ -74,7 +74,7 @@ class Change extends Insert
   execute: (count) ->
     # If we've typed, we're being repeated. If we're being repeated,
     # undo transactions are already handled.
-    @editor.beginTransaction() unless @typingCompleted
+    @vimState.setInsertionCheckpoint() unless @typingCompleted
     operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
     operator.compose(@motion)
 
@@ -103,7 +103,7 @@ class Change extends Insert
 class Substitute extends Insert
   register: '"'
   execute: (count=1) ->
-    @editor.beginTransaction() unless @typingCompleted
+    @vimState.setInsertionCheckpoint() unless @typingCompleted
     _.times count, =>
       @editor.selectRight()
     text = @editor.getLastSelection().getText()
@@ -120,7 +120,7 @@ class Substitute extends Insert
 class SubstituteLine extends Insert
   register: '"'
   execute: (count=1) ->
-    @editor.beginTransaction() unless @typingCompleted
+    @vimState.setInsertionCheckpoint() unless @typingCompleted
     @editor.moveToBeginningOfLine()
     _.times count, =>
       @editor.selectDown()
