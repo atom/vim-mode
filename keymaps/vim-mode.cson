@@ -10,6 +10,9 @@
 '.platform-darwin .editor.vim-mode:not(.command-mode)':
   'ctrl-c': 'vim-mode:activate-command-mode'
 
+'.editor.vim-mode.insert-mode':
+  'ctrl-w': 'editor:delete-to-beginning-of-word'
+
 '.editor.vim-mode:not(.insert-mode)':
   'h': 'vim-mode:move-left'
   'left': 'vim-mode:move-left'
