@@ -29,7 +29,7 @@ class StatusBarManager
   # Private
 
   attach: ->
-    {statusBar} = atom.workspaceView
+    statusBar = atom.workspaceView?.statusBar
     if statusBar?
       statusBar.prependRight(@element)
       @disposables.add =>
