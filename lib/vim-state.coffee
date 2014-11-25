@@ -34,7 +34,6 @@ class VimState
     params.id = 0;
 
     @setupCommandMode()
-    @registerUndoIntercept()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
@@ -45,19 +44,6 @@ class VimState
     @deactivateInsertMode()
     @editorElement.component.setInputEnabled(true)
     @editorElement.classList.remove("command-mode")
-
-  # Private: Intercept undo in insert mode.
-  #
-  # Undo in insert mode will blow up the previous transaction, but not
-  # put it into the redo stack anywhere correctly, as it hasn't been
-  # completed. As a workaround, we exit insert mode first and then
-  # bubble the event up
-  registerUndoIntercept: ->
-    preempt = $(@editorElement).preempt 'core:undo', (e) =>
-      return true unless @mode == 'insert'
-      @activateCommandMode()
-      return true
-    @subscriptions.add(new Disposable -> preempt.off())
 
   # Private: Creates the plugin's bindings
   #

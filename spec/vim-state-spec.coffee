@@ -189,14 +189,6 @@ describe "VimState", ->
       expect(editorElement.classList.contains('insert-mode')).toBe(false)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
-    it "puts the editor into command mode before undoing, saving work", ->
-      editor.setText("012345\n\nabcdef")
-      $(editorElement).trigger("core:undo")
-      expect(editorElement.classList.contains("command-mode")).toBe(true)
-      expect(editor.getText()).toEqual("")
-      $(editorElement).trigger("core:redo")
-      expect(editor.getText()).toEqual("012345\n\nabcdef")
-
   describe "visual-mode", ->
     beforeEach -> keydown('v')
 
