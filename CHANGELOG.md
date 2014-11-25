@@ -1,5 +1,6 @@
 ## HEAD
 
+## 0.20
 * Ctrl-w for delete-to-beginning-of-word in insert mode
 * Folding key-bindings
 * Remove more deprecated APIs
