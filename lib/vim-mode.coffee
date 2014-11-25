@@ -1,10 +1,13 @@
 VimState = require './vim-state'
 
 module.exports =
-  configDefaults:
-    'commandModeInputViewFontSize': 11
-    'startInInsertMode': false
-    'useSmartcaseForSearch': false
+  config:
+    startInInsertMode:
+      type: 'boolean'
+      default: false
+    useSmartcaseForSearch:
+      type: 'boolean'
+      default: false
 
   _initializeWorkspaceState: ->
     atom.workspace.vimState ||= {}
