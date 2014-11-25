@@ -1,4 +1,3 @@
-{$} = require 'atom'
 helpers = require './spec-helper'
 VimState = require '../lib/vim-state'
 
@@ -44,13 +43,6 @@ describe "VimState", ->
     it "removes the mode classes from the editor", ->
       expect(editorElement.classList.contains("command-mode")).toBeTruthy()
       vimState.destroy()
-      expect(editorElement.classList.contains("command-mode")).toBeFalsy()
-
-    it "removes the vim-mode undo handler from the editor", ->
-      keydown("i")
-      vimState.destroy()
-      $(editorElement).trigger("core:undo")
-      expect(editorElement.component.isInputEnabled()).toBeTruthy()
       expect(editorElement.classList.contains("command-mode")).toBeFalsy()
 
   describe "command-mode", ->

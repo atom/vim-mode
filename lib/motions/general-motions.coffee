@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$$, Point, Range} = require 'atom'
+{Point, Range} = require 'atom'
 
 class MotionError
   constructor: (@message) ->

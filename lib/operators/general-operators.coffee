@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$$, Point, Range} = require 'atom'
+{Point, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
 Utils = require '../utils'
 
