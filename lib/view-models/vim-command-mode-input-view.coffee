@@ -17,9 +17,7 @@ class VimCommandModeInputView extends View
     @singleChar = opts.singleChar
     @defaultText = opts.defaultText ? ''
 
-    # If in test mode, don't append to anything, just initialize.
-    if atom.workspace?
-      atom.workspace.addBottomPanel(item: this, priority: 100)
+    atom.workspace.addBottomPanel(item: this, priority: 100)
 
     @focus()
     @handleEvents()
@@ -56,4 +54,5 @@ class VimCommandModeInputView extends View
 
   remove: =>
     @stopHandlingEvents()
+    atom.workspace.getActivePane().activate()
     super()

@@ -886,7 +886,12 @@ describe "Motions", ->
         expect(editor.getCursorScreenPosition()).toEqual [3,1]
 
   describe "the / keybinding", ->
+    pane = null
+
     beforeEach ->
+      pane = {activate: jasmine.createSpy("activate")}
+      spyOn(atom.workspace, 'getActivePane').andReturn(pane)
+
       editor.setText("abc\ndef\nabc\ndef\n")
       editor.setCursorBufferPosition([0, 0])
 
@@ -898,6 +903,7 @@ describe "Motions", ->
         editor.commandModeInputView.editor.trigger 'core:confirm'
 
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        expect(pane.activate).toHaveBeenCalled()
 
       it "loops back around", ->
         editor.setCursorBufferPosition([3, 0])
