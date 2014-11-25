@@ -164,7 +164,7 @@ class MoveUp extends MoveVertically
 
     _.times count, =>
       if @isLinewise()
-        selection = @editor.getSelection()
+        selection = @editor.getLastSelection()
         range = selection.getBufferRange().copy()
         if range.coversSameRows(@vimState.initialSelectedRange)
           range.start.row--
@@ -191,9 +191,8 @@ class MoveDown extends MoveVertically
     @editor.selectLinesContainingCursors() unless @inVisualMode()
 
     _.times count, =>
-      # Handle linewise selection similar to vim
       if @isLinewise()
-        selection = @editor.getSelection()
+        selection = @editor.getLastSelection()
         range = selection.getBufferRange().copy()
         if range.start.row < @vimState.initialSelectedRange.start.row
           range.start.row++

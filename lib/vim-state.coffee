@@ -393,7 +393,7 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLinesContainingCursors()
-      @initialSelectedRange = @editor.getSelection().getBufferRange()
+      @initialSelectedRange = @editor.getLastSelection().getBufferRange()
 
     @updateStatusBar()
 
