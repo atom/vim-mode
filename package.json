@@ -1,7 +1,7 @@
 {
   "name": "vim-mode",
   "main": "./lib/vim-mode",
-  "version": "0.20.2",
+  "version": "0.20.3",
   "description": "Add vim modal control",
   "license": "MIT",
   "private": true,
