@@ -31,6 +31,7 @@ class VimState
     params.manager = this;
     params.id = 0;
 
+    @editorElement.classList.add("vim-mode")
     @setupCommandMode()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
@@ -41,6 +42,7 @@ class VimState
     @subscriptions.dispose()
     @deactivateInsertMode()
     @editorElement.component.setInputEnabled(true)
+    @editorElement.classList.remove("vim-mode")
     @editorElement.classList.remove("command-mode")
 
   # Private: Creates the plugin's bindings
