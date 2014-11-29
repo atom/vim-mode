@@ -1,32 +1,7 @@
 @import "syntax-variables";
 @import "ui-variables";
 
-.block-cursor(@visibility: visible) {
-  border: 0;
-  background-color: @syntax-cursor-color;
-  visibility: @visibility;
-  opacity: 0.5;
-}
-
-.vim-mode.command-mode, .vim-mode.operator-pending-mode, .vim-mode.visual-mode {
-  .cursor, .cursor.blink-off {
-    .block-cursor(hidden);
-  }
-
-  &.editor.is-focused {
-    .cursor, .cursor.blink-off {
-      .block-cursor;
-    }
-  }
-}
-
-.vim-mode.visual-mode {
-  .cursor.hidden-cursor {
-    display: block;
-  }
-}
-
-.command-mode-input .editor.mini {
+.command-mode-input atom-text-editor[mini] {
   background-color: inherit;
   border: none;
   width: 100%;
@@ -36,15 +11,4 @@
   cursor: default;
   white-space: nowrap;
   padding-left: 10px;
-}
-
-.command-mode-input .hidden-input {
-  padding: 0;
-  border: 0;
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  width: 1px;
 }
