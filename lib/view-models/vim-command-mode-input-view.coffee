@@ -17,7 +17,7 @@ class VimCommandModeInputView extends View
     @singleChar = opts.singleChar
     @defaultText = opts.defaultText ? ''
 
-    atom.workspace.addBottomPanel(item: this, priority: 100)
+    @panel = atom.workspace.addBottomPanel(item: this, priority: 100)
 
     @focus()
     @handleEvents()
@@ -55,4 +55,4 @@ class VimCommandModeInputView extends View
   remove: =>
     @stopHandlingEvents()
     atom.workspace.getActivePane().activate()
-    super()
+    @panel.destroy()
