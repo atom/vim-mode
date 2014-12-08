@@ -17,7 +17,7 @@
 * Fix interaction with autocomplete
 
 ## 0.19
-* Properly re-enable editor input when after disabling vim-mode
+* Properly re-enable editor input after disabling vim-mode
 
 ## 0.17
 * Fix typo
