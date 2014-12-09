@@ -516,6 +516,18 @@ class MoveToFirstCharacterOfLine extends Motion
   getDestinationColumn: ->
     @editor.lineTextForBufferRow(@cursor.getBufferRow()).search(/\S/)
 
+class MoveToFirstCharacterOfLineAndDown extends Motion
+  execute: (count=0) ->
+    (new MoveDown(@editor, @vimState)).execute(count)
+    (new MoveToFirstCharacterOfLine(@editor, @vimState)).execute()
+
+  select: (count=0) ->
+    if (count > 0)
+      (new MoveDown(@editor, @vimState)).select(count)
+    else
+      @editor.selectToFirstCharacterOfLine()
+      true
+
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
     # After moving to the end of the line, vertical motions
@@ -598,6 +610,6 @@ module.exports = {
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
-  MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
+  MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
 }
