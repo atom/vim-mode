@@ -35,12 +35,11 @@ module.exports =
       @editorStateMap[editor.id] = vimState
       @emitter.emit 'did-attach', vimState
 
-      stateDisposable = new Disposable =>
-        delete @editorStateMap[vimState.editor.id]
+      stateDisposable = new Disposable ->
         vimState.destroy()
 
       @disposables.add stateDisposable
-      editor.onDidDestroy -> stateDisposable.dispose()
+      editor.onDidDestroy => delete @editorStateMap[vimState.editor.id]
 
     version = require('../package.json').version
     @disposables.add atom.services.provide "vim-mode", version,
