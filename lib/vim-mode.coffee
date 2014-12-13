@@ -58,9 +58,3 @@ module.exports =
     for id, vimState of @editorStateMap
         callback(vimState)
     @onDidAttach(callback)
-
-module.exports.Motions = require './motions'
-module.exports.Operators = require './operators'
-module.exports.ViewModels = require './view-models/view-model'
-module.exports.ViewModels.VimCommandModeInputView =
-  require './view-models/vim-command-mode-input-view'
