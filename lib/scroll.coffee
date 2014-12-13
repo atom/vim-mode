@@ -5,7 +5,7 @@ class Scroll
     @scrolloff = 2 # atom default
     @rows =
       first: @editor.getFirstVisibleScreenRow()
-      last: @editor.getLastVisibleScreenRow()
+      last: @editor.getLastVisibleScreenRow() - 1
       final: @editor.getLastScreenRow()
 
 class ScrollDown extends Scroll
@@ -15,8 +15,8 @@ class ScrollDown extends Scroll
 
   keepCursorOnScreen: (count) ->
     {row, column} = @editor.getCursorScreenPosition()
-    firstScreenRow = @rows.first + @scrolloff + 1
-    if row - count <= firstScreenRow
+    firstScreenRow = @rows.first + @scrolloff
+    if row - count < firstScreenRow
       @editor.setCursorScreenPosition([firstScreenRow + count, column])
 
   scrollUp: (count) ->
@@ -30,8 +30,8 @@ class ScrollUp extends Scroll
 
   keepCursorOnScreen: (count) ->
     {row, column} = @editor.getCursorScreenPosition()
-    lastScreenRow = @rows.last - @scrolloff - 1
-    if row + count >= lastScreenRow
+    lastScreenRow = @rows.last - @scrolloff
+    if row + count > lastScreenRow
         @editor.setCursorScreenPosition([lastScreenRow - count, column])
 
   scrollDown: (count) ->
