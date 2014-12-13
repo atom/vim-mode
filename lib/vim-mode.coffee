@@ -1,7 +1,7 @@
 {Disposable, CompositeDisposable} = require 'event-kit'
 StatusBarManager = require './status-bar-manager'
 GlobalVimState = require './global-vim-state'
-VimState = require './vim-state'
+VimState = null
 
 module.exports =
   config:
@@ -20,6 +20,7 @@ module.exports =
     @disposables.add statusBarManager.initialize()
     @disposables.add atom.workspace.observeTextEditors (editor) =>
       return if editor.mini
+      VimState ?= require './vim-state'
 
       element = atom.views.getView(editor)
 
