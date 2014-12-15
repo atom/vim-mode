@@ -26,18 +26,42 @@ describe "Scrolling", ->
       spyOn(editor, 'scrollToScreenPosition')
 
     describe "the ctrl-e keybinding", ->
+      ###
+      0
+      1
+      2 <-
+      3
+      4 |
+      5
+      6
+      7 <-
+      8
+      9
+      ###
       beforeEach ->
         spyOn(editor, 'getCursorScreenPosition').andReturn({row: 4, column: 0})
         spyOn(editor, 'setCursorScreenPosition')
 
       it "moves the screen down by one and keeps cursor onscreen", ->
         keydown('e', ctrl: true)
-        expect(editor.scrollToScreenPosition).toHaveBeenCalledWith([7, 0])
-        expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([6, 0])
+        expect(editor.scrollToScreenPosition).toHaveBeenCalledWith([6, 0])
+        expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([5, 0])
 
     describe "the ctrl-y keybinding", ->
+      ###
+      0
+      1
+      2 <-
+      3
+      4
+      5 |
+      6
+      7 <-
+      8
+      9
+      ###
       beforeEach ->
-        spyOn(editor, 'getCursorScreenPosition').andReturn({row: 6, column: 0})
+        spyOn(editor, 'getCursorScreenPosition').andReturn({row: 5, column: 0})
         spyOn(editor, 'setCursorScreenPosition')
 
       it "moves the screen up by one and keeps the cursor onscreen", ->
