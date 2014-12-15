@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {Point, Range} = require 'atom'
 
+
 class MotionError
   constructor: (@message) ->
     @name = 'Motion Error'
@@ -12,6 +13,15 @@ class Motion
   isComplete: -> true
   isRecordable: -> false
   inVisualMode: -> @vimState.mode == "visual"
+
+  setCursorBufferPositions: (editor, positions) =>
+    first = true
+    for position in positions
+      if first
+        @editor.setCursorBufferPosition(position)
+        first = false
+      else
+        @editor.addCursorAtBufferPosition(position)
 
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
@@ -46,8 +56,9 @@ class MotionWithInput extends Motion
 class MoveLeft extends Motion
   execute: (count=1) ->
     _.times count, =>
-      {column} = @editor.getCursorBufferPosition()
-      @editor.moveLeft() if column > 0
+      newPositions = @editor.getCursorBufferPositions().map (position) =>
+        [position.row, Math.max(position.column - 1, 0)]
+      @setCursorBufferPositions(@editor, newPositions)
 
   select: (count=1) ->
     _.times count, =>
@@ -62,9 +73,10 @@ class MoveLeft extends Motion
 class MoveRight extends Motion
   execute: (count=1) ->
     _.times count, =>
-      {row, column} = @editor.getCursorBufferPosition()
-      if column < @editor.lineTextForBufferRow(row).length - 1
-        @editor.moveRight()
+      newPositions = @editor.getCursorBufferPositions().map (position) =>
+        lastPosition = @editor.lineTextForBufferRow(position.row).length - 1
+        [position.row, Math.min(position.column + 1, lastPosition)]
+      @setCursorBufferPositions(@editor, newPositions)
 
   select: (count=1) ->
     _.times count, =>

@@ -102,6 +102,36 @@ describe "Motions", ->
         keydown('l')
         expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
+  describe "multi-cursor simple motions", ->
+    beforeEach ->
+      editor.setText("12345\nabcd\nABCDE\nfghij")
+      editor.setCursorScreenPosition([1,1])
+      editor.addCursorAtScreenPosition([2,2])
+
+    describe "the h keybinding", ->
+      it "moves the cursor left, but not to the previous line", ->
+        keydown('h')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [1, 0]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [2, 1]
+
+        keydown('h')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [1, 0]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [2, 0]
+
+    describe "the l keybinding", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([1, 2])
+        editor.addCursorAtScreenPosition([2, 2])
+
+      it "moves the cursor right, but not to the next line", ->
+        keydown('l')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [1, 3]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [2, 3]
+
+        keydown('l')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [1, 3]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [2, 4]
+
   describe "the w keybinding", ->
     beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
 
