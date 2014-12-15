@@ -118,6 +118,26 @@ describe "Motions", ->
         expect(editor.getCursorScreenPositions()[0]).toEqual [1, 0]
         expect(editor.getCursorScreenPositions()[1]).toEqual [2, 0]
 
+    describe "the j keybinding", ->
+      it "moves the cursor down, but not to the previous line", ->
+        keydown('j')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [2, 1]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [3, 2]
+
+        keydown('j')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [3, 1]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [3, 2]
+
+    describe "the k keybinding", ->
+      it "moves the cursor up, but not to the beginning of the first line", ->
+        keydown('k')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [0, 1]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [1, 2]
+
+        keydown('k')
+        expect(editor.getCursorScreenPositions()[0]).toEqual [0, 1]
+        expect(editor.getCursorScreenPositions()[1]).toEqual [0, 2]
+
     describe "the l keybinding", ->
       beforeEach ->
         editor.setCursorScreenPosition([1, 2])

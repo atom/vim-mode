@@ -8,13 +8,13 @@ class MotionError
 
 class Motion
   constructor: (@editor, @vimState) ->
-    @vimState.desiredCursorColumn = null
+    @vimState.desiredCursorColumns = []
 
   isComplete: -> true
   isRecordable: -> false
   inVisualMode: -> @vimState.mode == "visual"
 
-  setCursorBufferPositions: (editor, positions) =>
+  setCursorBufferPositions: (positions) =>
     first = true
     for position in positions
       if first
@@ -58,7 +58,7 @@ class MoveLeft extends Motion
     _.times count, =>
       newPositions = @editor.getCursorBufferPositions().map (position) =>
         [position.row, Math.max(position.column - 1, 0)]
-      @setCursorBufferPositions(@editor, newPositions)
+      @setCursorBufferPositions(newPositions)
 
   select: (count=1) ->
     _.times count, =>
@@ -76,7 +76,7 @@ class MoveRight extends Motion
       newPositions = @editor.getCursorBufferPositions().map (position) =>
         lastPosition = @editor.lineTextForBufferRow(position.row).length - 1
         [position.row, Math.min(position.column + 1, lastPosition)]
-      @setCursorBufferPositions(@editor, newPositions)
+      @setCursorBufferPositions(newPositions)
 
   select: (count=1) ->
     _.times count, =>
@@ -92,26 +92,26 @@ class MoveRight extends Motion
 class MoveVertically extends Motion
 
   constructor: (@editor, @vimState) ->
-    # 'desiredCursorColumn' gets overwritten in the Motion constructor,
+    # 'desiredCursorColumns' gets overwritten in the Motion constructor,
     # so we need to re-set it after calling super.
-    column = @vimState.desiredCursorColumn
+    columns = @vimState.desiredCursorColumns
     super(@editor, @vimState)
-    @vimState.desiredCursorColumn = column
+    @vimState.desiredCursorColumns = columns
 
   isLinewise: -> @vimState.mode == 'visual' and @vimState.submode == 'linewise'
 
   execute: (count=1) ->
-    {row, column} = @editor.getCursorBufferPosition()
+    nextPositions = []
+    i = 0
+    for position in @editor.getCursorBufferPositions()
+      nextRow = @nextValidRow(count, position)
 
-    nextRow = @nextValidRow(count)
-
-    if nextRow != row
       nextLineLength = @editor.lineTextForBufferRow(nextRow).length
 
       # The 'nextColumn' the cursor should be in is the
-      # 'desiredCursorColumn', if it exists. If it does
+      # 'desiredCursorColumns', if it exists. If it does
       # not, the current column should be used.
-      nextColumn = @vimState.desiredCursorColumn || column
+      nextColumn = @vimState.desiredCursorColumns[i] || position.column
 
       # Check to see if the 'nextColumn' position of
       # cursor is greater than or equal to the length
@@ -120,15 +120,21 @@ class MoveVertically extends Motion
         # When the 'nextColumn' is greater than the
         # length of the next line, we should move the
         # cursor to the end of the next line and save
-        # 'nextColumn' in 'desiredCursorColumn'.
-        @editor.setCursorBufferPosition([nextRow, nextLineLength-1])
-        @vimState.desiredCursorColumn = nextColumn
+        # 'nextColumn' in 'desiredCursorColumns'.
+        nextPositions.push [nextRow, nextLineLength-1]
+        @editor.setCursorBufferPosition [nextRow, nextLineLength-1]
+        @vimState.desiredCursorColumns[i] = nextColumn
       else
         # When the 'nextColumn' is a valid spot to
         # move into, in the next line, simply move
         # there and unset 'desiredCursorColumn'.
-        @editor.setCursorBufferPosition([nextRow, nextColumn])
-        @vimState.desiredCursorColumn = null
+        nextPositions.push [nextRow, nextColumn]
+        @editor.setCursorBufferPosition [nextRow, nextColumn]
+        @vimState.desiredCursorColumns[i] = null
+      i++
+
+    @setCursorBufferPositions nextPositions
+
 
   # Internal: Finds the next valid row that can be moved
   # to. This move takes folded lines into account when
@@ -138,11 +144,11 @@ class MoveVertically extends Motion
   #         the current row.
   #
   # Returns an integer row index.
-  nextValidRow: (count) ->
-    {row, column} = @editor.getCursorBufferPosition()
-
+  nextValidRow: (count, position) ->
     maxRow = @editor.getLastBufferRow()
     minRow = 0
+
+    row = position.row
 
     # For each count, add 1 'directionIncrement' to
     # row. Folded rows count as a single row.
@@ -532,7 +538,7 @@ class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
     # After moving to the end of the line, vertical motions
     # should stay at the last column.
-    @vimState.desiredCursorColumn = Infinity
+    @vimState.desiredCursorColumns = [Infinity]
 
     _.times count, =>
       @editor.moveToEndOfLine()
