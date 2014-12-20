@@ -12,3 +12,47 @@
   white-space: nowrap;
   padding-left: 10px;
 }
+
+.block-cursor(@visibility: visible) {
+  border: 0;
+  background-color: @syntax-cursor-color;
+  visibility: @visibility;
+  opacity: 0.5;
+}
+
+atom-text-editor.vim-mode.command-mode,
+atom-text-editor.vim-mode.operator-pending-mode,
+atom-text-editor.vim-mode.visual-mode,
+{
+  &::shadow, // shadow-DOM enabled
+  &           // shadow-DOM disabled
+  {
+    .cursor, .cursor.blink-off {
+      .block-cursor(hidden);
+    }
+  }
+}
+
+atom-text-editor.vim-mode.command-mode.is-focused,
+atom-text-editor.vim-mode.operator-pending-mode.is-focused,
+atom-text-editor.vim-mode.visual-mode.is-focused
+{
+  &::shadow, // shadow-DOM enabled
+  &           // shadow-DOM disabled
+  {
+    .cursor, .cursor.blink-off {
+      .block-cursor;
+    }
+  }
+}
+
+atom-text-editor.vim-mode.visual-mode
+{
+  &::shadow, // shadow-DOM enabled
+  &           // shadow-DOM disabled
+  {
+    .cursor.hidden-cursor {
+      display: block;
+    }
+  }
+}
