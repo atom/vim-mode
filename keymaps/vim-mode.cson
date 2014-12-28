@@ -222,3 +222,5 @@
 '.editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
   's': 'vim-mode:change'
+  'v': 'vim-mode:reset-command-mode'
+  'V': 'vim-mode:reset-command-mode'
