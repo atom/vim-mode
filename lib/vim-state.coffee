@@ -340,7 +340,8 @@ class VimState
     @changeModeClass('command-mode')
 
     @clearOpStack()
-    @editor.clearSelections()
+
+    selection.clear() for selection in @editor.selections
 
     @updateStatusBar()
 
@@ -416,6 +417,7 @@ class VimState
   resetCommandMode: ->
     @clearOpStack()
     @activateCommandMode()
+    @editor.clearSelections()
 
   # Private: A generic way to create a Register prefix based on the event.
   #
