@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.22
+
+* Fixed a stylesheet issue that caused visual glitches when vim-mode
+  was disabled with the Shadow DOM turned on.
+
 ## 0.21
 
 * Fix issue where search panel was not removed properly
