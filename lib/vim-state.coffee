@@ -17,7 +17,6 @@ class VimState
   opStack: null
   mode: null
   submode: null
-  initialSelectedRange: null
 
   constructor: (@editorElement, @statusBarManager, @globalVimState) ->
     @emitter = new Emitter
@@ -390,7 +389,6 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLinesContainingCursors()
-      @initialSelectedRange = @editor.getLastSelection().getBufferRange()
 
     @updateStatusBar()
 
