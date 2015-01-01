@@ -17,7 +17,8 @@ class Replace extends OperatorWithInput
       if @motion?
         if _.contains(@motion.select(1), true)
           @editor.replaceSelectedText null, (text) =>
-            Array(text.length + 1).join(@input.characters)
+            # Replace all non-linebreak characters
+            text.replace(/./g, @input.characters)
           @editor.setCursorBufferPosition(@editor.getLastSelection().getBufferRange().start)
       else
         # Do nothing on an empty line

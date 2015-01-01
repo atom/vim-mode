@@ -65,6 +65,7 @@ class InsertBelowWithNewline extends Insert
 #
 class Change extends Insert
   standalone: false
+  register: '"'
 
   # Public: Changes the text selected by the given motion.
   #
@@ -75,30 +76,19 @@ class Change extends Insert
     # If we've typed, we're being repeated. If we're being repeated,
     # undo transactions are already handled.
     @vimState.setInsertionCheckpoint() unless @typingCompleted
-    operator = new Delete(@editor, @vimState, allowEOL: true, selectOptions: {excludeWhitespace: true})
-    operator.compose(@motion)
 
-    lastRow = @onLastRow()
-    lastRowEmpty = @emptyLastRow()
-    operator.execute(count)
-    if @motion.isLinewise?()
-      if lastRowEmpty or not @onLastRow() or not @emptyLastRow()
-        if lastRow and @motion.selectRows
-          @editor.insertNewlineBelow()
-        else
-          @editor.insertNewlineAbove()
+    if _.contains(@motion.select(count), true)
+      @setTextRegister(@register, @editor.getSelectedText())
+      if @motion.isLinewise?()
+        @editor.insertNewline()
+        @editor.moveLeft()
+      else
+        @editor.delete()
 
     return super if @typingCompleted
 
     @vimState.activateInsertMode(transactionStarted = true)
     @typingCompleted = true
-
-  onLastRow: ->
-    {row, column} = @editor.getCursorBufferPosition()
-    row is @editor.getBuffer().getLastRow()
-
-  emptyLastRow: ->
-    @editor.getBuffer().lineLengthForRow(@editor.getBuffer().getLastRow()) == 0
 
 class Substitute extends Insert
   register: '"'

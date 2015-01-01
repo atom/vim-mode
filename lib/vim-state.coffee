@@ -25,7 +25,6 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
-    @desiredCursorColumn = null
     params = {}
     params.manager = this;
     params.id = 0;
@@ -98,7 +97,7 @@ class VimState
       'move-to-first-character-of-line-up': => new Motions.MoveToFirstCharacterOfLineUp(@editor, @)
       'move-to-first-character-of-line-down': => new Motions.MoveToFirstCharacterOfLineDown(@editor, @)
       'move-to-start-of-file': => new Motions.MoveToStartOfFile(@editor, @)
-      'move-to-line': => new Motions.MoveToLine(@editor, @)
+      'move-to-line': => new Motions.MoveToAbsoluteLine(@editor, @)
       'move-to-top-of-screen': => new Motions.MoveToTopOfScreen(@editor, @)
       'move-to-bottom-of-screen': => new Motions.MoveToBottomOfScreen(@editor, @)
       'move-to-middle-of-screen': => new Motions.MoveToMiddleOfScreen(@editor, @)
@@ -339,7 +338,7 @@ class VimState
     @changeModeClass('command-mode')
 
     @clearOpStack()
-    @editor.clearSelections()
+    selection.clear() for selection in @editor.getSelections()
 
     @updateStatusBar()
 
@@ -389,6 +388,8 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLinesContainingCursors()
+    else
+      @editor.selectRight()
 
     @updateStatusBar()
 
@@ -413,6 +414,7 @@ class VimState
   # Returns nothing.
   resetCommandMode: ->
     @clearOpStack()
+    @editor.clearSelections()
     @activateCommandMode()
 
   # Private: A generic way to create a Register prefix based on the event.

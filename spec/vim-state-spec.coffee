@@ -74,6 +74,14 @@ describe "VimState", ->
         it "clears the operator stack", ->
           expect(vimState.opStack.length).toBe 0
 
+    describe "the escape keybinding", ->
+      it "clears any extra cursors", ->
+        editor.setText("one-two-three")
+        editor.addCursorAtBufferPosition([0, 3])
+        expect(editor.getCursors().length).toBe 2
+        keydown('escape')
+        expect(editor.getCursors().length).toBe 1
+
     describe "the v keybinding", ->
       beforeEach -> keydown('v')
 
@@ -198,7 +206,7 @@ describe "VimState", ->
         keydown('w')
 
       it "execute instead of select", ->
-        expect(editor.getLastSelection().getText()).toEqual '012345'
+        expect(editor.getLastSelection().getText()).toEqual '012345\n\n'
 
     describe "operators", ->
       beforeEach ->
