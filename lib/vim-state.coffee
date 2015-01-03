@@ -328,12 +328,13 @@ class VimState
   # Returns nothing.
   activateCommandMode: ->
     @deactivateInsertMode()
+
+    if @mode in ['insert', 'visual']
+      for cursor in @editor.getCursors()
+        cursor.moveLeft() unless cursor.isAtBeginningOfLine()
+
     @mode = 'command'
     @submode = null
-
-    if @editorElement.classList.contains("insert-mode")
-      cursor = @editor.getLastCursor()
-      cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
     @changeModeClass('command-mode')
 
