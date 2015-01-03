@@ -60,24 +60,21 @@ class SelectInsideQuotes extends TextObject
         else if endLine[end.column] == @char
           -- start.column if @includeQuotes
           ++ end.column if @includeQuotes
-          @editor.expandSelectionsForward (selection) =>
-            selection.cursor.setBufferPosition start
-            selection.selectToBufferPosition end
-          return {select:[true], end:end}
+          return end
         ++ end.column
       end.column = 0
       ++ end.row
-
-    {select:[false], end:end}
+    return
 
   select: ->
-    start = @findOpeningQuote(@editor.getCursorBufferPosition())
-    return [false] unless start?
-
-    ++ start.column  # skip the opening quote
-
-    {select,end} = @findClosingQuote(start)
-    select
+    for selection in @editor.getSelections()
+      start = @findOpeningQuote(selection.cursor.getBufferPosition())
+      if start?
+        ++ start.column # skip the opening quote
+        end = @findClosingQuote(start)
+        if end?
+          selection.setBufferRange([start, end])
+      not selection.isEmpty()
 
 # SelectInsideBrackets and the previous class defined (SelectInsideQuotes) are
 # almost-but-not-quite-repeated code. They are different because of the depth
@@ -113,22 +110,21 @@ class SelectInsideBrackets extends TextObject
             if -- depth < 0
               -- start.column if @includeBrackets
               ++ end.column if @includeBrackets
-              @editor.expandSelectionsForward (selection) =>
-                selection.cursor.setBufferPosition start
-                selection.selectToBufferPosition end
-              return {select:[true], end:end}
+              return end
         ++ end.column
       end.column = 0
       ++ end.row
-
-    {select:[false], end:end}
+    return
 
   select: ->
-    start = @findOpeningBracket(@editor.getCursorBufferPosition())
-    return [false] unless start?
-    ++ start.column  # skip the opening bracket
-    {select,end} = @findClosingBracket(start)
-    select
+    for selection in @editor.getSelections()
+      start = @findOpeningBracket(selection.cursor.getBufferPosition())
+      if start?
+        ++ start.column # skip the opening quote
+        end = @findClosingBracket(start)
+        if end?
+          selection.setBufferRange([start, end])
+      not selection.isEmpty()
 
 class SelectAWord extends TextObject
   select: ->
