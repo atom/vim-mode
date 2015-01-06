@@ -526,6 +526,9 @@ describe "Operators", ->
       it "saves the lines to the default register", ->
         expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
+      it "places the cursor at the beginning of the selection", ->
+        expect(editor.getCursorBufferPositions()).toEqual([[0, 0]])
+
     describe "when followed by a second y ", ->
       beforeEach ->
         keydown('y')

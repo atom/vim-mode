@@ -112,6 +112,7 @@ class Delete extends Operator
           cursor.moveLeft() if cursor.isAtEndOfLine()
 
     @vimState.activateCommandMode()
+
 #
 # It toggles the case of everything selected by the following motion
 #
@@ -156,11 +157,11 @@ class Yank extends Operator
   execute: (count) ->
     originalPositions = @editor.getCursorBufferPositions()
     if _.contains(@motion.select(count), true)
-      selectedPositions = _.pluck(@editor.getSelectedBufferRanges(), "start")
       text = @editor.getSelectedText()
+      startPositions = _.pluck(@editor.getSelectedBufferRanges(), "start")
       newPositions = for originalPosition, i in originalPositions
-        if selectedPositions[i] and not @motion.isLinewise?()
-          Point.min(selectedPositions[i], originalPositions[i])
+        if startPositions[i] and (@vimState.mode is 'visual' or not @motion.isLinewise?())
+          Point.min(startPositions[i], originalPositions[i])
         else
           originalPosition
     else
