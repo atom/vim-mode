@@ -1,5 +1,11 @@
 ## HEAD
 
+## 0.24
+
+* Fixed the position of the cursor after certain yank operations.
+* Fixed an issue where duplicate vim states were created when an editors were
+  moved to different panes.
+
 ## 0.23
 
 * Made motions, operators and text-objects work properly in the
