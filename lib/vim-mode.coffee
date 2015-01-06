@@ -16,6 +16,7 @@ module.exports =
     @disposables = new CompositeDisposable
     globalVimState = new GlobalVimState
     statusBarManager = new StatusBarManager
+    vimStates = new WeakMap
 
     @disposables.add statusBarManager.initialize()
     @disposables.add atom.workspace.observeTextEditors (editor) =>
@@ -23,14 +24,17 @@ module.exports =
 
       element = atom.views.getView(editor)
 
-      vimState = new VimState(
-        element,
-        statusBarManager,
-        globalVimState
-      )
+      if not vimStates.get(editor)
+        vimState = new VimState(
+          element,
+          statusBarManager,
+          globalVimState
+        )
 
-      @disposables.add new Disposable =>
-        vimState.destroy()
+        vimStates.set(editor, vimState)
+
+        @disposables.add new Disposable =>
+          vimState.destroy()
 
   deactivate: ->
     @disposables.dispose()
