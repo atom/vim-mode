@@ -26,6 +26,9 @@ class Prefix
   select: ->
     @composedObject.select?(@count)
 
+  isLinewise: ->
+    @composedObject.isLinewise()
+
 #
 # Used to track the number of times either a motion or operator should
 # be repeated.

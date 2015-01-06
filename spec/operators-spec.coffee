@@ -480,22 +480,22 @@ describe "Operators", ->
         editor.setText "12345\nabcde\nABCDE"
 
       describe "on the beginning of the second line", ->
-        it "deletes the line", ->
+        it "deletes all the text on the line", ->
           editor.setCursorScreenPosition([1,0])
           keydown('c')
           keydown('2')
           keydown('G', shift: true)
           keydown('escape');
-          expect(editor.getText()).toBe("12345\nABCDE")
+          expect(editor.getText()).toBe("12345\n\nABCDE")
 
       describe "on the middle of the second line", ->
-        it "deletes the line", ->
+        it "deletes all the text on the line", ->
           editor.setCursorScreenPosition([1,2])
           keydown('c')
           keydown('2')
           keydown('G', shift: true)
           keydown('escape');
-          expect(editor.getText()).toBe("12345\nABCDE")
+          expect(editor.getText()).toBe("12345\n\nABCDE")
 
   describe "the C keybinding", ->
     beforeEach ->

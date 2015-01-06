@@ -38,10 +38,6 @@ class Operator
     if not motion.select
       throw new OperatorError('Must compose with a motion')
 
-    # Take on the composed object's isLinewise function if this object
-    # doesn't have one.
-    motion.isLinewise ?= motion.composedObject?.isLinewise
-
     @motion = motion
     @complete = true
 
