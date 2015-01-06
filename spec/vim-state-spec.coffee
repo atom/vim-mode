@@ -74,6 +74,14 @@ describe "VimState", ->
         it "clears the operator stack", ->
           expect(vimState.opStack.length).toBe 0
 
+    describe "the escape keybinding", ->
+      it "clears any extra cursors", ->
+        editor.setText("one-two-three")
+        editor.addCursorAtBufferPosition([0, 3])
+        expect(editor.getCursors().length).toBe 2
+        keydown('escape')
+        expect(editor.getCursors().length).toBe 1
+
     describe "the v keybinding", ->
       beforeEach -> keydown('v')
 
@@ -183,22 +191,27 @@ describe "VimState", ->
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
   describe "visual-mode", ->
-    beforeEach -> keydown('v')
+    beforeEach ->
+      editor.setText("one two three")
+      editor.setCursorBufferPosition([0, 0])
+      keydown('v')
+
+    it "selects the character under the cursor", ->
+      expect(editor.getSelectedBufferRanges()).toEqual [[[0, 0], [0, 1]]]
 
     it "puts the editor into command mode when <escape> is pressed", ->
       keydown('escape')
 
+      expect(editor.getCursorBufferPositions()).toEqual [[0, 0]]
       expect(editorElement.classList.contains('command-mode')).toBe(true)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
     describe "motions", ->
       beforeEach ->
-        editor.setText("012345\n\nabcdef")
-        editor.setCursorScreenPosition([0, 0])
         keydown('w')
 
-      it "execute instead of select", ->
-        expect(editor.getLastSelection().getText()).toEqual '012345'
+      it "transforms the selection", ->
+        expect(editor.getLastSelection().getText()).toEqual 'one t'
 
     describe "operators", ->
       beforeEach ->

@@ -102,21 +102,18 @@ class Delete extends Operator
   #
   # Returns nothing.
   execute: (count) ->
-    cursor = @editor.getLastCursor()
-
     if _.contains(@motion.select(count, @selectOptions), true)
       validSelection = true
 
     if validSelection?
       text = @editor.getSelectedText()
       @setTextRegister(@register, text)
-
       @editor.delete()
-      if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
-        @editor.moveLeft()
-
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
+      for cursor in @editor.getCursors()
+        if @motion.isLinewise?()
+          cursor.moveToBeginningOfLine()
+        else
+          cursor.moveLeft() if cursor.isAtEndOfLine()
 
     @vimState.activateCommandMode()
 #
@@ -161,17 +158,22 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count) ->
-    originalPosition = @editor.getCursorScreenPosition()
+    originalPositions = @editor.getCursorBufferPositions()
     if _.contains(@motion.select(count), true)
-      selectedPosition = @editor.getCursorScreenPosition()
-      text = @editor.getLastSelection().getText()
-      originalPosition = Point.min(originalPosition, selectedPosition)
+      selectedPositions = @editor.getCursorBufferPositions()
+      text = @editor.getSelectedText()
+      newPositions = for originalPosition, i in originalPositions
+        if selectedPositions[i] and not @motion.isLinewise?()
+          Point.min(selectedPositions[i], originalPositions[i])
+        else
+          originalPosition
     else
       text = ''
+      newPositions = originalPositions
 
     @setTextRegister(@register, text)
 
-    @editor.setCursorScreenPosition(originalPosition)
+    @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
     @vimState.activateCommandMode()
 
 #

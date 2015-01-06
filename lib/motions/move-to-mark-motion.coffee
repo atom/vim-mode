@@ -4,37 +4,22 @@
 
 module.exports =
 class MoveToMark extends MotionWithInput
+  operatesInclusively: false
+
   constructor: (@editor, @vimState, @linewise=true) ->
     super(@editor, @vimState)
+    @operatesLinewise = @linewise
     @viewModel = new ViewModel(@, class: 'move-to-mark', singleChar: true, hidden: true)
 
   isLinewise: -> @linewise
 
-  execute: ->
+  moveCursor: (cursor, count=1) ->
     markPosition = @vimState.getMark(@input.characters)
 
-    if @input.characters == '`' # double '`' pressed
+    if @input.characters is '`' # double '`' pressed
       markPosition ?= [0, 0] # if markPosition not set, go to the beginning of the file
-      @vimState.setMark('`', @editor.getCursorBufferPosition())
+      @vimState.setMark('`', cursor.getBufferPosition())
 
-    @editor.setCursorBufferPosition(markPosition) if markPosition?
+    cursor.setBufferPosition(markPosition) if markPosition?
     if @linewise
-      new MoveToFirstCharacterOfLine(@editor, @vimState).execute()
-
-  select: (count=1, {requireEOL}={}) ->
-    markPosition = @vimState.getMark(@input.characters)
-    return [false] unless markPosition?
-    currentPosition = @editor.getCursorBufferPosition()
-    selectionRange = null
-    if currentPosition.isGreaterThan(markPosition)
-      if @linewise
-        currentPosition = @editor.clipBufferPosition([currentPosition.row, Infinity])
-        markPosition = new Point(markPosition.row, 0)
-      selectionRange = new Range(markPosition, currentPosition)
-    else
-      if @linewise
-        markPosition = @editor.clipBufferPosition([markPosition.row, Infinity])
-        currentPosition = new Point(currentPosition.row, 0)
-      selectionRange = new Range(currentPosition, markPosition)
-    @editor.setSelectedBufferRange(selectionRange, requireEOL: requireEOL)
-    [true]
+      cursor.moveToFirstCharacterOfLine()
