@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.23
+
+* Made motions, operators and text-objects work properly in the
+  presence of multiple cursors.
+
 ## 0.22
 
 * Fixed a stylesheet issue that caused visual glitches when vim-mode
