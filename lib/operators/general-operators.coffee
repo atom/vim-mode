@@ -156,7 +156,7 @@ class Yank extends Operator
   execute: (count) ->
     originalPositions = @editor.getCursorBufferPositions()
     if _.contains(@motion.select(count), true)
-      selectedPositions = @editor.getCursorBufferPositions()
+      selectedPositions = _.pluck(@editor.getSelectedBufferRanges(), "start")
       text = @editor.getSelectedText()
       newPositions = for originalPosition, i in originalPositions
         if selectedPositions[i] and not @motion.isLinewise?()

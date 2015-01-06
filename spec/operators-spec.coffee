@@ -559,7 +559,7 @@ describe "Operators", ->
       it "saves the line to the a register", ->
         expect(vimState.getRegister('a').text).toBe "012 345\n"
 
-    describe "with a motion", ->
+    describe "with a forward motion", ->
       beforeEach ->
         keydown('y')
         keydown('e')
@@ -569,6 +569,14 @@ describe "Operators", ->
 
       it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    describe "with a text object", ->
+      it "moves the cursor to the beginning of the text object", ->
+        editor.setCursorBufferPosition([0, 5])
+        keydown("y")
+        keydown("i")
+        keydown("w")
+        expect(editor.getCursorBufferPositions()).toEqual([[0, 4]])
 
     describe "with a left motion", ->
       beforeEach ->
