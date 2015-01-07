@@ -1,5 +1,8 @@
 ## HEAD
 
+* Fixed a regression in the handling of the 'cw' command
+* Made the replace operator work with multiple cursors
+
 ## 0.24
 
 * Fixed the position of the cursor after certain yank operations.
