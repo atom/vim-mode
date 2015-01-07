@@ -43,14 +43,6 @@ class Operator
 
   canComposeWith: (operation) -> operation.select?
 
-  # Protected: Wraps the function within an single undo step.
-  #
-  # fn - The function to wrap.
-  #
-  # Returns nothing.
-  undoTransaction: (fn) ->
-    @editor.getBuffer().transact(fn)
-
   # Public: Preps text and sets the text register
   #
   # Returns nothing
@@ -117,8 +109,8 @@ class Delete extends Operator
 # It toggles the case of everything selected by the following motion
 #
 class ToggleCase extends Operator
-
-  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @complete = true
 
   execute: (count=1) ->
     pos = @editor.getCursorBufferPosition()
@@ -128,7 +120,7 @@ class ToggleCase extends Operator
     # Do nothing on an empty line
     return if @editor.getBuffer().isRowBlank(pos.row)
 
-    @undoTransaction =>
+    @editor.transact =>
       _.times count, =>
         point = @editor.getCursorBufferPosition()
         range = Range.fromPointWithDelta(point, 0, 1)
@@ -185,7 +177,7 @@ class Join extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
-    @undoTransaction =>
+    @editor.transact =>
       _.times count, =>
         @editor.joinLines()
     @vimState.activateCommandMode()
@@ -199,7 +191,7 @@ class Repeat extends Operator
   isRecordable: -> false
 
   execute: (count=1) ->
-    @undoTransaction =>
+    @editor.transact =>
       _.times count, =>
         cmd = @vimState.history[0]
         cmd?.execute()

@@ -13,7 +13,7 @@ class Replace extends OperatorWithInput
     pos = @editor.getCursorBufferPosition()
     currentRowLength = @editor.lineTextForBufferRow(pos.row).length
 
-    @undoTransaction =>
+    @editor.transact =>
       if @motion?
         if _.contains(@motion.select(1), true)
           @editor.replaceSelectedText null, (text) =>
