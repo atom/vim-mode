@@ -1157,23 +1157,24 @@ describe "Operators", ->
     beforeEach ->
       editor.setText("12\n34\n\n")
       editor.setCursorBufferPosition([0,0])
+      editor.addCursorAtBufferPosition([1, 0])
 
     it "replaces a single character", ->
       keydown('r')
       commandModeInputKeydown('x')
-      expect(editor.getText()).toBe 'x2\n34\n\n'
+      expect(editor.getText()).toBe 'x2\nx4\n\n'
 
     it "replaces a single character with a line break", ->
       keydown('r')
       editor.commandModeInputView.editor.trigger 'core:confirm'
-      expect(editor.getText()).toBe '\n2\n34\n\n'
-      expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+      expect(editor.getText()).toBe '\n2\n\n4\n\n'
+      expect(editor.getCursorBufferPositions()).toEqual [[1, 0], [3, 0]]
 
     it "composes properly with motions", ->
       keydown('2')
       keydown('r')
       commandModeInputKeydown('x')
-      expect(editor.getText()).toBe 'xx\n34\n\n'
+      expect(editor.getText()).toBe 'xx\nxx\n\n'
 
     it "does nothing on an empty line", ->
       editor.setCursorBufferPosition([2, 0])
@@ -1190,17 +1191,17 @@ describe "Operators", ->
     describe "when in visual mode", ->
       beforeEach ->
         keydown('v')
-        keydown('$')
+        keydown('e')
 
       it "replaces the entire selection with the given character", ->
         keydown('r')
         commandModeInputKeydown('x')
-        expect(editor.getText()).toBe 'xx\n34\n\n'
+        expect(editor.getText()).toBe 'xx\nxx\n\n'
 
       it "leaves the cursor at the beginning of the selection", ->
         keydown('r')
         commandModeInputKeydown('x')
-        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+        expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
 
   describe 'the m keybinding', ->
     beforeEach ->
