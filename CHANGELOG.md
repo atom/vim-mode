@@ -1,5 +1,7 @@
 ## HEAD
 
+## 0.25
+
 * Fixed a regression in the handling of the 'cw' command
 * Made the replace operator work with multiple cursors
 
