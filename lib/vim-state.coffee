@@ -328,10 +328,7 @@ class VimState
   # Returns nothing.
   activateCommandMode: ->
     @deactivateInsertMode()
-
-    if @mode in ['insert', 'visual']
-      for cursor in @editor.getCursors()
-        cursor.moveLeft() unless cursor.isAtBeginningOfLine()
+    @deactivateVisualMode()
 
     @mode = 'command'
     @submode = null
@@ -358,14 +355,21 @@ class VimState
     @insertionCheckpoint = @editor.createCheckpoint() unless @insertionCheckpoint?
 
   deactivateInsertMode: ->
+    return unless @mode in [null, 'insert']
     @editorElement.component.setInputEnabled(false)
-    return unless @mode == 'insert'
     @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
     @insertionCheckpoint = null
     transaction = _.last(@editor.buffer.history.undoStack)
     item = @inputOperator(@history[0])
     if item? and transaction?
       item.confirmTransaction(transaction)
+    for cursor in @editor.getCursors()
+      cursor.moveLeft() unless cursor.isAtBeginningOfLine()
+
+  deactivateVisualMode: ->
+    return unless @mode is 'visual'
+    for selection in @editor.getSelections()
+      selection.cursor.moveLeft() unless selection.isEmpty()
 
   # Private: Get the input operator that needs to be told about about the
   # typed undo transaction in a recently completed operation, if there
@@ -374,7 +378,6 @@ class VimState
     return item unless item?
     return item if item.inputOperator?()
     return item.composedObject if item.composedObject?.inputOperator?()
-
 
   # Private: Used to enable visual mode.
   #
