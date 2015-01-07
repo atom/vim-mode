@@ -17,11 +17,11 @@ class Motion
   select: (count, options) ->
     value = for selection in @editor.getSelections()
       if @isLinewise()
-        @moveSelectionLinewise(selection, count)
+        @moveSelectionLinewise(selection, count, options)
       else if @isInclusive()
-        @moveSelectionInclusively(selection, count)
+        @moveSelectionInclusively(selection, count, options)
       else
-        @moveSelection(selection, count)
+        @moveSelection(selection, count, options)
       not selection.isEmpty()
 
     @editor.mergeCursors()
@@ -33,7 +33,7 @@ class Motion
       @moveCursor(cursor, count)
     @editor.mergeCursors()
 
-  moveSelectionLinewise: (selection, count) ->
+  moveSelectionLinewise: (selection, count, options) ->
     selection.modifySelection =>
       [oldStartRow, oldEndRow] = selection.getBufferRowRange()
 
@@ -42,7 +42,7 @@ class Motion
       unless wasEmpty or wasReversed
         selection.cursor.moveLeft()
 
-      @moveCursor(selection.cursor, count)
+      @moveCursor(selection.cursor, count, options)
 
       isEmpty = selection.isEmpty()
       isReversed = selection.isReversed()
@@ -58,7 +58,7 @@ class Motion
 
       selection.setBufferRange([[newStartRow, 0], [newEndRow + 1, 0]])
 
-  moveSelectionInclusively: (selection, count) ->
+  moveSelectionInclusively: (selection, count, options) ->
     selection.modifySelection =>
       range = selection.getBufferRange()
       [oldStart, oldEnd] = [range.start, range.end]
@@ -68,7 +68,7 @@ class Motion
       unless wasEmpty or wasReversed
         selection.cursor.moveLeft()
 
-      @moveCursor(selection.cursor, count)
+      @moveCursor(selection.cursor, count, options)
 
       isEmpty = selection.isEmpty()
       isReversed = selection.isReversed()
@@ -83,8 +83,8 @@ class Motion
       if wasReversed and not isReversed
         selection.setBufferRange([[newStart.row, oldEnd.column - 1], newEnd])
 
-  moveSelection: (selection, count) ->
-    selection.modifySelection => @moveCursor(selection.cursor, count)
+  moveSelection: (selection, count, options) ->
+    selection.modifySelection => @moveCursor(selection.cursor, count, options)
 
   ensureCursorIsWithinLine: (cursor) ->
     return if @vimState.mode is 'visual' or not cursor.selection.isEmpty()
@@ -198,10 +198,14 @@ class MoveToNextWord extends Motion
   wordRegex: null
   operatesInclusively: false
 
-  moveCursor: (cursor, count=1) ->
+  moveCursor: (cursor, count=1, options) ->
     _.times count, =>
       current = cursor.getBufferPosition()
-      next = cursor.getBeginningOfNextWordBufferPosition(wordRegex: @wordRegex)
+
+      next = if options?.excludeWhitespace
+        cursor.getEndOfCurrentWordBufferPosition(wordRegex: @wordRegex)
+      else
+        cursor.getBeginningOfNextWordBufferPosition(wordRegex: @wordRegex)
 
       return if @isEndOfFile(cursor)
 

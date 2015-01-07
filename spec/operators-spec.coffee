@@ -454,6 +454,17 @@ describe "Operators", ->
         keydown('r', ctrl: true)
         expect(editor.getText()).toBe "12345\nfg\nABCDE"
 
+    describe "when followed by a w", ->
+      it "changes the word", ->
+        editor.setText("word1 word2 word3")
+        editor.setCursorBufferPosition([0, "word1 w".length])
+
+        keydown("c")
+        keydown("w")
+        keydown("escape")
+
+        expect(editor.getText()).toBe "word1 w word3"
+
     describe "when followed by a G", ->
       beforeEach ->
         originalText = "12345\nabcde\nABCDE"
