@@ -232,6 +232,33 @@ describe "VimState", ->
       it "operate on the current selection", ->
         expect(editor.getLastSelection().getText()).toEqual ''
 
+    describe "the o keybinding", ->
+      it "reversed each selection", ->
+        editor.addCursorAtBufferPosition([0, Infinity])
+        keydown("v")
+        keydown("i")
+        keydown("w")
+
+        expect(editor.getSelectedBufferRanges()).toEqual([
+          [[0, 0], [0, 3]],
+          [[0, 8], [0, 13]]
+        ])
+        expect(editor.getCursorBufferPositions()).toEqual([
+          [0, 3]
+          [0, 13]
+        ])
+
+        keydown("o")
+
+        expect(editor.getSelectedBufferRanges()).toEqual([
+          [[0, 0], [0, 3]],
+          [[0, 8], [0, 13]]
+        ])
+        expect(editor.getCursorBufferPositions()).toEqual([
+          [0, 0]
+          [0, 8]
+        ])
+
   describe "marks", ->
     beforeEach ->  editor.setText("text in line 1\ntext in line 2\ntext in line 3")
 

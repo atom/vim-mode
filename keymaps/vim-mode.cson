@@ -223,3 +223,4 @@
 '.editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'
   's': 'vim-mode:change'
+  'o': 'vim-mode:reverse-selections'

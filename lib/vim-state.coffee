@@ -54,6 +54,7 @@ class VimState
       'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
       'reset-command-mode': => @resetCommandMode()
       'repeat-prefix': (e) => @repeatPrefix(e)
+      'reverse-selections': (e) => @reverseSelections(e)
 
     @registerOperationCommands
       'activate-insert-mode': => new Operators.Insert(@editor, @)
@@ -446,6 +447,11 @@ class VimState
         e.abortKeyBinding()
       else
         @pushOperations(new Prefixes.Repeat(num))
+
+  reverseSelections: ->
+    for selection in @editor.getSelections()
+      reversed = not selection.isReversed()
+      selection.setBufferRange(selection.getBufferRange(), {reversed})
 
   # Private: Figure out whether or not we are in a repeat sequence or we just
   # want to move to the beginning of the line. If we are within a repeat

@@ -91,9 +91,6 @@ class Delete extends Operator
   # Returns nothing.
   execute: (count) ->
     if _.contains(@motion.select(count, @selectOptions), true)
-      validSelection = true
-
-    if validSelection?
       text = @editor.getSelectedText()
       @setTextRegister(@register, text)
       @editor.delete()
