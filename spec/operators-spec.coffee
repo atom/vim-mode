@@ -136,7 +136,6 @@ describe "Operators", ->
       beforeEach ->
         keydown('v')
         editor.selectRight()
-        editor.selectRight()
         keydown('s')
 
       it "deletes the selected characters and enters insert mode", ->
@@ -205,8 +204,8 @@ describe "Operators", ->
         keydown('d')
         keydown('d')
 
-        expect(editor.getText()).toBe "12345\nabcde"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+        expect(editor.getText()).toBe "12345\nabcde\n"
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
     describe "undo behavior", ->
       beforeEach ->
@@ -230,8 +229,11 @@ describe "Operators", ->
         keydown('d')
         keydown('w')
 
-        expect(editor.getText()).toBe "abcd \nabc"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+        # Incompatibility with VIM. In vim, `w` behaves differently as an
+        # operator than as a motion; it stops at the end of a line.expect(editor.getText()).toBe "abcd abc"
+        expect(editor.getText()).toBe "abcd abc"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
         expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
         expect(editorElement.classList.contains('command-mode')).toBe(true)
 
@@ -363,6 +365,23 @@ describe "Operators", ->
           keydown('G', shift: true)
           expect(editor.getText()).toBe("12345\nABCDE")
 
+    describe "with multiple cursors", ->
+      it "deletes each selection", ->
+        editor.setText("abcd\n1234\nABCD")
+        editor.setCursorBufferPosition([0, 1])
+        editor.addCursorAtBufferPosition([1, 2])
+        editor.addCursorAtBufferPosition([2, 3])
+
+        keydown('d')
+        keydown('e')
+
+        expect(editor.getText()).toBe "a\n12\nABC"
+        expect(editor.getCursorBufferPositions()).toEqual [
+          [0, 0],
+          [1, 1],
+          [2, 2],
+        ]
+
   describe "the D keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("012\n")
@@ -395,7 +414,7 @@ describe "Operators", ->
           keydown('c')
           keydown('c')
 
-          expect(editor.getText()).toBe "12345\nabcde\n"
+          expect(editor.getText()).toBe "12345\nabcde\n\n"
           expect(editor.getCursorScreenPosition()).toEqual [2, 0]
           expect(editorElement.classList.contains('command-mode')).toBe(false)
           expect(editorElement.classList.contains('insert-mode')).toBe(true)
@@ -408,7 +427,7 @@ describe "Operators", ->
           keydown('c')
           keydown('c')
 
-          expect(editor.getText()).toBe ""
+          expect(editor.getText()).toBe "\n"
           expect(editor.getCursorScreenPosition()).toEqual [0, 0]
           expect(editorElement.classList.contains('command-mode')).toBe(false)
           expect(editorElement.classList.contains('insert-mode')).toBe(true)
@@ -435,6 +454,17 @@ describe "Operators", ->
         keydown('r', ctrl: true)
         expect(editor.getText()).toBe "12345\nfg\nABCDE"
 
+    describe "when followed by a w", ->
+      it "changes the word", ->
+        editor.setText("word1 word2 word3")
+        editor.setCursorBufferPosition([0, "word1 w".length])
+
+        keydown("c")
+        keydown("w")
+        keydown("escape")
+
+        expect(editor.getText()).toBe "word1 w word3"
+
     describe "when followed by a G", ->
       beforeEach ->
         originalText = "12345\nabcde\nABCDE"
@@ -446,7 +476,7 @@ describe "Operators", ->
           keydown('c')
           keydown('G', shift: true)
           keydown('escape');
-          expect(editor.getText()).toBe("12345\n");
+          expect(editor.getText()).toBe("12345\n\n");
 
       describe "on the middle of the second line", ->
         it "deletes the bottom two lines", ->
@@ -454,15 +484,14 @@ describe "Operators", ->
           keydown('c')
           keydown('G', shift: true)
           keydown('escape');
-          expect(editor.getText()).toBe("12345\n");
+          expect(editor.getText()).toBe("12345\n\n");
 
     describe "when followed by a goto line G", ->
       beforeEach ->
-        originalText = "12345\nabcde\nABCDE"
-        editor.setText(originalText)
+        editor.setText "12345\nabcde\nABCDE"
 
       describe "on the beginning of the second line", ->
-        it "deletes the bottom two lines", ->
+        it "deletes all the text on the line", ->
           editor.setCursorScreenPosition([1,0])
           keydown('c')
           keydown('2')
@@ -471,7 +500,7 @@ describe "Operators", ->
           expect(editor.getText()).toBe("12345\n\nABCDE")
 
       describe "on the middle of the second line", ->
-        it "deletes the bottom two lines", ->
+        it "deletes all the text on the line", ->
           editor.setCursorScreenPosition([1,2])
           keydown('c')
           keydown('2')
@@ -508,6 +537,9 @@ describe "Operators", ->
       it "saves the lines to the default register", ->
         expect(vimState.getRegister('"').text).toBe "012 345\nabc\n"
 
+      it "places the cursor at the beginning of the selection", ->
+        expect(editor.getCursorBufferPositions()).toEqual([[0, 0]])
+
     describe "when followed by a second y ", ->
       beforeEach ->
         keydown('y')
@@ -541,16 +573,24 @@ describe "Operators", ->
       it "saves the line to the a register", ->
         expect(vimState.getRegister('a').text).toBe "012 345\n"
 
-    describe "with a motion", ->
+    describe "with a forward motion", ->
       beforeEach ->
         keydown('y')
-        keydown('w')
+        keydown('e')
 
-      it "saves the first word to the default register", ->
+      it "saves the selected text to the default register", ->
         expect(vimState.getRegister('"').text).toBe '345'
 
       it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    describe "with a text object", ->
+      it "moves the cursor to the beginning of the text object", ->
+        editor.setCursorBufferPosition([0, 5])
+        keydown("y")
+        keydown("i")
+        keydown("w")
+        expect(editor.getCursorBufferPositions()).toEqual([[0, 4]])
 
     describe "with a left motion", ->
       beforeEach ->
@@ -617,6 +657,18 @@ describe "Operators", ->
           keydown('G', shift: true)
           keydown('P', shift: true)
           expect(editor.getText()).toBe("12345\nabcde\nabcde\nABCDE")
+
+    describe "with multiple cursors", ->
+      it "moves each cursor and copies the last selection's text", ->
+        editor.setText "  abcd\n  1234"
+        editor.setCursorBufferPosition([0, 0])
+        editor.addCursorAtBufferPosition([1, 5])
+
+        keydown("y")
+        keydown("^")
+
+        expect(vimState.getRegister('"').text).toBe '123'
+        expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 2]]
 
   describe "the yy keybinding", ->
     describe "on a single line file", ->
@@ -1116,23 +1168,24 @@ describe "Operators", ->
     beforeEach ->
       editor.setText("12\n34\n\n")
       editor.setCursorBufferPosition([0,0])
+      editor.addCursorAtBufferPosition([1, 0])
 
     it "replaces a single character", ->
       keydown('r')
       commandModeInputKeydown('x')
-      expect(editor.getText()).toBe 'x2\n34\n\n'
+      expect(editor.getText()).toBe 'x2\nx4\n\n'
 
     it "replaces a single character with a line break", ->
       keydown('r')
       editor.commandModeInputView.editor.trigger 'core:confirm'
-      expect(editor.getText()).toBe '\n2\n34\n\n'
-      expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+      expect(editor.getText()).toBe '\n2\n\n4\n\n'
+      expect(editor.getCursorBufferPositions()).toEqual [[1, 0], [3, 0]]
 
     it "composes properly with motions", ->
       keydown('2')
       keydown('r')
       commandModeInputKeydown('x')
-      expect(editor.getText()).toBe 'xx\n34\n\n'
+      expect(editor.getText()).toBe 'xx\nxx\n\n'
 
     it "does nothing on an empty line", ->
       editor.setCursorBufferPosition([2, 0])
@@ -1149,17 +1202,17 @@ describe "Operators", ->
     describe "when in visual mode", ->
       beforeEach ->
         keydown('v')
-        keydown('$')
+        keydown('e')
 
       it "replaces the entire selection with the given character", ->
         keydown('r')
         commandModeInputKeydown('x')
-        expect(editor.getText()).toBe 'xx\n34\n\n'
+        expect(editor.getText()).toBe 'xx\nxx\n\n'
 
       it "leaves the cursor at the beginning of the selection", ->
         keydown('r')
         commandModeInputKeydown('x')
-        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+        expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
 
   describe 'the m keybinding', ->
     beforeEach ->

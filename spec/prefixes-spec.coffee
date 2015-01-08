@@ -59,7 +59,7 @@ describe "Prefixes", ->
         keydown("2")
         keydown("w")
 
-        expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+        expect(editor.getCursorScreenPosition()).toEqual [0, 9]
 
   describe "Register", ->
     describe "the a register", ->

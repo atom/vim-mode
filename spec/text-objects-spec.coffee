@@ -46,6 +46,16 @@ describe "TextObjects", ->
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 11]]
 
+    it "works with multiple cursors", ->
+      editor.addCursorAtBufferPosition([0, 1])
+      keydown("v")
+      keydown("i")
+      keydown("w")
+      expect(editor.getSelectedBufferRanges()).toEqual [
+        [[0, 6], [0, 11]]
+        [[0, 0], [0, 5]]
+      ]
+
   describe "the 'i(' text object", ->
     beforeEach ->
       editor.setText("( something in here and in (here) )")
@@ -70,6 +80,20 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('command-mode')).toBe(true)
 
+    it "works with multiple cursors", ->
+      editor.setText("( a b ) cde ( f g h ) ijk")
+      editor.setCursorBufferPosition([0, 2])
+      editor.addCursorAtBufferPosition([0, 18])
+
+      keydown("v")
+      keydown("i")
+      keydown("(")
+
+      expect(editor.getSelectedBufferRanges()).toEqual [
+        [[0, 1],  [0, 6]]
+        [[0, 13], [0, 20]]
+      ]
+
   describe "the 'i{' text object", ->
     beforeEach ->
       editor.setText("{ something in here and in {here} }")
@@ -93,7 +117,6 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 28]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('command-mode')).toBe(true)
-
 
   describe "the 'i<' text object", ->
     beforeEach ->

@@ -1,7 +1,7 @@
 {Workspace} = require 'atom'
 
 describe "VimMode", ->
-  editorElement = null
+  [editor, editorElement] = []
 
   beforeEach ->
     atom.workspace = new Workspace
@@ -13,12 +13,25 @@ describe "VimMode", ->
       atom.packages.activatePackage('vim-mode')
 
     runs ->
-      editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
+      editor = atom.workspace.getActiveTextEditor()
+      editorElement = atom.views.getView(editor)
 
   describe ".activate", ->
     it "puts the editor in command-mode initially by default", ->
       expect(editorElement.classList.contains('vim-mode')).toBe(true)
       expect(editorElement.classList.contains('command-mode')).toBe(true)
+
+    it "doesn't register duplicate command listeners for editors", ->
+      editor.setText("12345")
+      editor.setCursorBufferPosition([0, 0])
+
+      pane = atom.workspace.getActivePane()
+      newPane = pane.splitRight()
+      pane.removeItem(editor)
+      newPane.addItem(editor)
+
+      atom.commands.dispatch(editorElement, "vim-mode:move-right")
+      expect(editor.getCursorBufferPosition()).toEqual([0, 1])
 
   describe ".deactivate", ->
     it "removes the vim classes from the editor", ->

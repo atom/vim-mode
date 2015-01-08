@@ -38,22 +38,10 @@ class Operator
     if not motion.select
       throw new OperatorError('Must compose with a motion')
 
-    # Take on the composed object's isLinewise function if this object
-    # doesn't have one.
-    motion.isLinewise ?= motion.composedObject?.isLinewise
-
     @motion = motion
     @complete = true
 
   canComposeWith: (operation) -> operation.select?
-
-  # Protected: Wraps the function within an single undo step.
-  #
-  # fn - The function to wrap.
-  #
-  # Returns nothing.
-  undoTransaction: (fn) ->
-    @editor.getBuffer().transact(fn)
 
   # Public: Preps text and sets the text register
   #
@@ -102,29 +90,27 @@ class Delete extends Operator
   #
   # Returns nothing.
   execute: (count) ->
-    cursor = @editor.getLastCursor()
-
     if _.contains(@motion.select(count, @selectOptions), true)
       validSelection = true
 
     if validSelection?
       text = @editor.getSelectedText()
       @setTextRegister(@register, text)
-
       @editor.delete()
-      if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
-        @editor.moveLeft()
-
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
+      for cursor in @editor.getCursors()
+        if @motion.isLinewise?()
+          cursor.moveToBeginningOfLine()
+        else
+          cursor.moveLeft() if cursor.isAtEndOfLine()
 
     @vimState.activateCommandMode()
+
 #
 # It toggles the case of everything selected by the following motion
 #
 class ToggleCase extends Operator
-
-  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @complete = true
 
   execute: (count=1) ->
     pos = @editor.getCursorBufferPosition()
@@ -134,7 +120,7 @@ class ToggleCase extends Operator
     # Do nothing on an empty line
     return if @editor.getBuffer().isRowBlank(pos.row)
 
-    @undoTransaction =>
+    @editor.transact =>
       _.times count, =>
         point = @editor.getCursorBufferPosition()
         range = Range.fromPointWithDelta(point, 0, 1)
@@ -161,17 +147,22 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count) ->
-    originalPosition = @editor.getCursorScreenPosition()
+    originalPositions = @editor.getCursorBufferPositions()
     if _.contains(@motion.select(count), true)
-      selectedPosition = @editor.getCursorScreenPosition()
-      text = @editor.getLastSelection().getText()
-      originalPosition = Point.min(originalPosition, selectedPosition)
+      text = @editor.getSelectedText()
+      startPositions = _.pluck(@editor.getSelectedBufferRanges(), "start")
+      newPositions = for originalPosition, i in originalPositions
+        if startPositions[i] and (@vimState.mode is 'visual' or not @motion.isLinewise?())
+          Point.min(startPositions[i], originalPositions[i])
+        else
+          originalPosition
     else
       text = ''
+      newPositions = originalPositions
 
     @setTextRegister(@register, text)
 
-    @editor.setCursorScreenPosition(originalPosition)
+    @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
     @vimState.activateCommandMode()
 
 #
@@ -186,7 +177,7 @@ class Join extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
-    @undoTransaction =>
+    @editor.transact =>
       _.times count, =>
         @editor.joinLines()
     @vimState.activateCommandMode()
@@ -200,7 +191,7 @@ class Repeat extends Operator
   isRecordable: -> false
 
   execute: (count=1) ->
-    @undoTransaction =>
+    @editor.transact =>
       _.times count, =>
         cmd = @vimState.history[0]
         cmd?.execute()

@@ -17,7 +17,6 @@ class VimState
   opStack: null
   mode: null
   submode: null
-  initialSelectedRange: null
 
   constructor: (@editorElement, @statusBarManager, @globalVimState) ->
     @emitter = new Emitter
@@ -26,7 +25,6 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
-    @desiredCursorColumn = null
     params = {}
     params.manager = this;
     params.id = 0;
@@ -100,7 +98,7 @@ class VimState
       'move-to-first-character-of-line-up': => new Motions.MoveToFirstCharacterOfLineUp(@editor, @)
       'move-to-first-character-of-line-down': => new Motions.MoveToFirstCharacterOfLineDown(@editor, @)
       'move-to-start-of-file': => new Motions.MoveToStartOfFile(@editor, @)
-      'move-to-line': => new Motions.MoveToLine(@editor, @)
+      'move-to-line': => new Motions.MoveToAbsoluteLine(@editor, @)
       'move-to-top-of-screen': => new Motions.MoveToTopOfScreen(@editor, @)
       'move-to-bottom-of-screen': => new Motions.MoveToBottomOfScreen(@editor, @)
       'move-to-middle-of-screen': => new Motions.MoveToMiddleOfScreen(@editor, @)
@@ -331,17 +329,15 @@ class VimState
   # Returns nothing.
   activateCommandMode: ->
     @deactivateInsertMode()
+    @deactivateVisualMode()
+
     @mode = 'command'
     @submode = null
-
-    if @editorElement.classList.contains("insert-mode")
-      cursor = @editor.getLastCursor()
-      cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
     @changeModeClass('command-mode')
 
     @clearOpStack()
-    @editor.clearSelections()
+    selection.clear() for selection in @editor.getSelections()
 
     @updateStatusBar()
 
@@ -360,14 +356,21 @@ class VimState
     @insertionCheckpoint = @editor.createCheckpoint() unless @insertionCheckpoint?
 
   deactivateInsertMode: ->
+    return unless @mode in [null, 'insert']
     @editorElement.component.setInputEnabled(false)
-    return unless @mode == 'insert'
     @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
     @insertionCheckpoint = null
     transaction = _.last(@editor.buffer.history.undoStack)
     item = @inputOperator(@history[0])
     if item? and transaction?
       item.confirmTransaction(transaction)
+    for cursor in @editor.getCursors()
+      cursor.moveLeft() unless cursor.isAtBeginningOfLine()
+
+  deactivateVisualMode: ->
+    return unless @mode is 'visual'
+    for selection in @editor.getSelections()
+      selection.cursor.moveLeft() unless selection.isEmpty()
 
   # Private: Get the input operator that needs to be told about about the
   # typed undo transaction in a recently completed operation, if there
@@ -376,7 +379,6 @@ class VimState
     return item unless item?
     return item if item.inputOperator?()
     return item.composedObject if item.composedObject?.inputOperator?()
-
 
   # Private: Used to enable visual mode.
   #
@@ -391,7 +393,8 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLinesContainingCursors()
-      @initialSelectedRange = @editor.getLastSelection().getBufferRange()
+    else
+      @editor.selectRight()
 
     @updateStatusBar()
 
@@ -416,6 +419,7 @@ class VimState
   # Returns nothing.
   resetCommandMode: ->
     @clearOpStack()
+    @editor.clearSelections()
     @activateCommandMode()
 
   # Private: A generic way to create a Register prefix based on the event.
