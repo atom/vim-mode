@@ -1,5 +1,11 @@
 ## HEAD
 
+## 0.26
+
+* Add o mapping in visual mode, for reversing selections
+* Implement toggle-case in visual mode
+* Fix bug in 'around word' text object
+
 ## 0.25
 
 * Fixed a regression in the handling of the 'cw' command
