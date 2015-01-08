@@ -1,3 +1,6 @@
+{Range} = require 'atom'
+AllWhitespace = /^\s$/
+
 class TextObject
   constructor: (@editor, @state) ->
 
@@ -128,8 +131,13 @@ class SelectInsideBrackets extends TextObject
 
 class SelectAWord extends TextObject
   select: ->
-    @editor.selectWordsContainingCursors()
-    @editor.selectToBeginningOfNextWord()
-    [true]
+    for selection in @editor.getSelections()
+      selection.selectWord()
+      loop
+        endPoint = selection.getBufferRange().end
+        char = @editor.getTextInRange(Range.fromPointWithDelta(endPoint, 0, 1))
+        break unless AllWhitespace.test(char)
+        selection.selectRight()
+      true
 
 module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets, SelectAWord}
