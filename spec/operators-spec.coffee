@@ -1249,6 +1249,12 @@ describe "Operators", ->
       expect(editor.getText()).toBe 'AbC'
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+    describe "in visual mode", ->
+      it "toggles the case of the selected text", ->
+        keydown("V", shift: true)
+        keydown("~")
+        expect(editor.getText()).toBe 'AbC'
+
   describe "the i keybinding", ->
     beforeEach ->
       editor.setText('')

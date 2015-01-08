@@ -78,6 +78,8 @@
   'P': 'vim-mode:put-before'
   'p': 'vim-mode:put-after'
 
+  '~': 'vim-mode:toggle-case'
+
   'ctrl-w ctrl-h': 'vim-mode:focus-pane-view-on-left'
   'ctrl-w h': 'vim-mode:focus-pane-view-on-left'
   'ctrl-w left': 'window:focus-pane-on-left'
@@ -150,7 +152,6 @@
   'A': 'vim-mode:insert-after-end-of-line'
   'x': 'vim-mode:delete-right'
   'X': 'vim-mode:delete-left'
-  '~': 'vim-mode:toggle-case'
   's': 'vim-mode:substitute'
   '.': 'vim-mode:repeat'
 

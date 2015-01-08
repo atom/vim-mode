@@ -113,26 +113,36 @@ class ToggleCase extends Operator
     @complete = true
 
   execute: (count=1) ->
-    pos = @editor.getCursorBufferPosition()
-    lastCharIndex = @editor.lineTextForBufferRow(pos.row).length - 1
-    count = Math.min count, @editor.lineTextForBufferRow(pos.row).length - pos.column
+    if @vimState.mode is 'visual'
+      @editor.replaceSelectedText {}, (text) ->
+        text.split('').map((char) ->
+          lower = char.toLowerCase()
+          if char is lower
+            char.toUpperCase()
+          else
+            lower
+        ).join('')
+    else
+      pos = @editor.getCursorBufferPosition()
+      lastCharIndex = @editor.lineTextForBufferRow(pos.row).length - 1
+      count = Math.min count, @editor.lineTextForBufferRow(pos.row).length - pos.column
 
-    # Do nothing on an empty line
-    return if @editor.getBuffer().isRowBlank(pos.row)
+      # Do nothing on an empty line
+      return if @editor.getBuffer().isRowBlank(pos.row)
 
-    @editor.transact =>
-      _.times count, =>
-        point = @editor.getCursorBufferPosition()
-        range = Range.fromPointWithDelta(point, 0, 1)
-        char = @editor.getTextInBufferRange(range)
+      @editor.transact =>
+        _.times count, =>
+          point = @editor.getCursorBufferPosition()
+          range = Range.fromPointWithDelta(point, 0, 1)
+          char = @editor.getTextInBufferRange(range)
 
-        if char is char.toLowerCase()
-          @editor.setTextInBufferRange(range, char.toUpperCase())
-        else
-          @editor.setTextInBufferRange(range, char.toLowerCase())
+          if char is char.toLowerCase()
+            @editor.setTextInBufferRange(range, char.toUpperCase())
+          else
+            @editor.setTextInBufferRange(range, char.toLowerCase())
 
-        unless point.column >= lastCharIndex
-          @editor.moveRight()
+          unless point.column >= lastCharIndex
+            @editor.moveRight()
 
     @vimState.activateCommandMode()
 
