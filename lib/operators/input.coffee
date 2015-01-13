@@ -113,7 +113,8 @@ class SubstituteLine extends Insert
     @vimState.setInsertionCheckpoint() unless @typingCompleted
     @editor.moveToBeginningOfLine()
     _.times count, =>
-      @editor.selectDown()
+      @editor.selectToEndOfLine()
+      @editor.selectRight()
     text = @editor.getLastSelection().getText()
     @setTextRegister(@register, text)
     @editor.delete()

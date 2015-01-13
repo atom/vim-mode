@@ -174,6 +174,13 @@ describe "Operators", ->
       keydown 'u'
       expect(editor.getText()).toBe "12345\nabcde\nABCDE"
 
+    it "works when the cursor's goal column is greater than its current column", ->
+      editor.setText("\n12345")
+      editor.setCursorBufferPosition([1, Infinity])
+      editor.moveUp()
+      keydown("S", shift: true)
+      expect(editor.getText()).toBe("\n12345")
+
     # Can't be tested without setting grammar of test buffer
     xit "respects indentation", ->
 
