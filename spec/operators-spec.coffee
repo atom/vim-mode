@@ -131,6 +131,7 @@ describe "Operators", ->
       expect(editor.getText()).toBe 'ab345'
       keydown('u')
       expect(editor.getText()).toBe '012345'
+      expect(editor.getSelectedText()).toBe ''
 
     describe "in visual mode", ->
       beforeEach ->
@@ -173,6 +174,7 @@ describe "Operators", ->
       expect(editor.getText()).toBe "12345\nabc\nABCDE"
       keydown 'u'
       expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+      expect(editor.getSelectedText()).toBe ''
 
     it "works when the cursor's goal column is greater than its current column", ->
       editor.setText("\n12345")
@@ -227,6 +229,7 @@ describe "Operators", ->
 
       it "undoes both lines", ->
         expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
+        expect(editor.getSelectedText()).toBe ''
 
     describe "when followed by a w", ->
       it "deletes the next word until the end of the line and exits operator-pending mode", ->

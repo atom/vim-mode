@@ -55,6 +55,7 @@ class VimState
       'reset-command-mode': => @resetCommandMode()
       'repeat-prefix': (e) => @repeatPrefix(e)
       'reverse-selections': (e) => @reverseSelections(e)
+      'undo': (e) => @undo(e)
 
     @registerOperationCommands
       'activate-insert-mode': => new Operators.Insert(@editor, @)
@@ -210,6 +211,10 @@ class VimState
   # Returns nothing.
   clearOpStack: ->
     @opStack = []
+
+  undo: ->
+    @editor.undo()
+    @activateCommandMode()
 
   # Private: Processes the command if the last operation is complete.
   #
