@@ -112,6 +112,15 @@ describe "VimState", ->
         expect(vimState.submode).toEqual 'blockwise'
         expect(editorElement.classList.contains('command-mode')).toBe(false)
 
+    describe "selecting text", ->
+      it "puts the editor into visual mode", ->
+        editor.setText("abc def")
+        expect(vimState.mode).toEqual 'command'
+        editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
+        expect(vimState.mode).toEqual 'visual'
+        expect(vimState.submode).toEqual 'characterwise'
+        expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 3]]])
+
     describe "the i keybinding", ->
       beforeEach -> keydown('i')
 

@@ -25,9 +25,12 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
-    params = {}
-    params.manager = this;
-    params.id = 0;
+
+    @editor.onDidChangeSelectionRange =>
+      if _.all(@editor.getSelections(), (selection) -> selection.isEmpty())
+        @activateCommandMode() if @mode is 'visual'
+      else
+        @activateVisualMode('characterwise') if @mode is 'command'
 
     @editorElement.classList.add("vim-mode")
     @setupCommandMode()
@@ -398,7 +401,7 @@ class VimState
 
     if @submode == 'linewise'
       @editor.selectLinesContainingCursors()
-    else
+    else if @editor.getSelectedText() is ''
       @editor.selectRight()
 
     @updateStatusBar()
