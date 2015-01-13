@@ -1,5 +1,13 @@
 ## HEAD
 
+## 0.27
+
+* Enter visual mode when selecting text in command mode
+* Don't select text after undo
+* Always preserve selection of the intially-selected character in visual mode
+* Fix bugs in the '%' motion
+* Fix bugs in the 'S' operator
+
 ## 0.26
 
 * Add o mapping in visual mode, for reversing selections
