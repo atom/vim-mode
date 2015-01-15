@@ -1,5 +1,9 @@
 ## HEAD
 
+## 0.29
+
+* Fix regression where '%' stopped working across multiple lines
+
 ## 0.28
 
 * Fix some deprecation warnings
