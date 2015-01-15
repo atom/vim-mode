@@ -144,24 +144,34 @@ class BracketMatchingMotion extends SearchBase
 
   isComplete: -> true
 
-  searchOnLine: (startPosition, reverse, inCharacter, outCharacter) ->
-    if reverse
-      endColumn = 0
-      increment = -1
-    else
-      endColumn = @editor.lineTextForBufferRow(startPosition.row).length
-      increment = 1
-
+  searchForMatch: (startPosition, reverse, inCharacter, outCharacter) ->
     depth = 0
-    {row, column} = startPosition
+    point = startPosition.copy()
+    lineLength = @editor.lineTextForBufferRow(point.row).length
+    eofPosition = @editor.getEofBufferPosition().translate([0, 1])
+    increment = if reverse then -1 else 1
+
     loop
-      point = new Point(row, column)
-      character = @characterAt(new Point(row, column))
+      character = @characterAt(point)
       depth++ if character is inCharacter
       depth-- if character is outCharacter
+
       return point if depth is 0
-      return null if column is endColumn
-      column += increment
+
+      point.column += increment
+
+      return null if depth < 0
+      return null if point.isEqual([0, -1])
+      return null if point.isEqual(eofPosition)
+
+      if point.column < 0
+        point.row--
+        lineLength = @editor.lineTextForBufferRow(point.row).length
+        point.column = lineLength - 1
+      else if point.column >= lineLength
+        point.row++
+        lineLength = @editor.lineTextForBufferRow(point.row).length
+        point.column = 0
 
   characterAt: (position) ->
     @editor.getTextInBufferRange([position, position.translate([0, 1])])
@@ -190,7 +200,7 @@ class BracketMatchingMotion extends SearchBase
 
     return unless inCharacter?
 
-    if matchPosition = @searchOnLine(startPosition, reverse, inCharacter, outCharacter)
+    if matchPosition = @searchForMatch(startPosition, reverse, inCharacter, outCharacter)
       cursor.setBufferPosition(matchPosition)
 
 module.exports = {Search, SearchCurrentWord,BracketMatchingMotion}

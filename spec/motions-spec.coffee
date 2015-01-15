@@ -1601,3 +1601,9 @@ describe "Motions", ->
       keydown('%')
       expect(editor.getCursorScreenPosition()).toEqual [0, 60]
       expect(editor.getText()).toEqual  "( ( ) )--{ text in here; and a function call(with parameters) }\n"
+
+    it "finds matches across multiple lines", ->
+      editor.setText("...(\n...)")
+      editor.setCursorScreenPosition([0, 0])
+      keydown("%")
+      expect(editor.getCursorScreenPosition()).toEqual([1, 3])
