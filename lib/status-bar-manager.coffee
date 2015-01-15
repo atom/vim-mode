@@ -15,7 +15,7 @@ class StatusBarManager
   initialize: ->
     @disposables = new CompositeDisposable
     unless @attach()
-      @disposables.add atom.packages.onDidActivateAll => @attach()
+      @disposables.add atom.packages.onDidActivateInitialPackages => @attach()
     @disposables
 
   update: (currentMode) ->
@@ -29,11 +29,10 @@ class StatusBarManager
   # Private
 
   attach: ->
-    statusBar = atom.workspaceView?.statusBar
+    statusBar = document.querySelector("status-bar")
     if statusBar?
-      statusBar.prependRight(@element)
-      @disposables.add new Disposable =>
-        @element.parentNode?.removeChild(@element)
+      tile = statusBar.addRightTile(item: @element, priority: 20)
+      @disposables.add new Disposable => tile.destroy()
       true
     else
       false

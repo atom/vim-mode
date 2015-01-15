@@ -18,7 +18,11 @@ class Insert extends Operator
     if @typingCompleted
       return unless @typedText? and @typedText.length > 0
       @editor.transact =>
-        @editor.getBuffer().insert(@editor.getCursorBufferPosition(), @typedText, true)
+        @editor.getBuffer().insert(
+          @editor.getCursorBufferPosition(),
+          @typedText,
+          normalizeLineEndings: true
+        )
     else
       @vimState.activateInsertMode()
       @typingCompleted = true

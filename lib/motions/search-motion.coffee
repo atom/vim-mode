@@ -149,7 +149,7 @@ class BracketMatchingMotion extends SearchBase
       endColumn = 0
       increment = -1
     else
-      endColumn = @editor.lineLengthForBufferRow(startPosition.row)
+      endColumn = @editor.lineTextForBufferRow(startPosition.row).length
       increment = 1
 
     depth = 0
@@ -164,7 +164,7 @@ class BracketMatchingMotion extends SearchBase
       column += increment
 
   characterAt: (position) ->
-    @editor.getTextInBufferRange([position, position.add([0, 1])])
+    @editor.getTextInBufferRange([position, position.translate([0, 1])])
 
   getSearchData: (position) ->
     character = @characterAt(position)
