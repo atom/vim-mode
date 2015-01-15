@@ -1,5 +1,9 @@
 ## HEAD
 
+## 0.28
+
+* Fix some deprecation warnings
+
 ## 0.27
 
 * Enter visual mode when selecting text in command mode
