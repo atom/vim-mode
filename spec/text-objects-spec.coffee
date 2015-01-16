@@ -256,6 +256,16 @@ describe "TextObjects", ->
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 12]]
 
+    it "doesn't span newlines", ->
+      editor.setText("12345\nabcde ABCDE")
+      editor.setCursorBufferPosition([0, 3])
+
+      keydown("v")
+      keydown("a")
+      keydown("w")
+
+      expect(editor.getSelectedBufferRanges()).toEqual [[[0, 0], [0, 5]]]
+
   describe "the 'a(' text object", ->
     beforeEach ->
       editor.setText("( something in here and in (here) )")

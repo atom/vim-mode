@@ -1,5 +1,27 @@
 ## HEAD
 
+## 0.29
+
+* Fix regression where '%' stopped working across multiple lines
+
+## 0.28
+
+* Fix some deprecation warnings
+
+## 0.27
+
+* Enter visual mode when selecting text in command mode
+* Don't select text after undo
+* Always preserve selection of the intially-selected character in visual mode
+* Fix bugs in the '%' motion
+* Fix bugs in the 'S' operator
+
+## 0.26
+
+* Add o mapping in visual mode, for reversing selections
+* Implement toggle-case in visual mode
+* Fix bug in 'around word' text object
+
 ## 0.25
 
 * Fixed a regression in the handling of the 'cw' command

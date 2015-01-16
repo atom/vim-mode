@@ -112,6 +112,15 @@ describe "VimState", ->
         expect(vimState.submode).toEqual 'blockwise'
         expect(editorElement.classList.contains('command-mode')).toBe(false)
 
+    describe "selecting text", ->
+      it "puts the editor into visual mode", ->
+        editor.setText("abc def")
+        expect(vimState.mode).toEqual 'command'
+        editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
+        expect(vimState.mode).toEqual 'visual'
+        expect(vimState.submode).toEqual 'characterwise'
+        expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 3]]])
+
     describe "the i keybinding", ->
       beforeEach -> keydown('i')
 
@@ -193,25 +202,35 @@ describe "VimState", ->
   describe "visual-mode", ->
     beforeEach ->
       editor.setText("one two three")
-      editor.setCursorBufferPosition([0, 0])
+      editor.setCursorBufferPosition([0, 4])
       keydown('v')
 
     it "selects the character under the cursor", ->
-      expect(editor.getSelectedBufferRanges()).toEqual [[[0, 0], [0, 1]]]
+      expect(editor.getSelectedBufferRanges()).toEqual [[[0, 4], [0, 5]]]
+      expect(editor.getSelectedText()).toBe("t")
 
     it "puts the editor into command mode when <escape> is pressed", ->
       keydown('escape')
 
-      expect(editor.getCursorBufferPositions()).toEqual [[0, 0]]
+      expect(editor.getCursorBufferPositions()).toEqual [[0, 4]]
       expect(editorElement.classList.contains('command-mode')).toBe(true)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
     describe "motions", ->
-      beforeEach ->
-        keydown('w')
-
       it "transforms the selection", ->
-        expect(editor.getLastSelection().getText()).toEqual 'one t'
+        keydown('w')
+        expect(editor.getLastSelection().getText()).toEqual 'two t'
+
+      it "always leaves the initially selected character selected", ->
+        keydown("h")
+        expect(editor.getSelectedText()).toBe(" t")
+
+        keydown("l")
+        expect(editor.getSelectedText()).toBe("t")
+
+        keydown("l")
+        keydown("l")
+        expect(editor.getSelectedText()).toBe("tw")
 
     describe "operators", ->
       beforeEach ->
@@ -231,6 +250,33 @@ describe "VimState", ->
 
       it "operate on the current selection", ->
         expect(editor.getLastSelection().getText()).toEqual ''
+
+    describe "the o keybinding", ->
+      it "reversed each selection", ->
+        editor.addCursorAtBufferPosition([0, Infinity])
+        keydown("v")
+        keydown("i")
+        keydown("w")
+
+        expect(editor.getSelectedBufferRanges()).toEqual([
+          [[0, 4], [0, 7]],
+          [[0, 8], [0, 13]]
+        ])
+        expect(editor.getCursorBufferPositions()).toEqual([
+          [0, 7]
+          [0, 13]
+        ])
+
+        keydown("o")
+
+        expect(editor.getSelectedBufferRanges()).toEqual([
+          [[0, 4], [0, 7]],
+          [[0, 8], [0, 13]]
+        ])
+        expect(editor.getCursorBufferPositions()).toEqual([
+          [0, 4]
+          [0, 8]
+        ])
 
   describe "marks", ->
     beforeEach ->  editor.setText("text in line 1\ntext in line 2\ntext in line 3")
