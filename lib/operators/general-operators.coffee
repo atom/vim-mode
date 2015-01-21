@@ -120,26 +120,23 @@ class ToggleCase extends Operator
             lower
         ).join('')
     else
-      pos = @editor.getCursorBufferPosition()
-      lastCharIndex = @editor.lineTextForBufferRow(pos.row).length - 1
-      count = Math.min count, @editor.lineTextForBufferRow(pos.row).length - pos.column
-
-      # Do nothing on an empty line
-      return if @editor.getBuffer().isRowBlank(pos.row)
-
       @editor.transact =>
-        _.times count, =>
-          point = @editor.getCursorBufferPosition()
-          range = Range.fromPointWithDelta(point, 0, 1)
-          char = @editor.getTextInBufferRange(range)
+        for cursor in @editor.getCursors()
+          point = cursor.getBufferPosition()
+          lineLength = @editor.lineTextForBufferRow(point.row).length
+          cursorCount = Math.min(count, lineLength - point.column)
 
-          if char is char.toLowerCase()
-            @editor.setTextInBufferRange(range, char.toUpperCase())
-          else
-            @editor.setTextInBufferRange(range, char.toLowerCase())
+          _.times cursorCount, =>
+            point = cursor.getBufferPosition()
+            range = Range.fromPointWithDelta(point, 0, 1)
+            char = @editor.getTextInBufferRange(range)
 
-          unless point.column >= lastCharIndex
-            @editor.moveRight()
+            if char is char.toLowerCase()
+              @editor.setTextInBufferRange(range, char.toUpperCase())
+            else
+              @editor.setTextInBufferRange(range, char.toLowerCase())
+
+            cursor.moveRight() unless point.column >= lineLength - 1
 
     @vimState.activateCommandMode()
 
