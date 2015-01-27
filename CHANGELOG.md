@@ -1,5 +1,9 @@
 ## HEAD
 
+## 0.30
+
+* Make toggle-case operator work with multiple cursors
+
 ## 0.29
 
 * Fix regression where '%' stopped working across multiple lines
