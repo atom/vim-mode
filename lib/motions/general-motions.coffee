@@ -306,16 +306,14 @@ class MoveToFirstCharacterOfLine extends Motion
       cursor.moveToFirstCharacterOfLine()
 
 class MoveToFirstCharacterOfLineAndDown extends Motion
-  execute: (count=0) ->
-    (new MoveDown(@editor, @vimState)).execute(count)
-    (new MoveToFirstCharacterOfLine(@editor, @vimState)).execute()
+  operatesLinewise: true
+  operatesInclusively: true
 
-  select: (count=0) ->
-    if (count > 0)
-      (new MoveDown(@editor, @vimState)).select(count)
-    else
-      @editor.selectToFirstCharacterOfLine()
-      true
+  moveCursor: (cursor, count=0) ->
+    _.times count-1, ->
+      cursor.moveDown()
+    cursor.moveToBeginningOfLine()
+    cursor.moveToFirstCharacterOfLine()
 
 class MoveToLastCharacterOfLine extends Motion
   operatesInclusively: false
