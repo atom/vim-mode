@@ -97,6 +97,7 @@ class VimState
       'move-to-next-paragraph': => new Motions.MoveToNextParagraph(@editor, @)
       'move-to-previous-paragraph': => new Motions.MoveToPreviousParagraph(@editor, @)
       'move-to-first-character-of-line': => new Motions.MoveToFirstCharacterOfLine(@editor, @)
+      'move-to-first-character-of-line-and-down': => new Motions.MoveToFirstCharacterOfLineAndDown(@editor, @)
       'move-to-last-character-of-line': => new Motions.MoveToLastCharacterOfLine(@editor, @)
       'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
       'move-to-first-character-of-line-up': => new Motions.MoveToFirstCharacterOfLineUp(@editor, @)

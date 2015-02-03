@@ -305,6 +305,16 @@ class MoveToFirstCharacterOfLine extends Motion
       cursor.moveToBeginningOfLine()
       cursor.moveToFirstCharacterOfLine()
 
+class MoveToFirstCharacterOfLineAndDown extends Motion
+  operatesLinewise: true
+  operatesInclusively: true
+
+  moveCursor: (cursor, count=0) ->
+    _.times count-1, ->
+      cursor.moveDown()
+    cursor.moveToBeginningOfLine()
+    cursor.moveToFirstCharacterOfLine()
+
 class MoveToLastCharacterOfLine extends Motion
   operatesInclusively: false
 
@@ -371,6 +381,6 @@ module.exports = {
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
-  MoveToFirstCharacterOfLine, MoveToLastCharacterOfLine, MoveToStartOfFile, MoveToTopOfScreen,
-  MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
+  MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
 }

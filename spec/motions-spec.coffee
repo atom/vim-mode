@@ -751,6 +751,51 @@ describe "Motions", ->
           # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
           #expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
+  describe "the _ keybinding", ->
+    beforeEach ->
+      editor.setText("  abc\n  abc\nabcdefg\n")
+
+    describe "from the middle of a line", ->
+      beforeEach -> editor.setCursorScreenPosition([1, 3])
+
+      describe "as a motion", ->
+        beforeEach -> keydown('_')
+
+        it "moves the cursor to the first character of the current line", ->
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('_')
+
+        it "deletes the current line", ->
+          expect(editor.getText()).toBe "  abc\nabcdefg\n"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+    describe "with a count", ->
+      beforeEach ->
+        editor.setText("1\n2\n3\n4\n5\n6\n")
+        editor.setCursorScreenPosition([1, 0])
+
+      describe "as a motion", ->
+        beforeEach ->
+          keydown('3')
+          keydown('_')
+
+        it "moves the cursor to the first character of that many lines following", ->
+          expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+
+      describe "as a selection", ->
+        beforeEach ->
+          keydown('d')
+          keydown('3')
+          keydown('_')
+
+        it "deletes the current line plus that many following lines", ->
+          expect(editor.getText()).toBe "1\n5\n6\n"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
   describe "the enter keybinding", ->
     keydownCodeForEnter = '\r' # 'enter' does not work
     startingText = "  abc\n  abc\nabcdefg\n"

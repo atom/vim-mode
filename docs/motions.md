@@ -17,6 +17,7 @@
 * [0](http://vimhelp.appspot.com/motion.txt.html#0)
 * [-](http://vimhelp.appspot.com/motion.txt.html#-)
 * [+](http://vimhelp.appspot.com/motion.txt.html#+)
+* [_](http://vimhelp.appspot.com/motion.txt.html#_)
 * [&lt;enter&gt;](http://vimhelp.appspot.com/motion.txt.html#<CR>)
 * [gg](http://vimhelp.appspot.com/motion.txt.html#gg)
 * [G](http://vimhelp.appspot.com/motion.txt.html#G)
