@@ -16,15 +16,19 @@ class VimCommandModeInputView extends View
 
     @singleChar = opts.singleChar
     @defaultText = opts.defaultText ? ''
+    @prefixChar = opts.prefixChar ? ''
 
     @panel = atom.workspace.addBottomPanel(item: this, priority: 100)
 
     @focus()
     @handleEvents()
+    @editor.setText @prefixChar
 
   handleEvents: ->
     if @singleChar?
       @editor.find('input').on 'textInput', @autosubmit
+    if @prefixChar?
+      @editor.find('input').on 'keyup', @checkPrefix
     @editor.on 'core:confirm', @confirm
     @editor.on 'core:cancel', @cancel
     @editor.find('input').on 'blur', @cancel
@@ -32,6 +36,8 @@ class VimCommandModeInputView extends View
   stopHandlingEvents: ->
     if @singleChar?
       @editor.find('input').off 'textInput', @autosubmit
+    if @prefixChar?
+      @editor.find('input').off 'keyup', @checkPrefix
     @editor.off 'core:confirm', @confirm
     @editor.off 'core:cancel', @cancel
     @editor.find('input').off 'blur', @cancel
@@ -40,10 +46,19 @@ class VimCommandModeInputView extends View
     @editor.setText(event.originalEvent.data)
     @confirm()
 
+  checkPrefix: =>
+    text = @editor.getText()
+    if text.length < 1 || text[0] != @prefixChar
+      @cancel()
+
   confirm: =>
-    @value = @editor.getText() or @defaultText
-    @viewModel.confirm(@)
-    @remove()
+    text = @editor.getText()
+    if @prefixChar? && !(text && text.length > 0 && text[0] == @prefixChar)
+      @cancel()
+    else
+      @value = if text != @prefixChar then text.substr(1) else @defaultText
+      @viewModel.confirm(@)
+      @remove()
 
   focus: =>
     @editorContainer.find('.editor').focus()

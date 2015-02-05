@@ -23,6 +23,7 @@ class ViewModel
   #
   #            - singleChar {Boolean} - tells the view whether it should only listen for a single
   #                                      character or an entire string
+  #            - prefixChar {Char} - to be shown in the beginning
   constructor: (@operation, opts={}) ->
     {@editor, @vimState} = @operation
 

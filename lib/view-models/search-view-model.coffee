@@ -3,7 +3,7 @@
 module.exports =
 class SearchViewModel extends ViewModel
   constructor: (@searchMotion) ->
-    super(@searchMotion, class: 'search')
+    super(@searchMotion, class: 'search', prefixChar: '/')
     @historyIndex = -1
 
     @view.editor.on('core:move-up', @increaseHistorySearch)
