@@ -1,4 +1,3 @@
-_ = require 'underscore-plus'
 {ViewModel} = require './view-model'
 
 module.exports =
