@@ -19,9 +19,13 @@ class SearchViewModel extends ViewModel
     if @history(@historyIndex + 1)?
       @historyIndex += 1
       @restoreHistory(@historyIndex)
+    else
+      atom.beep()
 
   decreaseHistorySearch: =>
-    if @historyIndex <= 0
+    if @historyIndex < 0
+      atom.beep()
+    else if @historyIndex == 0
       # get us back to a clean slate
       @historyIndex = -1
       @view.editor.setText('')
