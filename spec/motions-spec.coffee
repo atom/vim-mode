@@ -956,7 +956,7 @@ describe "Motions", ->
       it "moves the cursor to the specified search pattern", ->
         keydown('/')
 
-        editor.commandModeInputView.editor.setText 'def'
+        editor.commandModeInputView.editor.setText '/def'
         editor.commandModeInputView.editor.trigger 'core:confirm'
 
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
@@ -965,7 +965,7 @@ describe "Motions", ->
       it "loops back around", ->
         editor.setCursorBufferPosition([3, 0])
         keydown('/')
-        editor.commandModeInputView.editor.setText 'def'
+        editor.commandModeInputView.editor.setText '/def'
         editor.commandModeInputView.editor.trigger 'core:confirm'
 
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
@@ -973,7 +973,7 @@ describe "Motions", ->
       it "uses a valid regex as a regex", ->
         keydown('/')
         # Cycle through the 'abc' on the first line with a character pattern
-        editor.commandModeInputView.editor.setText '[abc]'
+        editor.commandModeInputView.editor.setText '/[abc]'
         editor.commandModeInputView.editor.trigger 'core:confirm'
         expect(editor.getCursorBufferPosition()).toEqual [0, 1]
         keydown('n')
@@ -983,7 +983,7 @@ describe "Motions", ->
         # Go straight to the literal [abc
         editor.setText("abc\n[abc]\n")
         keydown('/')
-        editor.commandModeInputView.editor.setText '[abc'
+        editor.commandModeInputView.editor.setText '/[abc'
         editor.commandModeInputView.editor.trigger 'core:confirm'
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
         keydown('n')
@@ -993,7 +993,7 @@ describe "Motions", ->
         editor.setText('one two three')
         keydown('v')
         keydown('/')
-        editor.commandModeInputView.editor.setText 'th'
+        editor.commandModeInputView.editor.setText '/th'
         editor.commandModeInputView.editor.trigger 'core:confirm'
         expect(editor.getCursorBufferPosition()).toEqual [0, 9]
         keydown('d')
@@ -1003,7 +1003,7 @@ describe "Motions", ->
         editor.setText('line1\nline2\nline3')
         keydown('v')
         keydown('/')
-        editor.commandModeInputView.editor.setText 'line'
+        editor.commandModeInputView.editor.setText '/line'
         editor.commandModeInputView.editor.trigger 'core:confirm'
         {start, end} = editor.getSelectedBufferRange()
         expect(start.row).toEqual 0
@@ -1020,21 +1020,21 @@ describe "Motions", ->
           keydown('/')
 
         it "works in case sensitive mode", ->
-          editor.commandModeInputView.editor.setText 'ABC'
+          editor.commandModeInputView.editor.setText '/ABC'
           editor.commandModeInputView.editor.trigger 'core:confirm'
           expect(editor.getCursorBufferPosition()).toEqual [2, 0]
           keydown('n')
           expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
         it "works in case insensitive mode", ->
-          editor.commandModeInputView.editor.setText '\\cAbC'
+          editor.commandModeInputView.editor.setText '/\\cAbC'
           editor.commandModeInputView.editor.trigger 'core:confirm'
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
           keydown('n')
           expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
         it "works in case insensitive mode wherever \\c is", ->
-          editor.commandModeInputView.editor.setText 'AbC\\c'
+          editor.commandModeInputView.editor.setText '/AbC\\c'
           editor.commandModeInputView.editor.trigger 'core:confirm'
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
           keydown('n')
@@ -1042,7 +1042,7 @@ describe "Motions", ->
 
         it "uses case insensitive search if useSmartcaseForSearch is true and searching lowercase", ->
           atom.config.set 'vim-mode.useSmartcaseForSearch', true
-          editor.commandModeInputView.editor.setText 'abc'
+          editor.commandModeInputView.editor.setText '/abc'
           editor.commandModeInputView.editor.trigger 'core:confirm'
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
           keydown('n')
@@ -1050,7 +1050,7 @@ describe "Motions", ->
 
         it "uses case sensitive search if useSmartcaseForSearch is true and searching uppercase", ->
           atom.config.set 'vim-mode.useSmartcaseForSearch', true
-          editor.commandModeInputView.editor.setText 'ABC'
+          editor.commandModeInputView.editor.setText '/ABC'
           editor.commandModeInputView.editor.trigger 'core:confirm'
           expect(editor.getCursorBufferPosition()).toEqual [2, 0]
           keydown('n')
@@ -1063,7 +1063,7 @@ describe "Motions", ->
 
         beforeEach ->
           keydown('/')
-          editor.commandModeInputView.editor.setText 'def'
+          editor.commandModeInputView.editor.setText '/def'
           editor.commandModeInputView.editor.trigger 'core:confirm'
 
         describe "the n keybinding", ->
@@ -1083,14 +1083,14 @@ describe "Motions", ->
         it "composes with operators", ->
           keydown('d')
           keydown('/')
-          editor.commandModeInputView.editor.setText('def')
+          editor.commandModeInputView.editor.setText('/def')
           editor.commandModeInputView.editor.trigger('core:confirm')
           expect(editor.getText()).toEqual "def\nabc\ndef\n"
 
         it "repeats correctly with operators", ->
           keydown('d')
           keydown('/')
-          editor.commandModeInputView.editor.setText('def')
+          editor.commandModeInputView.editor.setText('/def')
           editor.commandModeInputView.editor.trigger('core:confirm')
 
           keydown('.')
@@ -1099,14 +1099,14 @@ describe "Motions", ->
     describe "when reversed as ?", ->
       it "moves the cursor backwards to the specified search pattern", ->
         keydown('?')
-        editor.commandModeInputView.editor.setText('def')
+        editor.commandModeInputView.editor.setText('?def')
         editor.commandModeInputView.editor.trigger('core:confirm')
         expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
       describe "repeating", ->
         beforeEach ->
           keydown('?')
-          editor.commandModeInputView.editor.setText('def')
+          editor.commandModeInputView.editor.setText('?def')
           editor.commandModeInputView.editor.trigger('core:confirm')
 
         describe 'the n keybinding', ->
@@ -1124,34 +1124,34 @@ describe "Motions", ->
     describe "using search history", ->
       beforeEach ->
         keydown('/')
-        editor.commandModeInputView.editor.setText('def')
+        editor.commandModeInputView.editor.setText('/def')
         editor.commandModeInputView.editor.trigger('core:confirm')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
         keydown('/')
-        editor.commandModeInputView.editor.setText('abc')
+        editor.commandModeInputView.editor.setText('/abc')
         editor.commandModeInputView.editor.trigger('core:confirm')
         expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
       it "allows searching history in the search field", ->
         keydown('/')
         editor.commandModeInputView.editor.trigger('core:move-up')
-        expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('/abc')
         editor.commandModeInputView.editor.trigger('core:move-up')
-        expect(editor.commandModeInputView.editor.getText()).toEqual('def')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('/def')
         editor.commandModeInputView.editor.trigger('core:move-up')
-        expect(editor.commandModeInputView.editor.getText()).toEqual('def')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('/def')
 
       it "resets the search field to empty when scrolling back", ->
         keydown('/')
         editor.commandModeInputView.editor.trigger('core:move-up')
-        expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('/abc')
         editor.commandModeInputView.editor.trigger('core:move-up')
-        expect(editor.commandModeInputView.editor.getText()).toEqual('def')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('/def')
         editor.commandModeInputView.editor.trigger('core:move-down')
-        expect(editor.commandModeInputView.editor.getText()).toEqual('abc')
+        expect(editor.commandModeInputView.editor.getText()).toEqual('/abc')
         editor.commandModeInputView.editor.trigger('core:move-down')
-        expect(editor.commandModeInputView.editor.getText()).toEqual ''
+        expect(editor.commandModeInputView.editor.getText()).toEqual '/'
 
   describe "the * keybinding", ->
     beforeEach ->

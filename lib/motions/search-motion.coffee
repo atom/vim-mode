@@ -8,10 +8,10 @@ class SearchBase extends MotionWithInput
   operatesInclusively: false
   @currentSearch: null
 
-  constructor: (@editor, @vimState) ->
+  constructor: (@editor, @vimState, @reverse=false) ->
     super(@editor, @vimState)
     Search.currentSearch = @
-    @reverse = @initiallyReversed = false
+    @initiallyReversed = @reverse
 
   repeat: (opts = {}) =>
     reverse = opts.backwards
@@ -19,10 +19,6 @@ class SearchBase extends MotionWithInput
       @reverse = false
     else
       @reverse = reverse or @initiallyReversed
-    @
-
-  reversed: =>
-    @initiallyReversed = @reverse = true
     @
 
   moveCursor: (cursor, count=1) ->
@@ -71,11 +67,10 @@ class SearchBase extends MotionWithInput
       new RegExp(_.escapeRegExp(term), modFlags)
 
 class Search extends SearchBase
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editor, @vimState, @reverse=false) ->
+    super(@editor, @vimState, @reverse)
     @viewModel = new SearchViewModel(@)
     Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
   compose: (input) ->
     super(input)
@@ -84,10 +79,9 @@ class Search extends SearchBase
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null
 
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editor, @vimState, @reverse=false) ->
+    super(@editor, @vimState, @reverse)
     Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
     # FIXME: This must depend on the current language
     defaultIsKeyword = "[@a-zA-Z0-9_\-]+"

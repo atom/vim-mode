@@ -27,7 +27,7 @@ class VimCommandModeInputView extends View
   handleEvents: ->
     if @singleChar?
       @editor.find('input').on 'textInput', @autosubmit
-    if @prefixChar?
+    if @prefixChar != ''
       @editor.find('input').on 'keyup', @checkPrefix
     @editor.on 'core:confirm', @confirm
     @editor.on 'core:cancel', @cancel
@@ -36,7 +36,7 @@ class VimCommandModeInputView extends View
   stopHandlingEvents: ->
     if @singleChar?
       @editor.find('input').off 'textInput', @autosubmit
-    if @prefixChar?
+    if @prefixChar != ''
       @editor.find('input').off 'keyup', @checkPrefix
     @editor.off 'core:confirm', @confirm
     @editor.off 'core:cancel', @cancel
@@ -53,10 +53,10 @@ class VimCommandModeInputView extends View
 
   confirm: =>
     text = @editor.getText()
-    if @prefixChar? && !(text && text.length > 0 && text[0] == @prefixChar)
+    if @prefixChar != '' && !(text && text.length > 0 && text[0] == @prefixChar)
       @cancel()
     else
-      @value = if text != @prefixChar then text.substr(1) else @defaultText
+      @value = if text == @prefixChar then @defaultText else if @prefixChar == '' then text else text.substr(1)
       @viewModel.confirm(@)
       @remove()
 

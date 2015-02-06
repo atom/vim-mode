@@ -3,14 +3,15 @@
 module.exports =
 class SearchViewModel extends ViewModel
   constructor: (@searchMotion) ->
-    super(@searchMotion, class: 'search', prefixChar: '/')
+    @prefixChar = if @searchMotion.initiallyReversed then '?' else '/'
+    super(@searchMotion, class: 'search', prefixChar: @prefixChar)
     @historyIndex = -1
 
     @view.editor.on('core:move-up', @increaseHistorySearch)
     @view.editor.on('core:move-down', @decreaseHistorySearch)
 
   restoreHistory: (index) ->
-    @view.editor.setText(@history(index).value)
+    @view.editor.setText(@prefixChar + @history(index).value)
 
   history: (index) ->
     @vimState.getSearchHistoryItem(index)
@@ -24,7 +25,7 @@ class SearchViewModel extends ViewModel
     if @historyIndex <= 0
       # get us back to a clean slate
       @historyIndex = -1
-      @view.editor.setText('')
+      @view.editor.setText(@prefixChar)
     else
       @historyIndex -= 1
       @restoreHistory(@historyIndex)

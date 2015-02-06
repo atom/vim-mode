@@ -152,11 +152,11 @@ class VimState
       'repeat-find': (e) => @currentFind.repeat() if @currentFind?
       'repeat-find-reverse': (e) => @currentFind.repeat(reverse: true) if @currentFind?
       'replace': (e) => new Operators.Replace(@editor, @)
-      'search': (e) => new Motions.Search(@editor, @)
-      'reverse-search': (e) => (new Motions.Search(@editor, @)).reversed()
-      'search-current-word': (e) => new Motions.SearchCurrentWord(@editor, @)
+      'search': (e) => new Motions.Search(@editor, @, false)
+      'reverse-search': (e) => new Motions.Search(@editor, @, true)
+      'search-current-word': (e) => new Motions.SearchCurrentWord(@editor, @, false)
+      'reverse-search-current-word': (e) => new Motions.SearchCurrentWord(@editor, @, true)
       'bracket-matching-motion': (e) => new Motions.BracketMatchingMotion(@editor,@)
-      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editor, @)).reversed()
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
