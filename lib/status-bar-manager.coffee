@@ -2,7 +2,7 @@
 
 ContentsByMode =
   insert:  ["status-bar-vim-mode-insert", "Insert"]
-  command: ["status-bar-vim-mode-command", "Command"]
+  normal: ["status-bar-vim-mode-normal", "Normal"]
   visual:  ["status-bar-vim-mode-visual", "Visual"]
 
 module.exports =

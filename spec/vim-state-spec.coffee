@@ -115,7 +115,7 @@ describe "VimState", ->
     describe "selecting text", ->
       it "puts the editor into visual mode", ->
         editor.setText("abc def")
-        expect(vimState.mode).toEqual 'command'
+        expect(vimState.mode).toEqual 'normal'
         editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
         expect(vimState.mode).toEqual 'visual'
         expect(vimState.submode).toEqual 'characterwise'
@@ -150,7 +150,7 @@ describe "VimState", ->
       it 'properly clears the opStack', ->
         keydown('d')
         keydown('r')
-        expect(vimState.mode).toBe 'command'
+        expect(vimState.mode).toBe 'normal'
         expect(vimState.opStack.length).toBe 0
         normalModeInputKeydown('escape')
         keydown('d')

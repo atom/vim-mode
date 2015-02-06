@@ -30,7 +30,7 @@ class VimState
       if _.all(@editor.getSelections(), (selection) -> selection.isEmpty())
         @activateNormalMode() if @mode is 'visual'
       else
-        @activateVisualMode('characterwise') if @mode is 'command'
+        @activateVisualMode('characterwise') if @mode is 'normal'
 
     @editorElement.classList.add("vim-mode")
     @setupNormalMode()
@@ -228,7 +228,7 @@ class VimState
       return
 
     unless @topOperation().isComplete()
-      if @mode is 'command' and @topOperation() instanceof Operators.Operator
+      if @mode is 'normal' and @topOperation() instanceof Operators.Operator
         @activateOperatorPendingMode()
       return
 
@@ -340,7 +340,7 @@ class VimState
     @deactivateInsertMode()
     @deactivateVisualMode()
 
-    @mode = 'command'
+    @mode = 'normal'
     @submode = null
 
     @changeModeClass('normal-mode')
