@@ -11,15 +11,15 @@ describe "Operators", ->
       editorElement = element
       editor = editorElement.getModel()
       vimState = editorElement.vimState
-      vimState.activateCommandMode()
-      vimState.resetCommandMode()
+      vimState.activateNormalMode()
+      vimState.resetNormalMode()
 
   keydown = (key, options={}) ->
     options.element ?= editorElement
     helpers.keydown(key, options)
 
-  commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+  normalModeInputKeydown = (key, opts = {}) ->
+    opts.element = editor.normalModeInputView.editor.find('input').get(0)
     opts.raw = true
     keydown(key, opts)
 
@@ -29,13 +29,13 @@ describe "Operators", ->
       # doing this without a pending operation throws an exception
       expect(-> vimState.pushOperations(new Input(''))).toThrow()
 
-      # make sure commandModeInputView is created
+      # make sure normalModeInputView is created
       keydown('/')
       expect(vimState.isOperatorPending()).toBe true
-      editor.commandModeInputView.viewModel.cancel()
+      editor.normalModeInputView.viewModel.cancel()
 
       expect(vimState.isOperatorPending()).toBe false
-      expect(-> editor.commandModeInputView.viewModel.cancel()).not.toThrow()
+      expect(-> editor.normalModeInputView.viewModel.cancel()).not.toThrow()
 
   describe "the x keybinding", ->
     describe "on a line with content", ->
@@ -190,7 +190,7 @@ describe "Operators", ->
     it "enters operator-pending mode", ->
       keydown('d')
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(true)
-      expect(editorElement.classList.contains('command-mode')).toBe(false)
+      expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
     describe "when followed by a d", ->
       it "deletes the current line and exits operator-pending mode", ->
@@ -204,7 +204,7 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
         expect(vimState.getRegister('"').text).toBe "abcde\n"
         expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
-        expect(editorElement.classList.contains('command-mode')).toBe(true)
+        expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
       it "deletes the last line", ->
         editor.setText("12345\nabcde\nABCDE")
@@ -245,7 +245,7 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
         expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
-        expect(editorElement.classList.contains('command-mode')).toBe(true)
+        expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
       it "deletes to the beginning of the next word", ->
         editor.setText('abcd efg')
@@ -281,7 +281,7 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 6]
         expect(vimState.getRegister('"').text).toBe "abcde"
         expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
-        expect(editorElement.classList.contains('command-mode')).toBe(true)
+        expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
     describe "when followed by an j", ->
       beforeEach ->
@@ -414,7 +414,7 @@ describe "Operators", ->
 
         expect(editor.getText()).toBe "12345\n\nABCDE"
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
-        expect(editorElement.classList.contains('command-mode')).toBe(false)
+        expect(editorElement.classList.contains('normal-mode')).toBe(false)
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
 
       describe "when the cursor is on the last line", ->
@@ -426,7 +426,7 @@ describe "Operators", ->
 
           expect(editor.getText()).toBe "12345\nabcde\n\n"
           expect(editor.getCursorScreenPosition()).toEqual [2, 0]
-          expect(editorElement.classList.contains('command-mode')).toBe(false)
+          expect(editorElement.classList.contains('normal-mode')).toBe(false)
           expect(editorElement.classList.contains('insert-mode')).toBe(true)
 
       describe "when the cursor is on the only line", ->
@@ -439,7 +439,7 @@ describe "Operators", ->
 
           expect(editor.getText()).toBe "\n"
           expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-          expect(editorElement.classList.contains('command-mode')).toBe(false)
+          expect(editorElement.classList.contains('normal-mode')).toBe(false)
           expect(editorElement.classList.contains('insert-mode')).toBe(true)
 
     describe "when followed by i w", ->
@@ -456,7 +456,7 @@ describe "Operators", ->
         # Just cannot get "typing" to work correctly in test.
         editor.setText("12345\nfg\nABCDE")
         keydown('escape')
-        expect(editorElement.classList.contains('command-mode')).toBe(true)
+        expect(editorElement.classList.contains('normal-mode')).toBe(true)
         expect(editor.getText()).toBe "12345\nfg\nABCDE"
 
         keydown('u')
@@ -527,7 +527,7 @@ describe "Operators", ->
     it "deletes the contents until the end of the line and enters insert mode", ->
       expect(editor.getText()).toBe "0\n"
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
-      expect(editorElement.classList.contains('command-mode')).toBe(false)
+      expect(editorElement.classList.contains('normal-mode')).toBe(false)
       expect(editorElement.classList.contains('insert-mode')).toBe(true)
 
   describe "the y keybinding", ->
@@ -1067,7 +1067,7 @@ describe "Operators", ->
       it "allows repeating the operation", ->
         keydown("escape")
         keydown(".")
-        expect(editorElement.classList.contains('command-mode')).toBe(true)
+        expect(editorElement.classList.contains('normal-mode')).toBe(true)
         expect(editor.getText()).toBe "    12345\nabcde\nABCDE"
 
   describe "the < keybinding", ->
@@ -1182,31 +1182,31 @@ describe "Operators", ->
 
     it "replaces a single character", ->
       keydown('r')
-      commandModeInputKeydown('x')
+      normalModeInputKeydown('x')
       expect(editor.getText()).toBe 'x2\nx4\n\n'
 
     it "replaces a single character with a line break", ->
       keydown('r')
-      editor.commandModeInputView.editor.trigger 'core:confirm'
+      editor.normalModeInputView.editor.trigger 'core:confirm'
       expect(editor.getText()).toBe '\n2\n\n4\n\n'
       expect(editor.getCursorBufferPositions()).toEqual [[1, 0], [3, 0]]
 
     it "composes properly with motions", ->
       keydown('2')
       keydown('r')
-      commandModeInputKeydown('x')
+      normalModeInputKeydown('x')
       expect(editor.getText()).toBe 'xx\nxx\n\n'
 
     it "does nothing on an empty line", ->
       editor.setCursorBufferPosition([2, 0])
       keydown('r')
-      commandModeInputKeydown('x')
+      normalModeInputKeydown('x')
       expect(editor.getText()).toBe '12\n34\n\n'
 
     it "does nothing if asked to replace more characters than there are on a line", ->
       keydown('3')
       keydown('r')
-      commandModeInputKeydown('x')
+      normalModeInputKeydown('x')
       expect(editor.getText()).toBe '12\n34\n\n'
 
     describe "when in visual mode", ->
@@ -1216,12 +1216,12 @@ describe "Operators", ->
 
       it "replaces the entire selection with the given character", ->
         keydown('r')
-        commandModeInputKeydown('x')
+        normalModeInputKeydown('x')
         expect(editor.getText()).toBe 'xx\nxx\n\n'
 
       it "leaves the cursor at the beginning of the selection", ->
         keydown('r')
-        commandModeInputKeydown('x')
+        normalModeInputKeydown('x')
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
 
   describe 'the m keybinding', ->
@@ -1231,7 +1231,7 @@ describe "Operators", ->
 
     it 'marks a position', ->
       keydown('m')
-      commandModeInputKeydown('a')
+      normalModeInputKeydown('a')
       expect(vimState.getMark('a')).toEqual [0,1]
 
   describe 'the ~ keybinding', ->

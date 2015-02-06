@@ -32,7 +32,7 @@ class Indent extends Operator
     if mode != 'visual'
       @editor.setCursorScreenPosition([start.row, 0])
       @editor.moveToFirstCharacterOfLine()
-      @vimState.activateCommandMode()
+      @vimState.activateNormalMode()
 
 #
 # It outdents everything selected by the following motion.

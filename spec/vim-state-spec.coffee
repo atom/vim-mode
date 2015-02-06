@@ -13,22 +13,22 @@ describe "VimState", ->
       editorElement = element
       editor = editorElement.getModel()
       vimState = editorElement.vimState
-      vimState.activateCommandMode()
-      vimState.resetCommandMode()
+      vimState.activateNormalMode()
+      vimState.resetNormalMode()
 
   keydown = (key, options={}) ->
     options.element ?= editorElement
     helpers.keydown(key, options)
 
-  commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+  normalModeInputKeydown = (key, opts = {}) ->
+    opts.element = editor.normalModeInputView.editor.find('input').get(0)
     opts.raw = true
     keydown(key, opts)
 
   describe "initialization", ->
-    it "puts the editor in command-mode initially by default", ->
+    it "puts the editor in normal-mode initially by default", ->
       expect(editorElement.classList.contains('vim-mode')).toBe(true)
-      expect(editorElement.classList.contains('command-mode')).toBe(true)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
     it "puts the editor in insert-mode if startInInsertMode is true", ->
       atom.config.set 'vim-mode.startInInsertMode', true
@@ -42,11 +42,11 @@ describe "VimState", ->
       expect(editorElement.component.isInputEnabled()).toBeTruthy()
 
     it "removes the mode classes from the editor", ->
-      expect(editorElement.classList.contains("command-mode")).toBeTruthy()
+      expect(editorElement.classList.contains("normal-mode")).toBeTruthy()
       vimState.destroy()
-      expect(editorElement.classList.contains("command-mode")).toBeFalsy()
+      expect(editorElement.classList.contains("normal-mode")).toBeFalsy()
 
-  describe "command-mode", ->
+  describe "normal-mode", ->
     describe "when entering an insertable character", ->
       beforeEach -> keydown('\\')
 
@@ -88,7 +88,7 @@ describe "VimState", ->
       it "puts the editor into visual characterwise mode", ->
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
         expect(vimState.submode).toEqual 'characterwise'
-        expect(editorElement.classList.contains('command-mode')).toBe(false)
+        expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
     describe "the V keybinding", ->
       beforeEach ->
@@ -99,7 +99,7 @@ describe "VimState", ->
       it "puts the editor into visual linewise mode", ->
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
         expect(vimState.submode).toEqual 'linewise'
-        expect(editorElement.classList.contains('command-mode')).toBe(false)
+        expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
       it "selects the current line", ->
         expect(editor.getLastSelection().getText()).toEqual '012345\n'
@@ -110,7 +110,7 @@ describe "VimState", ->
       it "puts the editor into visual characterwise mode", ->
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
         expect(vimState.submode).toEqual 'blockwise'
-        expect(editorElement.classList.contains('command-mode')).toBe(false)
+        expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
     describe "selecting text", ->
       it "puts the editor into visual mode", ->
@@ -126,7 +126,7 @@ describe "VimState", ->
 
       it "puts the editor into insert mode", ->
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
-        expect(editorElement.classList.contains('command-mode')).toBe(false)
+        expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
@@ -152,7 +152,7 @@ describe "VimState", ->
         keydown('r')
         expect(vimState.mode).toBe 'command'
         expect(vimState.opStack.length).toBe 0
-        commandModeInputKeydown('escape')
+        normalModeInputKeydown('escape')
         keydown('d')
         expect(editor.getText()).toBe '012345\nabcdef'
 
@@ -183,19 +183,19 @@ describe "VimState", ->
         it "allows the cursor to be placed on the \n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
-    it "puts the editor into command mode when <escape> is pressed", ->
+    it "puts the editor into normal mode when <escape> is pressed", ->
       keydown('escape')
 
-      expect(editorElement.classList.contains('command-mode')).toBe(true)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
       expect(editorElement.classList.contains('insert-mode')).toBe(false)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
-    it "puts the editor into command mode when <ctrl-c> is pressed", ->
+    it "puts the editor into normal mode when <ctrl-c> is pressed", ->
       helpers.mockPlatform(editorElement, 'platform-darwin')
       keydown('c', ctrl: true)
       helpers.unmockPlatform(editorElement)
 
-      expect(editorElement.classList.contains('command-mode')).toBe(true)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
       expect(editorElement.classList.contains('insert-mode')).toBe(false)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
@@ -209,11 +209,11 @@ describe "VimState", ->
       expect(editor.getSelectedBufferRanges()).toEqual [[[0, 4], [0, 5]]]
       expect(editor.getSelectedText()).toBe("t")
 
-    it "puts the editor into command mode when <escape> is pressed", ->
+    it "puts the editor into normal mode when <escape> is pressed", ->
       keydown('escape')
 
       expect(editor.getCursorBufferPositions()).toEqual [[0, 4]]
-      expect(editorElement.classList.contains('command-mode')).toBe(true)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
     describe "motions", ->
@@ -242,7 +242,7 @@ describe "VimState", ->
       it "operate on the current selection", ->
         expect(editor.getText()).toEqual "\nabcdef"
 
-    describe "returning to command-mode", ->
+    describe "returning to normal-mode", ->
       beforeEach ->
         editor.setText("012345\n\nabcdef")
         editor.selectLinesContainingCursors()
@@ -284,32 +284,32 @@ describe "VimState", ->
     it "basic marking functionality", ->
       editor.setCursorScreenPosition([1, 1])
       keydown('m')
-      commandModeInputKeydown('t')
+      normalModeInputKeydown('t')
       expect(editor.getText()).toEqual "text in line 1\ntext in line 2\ntext in line 3"
       editor.setCursorScreenPosition([2, 2])
       keydown('`')
-      commandModeInputKeydown('t')
+      normalModeInputKeydown('t')
       expect(editor.getCursorScreenPosition()).toEqual [1,1]
 
     it "real (tracking) marking functionality", ->
       editor.setCursorScreenPosition([2, 2])
       keydown('m')
-      commandModeInputKeydown('q')
+      normalModeInputKeydown('q')
       editor.setCursorScreenPosition([1, 2])
       keydown('o')
       keydown('escape')
       keydown('`')
-      commandModeInputKeydown('q')
+      normalModeInputKeydown('q')
       expect(editor.getCursorScreenPosition()).toEqual [3,2]
 
     it "real (tracking) marking functionality", ->
       editor.setCursorScreenPosition([2, 2])
       keydown('m')
-      commandModeInputKeydown('q')
+      normalModeInputKeydown('q')
       editor.setCursorScreenPosition([1, 2])
       keydown('d')
       keydown('d')
       keydown('escape')
       keydown('`')
-      commandModeInputKeydown('q')
+      normalModeInputKeydown('q')
       expect(editor.getCursorScreenPosition()).toEqual [1,2]

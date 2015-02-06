@@ -1,7 +1,7 @@
 @import "syntax-variables";
 @import "ui-variables";
 
-.command-mode-input atom-text-editor[mini] {
+.normal-mode-input atom-text-editor[mini] {
   background-color: inherit;
   border: none;
   width: 100%;
@@ -20,7 +20,7 @@
   opacity: 0.5;
 }
 
-atom-text-editor.vim-mode.command-mode,
+atom-text-editor.vim-mode.normal-mode,
 atom-text-editor.vim-mode.operator-pending-mode,
 atom-text-editor.vim-mode.visual-mode,
 {
@@ -33,7 +33,7 @@ atom-text-editor.vim-mode.visual-mode,
   }
 }
 
-atom-text-editor.vim-mode.command-mode.is-focused,
+atom-text-editor.vim-mode.normal-mode.is-focused,
 atom-text-editor.vim-mode.operator-pending-mode.is-focused,
 atom-text-editor.vim-mode.visual-mode.is-focused
 {

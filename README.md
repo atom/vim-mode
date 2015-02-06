@@ -10,7 +10,7 @@ run `apm install vim-mode` from the command line.
 
 ### Current Status
 
-Sizable portions of Vim's command mode work as you'd expect, including
+Sizable portions of Vim's normal mode work as you'd expect, including
 many complex combinations. Even so, this package is far from finished (Vim
 wasn't built in a day).
 

@@ -28,34 +28,34 @@ class VimState
 
     @editor.onDidChangeSelectionRange =>
       if _.all(@editor.getSelections(), (selection) -> selection.isEmpty())
-        @activateCommandMode() if @mode is 'visual'
+        @activateNormalMode() if @mode is 'visual'
       else
         @activateVisualMode('characterwise') if @mode is 'command'
 
     @editorElement.classList.add("vim-mode")
-    @setupCommandMode()
+    @setupNormalMode()
     if atom.config.get 'vim-mode.startInInsertMode'
       @activateInsertMode()
     else
-      @activateCommandMode()
+      @activateNormalMode()
 
   destroy: ->
     @subscriptions.dispose()
     @deactivateInsertMode()
     @editorElement.component.setInputEnabled(true)
     @editorElement.classList.remove("vim-mode")
-    @editorElement.classList.remove("command-mode")
+    @editorElement.classList.remove("normal-mode")
 
   # Private: Creates the plugin's bindings
   #
   # Returns nothing.
-  setupCommandMode: ->
+  setupNormalMode: ->
     @registerCommands
-      'activate-command-mode': => @activateCommandMode()
+      'activate-normal-mode': => @activateNormalMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
       'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
       'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
-      'reset-command-mode': => @resetCommandMode()
+      'reset-normal-mode': => @resetNormalMode()
       'repeat-prefix': (e) => @repeatPrefix(e)
       'reverse-selections': (e) => @reverseSelections(e)
       'undo': (e) => @undo(e)
@@ -195,7 +195,7 @@ class VimState
       # with the operation we're going to push onto the stack
       if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
         @emitter.emit('failed-to-compose')
-        @resetCommandMode()
+        @resetNormalMode()
         break
 
       @opStack.push(operation)
@@ -218,7 +218,7 @@ class VimState
 
   undo: ->
     @editor.undo()
-    @activateCommandMode()
+    @activateNormalMode()
 
   # Private: Processes the command if the last operation is complete.
   #
@@ -239,7 +239,7 @@ class VimState
         @processOpStack()
       catch e
         if (e instanceof Operators.OperatorError) or (e instanceof Motions.MotionError)
-          @resetCommandMode()
+          @resetNormalMode()
         else
           throw e
     else
@@ -333,17 +333,17 @@ class VimState
   # Mode Switching
   ##############################################################################
 
-  # Private: Used to enable command mode.
+  # Private: Used to enable normal mode.
   #
   # Returns nothing.
-  activateCommandMode: ->
+  activateNormalMode: ->
     @deactivateInsertMode()
     @deactivateVisualMode()
 
     @mode = 'command'
     @submode = null
 
-    @changeModeClass('command-mode')
+    @changeModeClass('normal-mode')
 
     @clearOpStack()
     selection.clear() for selection in @editor.getSelections()
@@ -417,19 +417,19 @@ class VimState
     @updateStatusBar()
 
   changeModeClass: (targetMode) ->
-    for mode in ['command-mode', 'insert-mode', 'visual-mode', 'operator-pending-mode']
+    for mode in ['normal-mode', 'insert-mode', 'visual-mode', 'operator-pending-mode']
       if mode is targetMode
         @editorElement.classList.add(mode)
       else
         @editorElement.classList.remove(mode)
 
-  # Private: Resets the command mode back to it's initial state.
+  # Private: Resets the normal mode back to it's initial state.
   #
   # Returns nothing.
-  resetCommandMode: ->
+  resetNormalMode: ->
     @clearOpStack()
     @editor.clearSelections()
-    @activateCommandMode()
+    @activateNormalMode()
 
   # Private: A generic way to create a Register prefix based on the event.
   #

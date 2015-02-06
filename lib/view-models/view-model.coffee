@@ -1,13 +1,13 @@
-VimCommandModeInputView = require './vim-command-mode-input-view'
+VimNormalModeInputView = require './vim-normal-mode-input-view'
 
 # Public: Base class for all view models; a view model
-#         is the model attached to a VimCommandModeInputView
+#         is the model attached to a VimNormalModeInputView
 #         which is used when a given operator, motion
 #         needs extra keystroke.
 #
 # Ivars:
 #
-#   @value - automatically set to the value of typed into the `VimCommandModeInputView`
+#   @value - automatically set to the value of typed into the `VimNormalModeInputView`
 #            when the `confirm` method is called
 #
 class ViewModel
@@ -15,7 +15,7 @@ class ViewModel
   #
   # operator - An operator, motion, prefix, etc with `@editor` and `@state` set
   #
-  # opts - the options to be passed to `VimCommandModeInputView`. Possible options are:
+  # opts - the options to be passed to `VimNormalModeInputView`. Possible options are:
   #
   #            - class {String} - the class of the view to be added to the bottom of the screen
   #
@@ -26,15 +26,15 @@ class ViewModel
   constructor: (@operation, opts={}) ->
     {@editor, @vimState} = @operation
 
-    @view = new VimCommandModeInputView(@, opts)
-    @editor.commandModeInputView = @view
+    @view = new VimNormalModeInputView(@, opts)
+    @editor.normalModeInputView = @view
     @vimState.onDidFailToCompose => @view.remove()
 
   # Public: Overriding this isn't usually necessary in subclasses, this pushes another operation
   #         to the `opStack` in `vim-stack.coffee` which causes the opStack to collapse and
   #         call execute/select on the parent operation
   #
-  # view - the `VimCommandModeInputView` that called this method
+  # view - the `VimNormalModeInputView` that called this method
   #
   # Returns nothing.
   confirm: (view) ->
@@ -44,7 +44,7 @@ class ViewModel
   #         to the `opStack` in `vim-stack.coffee` which causes the opStack to collapse and
   #         call execute/select on the parent operation
   #
-  # view - the `VimCommandModeInputView` that called this method
+  # view - the `VimNormalModeInputView` that called this method
   #
   # Returns nothing.
   cancel: (view) ->

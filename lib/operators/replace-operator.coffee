@@ -38,4 +38,4 @@ class Replace extends OperatorWithInput
             @editor.moveDown()
           @editor.moveToFirstCharacterOfLine()
 
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()

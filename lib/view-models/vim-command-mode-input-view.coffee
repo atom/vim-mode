@@ -1,9 +1,9 @@
 {View, TextEditorView} = require 'atom'
 
 module.exports =
-class VimCommandModeInputView extends View
+class VimNormalModeInputView extends View
   @content: ->
-    @div class: 'command-mode-input', =>
+    @div class: 'normal-mode-input', =>
       @div class: 'editor-container', outlet: 'editorContainer', =>
         @subview 'editor', new TextEditorView(mini: true)
 
