@@ -105,6 +105,10 @@
   'ctrl-w c': 'pane:close'
   'ctrl-w ctrl-q': 'core:close'
   'ctrl-w q': 'core:close'
+  'ctrl-w H': 'vim-mode:move-pane-view-to-far-left'
+  'ctrl-w L': 'vim-mode:move-pane-view-to-far-right'
+  'ctrl-w K': 'vim-mode:move-pane-view-to-very-top'
+  'ctrl-w J': 'vim-mode:move-pane-view-to-very-bottom'
   'g t': 'pane:show-next-item'
   'g T': 'pane:show-previous-item'
 
