@@ -1,5 +1,11 @@
 ## HEAD
 
+## 0.31
+
+* Added '_' binding - @ftwillms
+* Fixed an issue where the '>', '<', and '=' operators
+  would move the cursor incorrectly.
+
 ## 0.30
 
 * Make toggle-case operator work with multiple cursors
