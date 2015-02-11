@@ -12,11 +12,7 @@ class StatusBarManager
     @element.id = "status-bar-vim-mode"
     @element.classList.add("inline-block")
 
-  initialize: ->
-    @disposables = new CompositeDisposable
-    unless @attach()
-      @disposables.add atom.packages.onDidActivateInitialPackages => @attach()
-    @disposables
+  initialize: (@statusBar) ->
 
   update: (currentMode) ->
     for mode, [klass, html] of ContentsByMode
@@ -29,10 +25,7 @@ class StatusBarManager
   # Private
 
   attach: ->
-    statusBar = document.querySelector("status-bar")
-    if statusBar?
-      tile = statusBar.addRightTile(item: @element, priority: 20)
-      @disposables.add new Disposable => tile.destroy()
-      true
-    else
-      false
+    @tile = @statusBar.addRightTile(item: @element, priority: 20)
+
+  detach: ->
+    @tile.destroy()

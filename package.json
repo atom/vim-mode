@@ -12,5 +12,12 @@
   "dependencies": {
     "underscore-plus": "1.x",
     "event-kit": "^0.7.2"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^0.58.0": "consumeStatusBar"
+      }
+    }
   }
 }

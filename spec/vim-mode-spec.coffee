@@ -1,16 +1,20 @@
 {Workspace} = require 'atom'
 
 describe "VimMode", ->
-  [editor, editorElement] = []
+  [editor, editorElement, workspaceElement] = []
 
   beforeEach ->
     atom.workspace = new Workspace
+    workspaceElement = atom.views.getView(atom.workspace)
 
     waitsForPromise ->
       atom.workspace.open()
 
     waitsForPromise ->
       atom.packages.activatePackage('vim-mode')
+
+    waitsForPromise ->
+      atom.packages.activatePackage('status-bar')
 
     runs ->
       editor = atom.workspace.getActiveTextEditor()
@@ -20,6 +24,12 @@ describe "VimMode", ->
     it "puts the editor in command-mode initially by default", ->
       expect(editorElement.classList.contains('vim-mode')).toBe(true)
       expect(editorElement.classList.contains('command-mode')).toBe(true)
+
+    it "shows the current vim mode in the status bar", ->
+      statusBarTile = workspaceElement.querySelector("#status-bar-vim-mode")
+      expect(statusBarTile.textContent).toBe("Command")
+      atom.commands.dispatch(editorElement, "vim-mode:activate-insert-mode")
+      expect(statusBarTile.textContent).toBe("Insert")
 
     it "doesn't register duplicate command listeners for editors", ->
       editor.setText("12345")
