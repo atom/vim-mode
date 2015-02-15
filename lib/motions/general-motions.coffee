@@ -3,6 +3,7 @@ _ = require 'underscore-plus'
 
 WholeWordRegex = /\S+/
 WholeWordOrEmptyLineRegex = /^\s*$|\S+/
+AllWhitespace = /^\s$/
 
 class MotionError
   constructor: (@message) ->
@@ -188,7 +189,7 @@ class MoveToPreviousWholeWord extends Motion
 
   isWholeWord: (cursor) ->
     char = cursor.getCurrentWordPrefix().slice(-1)
-    char is ' ' or char is '\n'
+    AllWhitespace.test(char)
 
   isBeginningOfFile: (cursor) ->
     cur = cursor.getBufferPosition()
