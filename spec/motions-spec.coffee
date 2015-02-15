@@ -102,18 +102,18 @@ describe "Motions", ->
     describe "the l keybinding", ->
       beforeEach -> editor.setCursorScreenPosition([1, 2])
 
-      it "moves the cursor to the next line if wrapLeftRightMotion is true", ->
-        atom.config.set('vim-mode.wrapLeftRightMotion', true)
-        keydown('l')
-        keydown('l')
-        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
-
       it "moves the cursor right, but not to the next line", ->
         keydown('l')
         expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
         keydown('l')
         expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+      it "moves the cursor to the next line if wrapLeftRightMotion is true", ->
+        atom.config.set('vim-mode.wrapLeftRightMotion', true)
+        keydown('l')
+        keydown('l')
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
       describe "on a blank line", ->
         it "doesn't move the cursor", ->
