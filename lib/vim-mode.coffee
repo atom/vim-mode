@@ -11,6 +11,9 @@ module.exports =
     useSmartcaseForSearch:
       type: 'boolean'
       default: false
+    wrapHLMotion:
+      type: 'boolean'
+      default: false
 
   activate: (state) ->
     @disposables = new CompositeDisposable

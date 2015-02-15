@@ -140,9 +140,9 @@ class MoveLeft extends Motion
   operatesInclusively: false
 
   moveCursor: (cursor, count=1) ->
-    _.times count, ->
-      unless cursor.isAtBeginningOfLine()
-        cursor.moveLeft()
+    _.times count, =>
+      cursor.moveLeft() unless cursor.isAtBeginningOfLine() and !atom.config.get('vim-mode.wrapHLMotion')
+      @ensureCursorIsWithinLine(cursor)
 
 class MoveRight extends Motion
   operatesInclusively: false
@@ -150,6 +150,7 @@ class MoveRight extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, =>
       cursor.moveRight() unless cursor.isAtEndOfLine()
+      cursor.moveRight() if cursor.isAtEndOfLine() and atom.config.get('vim-mode.wrapHLMotion')
       @ensureCursorIsWithinLine(cursor)
 
 class MoveUp extends Motion
