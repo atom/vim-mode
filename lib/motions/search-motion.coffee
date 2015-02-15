@@ -3,6 +3,7 @@ _ = require 'underscore-plus'
 SearchViewModel = require '../view-models/search-view-model'
 {Input} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
+settings = require '../settings'
 
 class SearchBase extends MotionWithInput
   operatesInclusively: false
@@ -56,7 +57,7 @@ class SearchBase extends MotionWithInput
   getSearchTerm: (term) ->
     modifiers = {'g': true}
 
-    if not term.match('[A-Z]') and atom.config.get('vim-mode.useSmartcaseForSearch')
+    if not term.match('[A-Z]') and settings.useSmartcaseForSearch()
       modifiers['i'] = true
 
     if term.indexOf('\\c') >= 0

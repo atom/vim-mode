@@ -1,16 +1,18 @@
 _ = require 'underscore-plus'
 {Operator} = require './general-operators'
+settings = require '../settings'
 
 module.exports =
 #
 # It pastes everything contained within the specifed register
 #
 class Put extends Operator
-  register: '"'
+  register: null
 
   constructor: (@editor, @vimState, {@location, @selectOptions}={}) ->
     @location ?= 'after'
     @complete = true
+    @register = settings.defaultRegister()
 
   # Public: Pastes the text in the given register.
   #

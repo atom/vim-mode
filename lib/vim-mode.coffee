@@ -2,18 +2,10 @@
 StatusBarManager = require './status-bar-manager'
 GlobalVimState = require './global-vim-state'
 VimState = require './vim-state'
+settings = require './settings'
 
 module.exports =
-  config:
-    startInInsertMode:
-      type: 'boolean'
-      default: false
-    useSmartcaseForSearch:
-      type: 'boolean'
-      default: false
-    wrapLeftRightMotion:
-      type: 'boolean'
-      default: false
+  config: settings.config
 
   activate: (state) ->
     @disposables = new CompositeDisposable

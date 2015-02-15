@@ -1,5 +1,6 @@
 _ = require 'underscore-plus'
 {Point, Range} = require 'atom'
+settings = require '../settings'
 
 WholeWordRegex = /\S+/
 WholeWordOrEmptyLineRegex = /^\s*$|\S+/
@@ -142,7 +143,7 @@ class MoveLeft extends Motion
 
   moveCursor: (cursor, count=1) ->
     _.times count, =>
-      cursor.moveLeft() if not cursor.isAtBeginningOfLine() or atom.config.get('vim-mode.wrapLeftRightMotion')
+      cursor.moveLeft() if not cursor.isAtBeginningOfLine() or settings.wrapLeftRightMotion()
       @ensureCursorIsWithinLine(cursor)
 
 class MoveRight extends Motion
@@ -151,7 +152,7 @@ class MoveRight extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, =>
       cursor.moveRight() unless cursor.isAtEndOfLine()
-      cursor.moveRight() if atom.config.get('vim-mode.wrapLeftRightMotion') and cursor.isAtEndOfLine()
+      cursor.moveRight() if settings.wrapLeftRightMotion() and cursor.isAtEndOfLine()
       @ensureCursorIsWithinLine(cursor)
 
 class MoveUp extends Motion

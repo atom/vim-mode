@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {Point, Range} = require 'atom'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
+settings = require './settings'
 
 Operators = require './operators/index'
 Prefixes = require './prefixes'
@@ -34,7 +35,7 @@ class VimState
 
     @editorElement.classList.add("vim-mode")
     @setupCommandMode()
-    if atom.config.get 'vim-mode.startInInsertMode'
+    if settings.startInInsertMode()
       @activateInsertMode()
     else
       @activateCommandMode()
