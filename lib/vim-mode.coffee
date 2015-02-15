@@ -11,7 +11,7 @@ module.exports =
     useSmartcaseForSearch:
       type: 'boolean'
       default: false
-    wrapHLMotion:
+    wrapLeftRightMotion:
       type: 'boolean'
       default: false
 

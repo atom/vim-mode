@@ -12,4 +12,4 @@
   * What Doesn't Exist:
     * default buffer doesn't yet save on delete operations.
     * `A-Z` - Appending via upper case registers
-* Setting `wrapHLMotion` acts like VIM's whichwrap=h,l
+* Setting `wrapLeftRightMotion` acts like VIM's whichwrap=h,l,<,>
