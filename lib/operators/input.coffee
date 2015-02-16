@@ -71,7 +71,7 @@ class InsertBelowWithNewline extends Insert
 class Change extends Insert
   standalone: false
   register: null
-  constructor: ->
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
       @register = settings.defaultRegister()
 
   # Public: Changes the text selected by the given motion.
@@ -99,7 +99,7 @@ class Change extends Insert
 
 class Substitute extends Insert
   register: null
-  constructor: ->
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
       @register = settings.defaultRegister()
   execute: (count=1) ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
@@ -118,7 +118,7 @@ class Substitute extends Insert
 
 class SubstituteLine extends Insert
   register: null
-  constructor: ->
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
       @register = settings.defaultRegister()
   execute: (count=1) ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
