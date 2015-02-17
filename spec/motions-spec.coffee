@@ -1413,6 +1413,12 @@ describe "Motions", ->
       keydown('f')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      # bug was making this behaviour depend on the number
+      keydown('1')
+      keydown('1')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     it "composes with d", ->
       editor.setCursorScreenPosition([0,3])
@@ -1459,6 +1465,11 @@ describe "Motions", ->
     it "doesn't move if there aren't the specified count of the specified character", ->
       keydown('1')
       keydown('0')
+      keydown('t')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      keydown('1')
+      keydown('1')
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
