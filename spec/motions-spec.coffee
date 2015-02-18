@@ -37,6 +37,12 @@ describe "Motions", ->
           keydown('h')
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
+        it "moves the cursor to the previous line if wrapLeftRightMotion is true", ->
+          atom.config.set('vim-mode.wrapLeftRightMotion', true)
+          keydown('h')
+          keydown('h')
+          expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
       describe "as a selection", ->
         it "selects the character to the left", ->
           keydown('y')
@@ -102,6 +108,12 @@ describe "Motions", ->
 
         keydown('l')
         expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+      it "moves the cursor to the next line if wrapLeftRightMotion is true", ->
+        atom.config.set('vim-mode.wrapLeftRightMotion', true)
+        keydown('l')
+        keydown('l')
+        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
       describe "on a blank line", ->
         it "doesn't move the cursor", ->
