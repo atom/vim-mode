@@ -141,7 +141,7 @@ class MoveLeft extends Motion
 
   moveCursor: (cursor, count=1) ->
     _.times count, =>
-      cursor.moveLeft() unless cursor.isAtBeginningOfLine() and not atom.config.get('vim-mode.wrapLeftRightMotion')
+      cursor.moveLeft() if not cursor.isAtBeginningOfLine() or atom.config.get('vim-mode.wrapLeftRightMotion')
       @ensureCursorIsWithinLine(cursor)
 
 class MoveRight extends Motion
