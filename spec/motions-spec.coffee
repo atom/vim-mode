@@ -422,7 +422,7 @@ describe "Motions", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
   describe "the B keybinding", ->
-    beforeEach -> editor.setText("cde1+- ab \n xyz-123\n\n zip")
+    beforeEach -> editor.setText("cde1+- ab \n\t xyz-123\n\n zip")
 
     describe "as a motion", ->
       beforeEach -> editor.setCursorScreenPosition([4, 1])
@@ -435,7 +435,7 @@ describe "Motions", ->
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
         keydown('B', shift:true)
-        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+        expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
         keydown('B', shift:true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 7]
@@ -445,7 +445,7 @@ describe "Motions", ->
 
     describe "as a selection", ->
       it "selects to the beginning of the whole word", ->
-        editor.setCursorScreenPosition([1, 8])
+        editor.setCursorScreenPosition([1, 10])
         keydown('y')
         keydown('B', shift:true)
         expect(vimState.getRegister('"').text).toBe 'xyz-123'
