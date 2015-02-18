@@ -1,5 +1,11 @@
 ## HEAD
 
+## 0.32
+
+* Added setting for allowing traversal of line breaks via `h` and `l` - @jacekkopecky
+* Fixed handling of whitespace characters in `B` mapping - @jacekkopecky
+* Fixed bugs when using counts with `f`, `F`, `t` and `T` mappings - @jacekkopecky
+
 ## 0.31
 
 * Added '_' binding - @ftwillms
