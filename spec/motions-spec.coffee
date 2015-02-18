@@ -1413,6 +1413,24 @@ describe "Motions", ->
       keydown('f')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      # a bug was making this behaviour depend on the count
+      keydown('1')
+      keydown('1')
+      keydown('f')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      # and backwards now
+      editor.setCursorScreenPosition([0, 6])
+      keydown('1')
+      keydown('0')
+      keydown('F', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+      keydown('1')
+      keydown('1')
+      keydown('F', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "composes with d", ->
       editor.setCursorScreenPosition([0,3])
@@ -1462,6 +1480,24 @@ describe "Motions", ->
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      # a bug was making this behaviour depend on the count
+      keydown('1')
+      keydown('1')
+      keydown('t')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      # and backwards now
+      editor.setCursorScreenPosition([0, 6])
+      keydown('1')
+      keydown('0')
+      keydown('T', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+      keydown('1')
+      keydown('1')
+      keydown('T', shift: true)
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "composes with d", ->
       editor.setCursorScreenPosition([0,3])
