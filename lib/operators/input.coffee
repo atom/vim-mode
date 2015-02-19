@@ -1,5 +1,6 @@
 {Operator, Delete} = require './general-operators'
 _ = require 'underscore-plus'
+settings = require '../settings'
 
 # The operation for text entered in input mode. Broadly speaking, input
 # operators manage an undo transaction and set a @typingCompleted variable when
@@ -69,7 +70,9 @@ class InsertBelowWithNewline extends Insert
 #
 class Change extends Insert
   standalone: false
-  register: '"'
+  register: null
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+      @register = settings.defaultRegister()
 
   # Public: Changes the text selected by the given motion.
   #
@@ -95,7 +98,9 @@ class Change extends Insert
     @typingCompleted = true
 
 class Substitute extends Insert
-  register: '"'
+  register: null
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+      @register = settings.defaultRegister()
   execute: (count=1) ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
     _.times count, =>
@@ -112,7 +117,9 @@ class Substitute extends Insert
     @typingCompleted = true
 
 class SubstituteLine extends Insert
-  register: '"'
+  register: null
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+      @register = settings.defaultRegister()
   execute: (count=1) ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
     @editor.moveToBeginningOfLine()

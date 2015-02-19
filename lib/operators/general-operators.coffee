@@ -2,6 +2,7 @@ _ = require 'underscore-plus'
 {Point, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
 Utils = require '../utils'
+settings = require '../settings'
 
 class OperatorError
   constructor: (@message) ->
@@ -74,7 +75,7 @@ class OperatorWithInput extends Operator
 # It deletes everything selected by the following motion.
 #
 class Delete extends Operator
-  register: '"'
+  register: null
   allowEOL: null
 
   # allowEOL - Determines whether the cursor should be allowed to rest on the
@@ -83,6 +84,7 @@ class Delete extends Operator
     @complete = false
     @selectOptions ?= {}
     @selectOptions.requireEOL ?= true
+    @register = settings.defaultRegister()
 
   # Public: Deletes the text selected by the given motion.
   #
@@ -144,7 +146,11 @@ class ToggleCase extends Operator
 # It copies everything selected by the following motion.
 #
 class Yank extends Operator
-  register: '"'
+  register: null
+
+  constructor: (@editor, @vimState, {@allowEOL, @selectOptions}={}) ->
+    @register = settings.defaultRegister()
+
   # Public: Copies the text selected by the given motion.
   #
   # count - The number of times to execute.
