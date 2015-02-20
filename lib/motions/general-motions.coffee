@@ -160,7 +160,7 @@ class MoveUp extends Motion
 
   moveCursor: (cursor, count=1) ->
     _.times count, =>
-      unless cursor.getBufferRow() is 0
+      unless cursor.getScreenRow() is 0
         cursor.moveUp()
         @ensureCursorIsWithinLine(cursor)
 
@@ -169,7 +169,7 @@ class MoveDown extends Motion
 
   moveCursor: (cursor, count=1) ->
     _.times count, =>
-      unless cursor.getBufferRow() is @editor.getEofBufferPosition().row
+      unless cursor.getScreenRow() is @editor.getLastScreenRow()
         cursor.moveDown()
         @ensureCursorIsWithinLine(cursor)
 
