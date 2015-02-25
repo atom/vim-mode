@@ -1461,6 +1461,10 @@ describe "Motions", ->
       keydown('t')
       commandModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+      # or stays put when it's already there
+      keydown('t')
+      commandModeInputKeydown('a')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     it 'moves backwards to the character after the first specified character it finds', ->
       editor.setCursorScreenPosition([0, 2])
@@ -1598,20 +1602,20 @@ describe "Motions", ->
       keydown(',')
       expect(editor.getCursorScreenPosition()).toEqual [0, 8]
 
-    it "repeat t in same direction (won't move)", ->
+    it "repeat t in same direction", ->
       keydown('t')
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 1]
       keydown(';')
-      expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
-    it "repeat T in same direction (won't move)", ->
+    it "repeat T in same direction", ->
       editor.setCursorScreenPosition([0,10])
       keydown('T', shift: true)
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 9]
       keydown(';')
-      expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "repeat t in opposite direction first, and then reverse", ->
       editor.setCursorScreenPosition([0,3])
