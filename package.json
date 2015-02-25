@@ -19,5 +19,13 @@
         "^0.58.0": "consumeStatusBar"
       }
     }
+  },
+  "providedServices": {
+    "vim-mode": {
+      "description": "",
+      "versions": {
+        "0.1.0": "provideVimMode"
+      }
+    }
   }
 }
