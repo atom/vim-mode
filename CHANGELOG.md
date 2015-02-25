@@ -1,5 +1,20 @@
 ## HEAD
 
+## 0.34
+
+* Added a service API so that other packages can extend vim-mode - @lloeki
+* Added an insert-mode mapping for ctrl-u - @nicolaiskogheim
+
+## 0.33
+
+* Added a setting for using the system clipboard as the default register - @chrisfarms
+
+## 0.32
+
+* Added setting for allowing traversal of line breaks via `h` and `l` - @jacekkopecky
+* Fixed handling of whitespace characters in `B` mapping - @jacekkopecky
+* Fixed bugs when using counts with `f`, `F`, `t` and `T` mappings - @jacekkopecky
+
 ## 0.31
 
 * Added '_' binding - @ftwillms

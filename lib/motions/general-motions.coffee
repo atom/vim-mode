@@ -1,8 +1,10 @@
 _ = require 'underscore-plus'
 {Point, Range} = require 'atom'
+settings = require '../settings'
 
 WholeWordRegex = /\S+/
 WholeWordOrEmptyLineRegex = /^\s*$|\S+/
+AllWhitespace = /^\s$/
 
 class MotionError
   constructor: (@message) ->
@@ -140,9 +142,9 @@ class MoveLeft extends Motion
   operatesInclusively: false
 
   moveCursor: (cursor, count=1) ->
-    _.times count, ->
-      unless cursor.isAtBeginningOfLine()
-        cursor.moveLeft()
+    _.times count, =>
+      cursor.moveLeft() if not cursor.isAtBeginningOfLine() or settings.wrapLeftRightMotion()
+      @ensureCursorIsWithinLine(cursor)
 
 class MoveRight extends Motion
   operatesInclusively: false
@@ -150,6 +152,7 @@ class MoveRight extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, =>
       cursor.moveRight() unless cursor.isAtEndOfLine()
+      cursor.moveRight() if settings.wrapLeftRightMotion() and cursor.isAtEndOfLine()
       @ensureCursorIsWithinLine(cursor)
 
 class MoveUp extends Motion
@@ -157,7 +160,7 @@ class MoveUp extends Motion
 
   moveCursor: (cursor, count=1) ->
     _.times count, =>
-      unless cursor.getBufferRow() is 0
+      unless cursor.getScreenRow() is 0
         cursor.moveUp()
         @ensureCursorIsWithinLine(cursor)
 
@@ -166,7 +169,7 @@ class MoveDown extends Motion
 
   moveCursor: (cursor, count=1) ->
     _.times count, =>
-      unless cursor.getBufferRow() is @editor.getEofBufferPosition().row
+      unless cursor.getScreenRow() is @editor.getLastScreenRow()
         cursor.moveDown()
         @ensureCursorIsWithinLine(cursor)
 
@@ -188,7 +191,7 @@ class MoveToPreviousWholeWord extends Motion
 
   isWholeWord: (cursor) ->
     char = cursor.getCurrentWordPrefix().slice(-1)
-    char is ' ' or char is '\n'
+    AllWhitespace.test(char)
 
   isBeginningOfFile: (cursor) ->
     cur = cursor.getBufferPosition()

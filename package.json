@@ -1,7 +1,7 @@
 {
   "name": "vim-mode",
   "main": "./lib/vim-mode",
-  "version": "0.31.0",
+  "version": "0.34.0",
   "description": "Add vim modal control",
   "license": "MIT",
   "private": true,
@@ -17,6 +17,14 @@
     "status-bar": {
       "versions": {
         "^0.58.0": "consumeStatusBar"
+      }
+    }
+  },
+  "providedServices": {
+    "vim-mode": {
+      "description": "",
+      "versions": {
+        "0.1.0": "provideVimMode"
       }
     }
   }

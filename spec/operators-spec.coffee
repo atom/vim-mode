@@ -561,6 +561,13 @@ describe "Operators", ->
       it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
+    describe "when useClipboardAsDefaultRegister enabled", ->
+      it "writes to clipboard", ->
+        atom.config.set 'vim-mode.useClipboardAsDefaultRegister', true
+        keydown('y')
+        keydown('y')
+        expect(atom.clipboard.read()).toBe '012 345\n'
+
     describe "when followed with a repeated y", ->
       beforeEach ->
         keydown('y')
@@ -734,6 +741,7 @@ describe "Operators", ->
         editor.setCursorScreenPosition [0, 0]
         vimState.setRegister('"', text: '345')
         vimState.setRegister('a', text: 'a')
+        atom.clipboard.write "clip"
 
       describe "from the default register", ->
         beforeEach -> keydown('p')
@@ -741,6 +749,12 @@ describe "Operators", ->
         it "inserts the contents", ->
           expect(editor.getText()).toBe "034512\n"
           expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+      describe "when useClipboardAsDefaultRegister enabled", ->
+        it "inserts contents from clipboard", ->
+          atom.config.set 'vim-mode.useClipboardAsDefaultRegister', true
+          keydown('p')
+          expect(editor.getText()).toBe "0clip12\n"
 
       describe "from a specified register", ->
         beforeEach ->
