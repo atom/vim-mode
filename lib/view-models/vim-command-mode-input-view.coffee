@@ -1,4 +1,4 @@
-{View} = require 'space-pen'
+{View, $} = require 'space-pen'
 {TextEditorView} = require 'atom-space-pen-views'
 
 module.exports =
@@ -24,18 +24,20 @@ class VimCommandModeInputView extends View
     @handleEvents()
 
   handleEvents: ->
+    input = $ @editor[0].rootElement.querySelector 'input'
     if @singleChar?
-      @editor.find('input').on 'textInput', @autosubmit
+      input.on 'textInput', @autosubmit
     @editor.on 'core:confirm', @confirm
     @editor.on 'core:cancel', @cancel
-    @editor.find('input').on 'blur', @cancel
+    input.on 'blur', @cancel
 
   stopHandlingEvents: ->
+    input = $ @editor[0].rootElement.querySelector 'input'
     if @singleChar?
-      @editor.find('input').off 'textInput', @autosubmit
+      input.off 'textInput', @autosubmit
     @editor.off 'core:confirm', @confirm
     @editor.off 'core:cancel', @cancel
-    @editor.find('input').off 'blur', @cancel
+    input.off 'blur', @cancel
 
   autosubmit: (event) =>
     @editor.setText(event.originalEvent.data)
