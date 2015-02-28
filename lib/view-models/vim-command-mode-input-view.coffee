@@ -1,4 +1,5 @@
-{View, TextEditorView} = require 'atom'
+{View} = require 'space-pen'
+{TextEditorView} = require 'atom-space-pen-views'
 
 module.exports =
 class VimCommandModeInputView extends View
