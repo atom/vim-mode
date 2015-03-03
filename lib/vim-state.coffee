@@ -124,6 +124,7 @@ class VimState
       'select-inside-back-ticks': => new TextObjects.SelectInsideQuotes(@editor, '`', false)
       'select-inside-curly-brackets': => new TextObjects.SelectInsideBrackets(@editor, '{', '}', false)
       'select-inside-angle-brackets': => new TextObjects.SelectInsideBrackets(@editor, '<', '>', false)
+      'select-inside-tags': => new TextObjects.SelectInsideBrackets(@editor, '>', '<', false)
       'select-inside-square-brackets': => new TextObjects.SelectInsideBrackets(@editor, '[', ']', false)
       'select-inside-parentheses': => new TextObjects.SelectInsideBrackets(@editor, '(', ')', false)
       'select-a-word': => new TextObjects.SelectAWord(@editor)

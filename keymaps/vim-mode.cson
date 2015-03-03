@@ -201,6 +201,7 @@
   'i B': 'vim-mode:select-inside-curly-brackets'
   'i <': 'vim-mode:select-inside-angle-brackets'
   'i >': 'vim-mode:select-inside-angle-brackets'
+  'i t': 'vim-mode:select-inside-tags'
   'i [': 'vim-mode:select-inside-square-brackets'
   'i ]': 'vim-mode:select-inside-square-brackets'
   'i (': 'vim-mode:select-inside-parentheses'
