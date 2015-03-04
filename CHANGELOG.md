@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.35
+
+* Implemented basic version of `i t` operator - @neiled
+* Made `t` motion repeatable with `;` - @jacekkopecky
+
 ## 0.34
 
 * Added a service API so that other packages can extend vim-mode - @lloeki
