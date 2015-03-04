@@ -375,6 +375,21 @@ describe "Operators", ->
           keydown('G', shift: true)
           expect(editor.getText()).toBe("12345\nABCDE")
 
+    describe "when followed by a t)", ->
+      describe "with the entire line yanked before", ->
+        beforeEach ->
+          editor.setText("test (xyz)")
+          editor.setCursorScreenPosition([0, 6])
+
+        it "deletes until the closing parenthesis", ->
+          keydown('y')
+          keydown('y')
+          keydown('d')
+          keydown('t')
+          commandModeInputKeydown(')')
+          expect(editor.getText()).toBe("test ()")
+          expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
     describe "with multiple cursors", ->
       it "deletes each selection", ->
         editor.setText("abcd\n1234\nABCD")
