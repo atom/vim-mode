@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.36
+
+* Fixed an issue where `d` and `c` with forward motions would sometimes
+  incorrectly delete the character before the cursor - @deiwin
+
 ## 0.35
 
 * Implemented basic version of `i t` operator - @neiled
