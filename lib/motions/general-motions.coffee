@@ -82,7 +82,7 @@ class Motion
 
       if (isReversed or isEmpty) and not (wasReversed or wasEmpty)
         selection.setBufferRange([newStart, [newEnd.row, oldStart.column + 1]])
-      if wasReversed and not isReversed
+      if wasReversed and not wasEmpty and not isReversed
         selection.setBufferRange([[newStart.row, oldEnd.column - 1], newEnd])
 
   moveSelection: (selection, count, options) ->
