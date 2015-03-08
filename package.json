@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "underscore-plus": "1.x",
-    "event-kit": "^0.7.2"
+    "event-kit": "^0.7.2",
+    "atom-space-pen-views": "^2.0.3"
   },
   "consumedServices": {
     "status-bar": {
