@@ -143,6 +143,33 @@ class ToggleCase extends Operator
     @vimState.activateCommandMode()
 
 #
+# In visual mode, it makes the selection uppercase
+#
+class UpperCase extends Operator
+  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+    @complete = true
+
+  execute: (count=1) ->
+    if @vimState.mode is 'visual'
+      @editor.replaceSelectedText {}, (text) ->
+        text.toUpperCase()
+    else
+      @editor.transact =>
+        for cursor in @editor.getCursors()
+          point = cursor.getBufferPosition()
+          lineLength = @editor.lineTextForBufferRow(point.row).length
+          cursorCount = Math.min(count, lineLength - point.column)
+
+          _.times cursorCount, =>
+            point = cursor.getBufferPosition()
+            range = Range.fromPointWithDelta(point, 0, 1)
+            char = @editor.getTextInBufferRange(range)
+            @editor.setTextInBufferRange(range, char.toUpperCase())
+            cursor.moveRight() unless point.column >= lineLength - 1
+
+    @vimState.activateCommandMode()
+
+#
 # It copies everything selected by the following motion.
 #
 class Yank extends Operator
@@ -223,5 +250,5 @@ class Mark extends OperatorWithInput
 
 module.exports = {
   Operator, OperatorWithInput, OperatorError, Delete, ToggleCase,
-  Yank, Join, Repeat, Mark
+  UpperCase, Yank, Join, Repeat, Mark
 }

@@ -227,3 +227,4 @@
   'x': 'vim-mode:delete'
   's': 'vim-mode:change'
   'o': 'vim-mode:reverse-selections'
+  'U': 'vim-mode:upper-case'
