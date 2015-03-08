@@ -580,9 +580,7 @@ describe "Motions", ->
         expect(editor.getText()).toBe "  ab\n\n1234567890"
         expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
-  # FIXME: this doesn't work as we can't determine if this is a motion
-  # or part of a repeat prefix.
-  xdescribe "the 0 keybinding", ->
+  describe "the 0 keybinding", ->
     beforeEach ->
       editor.setText("  a\n")
       editor.setCursorScreenPosition([0, 2])
