@@ -149,10 +149,16 @@ class MoveLeft extends Motion
 class MoveRight extends Motion
   operatesInclusively: false
 
-  moveCursor: (cursor, count=1) ->
+  # MoveRight can be combined with Delete, which will indicate it by the presence of options.deleting
+  moveCursor: (cursor, count=1, options={}) ->
     _.times count, =>
-      cursor.moveRight() unless cursor.isAtEndOfLine()
-      cursor.moveRight() if settings.wrapLeftRightMotion() and cursor.isAtEndOfLine()
+      goingToNextLine = atom.config.get('vim-mode.wrapLeftRightMotion')
+
+      if not cursor.isAtEndOfLine() # the line is not empty
+        cursor.moveRight()
+        goingToNextLine = false if options.deleting # when deleting, wrapLeftRightMotion only works on an empty line
+
+      cursor.moveRight() if cursor.isAtEndOfLine() and goingToNextLine
       @ensureCursorIsWithinLine(cursor)
 
 class MoveUp extends Motion

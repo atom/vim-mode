@@ -84,6 +84,7 @@ class Delete extends Operator
     @complete = false
     @selectOptions ?= {}
     @selectOptions.requireEOL ?= true
+    @selectOptions.deleting ?= true
     @register = settings.defaultRegister()
 
   # Public: Deletes the text selected by the given motion.
@@ -100,7 +101,7 @@ class Delete extends Operator
         if @motion.isLinewise?()
           cursor.moveToBeginningOfLine()
         else
-          cursor.moveLeft() if cursor.isAtEndOfLine()
+          cursor.moveLeft() if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
 
     @vimState.activateCommandMode()
 
