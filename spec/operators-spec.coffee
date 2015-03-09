@@ -1296,15 +1296,43 @@ describe "Operators", ->
         keydown("~")
         expect(editor.getText()).toBe 'AbC\nXyZ'
 
-  describe 'the U keybinding (in visual mode)', ->
+  describe 'the U keybinding', ->
     beforeEach ->
       editor.setText('aBc\nXyZ')
       editor.setCursorBufferPosition([0, 0])
 
-    it "makes the selected text uppercase", ->
+    it "makes one character uppercase with `g`", ->
+      keydown("g")
+      keydown("U", shift: true)
+      expect(editor.getText()).toBe 'ABc\nXyZ'
+
+      keydown("g")
+      keydown("U", shift: true)
+      expect(editor.getText()).toBe 'ABc\nXyZ'
+
+    it "makes the selected text uppercase in visual mode", ->
       keydown("V", shift: true)
       keydown("U", shift: true)
       expect(editor.getText()).toBe 'ABC\nXyZ'
+
+  describe 'the u keybinding', ->
+    beforeEach ->
+      editor.setText('aBc\nXyZ')
+      editor.setCursorBufferPosition([0, 0])
+
+    it "makes one character lowercase with `g`", ->
+      keydown("g")
+      keydown("u")
+      expect(editor.getText()).toBe 'aBc\nXyZ'
+
+      keydown("g")
+      keydown("u")
+      expect(editor.getText()).toBe 'abc\nXyZ'
+
+    it "makes the selected text lowercase in visual mode", ->
+      keydown("V", shift: true)
+      keydown("u")
+      expect(editor.getText()).toBe 'abc\nXyZ'
 
   describe "the i keybinding", ->
     beforeEach ->

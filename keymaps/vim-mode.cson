@@ -81,6 +81,8 @@
   'p': 'vim-mode:put-after'
 
   '~': 'vim-mode:toggle-case'
+  'g U': 'vim-mode:upper-case'
+  'g u': 'vim-mode:lower-case'
 
   'ctrl-w ctrl-h': 'vim-mode:focus-pane-view-on-left'
   'ctrl-w h': 'vim-mode:focus-pane-view-on-left'
@@ -228,3 +230,4 @@
   's': 'vim-mode:change'
   'o': 'vim-mode:reverse-selections'
   'U': 'vim-mode:upper-case'
+  'u': 'vim-mode:lower-case'
