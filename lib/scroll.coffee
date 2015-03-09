@@ -84,5 +84,26 @@ class ScrollCursorToBottom extends ScrollCursor
   moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
 
+class ScrollHorizontal
+  isComplete: -> true
+  isRecordable: -> false
+  constructor: (@editor) ->
+    cursorPos = @editor.getCursorScreenPosition()
+    @pixel = @editor.pixelPositionForScreenPosition(cursorPos).left
+    @cursor = @editor.getLastCursor()
+
+  putCursorOnScreen: ->
+    @cursor.autoscroll({center: false})
+
+class ScrollCursorToLeft extends ScrollHorizontal
+  execute: ->
+    @editor.setScrollLeft(@pixel)
+    @putCursorOnScreen()
+
+class ScrollCursorToRight extends ScrollHorizontal
+  execute: ->
+    @editor.setScrollRight(@pixel)
+    @putCursorOnScreen()
+
 module.exports = {ScrollDown, ScrollUp, ScrollCursorToTop, ScrollCursorToMiddle,
-  ScrollCursorToBottom}
+  ScrollCursorToBottom, ScrollCursorToLeft, ScrollCursorToRight}
