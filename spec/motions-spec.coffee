@@ -1221,8 +1221,8 @@ describe "Motions", ->
 
       describe "when cursor is not on a word", ->
         it "does a match with the next word", ->
-          editor.setText("abc\n  @def\n abc\n @def")
-          editor.setCursorBufferPosition([1, 0])
+          editor.setText("abc\na  @def\n abc\n @def")
+          editor.setCursorBufferPosition([1, 1])
           keydown("*")
           expect(editor.getCursorBufferPosition()).toEqual [3, 1]
 
@@ -1231,13 +1231,13 @@ describe "Motions", ->
           editor.setText("abc\n@def\nabc\n ")
           editor.setCursorBufferPosition([3, 0])
           keydown("*")
-          expect(editor.getCursorBufferPosition()).toEqual [3, 1]
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
   describe "the hash keybinding", ->
     describe "as a motion", ->
-      it "moves cursor to next occurence of word under cursor", ->
+      it "moves cursor to previous occurence of word under cursor", ->
         editor.setText("abc\n@def\nabc\ndef\n")
-        editor.setCursorBufferPosition([2, 0])
+        editor.setCursorBufferPosition([2, 1])
         keydown("#")
         expect(editor.getCursorBufferPosition()).toEqual [0, 0]
 
