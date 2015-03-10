@@ -111,7 +111,7 @@ class ToggleCase extends Operator
   constructor: (@editor, @vimState, {@complete, @selectOptions}={}) ->
 
   execute: (count=1) ->
-    if @motion
+    if @motion?
       if _.contains(@motion.select(count, @selectOptions), true)
         @editor.replaceSelectedText {}, (text) ->
           text.split('').map((char) ->
