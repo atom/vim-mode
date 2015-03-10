@@ -108,19 +108,19 @@ class Delete extends Operator
 # It toggles the case of everything selected by the following motion
 #
 class ToggleCase extends Operator
-  constructor: (@editor, @vimState, {@selectOptions}={}) ->
-    @complete = true
+  constructor: (@editor, @vimState, {@complete, @selectOptions}={}) ->
 
   execute: (count=1) ->
-    if @vimState.mode is 'visual'
-      @editor.replaceSelectedText {}, (text) ->
-        text.split('').map((char) ->
-          lower = char.toLowerCase()
-          if char is lower
-            char.toUpperCase()
-          else
-            lower
-        ).join('')
+    if @motion
+      if _.contains(@motion.select(count, @selectOptions), true)
+        @editor.replaceSelectedText {}, (text) ->
+          text.split('').map((char) ->
+            lower = char.toLowerCase()
+            if char is lower
+              char.toUpperCase()
+            else
+              lower
+          ).join('')
     else
       @editor.transact =>
         for cursor in @editor.getCursors()
@@ -143,56 +143,30 @@ class ToggleCase extends Operator
     @vimState.activateCommandMode()
 
 #
-# In visual mode or after `g`, it makes the selection uppercase
+# In visual mode or after `g` with a motion, it makes the selection uppercase
 #
 class UpperCase extends Operator
   constructor: (@editor, @vimState, {@selectOptions}={}) ->
-    @complete = true
+    @complete = false
 
   execute: (count=1) ->
-    if @vimState.mode is 'visual'
+    if _.contains(@motion.select(count, @selectOptions), true)
       @editor.replaceSelectedText {}, (text) ->
         text.toUpperCase()
-    else
-      @editor.transact =>
-        for cursor in @editor.getCursors()
-          point = cursor.getBufferPosition()
-          lineLength = @editor.lineTextForBufferRow(point.row).length
-          cursorCount = Math.min(count, lineLength - point.column)
-
-          _.times cursorCount, =>
-            point = cursor.getBufferPosition()
-            range = Range.fromPointWithDelta(point, 0, 1)
-            char = @editor.getTextInBufferRange(range)
-            @editor.setTextInBufferRange(range, char.toUpperCase())
-            cursor.moveRight() unless point.column >= lineLength - 1
 
     @vimState.activateCommandMode()
 
 #
-# In visual mode or after `g`, it makes the selection lowercase
+# In visual mode or after `g` with a motion, it makes the selection lowercase
 #
 class LowerCase extends Operator
   constructor: (@editor, @vimState, {@selectOptions}={}) ->
-    @complete = true
+    @complete = false
 
   execute: (count=1) ->
-    if @vimState.mode is 'visual'
+    if _.contains(@motion.select(count, @selectOptions), true)
       @editor.replaceSelectedText {}, (text) ->
         text.toLowerCase()
-    else
-      @editor.transact =>
-        for cursor in @editor.getCursors()
-          point = cursor.getBufferPosition()
-          lineLength = @editor.lineTextForBufferRow(point.row).length
-          cursorCount = Math.min(count, lineLength - point.column)
-
-          _.times cursorCount, =>
-            point = cursor.getBufferPosition()
-            range = Range.fromPointWithDelta(point, 0, 1)
-            char = @editor.getTextInBufferRange(range)
-            @editor.setTextInBufferRange(range, char.toLowerCase())
-            cursor.moveRight() unless point.column >= lineLength - 1
 
     @vimState.activateCommandMode()
 

@@ -80,9 +80,10 @@
   'P': 'vim-mode:put-before'
   'p': 'vim-mode:put-after'
 
-  '~': 'vim-mode:toggle-case'
+  'g ~': 'vim-mode:toggle-case'
   'g U': 'vim-mode:upper-case'
   'g u': 'vim-mode:lower-case'
+  '~': 'vim-mode:toggle-case-now'
 
   'ctrl-w ctrl-h': 'vim-mode:focus-pane-view-on-left'
   'ctrl-w h': 'vim-mode:focus-pane-view-on-left'
