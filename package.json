@@ -16,7 +16,7 @@
   "consumedServices": {
     "status-bar": {
       "versions": {
-        "^0.58.0": "consumeStatusBar"
+        "^1.0.0": "consumeStatusBar"
       }
     }
   },
