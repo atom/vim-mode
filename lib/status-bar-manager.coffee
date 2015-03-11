@@ -3,11 +3,12 @@
 # mode names can be combined with submode names with the `$` character
 # the order matters - the last matching entry wins
 ContentsByMode =
-  insert:  ["status-bar-vim-mode-insert", "Insert"]
-  command: ["status-bar-vim-mode-command", "Command"]
-  visual:  ["status-bar-vim-mode-visual", "Visual"]
-  visual$linewise:      ["status-bar-vim-mode-visual", "Visual Line"]
-  visual$blockwise:     ["status-bar-vim-mode-visual", "Visual Block"]
+  insert:           ["status-bar-vim-mode-insert", "Insert"]
+  insert$replace:   ["status-bar-vim-mode-insert", "Replace"]
+  command:          ["status-bar-vim-mode-command", "Command"]
+  visual:           ["status-bar-vim-mode-visual", "Visual"]
+  visual$linewise:  ["status-bar-vim-mode-visual", "Visual Line"]
+  visual$blockwise: ["status-bar-vim-mode-visual", "Visual Block"]
 
 module.exports =
 class StatusBarManager
