@@ -27,7 +27,7 @@ class VimState
     @history = []
     @marks = {}
 
-    @editor.onDidChangeSelectionRange =>
+    @subscriptions.add @editor.onDidChangeSelectionRange =>
       if _.all(@editor.getSelections(), (selection) -> selection.isEmpty())
         @activateCommandMode() if @mode is 'visual'
       else
