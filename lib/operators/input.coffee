@@ -47,7 +47,7 @@ class InsertAboveWithNewline extends Insert
       @typedText = @typedText.trimLeft()
       return super
 
-    @vimState.activateInsertMode(transactionStarted = true)
+    @vimState.activateInsertMode()
     @typingCompleted = true
 
 class InsertBelowWithNewline extends Insert
@@ -62,7 +62,7 @@ class InsertBelowWithNewline extends Insert
       @typedText = @typedText.trimLeft()
       return super
 
-    @vimState.activateInsertMode(transactionStarted = true)
+    @vimState.activateInsertMode()
     @typingCompleted = true
 
 #
@@ -94,7 +94,7 @@ class Change extends Insert
 
     return super if @typingCompleted
 
-    @vimState.activateInsertMode(transactionStarted = true)
+    @vimState.activateInsertMode()
     @typingCompleted = true
 
 class Substitute extends Insert
@@ -113,7 +113,7 @@ class Substitute extends Insert
       @typedText = @typedText.trimLeft()
       return super
 
-    @vimState.activateInsertMode(transactionStarated = true)
+    @vimState.activateInsertMode()
     @typingCompleted = true
 
 class SubstituteLine extends Insert
@@ -136,7 +136,7 @@ class SubstituteLine extends Insert
       @typedText = @typedText.trimLeft()
       return super
 
-    @vimState.activateInsertMode(transactionStarated = true)
+    @vimState.activateInsertMode()
     @typingCompleted = true
 
 # Takes a transaction and turns it into a string of what was typed.
@@ -154,8 +154,7 @@ class TransactionBundler
     chars.join("")
 
   isTypedChar: (patch) ->
-    # Technically speaking, a typed char will be of length 1, but >= 1
-    # happens to let us test with editor.setText, so we'll look the other way.
+    # a typed char will be of length 1, but pasted text can be longer
     return false unless patch.newText?.length >= 1 and patch.oldText?.length == 0
     patch.newText
 
