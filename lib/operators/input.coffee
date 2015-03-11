@@ -24,6 +24,8 @@ class Insert extends Operator
           @typedText,
           normalizeLineEndings: true
         )
+        cursor = @editor.getLastCursor()
+        cursor.moveLeft() unless cursor.isAtBeginningOfLine()
     else
       @vimState.activateInsertMode()
       @typingCompleted = true
@@ -33,6 +35,17 @@ class Insert extends Operator
 class InsertAfter extends Insert
   execute: ->
     @editor.moveRight() unless @editor.getLastCursor().isAtEndOfLine()
+    super
+
+class InsertAfterEndOfLine extends Insert
+  execute: ->
+    @editor.moveToEndOfLine()
+    super
+
+class InsertAtBeginningOfLine extends Insert
+  execute: ->
+    @editor.moveToBeginningOfLine()
+    @editor.moveToFirstCharacterOfLine()
     super
 
 class InsertAboveWithNewline extends Insert
@@ -164,6 +177,8 @@ class TransactionBundler
 module.exports = {
   Insert,
   InsertAfter,
+  InsertAfterEndOfLine,
+  InsertAtBeginningOfLine,
   InsertAboveWithNewline,
   InsertBelowWithNewline,
   Change,

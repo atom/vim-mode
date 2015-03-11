@@ -993,6 +993,18 @@ describe "Operators", ->
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+      it "repeats always as insert at the end of the line", ->
+        editor.setCursorScreenPosition([0,0])
+        keydown('A', shift: true)
+        editor.insertText("abc")
+        keydown 'escape'
+        editor.setCursorScreenPosition([1,0])
+        keydown '.'
+
+        expect(editor.getText()).toBe "11abc\n22abc\n"
+        expect(editorElement.classList.contains('insert-mode')).toBe(false)
+        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+
   describe "the I keybinding", ->
     beforeEach ->
       editor.getBuffer().setText("11\n  22\n")
@@ -1011,6 +1023,19 @@ describe "Operators", ->
 
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
         expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      it "repeats always as insert at the first character of the line", ->
+        editor.setCursorScreenPosition([0,2])
+        keydown('I', shift: true)
+        editor.insertText("abc")
+        keydown 'escape'
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+        editor.setCursorScreenPosition([1,4])
+        keydown '.'
+
+        expect(editor.getText()).toBe "abc11\n  abc22\n"
+        expect(editorElement.classList.contains('insert-mode')).toBe(false)
+        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
 
   describe "the J keybinding", ->
     beforeEach ->
@@ -1319,7 +1344,9 @@ describe "Operators", ->
       editor.insertText("abc")
       keydown 'escape'
       keydown '.'
-      editor.insertText("ababcc")
+      expect(editor.getText()).toBe "ababcc"
+      keydown '.'
+      expect(editor.getText()).toBe "abababccc"
 
   describe 'the a keybinding', ->
     beforeEach ->
@@ -1339,5 +1366,7 @@ describe "Operators", ->
       editor.insertText("abc")
       keydown 'escape'
       expect(editor.getText()).toBe "abc"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
       keydown '.'
       expect(editor.getText()).toBe "abcabc"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
