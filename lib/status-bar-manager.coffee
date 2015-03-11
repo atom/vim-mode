@@ -6,7 +6,6 @@ ContentsByMode =
   insert:  ["status-bar-vim-mode-insert", "Insert"]
   command: ["status-bar-vim-mode-command", "Command"]
   visual:  ["status-bar-vim-mode-visual", "Visual"]
-  visual$characterwise: ["status-bar-vim-mode-visual", "Visual Char"]
   visual$linewise:      ["status-bar-vim-mode-visual", "Visual Line"]
   visual$blockwise:     ["status-bar-vim-mode-visual", "Visual Block"]
 
