@@ -230,12 +230,8 @@ class Repeat extends Operator
 
   execute: (count=1) ->
     @editor.transact =>
-      cmd = @vimState.history[0]
-      while cmd?.cancelled
-        @vimState.history.shift()
-        cmd = @vimState.history[0]
-
       _.times count, =>
+        cmd = @vimState.history[0]
         cmd?.execute()
 #
 # It creates a mark at the current cursor position

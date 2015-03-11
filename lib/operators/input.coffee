@@ -28,12 +28,14 @@ class Insert extends Operator
 
   inputOperator: -> true
 
+# an insert operation following cursor motion in insert mode can be cancelled
+# and forgotten like it never happened
 class InsertCancellable extends Insert
-  cancelled: false
 
   confirmTransaction: (transaction) ->
     super
-    @cancelled = true if @typedText?.length == 0
+    if @typedText?.length == 0
+      @vimState.history.shift() if @vimState.history[0] is @
 
 class InsertAfter extends Insert
   execute: ->
