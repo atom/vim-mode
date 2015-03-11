@@ -28,6 +28,13 @@ class Insert extends Operator
 
   inputOperator: -> true
 
+class InsertCancellable extends Insert
+  cancelled: false
+
+  confirmTransaction: (transaction) ->
+    super
+    @cancelled = true if @typedText?.length == 0
+
 class InsertAfter extends Insert
   execute: ->
     @editor.moveRight() unless @editor.getLastCursor().isAtEndOfLine()
@@ -189,6 +196,7 @@ module.exports = {
   InsertAtBeginningOfLine,
   InsertAboveWithNewline,
   InsertBelowWithNewline,
+  InsertCancellable,
   Change,
   Substitute,
   SubstituteLine

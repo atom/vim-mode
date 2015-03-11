@@ -13,6 +13,10 @@
 'atom-text-editor.vim-mode.insert-mode':
   'ctrl-w': 'editor:delete-to-beginning-of-word'
   'ctrl-u': 'editor:delete-to-beginning-of-line'
+  'left': 'vim-mode:move-left-insert'
+  'right': 'vim-mode:move-right-insert'
+  'up': 'vim-mode:move-up-insert'
+  'down': 'vim-mode:move-down-insert'
 
 'atom-text-editor.vim-mode:not(.insert-mode)':
   'h': 'vim-mode:move-left'
