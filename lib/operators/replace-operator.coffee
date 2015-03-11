@@ -10,6 +10,7 @@ class Replace extends OperatorWithInput
     @viewModel = new ViewModel(@, class: 'replace', hidden: true, singleChar: true, defaultText: '\n')
 
   execute: (count=1) ->
+    return if @input.characters is "" # replace canceled
 
     @editor.transact =>
       if @motion?
