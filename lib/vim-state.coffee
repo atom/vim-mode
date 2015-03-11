@@ -419,7 +419,7 @@ class VimState
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
   interruptInsertMode: ->
-    return unless @mode in [null, 'insert']
+    return unless @mode is 'insert'
     @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
     @insertionCheckpoint = null
     transaction = _.last(@editor.buffer.history.undoStack)
