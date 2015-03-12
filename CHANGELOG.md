@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.37
+
+* Implemented change case operators: `gU`, `gu` and `g~` - @jacekkopecky
+* Fixed behavior of repeating `I` and `A` insertions - @jacekkopecky
+
 ## 0.36
 
 * Fixed an issue where `d` and `c` with forward motions would sometimes
