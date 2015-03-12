@@ -1321,6 +1321,52 @@ describe "Operators", ->
         keydown("~")
         expect(editor.getText()).toBe 'AbC\nXyZ'
 
+    describe "with g and motion", ->
+      it "toggles the case of text", ->
+        editor.setCursorBufferPosition([0, 0])
+        keydown("g")
+        keydown("~")
+        keydown("2")
+        keydown("l")
+        expect(editor.getText()).toBe 'Abc\nXyZ'
+
+  describe 'the U keybinding', ->
+    beforeEach ->
+      editor.setText('aBc\nXyZ')
+      editor.setCursorBufferPosition([0, 0])
+
+    it "makes text uppercase with g and motion", ->
+      keydown("g")
+      keydown("U", shift: true)
+      keydown("l")
+      expect(editor.getText()).toBe 'ABc\nXyZ'
+
+      keydown("g")
+      keydown("U", shift: true)
+      keydown("e")
+      expect(editor.getText()).toBe 'ABC\nXyZ'
+
+    it "makes the selected text uppercase in visual mode", ->
+      keydown("V", shift: true)
+      keydown("U", shift: true)
+      expect(editor.getText()).toBe 'ABC\nXyZ'
+
+  describe 'the u keybinding', ->
+    beforeEach ->
+      editor.setText('aBc\nXyZ')
+      editor.setCursorBufferPosition([0, 0])
+
+    it "makes text lowercase with g and motion", ->
+      keydown("g")
+      keydown("u")
+      keydown("e")
+      expect(editor.getText()).toBe 'abc\nXyZ'
+
+    it "makes the selected text lowercase in visual mode", ->
+      keydown("V", shift: true)
+      keydown("u")
+      expect(editor.getText()).toBe 'abc\nXyZ'
+
   describe "the i keybinding", ->
     beforeEach ->
       editor.setText('')
