@@ -1,6 +1,6 @@
 ## HEAD
 
-## 0.37
+## 0.38
 
 * Implemented change case operators: `gU`, `gu` and `g~` - @jacekkopecky
 * Fixed behavior of repeating `I` and `A` insertions - @jacekkopecky
