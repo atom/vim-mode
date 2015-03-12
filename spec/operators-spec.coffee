@@ -1369,30 +1369,42 @@ describe "Operators", ->
 
   describe "the i keybinding", ->
     beforeEach ->
-      editor.setText('')
+      editor.setText('123\n4567')
       editor.setCursorBufferPosition([0, 0])
+      editor.addCursorAtBufferPosition([1, 0])
 
     it "allows undoing an entire batch of typing", ->
       keydown 'i'
-      editor.insertText("abc")
+      editor.insertText("abcXX")
+      editor.backspace()
+      editor.backspace()
       keydown 'escape'
+      expect(editor.getText()).toBe "abc123\nabc4567"
+
       keydown 'i'
       editor.insertText("def")
       keydown 'escape'
-      expect(editor.getText()).toBe "abdefc"
+      expect(editor.getText()).toBe "abdefc123\nabdefc4567"
+
       keydown 'u'
-      expect(editor.getText()).toBe "abc"
+      expect(editor.getText()).toBe "abc123\nabc4567"
+
       keydown 'u'
-      expect(editor.getText()).toBe ""
+      expect(editor.getText()).toBe "123\n4567"
 
     it "allows repeating typing", ->
       keydown 'i'
-      editor.insertText("abc")
+      editor.insertText("abcXX")
+      editor.backspace()
+      editor.backspace()
       keydown 'escape'
+      expect(editor.getText()).toBe "abc123\nabc4567"
+
       keydown '.'
-      expect(editor.getText()).toBe "ababcc"
+      expect(editor.getText()).toBe "ababcc123\nababcc4567"
+
       keydown '.'
-      expect(editor.getText()).toBe "abababccc"
+      expect(editor.getText()).toBe "abababccc123\nabababccc4567"
 
   describe 'the a keybinding', ->
     beforeEach ->
