@@ -1,7 +1,7 @@
 {Disposable, CompositeDisposable} = require 'event-kit'
 
-# mode names can be combined with submode names with the `.` character
-# the order matters - the last matching entry wins
+# Mode names can be combined with submode names with the `.` character.
+# The status bar will display the most specific matching entry.
 ContentsByMode =
   'insert':           ["status-bar-vim-mode-insert",  "Insert"]
   'insert.replace':   ["status-bar-vim-mode-insert",  "Replace"]
@@ -25,6 +25,9 @@ class StatusBarManager
       if mode is currentMode or mode is currentFullMode
         @element.classList.add(klass)
         @element.innerHTML = html
+
+        # if the submode is matched, it's the most specific matching entry, so stop looking
+        break if mode is currentFullMode
       else
         @element.classList.remove(klass)
 
