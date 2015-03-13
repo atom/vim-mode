@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.39
+
+* Made repeating insertions work more correctly with multiple cursors
+* Fixed bugs in `*` and `#` with cursor between words - @jacekkopecky
+
 ## 0.38
 
 * Implemented change case operators: `gU`, `gu` and `g~` - @jacekkopecky
