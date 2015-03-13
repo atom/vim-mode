@@ -1,14 +1,14 @@
 {Disposable, CompositeDisposable} = require 'event-kit'
 
-# mode names can be combined with submode names with the `$` character
+# mode names can be combined with submode names with the `.` character
 # the order matters - the last matching entry wins
 ContentsByMode =
-  insert:           ["status-bar-vim-mode-insert", "Insert"]
-  insert$replace:   ["status-bar-vim-mode-insert", "Replace"]
-  command:          ["status-bar-vim-mode-command", "Command"]
-  visual:           ["status-bar-vim-mode-visual", "Visual"]
-  visual$linewise:  ["status-bar-vim-mode-visual", "Visual Line"]
-  visual$blockwise: ["status-bar-vim-mode-visual", "Visual Block"]
+  'insert':           ["status-bar-vim-mode-insert",  "Insert"]
+  'insert.replace':   ["status-bar-vim-mode-insert",  "Replace"]
+  'command':          ["status-bar-vim-mode-command", "Command"]
+  'visual':           ["status-bar-vim-mode-visual",  "Visual"]
+  'visual.linewise':  ["status-bar-vim-mode-visual",  "Visual Line"]
+  'visual.blockwise': ["status-bar-vim-mode-visual",  "Visual Block"]
 
 module.exports =
 class StatusBarManager
@@ -20,7 +20,7 @@ class StatusBarManager
   initialize: (@statusBar) ->
 
   update: (currentMode, currentSubmode) ->
-    currentFullMode = currentMode + "$" + currentSubmode if currentSubmode?
+    currentFullMode = currentMode + "." + currentSubmode if currentSubmode?
     for mode, [klass, html] of ContentsByMode
       if mode is currentMode or mode is currentFullMode
         @element.classList.add(klass)
