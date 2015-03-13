@@ -97,21 +97,23 @@ class SearchCurrentWord extends SearchBase
 
     @input = new Input(@getCurrentWordMatch())
 
-  getCurrentWord: (onRecursion=false) ->
+  getCurrentWord: ->
     cursor = @editor.getLastCursor()
-    wordRange  = cursor.getCurrentWordBufferRange(wordRegex: @keywordRegex)
-    characters = @editor.getTextInBufferRange(wordRange)
+    wordStart = cursor.getBeginningOfCurrentWordBufferPosition(wordRegex: @keywordRegex, allowPrevious: false)
+    wordEnd   = cursor.getEndOfCurrentWordBufferPosition      (wordRegex: @keywordRegex, allowNext: false)
+    cursorPosition = cursor.getBufferPosition()
 
-    # We are not standing on top of a word, let's try to
-    # get to the next word and try again
-    if characters.length is 0 and not onRecursion
-      if @cursorIsOnEOF(cursor)
-        ""
-      else
-        cursor.moveToNextWordBoundary(wordRegex: @keywordRegex)
-        @getCurrentWord(true)
-    else
-      characters
+    if wordEnd.column is cursorPosition.column
+      # either we don't have a current word, or it ends on cursor, i.e. precedes it, so look for the next one
+      wordEnd = cursor.getEndOfCurrentWordBufferPosition      (wordRegex: @keywordRegex, allowNext: true)
+      return "" if wordEnd.row isnt cursorPosition.row # don't look beyond the current line
+
+      cursor.setBufferPosition wordEnd
+      wordStart = cursor.getBeginningOfCurrentWordBufferPosition(wordRegex: @keywordRegex, allowPrevious: false)
+
+    cursor.setBufferPosition wordStart
+
+    @editor.getTextInBufferRange([wordStart, wordEnd])
 
   cursorIsOnEOF: (cursor) ->
     pos = cursor.getNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
