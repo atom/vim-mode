@@ -21,7 +21,7 @@ describe "VimState", ->
     helpers.keydown(key, options)
 
   commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.element = editor.commandModeInputView.editor[0].rootElement.querySelector 'input'
     opts.raw = true
     keydown(key, opts)
 
