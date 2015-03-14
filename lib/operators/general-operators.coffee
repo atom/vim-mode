@@ -84,6 +84,7 @@ class Delete extends Operator
     @complete = false
     @selectOptions ?= {}
     @selectOptions.requireEOL ?= true
+    @selectOptions.allowEOL ?= true
     @register = settings.defaultRegister()
 
   # Public: Deletes the text selected by the given motion.

@@ -212,7 +212,7 @@ class MoveToNextWord extends Motion
     new RegExp(segments.join("|"), "g")
 
   moveCursor: (cursor, count=1, options) ->
-    @wordRegex = @wordRegExp(cursor)
+    @wordRegex = @wordRegExp(cursor) if options?.allowEOL
     _.times count, =>
       current = cursor.getBufferPosition()
 
