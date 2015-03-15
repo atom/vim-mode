@@ -1,7 +1,5 @@
 {Disposable, CompositeDisposable} = require 'event-kit'
 
-# Mode names are combined with submode names with the `.` character.
-# If a mode has submodes, they need to be enumerated here.
 ContentsByMode =
   'insert':               ["status-bar-vim-mode-insert",  "Insert"]
   'insert.replace':       ["status-bar-vim-mode-insert",  "Replace"]
@@ -11,36 +9,29 @@ ContentsByMode =
   'visual.linewise':      ["status-bar-vim-mode-visual",  "Visual Line"]
   'visual.blockwise':     ["status-bar-vim-mode-visual",  "Visual Block"]
 
-ClassesByMode = []
-
-for mode, [klass, html] of ContentsByMode
-  ClassesByMode.push(klass) unless klass in ClassesByMode
-
 module.exports =
 class StatusBarManager
   constructor: ->
     @element = document.createElement("div")
     @element.id = "status-bar-vim-mode"
-    @element.classList.add("inline-block")
+
+    @container = document.createElement("div")
+    @container.className = "inline-block"
+    @container.appendChild(@element)
 
   initialize: (@statusBar) ->
 
   update: (currentMode, currentSubmode) ->
     currentMode = currentMode + "." + currentSubmode if currentSubmode?
-    return unless currentMode of ContentsByMode
-
-    # remove all the classes from @element before adding the right class
-    for klass in ClassesByMode
-      @element.classList.remove(klass)
-
-    [klass, html] = ContentsByMode[currentMode]
-    @element.classList.add(klass)
-    @element.innerHTML = html
+    if newContents = ContentsByMode[currentMode]
+      [klass, text] = newContents
+      @element.className = klass
+      @element.textContent = text
 
   # Private
 
   attach: ->
-    @tile = @statusBar.addRightTile(item: @element, priority: 20)
+    @tile = @statusBar.addRightTile(item: @container, priority: 20)
 
   detach: ->
     @tile.destroy()
