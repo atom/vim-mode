@@ -507,4 +507,4 @@ class VimState
       @opStack.length > 0
 
   updateStatusBar: ->
-    @statusBarManager.update(@mode)
+    @statusBarManager.update(@mode, @submode)
