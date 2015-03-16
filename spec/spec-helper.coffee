@@ -63,4 +63,13 @@ keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
        element.value += key
   dispatchKeyboardEvent(element, 'keyup', eventArgs...)
 
-module.exports = { keydown, getEditorElement, mockPlatform, unmockPlatform }
+getCommandModeInputElement = (editor) ->
+  editor.commandModeInputView.editor[0].rootElement.querySelector 'input'
+
+module.exports = {
+  keydown
+  getCommandModeInputElement
+  getEditorElement
+  mockPlatform
+  unmockPlatform
+}

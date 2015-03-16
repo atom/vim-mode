@@ -19,7 +19,7 @@ describe "Operators", ->
     helpers.keydown(key, options)
 
   commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.element = helpers.getCommandModeInputElement editor
     opts.raw = true
     keydown(key, opts)
 

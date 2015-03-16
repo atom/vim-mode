@@ -10,8 +10,10 @@
     "atom": ">0.151.0"
   },
   "dependencies": {
-    "underscore-plus": "1.x",
-    "event-kit": "^0.7.2"
+    "atom-space-pen-views": "^2.0.4",
+    "event-kit": "^0.7.2",
+    "space-pen": "^5.1.1",
+    "underscore-plus": "1.x"
   },
   "consumedServices": {
     "status-bar": {
