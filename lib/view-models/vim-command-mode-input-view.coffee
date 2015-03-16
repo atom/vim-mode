@@ -1,4 +1,4 @@
-{View, TextEditorView} = require 'atom'
+{View, TextEditorView} = require 'atom-space-pen-views'
 
 module.exports =
 class VimCommandModeInputView extends View
@@ -25,15 +25,15 @@ class VimCommandModeInputView extends View
   handleEvents: ->
     if @singleChar?
       @editor.find('input').on 'textInput', @autosubmit
-    @editor.on 'core:confirm', @confirm
-    @editor.on 'core:cancel', @cancel
+    @on 'core:cancel', @cancel
+    @on 'core:confirm', @confirm
     @editor.find('input').on 'blur', @cancel
 
   stopHandlingEvents: ->
     if @singleChar?
       @editor.find('input').off 'textInput', @autosubmit
-    @editor.off 'core:confirm', @confirm
-    @editor.off 'core:cancel', @cancel
+    @off 'core:confirm', @confirm
+    @off 'core:cancel', @cancel
     @editor.find('input').off 'blur', @cancel
 
   autosubmit: (event) =>
