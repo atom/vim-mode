@@ -1,4 +1,4 @@
-{View, TextEditorView} = require 'atom'
+{View} = require 'atom'
 
 module.exports =
 class VimCommandModeInputView extends View
@@ -29,7 +29,7 @@ class VimCommandModeInputView extends View
 
   handleEvents: ->
     if @singleChar?
-      atom.commands.add(@editorElement, 'textInput', @autoSubmit)
+      @editorElement.addEventListener('textInput', @autoSubmit)
     else
       atom.commands.add(@editorElement, 'editor:newline', @confirm)
     atom.commands.add(@editorElement, 'core:confirm', @confirm)
