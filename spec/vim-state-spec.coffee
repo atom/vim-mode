@@ -21,7 +21,7 @@ describe "VimState", ->
     helpers.keydown(key, options)
 
   commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.element = editor.commandModeInputView.editorElement
     opts.raw = true
     keydown(key, opts)
 
@@ -152,7 +152,7 @@ describe "VimState", ->
         keydown('r')
         expect(vimState.mode).toBe 'command'
         expect(vimState.opStack.length).toBe 0
-        commandModeInputKeydown('escape')
+        atom.commands.dispatch(editor.commandModeInputView.editorElement, "core:cancel")
         keydown('d')
         expect(editor.getText()).toBe '012345\nabcdef'
 

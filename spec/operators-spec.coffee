@@ -19,7 +19,7 @@ describe "Operators", ->
     helpers.keydown(key, options)
 
   commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
+    opts.element = editor.commandModeInputView.editorElement
     opts.raw = true
     keydown(key, opts)
 
@@ -1241,7 +1241,7 @@ describe "Operators", ->
 
     it "replaces a single character with a line break", ->
       keydown('r')
-      editor.commandModeInputView.editor.trigger 'core:confirm'
+      atom.commands.dispatch(editor.commandModeInputView.editorElement, 'core:confirm')
       expect(editor.getText()).toBe '\n2\n\n4\n\n'
       expect(editor.getCursorBufferPositions()).toEqual [[1, 0], [3, 0]]
 
