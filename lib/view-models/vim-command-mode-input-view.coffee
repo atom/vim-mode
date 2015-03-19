@@ -11,8 +11,7 @@ class VimCommandModeInputView extends View
       @editorContainer.addClass opts.class
 
     if opts.hidden
-      # TODO: this no longer works with atom-text-editor
-      @editorContainer.addClass 'hidden-input'
+      @editorContainer.height(0)
 
     @editorElement = document.createElement "atom-text-editor"
     @editorElement.classList.add('editor')
