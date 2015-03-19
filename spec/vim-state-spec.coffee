@@ -21,9 +21,7 @@ describe "VimState", ->
     helpers.keydown(key, options)
 
   commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editorElement
-    opts.raw = true
-    keydown(key, opts)
+    editor.commandModeInputView.editorElement.getModel().setText(key)
 
   describe "initialization", ->
     it "puts the editor in command-mode initially by default", ->

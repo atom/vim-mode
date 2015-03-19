@@ -29,16 +29,13 @@ class VimCommandModeInputView extends View
 
   handleEvents: ->
     if @singleChar?
-      @editorElement.addEventListener('textInput', @autoSubmit)
+      @editorElement.getModel().getBuffer().onDidChange (e) =>
+        @confirm() if e.newText
     else
       atom.commands.add(@editorElement, 'editor:newline', @confirm)
     atom.commands.add(@editorElement, 'core:confirm', @confirm)
     atom.commands.add(@editorElement, 'core:cancel', @cancel)
     atom.commands.add(@editorElement, 'blur', @cancel)
-
-  autoSubmit: (event) =>
-    @editorElement.getModel().setText(event.data)
-    @confirm()
 
   confirm: =>
     @value = @editorElement.getModel().getText() or @defaultText

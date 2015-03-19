@@ -19,9 +19,7 @@ describe "Operators", ->
     helpers.keydown(key, options)
 
   commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editorElement
-    opts.raw = true
-    keydown(key, opts)
+    editor.commandModeInputView.editorElement.getModel().setText(key)
 
   describe "cancelling operations", ->
     it "does not throw an error even if no operation is pending", ->
