@@ -21,9 +21,7 @@ describe "VimState", ->
     helpers.keydown(key, options)
 
   commandModeInputKeydown = (key, opts = {}) ->
-    opts.element = editor.commandModeInputView.editor.find('input').get(0)
-    opts.raw = true
-    keydown(key, opts)
+    editor.commandModeInputView.editorElement.getModel().setText(key)
 
   describe "initialization", ->
     it "puts the editor in command-mode initially by default", ->
@@ -152,7 +150,7 @@ describe "VimState", ->
         keydown('r')
         expect(vimState.mode).toBe 'command'
         expect(vimState.opStack.length).toBe 0
-        commandModeInputKeydown('escape')
+        atom.commands.dispatch(editor.commandModeInputView.editorElement, "core:cancel")
         keydown('d')
         expect(editor.getText()).toBe '012345\nabcdef'
 

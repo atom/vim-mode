@@ -1,18 +1,22 @@
-{View, TextEditorView} = require 'atom'
+{View} = require 'atom'
 
 module.exports =
 class VimCommandModeInputView extends View
   @content: ->
     @div class: 'command-mode-input', =>
-      @div class: 'editor-container', outlet: 'editorContainer', =>
-        @subview 'editor', new TextEditorView(mini: true)
+      @div class: 'editor-container', outlet: 'editorContainer'
 
   initialize: (@viewModel, opts = {})->
     if opts.class?
       @editorContainer.addClass opts.class
 
     if opts.hidden
-      @editorContainer.addClass 'hidden-input'
+      @editorContainer.height(0)
+
+    @editorElement = document.createElement "atom-text-editor"
+    @editorElement.classList.add('editor')
+    @editorElement.getModel().setMini(true)
+    @editorContainer.append(@editorElement)
 
     @singleChar = opts.singleChar
     @defaultText = opts.defaultText ? ''
@@ -24,35 +28,26 @@ class VimCommandModeInputView extends View
 
   handleEvents: ->
     if @singleChar?
-      @editor.find('input').on 'textInput', @autosubmit
-    @editor.on 'core:confirm', @confirm
-    @editor.on 'core:cancel', @cancel
-    @editor.find('input').on 'blur', @cancel
-
-  stopHandlingEvents: ->
-    if @singleChar?
-      @editor.find('input').off 'textInput', @autosubmit
-    @editor.off 'core:confirm', @confirm
-    @editor.off 'core:cancel', @cancel
-    @editor.find('input').off 'blur', @cancel
-
-  autosubmit: (event) =>
-    @editor.setText(event.originalEvent.data)
-    @confirm()
+      @editorElement.getModel().getBuffer().onDidChange (e) =>
+        @confirm() if e.newText
+    else
+      atom.commands.add(@editorElement, 'editor:newline', @confirm)
+    atom.commands.add(@editorElement, 'core:confirm', @confirm)
+    atom.commands.add(@editorElement, 'core:cancel', @cancel)
+    atom.commands.add(@editorElement, 'blur', @cancel)
 
   confirm: =>
-    @value = @editor.getText() or @defaultText
+    @value = @editorElement.getModel().getText() or @defaultText
     @viewModel.confirm(@)
     @remove()
 
   focus: =>
-    @editorContainer.find('.editor').focus()
+    @editorElement.focus()
 
   cancel: (e) =>
     @viewModel.cancel(@)
     @remove()
 
   remove: =>
-    @stopHandlingEvents()
     atom.workspace.getActivePane().activate()
     @panel.destroy()
