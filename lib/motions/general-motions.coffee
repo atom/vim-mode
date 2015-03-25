@@ -152,7 +152,7 @@ class MoveRight extends Motion
   # MoveRight can be combined with Delete, which will indicate it by the presence of options.deleting
   moveCursor: (cursor, count=1, options={}) ->
     _.times count, =>
-      goingToNextLine = atom.config.get('vim-mode.wrapLeftRightMotion')
+      goingToNextLine = settings.wrapLeftRightMotion()
 
       if not cursor.isAtEndOfLine() # the line is not empty
         cursor.moveRight()
