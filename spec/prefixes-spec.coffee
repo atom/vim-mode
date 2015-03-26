@@ -72,6 +72,27 @@ describe "Prefixes", ->
         vimState.setRegister('a', text: 'new content')
         expect(vimState.getRegister("a").text).toEqual 'new content'
 
+    describe "the B register", ->
+      it "saves a value for future reading", ->
+        vimState.setRegister('B', text: 'new content')
+        expect(vimState.getRegister("b").text).toEqual 'new content'
+        expect(vimState.getRegister("B").text).toEqual 'new content'
+
+      it "appends to a value previously in the register", ->
+        vimState.setRegister('b', text: 'content')
+        vimState.setRegister('B', text: 'new content')
+        expect(vimState.getRegister("b").text).toEqual 'contentnew content'
+
+      it "appends linewise to a linewise value previously in the register", ->
+        vimState.setRegister('b', {type: 'linewise', text: 'content\n'})
+        vimState.setRegister('B', text: 'new content')
+        expect(vimState.getRegister("b").text).toEqual 'content\nnew content\n'
+
+      it "appends linewise to a character value previously in the register", ->
+        vimState.setRegister('b', text: 'content')
+        vimState.setRegister('B', {type: 'linewise', text: 'new content\n'})
+        expect(vimState.getRegister("b").text).toEqual 'content\nnew content\n'
+
 
     describe "the * register", ->
       describe "reading", ->
