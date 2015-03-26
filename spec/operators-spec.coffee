@@ -1608,6 +1608,18 @@ describe "Operators", ->
       expect(editor.getText()).toBe "abcabc"
       expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
+    it "stores for repeating only the last batch of characters, repeats as insert", ->
+      keydown 'a'
+      editor.insertText("abc")
+      atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+      editor.insertText("de")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abdec"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      keydown '.'
+      expect(editor.getText()).toBe "abddeec"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
   describe "the ctrl-a/ctrl-x keybindings", ->
     beforeEach ->
       atom.config.set 'vim-mode.numberRegex', settings.config.numberRegex.default
