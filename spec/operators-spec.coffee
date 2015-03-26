@@ -603,6 +603,13 @@ describe "Operators", ->
       it "saves the line to the a register", ->
         expect(vimState.getRegister('a').text).toBe "012 345\n"
 
+      it "appends the line to the A register", ->
+        keydown('"')
+        keydown('A', shift: true)
+        keydown('y')
+        keydown('y')
+        expect(vimState.getRegister('a').text).toBe "012 345\n012 345\n"
+
     describe "with a forward motion", ->
       beforeEach ->
         keydown('y')

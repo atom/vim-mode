@@ -277,7 +277,7 @@ class VimState
       type = Utils.copyType(text)
       {text, type}
     else
-      @globalVimState.registers[name]
+      @globalVimState.registers[name.toLowerCase()]
 
   # Private: Fetches the value of a given mark.
   #
@@ -303,8 +303,26 @@ class VimState
       atom.clipboard.write(value.text)
     else if name == '_'
       # Blackhole register, nothing to do
+    else if /^[A-Z]$/.test(name)
+      @appendRegister(name.toLowerCase(), value)
     else
       @globalVimState.registers[name] = value
+
+
+  # Private: append a value into a given register
+  # like setRegister, but appends the value
+  appendRegister: (name, value) ->
+    register = @globalVimState.registers[name] ?=
+      type: 'character'
+      text: ""
+    if register.type is 'linewise' and value.type isnt 'linewise'
+      register.text += value.text + '\n'
+    else if register.type isnt 'linewise' and value.type is 'linewise'
+      register.text += '\n' + value.text
+      register.type = 'linewise'
+    else
+      register.text += value.text
+
 
   # Private: Sets the value of a given mark.
   #
@@ -444,6 +462,8 @@ class VimState
   registerPrefix: (e) ->
     keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
     name = atom.keymap.keystrokeForKeyboardEvent(keyboardEvent)
+    if name.lastIndexOf('shift-', 0) is 0
+      name = name.slice(6)
     new Prefixes.Register(name)
 
   # Private: A generic way to create a Number prefix based on the event.
