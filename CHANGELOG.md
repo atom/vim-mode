@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.41
+
+* Added ability to append to register - @jacekkopecky
+* Fixed an issue where deactivation would sometimes fail
+
 ## 0.40
 
 * Fixed an issue where the search input text was not visible - @tmm1 
