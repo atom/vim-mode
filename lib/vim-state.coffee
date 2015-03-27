@@ -18,6 +18,7 @@ class VimState
   opStack: null
   mode: null
   submode: null
+  destroyed: false
 
   constructor: (@editorElement, @statusBarManager, @globalVimState) ->
     @emitter = new Emitter
@@ -26,6 +27,7 @@ class VimState
     @opStack = []
     @history = []
     @marks = {}
+    @subscriptions.add @editor.onDidDestroy => @destroy()
 
     @subscriptions.add @editor.onDidChangeSelectionRange =>
       if _.all(@editor.getSelections(), (selection) -> selection.isEmpty())
@@ -41,11 +43,16 @@ class VimState
       @activateCommandMode()
 
   destroy: ->
-    @subscriptions.dispose()
-    @deactivateInsertMode()
-    @editorElement.component.setInputEnabled(true)
-    @editorElement.classList.remove("vim-mode")
-    @editorElement.classList.remove("command-mode")
+    unless @destroyed
+      @destroyed = true
+      @subscriptions.dispose()
+      if @editor.isAlive()
+        @deactivateInsertMode()
+        @editorElement.component?.setInputEnabled(true)
+        @editorElement.classList.remove("vim-mode")
+        @editorElement.classList.remove("command-mode")
+      @editor = null
+      @editorElement = null
 
   # Private: Creates the plugin's bindings
   #

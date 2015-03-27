@@ -44,6 +44,10 @@ describe "VimState", ->
       vimState.destroy()
       expect(editorElement.classList.contains("command-mode")).toBeFalsy()
 
+    it "is a noop when the editor is already destroyed", ->
+      editorElement.getModel().destroy()
+      vimState.destroy()
+
   describe "command-mode", ->
     describe "when entering an insertable character", ->
       beforeEach -> keydown('\\')
