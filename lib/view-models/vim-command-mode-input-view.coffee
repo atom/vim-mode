@@ -16,6 +16,7 @@ class VimCommandModeInputView extends View
     @editorElement = document.createElement "atom-text-editor"
     @editorElement.classList.add('editor')
     @editorElement.getModel().setMini(true)
+    @editorElement.setAttribute 'mini', ''
     @editorContainer.append(@editorElement)
 
     @singleChar = opts.singleChar
