@@ -376,7 +376,7 @@ class VimState
     @changeModeClass('command-mode')
 
     @clearOpStack()
-    selection.clear() for selection in @editor.getSelections()
+    selection.clear(autoscroll: false) for selection in @editor.getSelections()
 
     @updateStatusBar()
 
