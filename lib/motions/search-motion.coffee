@@ -75,8 +75,6 @@ class Search extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
     @viewModel = new SearchViewModel(@)
-    Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
   compose: (input) ->
     super(input)
@@ -87,8 +85,6 @@ class SearchCurrentWord extends SearchBase
 
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
     # FIXME: This must depend on the current language
     defaultIsKeyword = "[@a-zA-Z0-9_\-]+"
@@ -142,8 +138,6 @@ class BracketMatchingMotion extends SearchBase
 
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
   isComplete: -> true
 
