@@ -136,10 +136,6 @@ AnyBracket = new RegExp(OpenBrackets.concat(CloseBrackets).map(_.escapeRegExp).j
 
 class BracketMatchingMotion extends SearchBase
   operatesInclusively: true
-  @keywordRegex: null
-
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
 
   isComplete: -> true
 
