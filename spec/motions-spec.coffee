@@ -1691,3 +1691,12 @@ describe "Motions", ->
       editor.setCursorScreenPosition([0, 0])
       keydown("%")
       expect(editor.getCursorScreenPosition()).toEqual([1, 3])
+
+    it "does not affect search history", ->
+      keydown('/')
+      submitCommandModeInputText 'func'
+      expect(editor.getCursorBufferPosition()).toEqual [0, 31]
+      keydown('%')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 60]
+      keydown('n')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 31]
