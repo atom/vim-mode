@@ -147,8 +147,8 @@ class VimState
       'select-around-parentheses': => new TextObjects.SelectInsideBrackets(@editor, '(', ')', true)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
-      'repeat-search': (e) => currentSearch.repeat() if (currentSearch = Motions.Search.currentSearch)?
-      'repeat-search-backwards': (e) => currentSearch.repeat(backwards: true) if (currentSearch = Motions.Search.currentSearch)?
+      'repeat-search': (e) => new Motions.RepeatSearch(@editor, @)
+      'repeat-search-backwards': (e) => new Motions.RepeatSearch(@editor, @).reversed()
       'focus-pane-view-on-left': => new Panes.FocusPaneViewOnLeft()
       'focus-pane-view-on-right': => new Panes.FocusPaneViewOnRight()
       'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
@@ -356,7 +356,7 @@ class VimState
   # index - the index of the search history item
   #
   # Returns a search motion
-  getSearchHistoryItem: (index) ->
+  getSearchHistoryItem: (index = 0) ->
     @globalVimState.searchHistory[index]
 
   ##############################################################################

@@ -10,7 +10,7 @@ class SearchViewModel extends ViewModel
     atom.commands.add(@view.editorElement, 'core:move-down', @decreaseHistorySearch)
 
   restoreHistory: (index) ->
-    @view.editorElement.getModel().setText(@history(index).value)
+    @view.editorElement.getModel().setText(@history(index))
 
   history: (index) ->
     @vimState.getSearchHistoryItem(index)
@@ -30,5 +30,5 @@ class SearchViewModel extends ViewModel
       @restoreHistory(@historyIndex)
 
   confirm: (view) =>
-    @vimState.pushSearchHistory(@)
     super(view)
+    @vimState.pushSearchHistory(@value)

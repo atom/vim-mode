@@ -1154,13 +1154,19 @@ describe "Motions", ->
 
   describe "the * keybinding", ->
     beforeEach ->
-      editor.setText("abc\n@def\nabc\ndef\n")
+      editor.setText("abd\n@def\nabd\ndef\n")
       editor.setCursorBufferPosition([0, 0])
 
     describe "as a motion", ->
       it "moves cursor to next occurence of word under cursor", ->
         keydown("*")
         expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+      it "repeats with the n key", ->
+        keydown("*")
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+        keydown("n")
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
 
       it "doesn't move cursor unless next occurence is the exact word (no partial matches)", ->
         editor.setText("abc\ndef\nghiabc\njkl\nabcdef")
@@ -1227,6 +1233,16 @@ describe "Motions", ->
         editor.setCursorBufferPosition([2, 1])
         keydown("#")
         expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+      it "repeats with n", ->
+        editor.setText("abc\n@def\nabc\ndef\nabc\n")
+        editor.setCursorBufferPosition([2, 1])
+        keydown("#")
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+        keydown("n")
+        expect(editor.getCursorBufferPosition()).toEqual [4, 0]
+        keydown("n")
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
       it "doesn't move cursor unless next occurence is the exact word (no partial matches)", ->
         editor.setText("abc\ndef\nghiabc\njkl\nabcdef")
@@ -1691,3 +1707,12 @@ describe "Motions", ->
       editor.setCursorScreenPosition([0, 0])
       keydown("%")
       expect(editor.getCursorScreenPosition()).toEqual([1, 3])
+
+    it "does not affect search history", ->
+      keydown('/')
+      submitCommandModeInputText 'func'
+      expect(editor.getCursorBufferPosition()).toEqual [0, 31]
+      keydown('%')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 60]
+      keydown('n')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 31]

@@ -7,23 +7,15 @@ settings = require '../settings'
 
 class SearchBase extends MotionWithInput
   operatesInclusively: false
-  @currentSearch: null
 
-  constructor: (@editor, @vimState) ->
+  constructor: (@editor, @vimState, options = {}) ->
     super(@editor, @vimState)
-    Search.currentSearch = @
     @reverse = @initiallyReversed = false
-
-  repeat: (opts = {}) =>
-    reverse = opts.backwards
-    if @initiallyReversed and reverse
-      @reverse = false
-    else
-      @reverse = reverse or @initiallyReversed
-    @
+    @updateCurrentSearch() unless options.dontUpdateCurrentSearch
 
   reversed: =>
     @initiallyReversed = @reverse = true
+    @updateCurrentSearch()
     @
 
   moveCursor: (cursor, count=1) ->
@@ -71,12 +63,18 @@ class SearchBase extends MotionWithInput
     catch
       new RegExp(_.escapeRegExp(term), modFlags)
 
+  updateCurrentSearch: ->
+    @vimState.globalVimState.currentSearch.reverse = @reverse;
+    @vimState.globalVimState.currentSearch.initiallyReversed = @initiallyReversed;
+
+  replicateCurrentSearch: ->
+    @reverse = @vimState.globalVimState.currentSearch.reverse;
+    @initiallyReversed = @vimState.globalVimState.currentSearch.initiallyReversed;
+
 class Search extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
     @viewModel = new SearchViewModel(@)
-    Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
   compose: (input) ->
     super(input)
@@ -87,15 +85,15 @@ class SearchCurrentWord extends SearchBase
 
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
     # FIXME: This must depend on the current language
     defaultIsKeyword = "[@a-zA-Z0-9_\-]+"
     userIsKeyword = atom.config.get('vim-mode.iskeyword')
     @keywordRegex = new RegExp(userIsKeyword or defaultIsKeyword)
 
-    @input = new Input(@getCurrentWordMatch())
+    searchString = @getCurrentWordMatch()
+    @input = new Input(searchString)
+    @vimState.pushSearchHistory(searchString) unless searchString is @vimState.getSearchHistoryItem()
 
   getCurrentWord: ->
     cursor = @editor.getLastCursor()
@@ -138,12 +136,6 @@ AnyBracket = new RegExp(OpenBrackets.concat(CloseBrackets).map(_.escapeRegExp).j
 
 class BracketMatchingMotion extends SearchBase
   operatesInclusively: true
-  @keywordRegex: null
-
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
-    Search.currentSearch = @
-    @reverse = @initiallyReversed = false
 
   isComplete: -> true
 
@@ -206,4 +198,17 @@ class BracketMatchingMotion extends SearchBase
     if matchPosition = @searchForMatch(startPosition, reverse, inCharacter, outCharacter)
       cursor.setBufferPosition(matchPosition)
 
-module.exports = {Search, SearchCurrentWord,BracketMatchingMotion}
+class RepeatSearch extends SearchBase
+  constructor: (@editor, @vimState) ->
+    super(@editor, @vimState, dontUpdateCurrentSearch: true)
+    @input = new Input(@vimState.getSearchHistoryItem(0) ? "")
+    @replicateCurrentSearch()
+
+  isComplete: -> true
+
+  reversed: ->
+    @reverse = not @initiallyReversed
+    @
+
+
+module.exports = {Search, SearchCurrentWord, BracketMatchingMotion, RepeatSearch}
