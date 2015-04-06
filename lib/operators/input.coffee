@@ -8,17 +8,22 @@ settings = require '../settings'
 # tells the operation to repeat itself instead of enter insert mode.
 class Insert extends Operator
   standalone: true
+  count: 1
 
   isComplete: -> @standalone or super
 
-  confirmChanges: (changes) ->
+  confirmChanges: (changes, interrupted) ->
     bundler = new TransactionBundler(changes)
     @typedText = bundler.buildInsertText()
+    if @count > 1 and not interrupted
+      @editor.insertText(@typedText) for i in [2..@count]
 
-  execute: ->
+  execute: (count) ->
+    @count = count if count?
     if @typingCompleted
       return unless @typedText? and @typedText.length > 0
-      @editor.insertText(@typedText, normalizeLineEndings: true)
+      @editor.transact =>
+        @editor.insertText(@typedText, normalizeLineEndings: true) for i in [1..@count]
       for cursor in @editor.getCursors()
         cursor.moveLeft() unless cursor.isAtBeginningOfLine()
     else
@@ -112,7 +117,7 @@ class Change extends Insert
         for selection in @editor.getSelections()
           selection.deleteSelectedText()
 
-    return super if @typingCompleted
+    return super(1) if @typingCompleted
 
     @vimState.activateInsertMode()
     @typingCompleted = true
@@ -132,7 +137,7 @@ class Substitute extends Insert
 
     if @typingCompleted
       @typedText = @typedText.trimLeft()
-      return super
+      return super(1)
 
     @vimState.activateInsertMode()
     @typingCompleted = true
@@ -156,7 +161,7 @@ class SubstituteLine extends Insert
 
     if @typingCompleted
       @typedText = @typedText.trimLeft()
-      return super
+      return super(1)
 
     @vimState.activateInsertMode()
     @typingCompleted = true

@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 {Point, Range} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
+Prefixes = require '../prefixes'
 Utils = require '../utils'
 settings = require '../settings'
 
@@ -228,11 +229,24 @@ class Repeat extends Operator
 
   isRecordable: -> false
 
-  execute: (count=1) ->
+  execute: (count) ->
+    return unless (cmd = @vimState.history[0])?
+
     @editor.transact =>
-      _.times count, =>
-        cmd = @vimState.history[0]
-        cmd?.execute()
+
+      if count?
+        # try to propagate prefix to inner operation
+        if cmd instanceof Prefixes.Repeat
+          cmd.count = count
+        else if cmd.motion instanceof Prefixes.Repeat
+          cmd.motion.count = count
+        else
+          repeat = new Prefixes.Repeat(count)
+          repeat.compose(cmd)
+          cmd = @vimState.history[0] = repeat
+
+      cmd.execute()
+
 #
 # It creates a mark at the current cursor position
 #

@@ -421,11 +421,11 @@ class VimState
   interruptInsertMode: ->
     return unless @mode is 'insert'
     @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
-    @insertionCheckpoint = null
-    transaction = _.last(@editor.buffer.history.undoStack)
+    changes = getChangesSinceCheckpoint(@editor.buffer, @insertionCheckpoint)
     item = @inputOperator(@history[0])
-    if item? and transaction?
-      item.confirmTransaction(transaction)
+    @insertionCheckpoint = null
+    if item?
+      item.confirmChanges(changes, interrupted: true)
     @setInsertionCheckpoint()
 
 
