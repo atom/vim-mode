@@ -142,7 +142,7 @@ class ToggleCase extends Operator
 
     @vimState.activateCommandMode()
 
-    if @motion.isLinewise?()
+    if @motion? and @motion.isLinewise?()
       @editor.moveToPreviousWordBoundary()
       @editor.moveToFirstCharacterOfLine()
 
@@ -160,7 +160,7 @@ class UpperCase extends Operator
 
     @vimState.activateCommandMode()
 
-    if @motion.isLinewise?()
+    if @motion? and @motion.isLinewise?()
       @editor.moveToPreviousWordBoundary()
       @editor.moveToFirstCharacterOfLine()
 
@@ -178,7 +178,7 @@ class LowerCase extends Operator
 
     @vimState.activateCommandMode()
 
-    if @motion.isLinewise?()
+    if @motion and @motion.isLinewise?()
       @editor.moveToPreviousWordBoundary()
       @editor.moveToFirstCharacterOfLine()
 
