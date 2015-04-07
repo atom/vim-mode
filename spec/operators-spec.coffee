@@ -1336,8 +1336,8 @@ describe "Operators", ->
         expect(editor.getText()).toBe 'Abc\nXyZ'
 
     describe "when followed by g~", ->
-      it "toggles the case of the whole line", ->
-        editor.setCursorBufferPosition([2, 2])
+      it "toggles the case of the whole line, and the cursor ends up on the first character of that line", ->
+        editor.setCursorBufferPosition([1, 1])
 
         keydown('g')
         keydown('~')
@@ -1345,6 +1345,7 @@ describe "Operators", ->
         keydown('~')
 
         expect(editor.getText()).toBe "aBc\nxYz"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe 'the gU keybinding', ->
     beforeEach ->
@@ -1368,8 +1369,8 @@ describe "Operators", ->
       expect(editor.getText()).toBe 'ABC\nXyZ'
 
     describe "when followed by gU", ->
-      it "makes the whole line uppercase", ->
-        editor.setCursorBufferPosition([2, 2])
+      it "makes the whole line uppercase, and the cursor ends up on the first character of that line", ->
+        editor.setCursorBufferPosition([1, 1])
 
         keydown('g')
         keydown('U', shift: true)
@@ -1377,6 +1378,7 @@ describe "Operators", ->
         keydown('U', shift: true)
 
         expect(editor.getText()).toBe "aBc\nXYZ"
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
   describe 'the gu keybinding', ->
     beforeEach ->
@@ -1395,8 +1397,8 @@ describe "Operators", ->
       expect(editor.getText()).toBe 'abc\nXyZ'
 
     describe "when followed by gu", ->
-      it "makes the whole line lowercase", ->
-        editor.setCursorBufferPosition([2, 2])
+      it "makes the whole line lowercase, and the cursor ends up on the first character of that line", ->
+        editor.setCursorBufferPosition([1, 1])
 
         keydown('g')
         keydown('u')
@@ -1404,6 +1406,7 @@ describe "Operators", ->
         keydown('u')
 
         expect(editor.getText()).toBe "aBc\nxyz"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the i keybinding", ->
     beforeEach ->
