@@ -1,5 +1,13 @@
 ## HEAD
 
+## 0.43
+
+* Made '%', '\*' and '\#' interact properly with search history @jacekkopecky
+
+## 0.42
+
+* Fixed spurious command bindings on command mode input element - @andischerer
+
 ## 0.41
 
 * Added ability to append to register - @jacekkopecky
@@ -7,7 +15,7 @@
 
 ## 0.40
 
-* Fixed an issue where the search input text was not visible - @tmm1 
+* Fixed an issue where the search input text was not visible - @tmm1
 * Added a different status-bar entry for visual-line mode - @jacekkopecky
 
 ## 0.39
