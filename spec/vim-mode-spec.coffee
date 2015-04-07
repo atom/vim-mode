@@ -1,10 +1,7 @@
-{Workspace} = require 'atom'
-
 describe "VimMode", ->
   [editor, editorElement, workspaceElement] = []
 
   beforeEach ->
-    atom.workspace = new Workspace
     workspaceElement = atom.views.getView(atom.workspace)
 
     waitsForPromise ->
