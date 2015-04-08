@@ -27,7 +27,7 @@ module.exports =
 
         @vimStates.set(editor, vimState)
 
-        @disposables.add new Disposable =>
+        @disposables.add new Disposable ->
           vimState.destroy()
 
   deactivate: ->

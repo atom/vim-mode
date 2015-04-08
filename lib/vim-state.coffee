@@ -149,11 +149,11 @@ class VimState
       'repeat': (e) => new Operators.Repeat(@editor, @)
       'repeat-search': (e) => new Motions.RepeatSearch(@editor, @)
       'repeat-search-backwards': (e) => new Motions.RepeatSearch(@editor, @).reversed()
-      'focus-pane-view-on-left': => new Panes.FocusPaneViewOnLeft()
-      'focus-pane-view-on-right': => new Panes.FocusPaneViewOnRight()
-      'focus-pane-view-above': => new Panes.FocusPaneViewAbove()
-      'focus-pane-view-below': => new Panes.FocusPaneViewBelow()
-      'focus-previous-pane-view': => new Panes.FocusPreviousPaneView()
+      'focus-pane-view-on-left': -> new Panes.FocusPaneViewOnLeft()
+      'focus-pane-view-on-right': -> new Panes.FocusPaneViewOnRight()
+      'focus-pane-view-above': -> new Panes.FocusPaneViewAbove()
+      'focus-pane-view-below': -> new Panes.FocusPaneViewBelow()
+      'focus-previous-pane-view': -> new Panes.FocusPreviousPaneView()
       'move-to-mark': (e) => new Motions.MoveToMark(@editor, @)
       'move-to-mark-literal': (e) => new Motions.MoveToMark(@editor, @, false)
       'mark': (e) => new Operators.Mark(@editor, @)
@@ -275,11 +275,11 @@ class VimState
       text = atom.clipboard.read()
       type = Utils.copyType(text)
       {text, type}
-    else if name == '%'
+    else if name is '%'
       text = @editor.getUri()
       type = Utils.copyType(text)
       {text, type}
-    else if name == "_" # Blackhole always returns nothing
+    else if name is "_" # Blackhole always returns nothing
       text = ''
       type = Utils.copyType(text)
       {text, type}
@@ -308,7 +308,7 @@ class VimState
   setRegister: (name, value) ->
     if name in ['*', '+']
       atom.clipboard.write(value.text)
-    else if name == '_'
+    else if name is '_'
       # Blackhole register, nothing to do
     else if /^[A-Z]$/.test(name)
       @appendRegister(name.toLowerCase(), value)
@@ -340,7 +340,7 @@ class VimState
   setMark: (name, pos) ->
     # check to make sure name is in [a-z] or is `
     if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
-      marker = @editor.markBufferRange(new Range(pos,pos),{invalidate:'never',persistent:false})
+      marker = @editor.markBufferRange(new Range(pos, pos), {invalidate: 'never', persistent: false})
       @marks[name] = marker
 
   # Public: Append a search to the search history.
@@ -430,7 +430,7 @@ class VimState
     @submode = type
     @changeModeClass('visual-mode')
 
-    if @submode == 'linewise'
+    if @submode is 'linewise'
       @editor.selectLinesContainingCursors()
     else if @editor.getSelectedText() is ''
       @editor.selectRight()

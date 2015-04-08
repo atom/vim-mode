@@ -32,7 +32,7 @@ class ScrollUp extends Scroll
     {row, column} = @editor.getCursorScreenPosition()
     lastScreenRow = @rows.last - @scrolloff - 1
     if row + count >= lastScreenRow
-        @editor.setCursorScreenPosition([lastScreenRow - count, column])
+      @editor.setCursorScreenPosition([lastScreenRow - count, column])
 
   scrollDown: (count) ->
     firstScreenRow = @rows.first + @scrolloff
@@ -115,5 +115,5 @@ class ScrollHalfScreenDown extends Scroll
     dest = @editor.getScrollTop() + Math.floor(@editor.getHeight() / 2)
     @editor.setScrollTop(dest)
 
-module.exports = { ScrollDown, ScrollUp, ScrollCursorToTop, ScrollCursorToMiddle,
-  ScrollCursorToBottom, ScrollHalfScreenUp, ScrollHalfScreenDown }
+module.exports = {ScrollDown, ScrollUp, ScrollCursorToTop, ScrollCursorToMiddle,
+  ScrollCursorToBottom, ScrollHalfScreenUp, ScrollHalfScreenDown}

@@ -65,4 +65,4 @@ class Register extends Prefix
     super(composedObject)
     composedObject.register = @name if composedObject.register?
 
-module.exports = { Repeat, Register}
+module.exports = {Repeat, Register}

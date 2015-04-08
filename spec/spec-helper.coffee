@@ -45,7 +45,7 @@ dispatchTextEvent = (target, eventArgs...) ->
   target.dispatchEvent e
 
 keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
-  key = "U+#{key.charCodeAt(0).toString(16)}" unless key == 'escape' || raw?
+  key = "U+#{key.charCodeAt(0).toString(16)}" unless key is 'escape' or raw?
   element ||= document.activeElement
   eventArgs = [
     true, # bubbles
@@ -59,8 +59,8 @@ keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
   canceled = not dispatchKeyboardEvent(element, 'keydown', eventArgs...)
   dispatchKeyboardEvent(element, 'keypress', eventArgs...)
   if not canceled
-     if dispatchTextEvent(element, 'textInput', eventArgs...)
-       element.value += key
+    if dispatchTextEvent(element, 'textInput', eventArgs...)
+      element.value += key
   dispatchKeyboardEvent(element, 'keyup', eventArgs...)
 
-module.exports = { keydown, getEditorElement, mockPlatform, unmockPlatform }
+module.exports = {keydown, getEditorElement, mockPlatform, unmockPlatform}

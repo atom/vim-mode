@@ -257,12 +257,12 @@ class MoveToNextParagraph extends Motion
   operatesInclusively: false
 
   moveCursor: (cursor, count=1) ->
-    _.times count, =>
+    _.times count, ->
       cursor.moveToBeginningOfNextParagraph()
 
 class MoveToPreviousParagraph extends Motion
   moveCursor: (cursor, count=1) ->
-    _.times count, =>
+    _.times count, ->
       cursor.moveToBeginningOfPreviousParagraph()
 
 class MoveToLine extends Motion
@@ -366,7 +366,7 @@ class MoveToBottomOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
     lastScreenRow = @editor.getLastVisibleScreenRow()
     lastRow = @editor.getBuffer().getLastRow()
-    if lastScreenRow != lastRow
+    if lastScreenRow isnt lastRow
       offset = Math.max(count - 1, @scrolloff)
     else
       offset = if count > 0 then count - 1 else count

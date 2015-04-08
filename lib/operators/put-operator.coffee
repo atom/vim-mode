@@ -20,7 +20,7 @@ class Put extends Operator
   #
   # Returns nothing.
   execute: (count=1) ->
-    {text, type} = @vimState.getRegister(@register) || {}
+    {text, type} = @vimState.getRegister(@register) or {}
     return unless text
 
     textToInsert = _.times(count, -> text).join('')
@@ -28,15 +28,15 @@ class Put extends Operator
     selection = @editor.getSelectedBufferRange()
     if selection.isEmpty()
       # Clean up some corner cases on the last line of the file
-      if type == 'linewise'
+      if type is 'linewise'
         textToInsert = textToInsert.replace(/\n$/, '')
-        if @location == 'after' and @onLastRow()
+        if @location is 'after' and @onLastRow()
           textToInsert = "\n#{textToInsert}"
         else
           textToInsert = "#{textToInsert}\n"
 
-      if @location == 'after'
-        if type == 'linewise'
+      if @location is 'after'
+        if type is 'linewise'
           if @onLastRow()
             @editor.moveToEndOfLine()
 
@@ -48,7 +48,7 @@ class Put extends Operator
           unless @onLastColumn()
             @editor.moveRight()
 
-      if type == 'linewise' and !originalPosition?
+      if type is 'linewise' and not originalPosition?
         @editor.moveToBeginningOfLine()
         originalPosition = @editor.getCursorScreenPosition()
 
@@ -59,7 +59,7 @@ class Put extends Operator
       @editor.moveToFirstCharacterOfLine()
 
     @vimState.activateCommandMode()
-    if type != 'linewise'
+    if type isnt 'linewise'
       @editor.moveLeft()
 
   # Private: Helper to determine if the editor is currently on the last row.
@@ -67,7 +67,7 @@ class Put extends Operator
   # Returns true on the last row and false otherwise.
   onLastRow: ->
     {row, column} = @editor.getCursorBufferPosition()
-    row == @editor.getBuffer().getLastRow()
+    row is @editor.getBuffer().getLastRow()
 
   onLastColumn: ->
     @editor.getLastCursor().isAtEndOfLine()

@@ -7,7 +7,7 @@ class VimCommandModeInputElement extends HTMLDivElement
 
     @appendChild(@editorContainer)
 
-  initialize: (@viewModel, opts = {})->
+  initialize: (@viewModel, opts = {}) ->
     if opts.class?
       @editorContainer.classList.add(opts.class)
 

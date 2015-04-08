@@ -31,7 +31,7 @@ class Find extends MotionWithInput
         new Point(currentPosition.row, index - @offset)
 
   reverse: ->
-    @backwards = !@backwards
+    @backwards = not @backwards
     @
 
   moveCursor: (cursor, count=1) ->

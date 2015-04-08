@@ -245,7 +245,7 @@ class Mark extends OperatorWithInput
   # at the current position
   #
   # Returns nothing.
-  execute: () ->
+  execute: ->
     @vimState.setMark(@input.characters, @editor.getCursorBufferPosition())
     @vimState.activateCommandMode()
 
