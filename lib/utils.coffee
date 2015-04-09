@@ -6,9 +6,9 @@ module.exports =
   # Returns 'linewise' if the string ends with a line return and 'character'
   #  otherwise.
   copyType: (text) ->
-    if text.lastIndexOf("\n") == text.length - 1
+    if text.lastIndexOf("\n") is text.length - 1
       'linewise'
-    else if text.lastIndexOf("\r") == text.length - 1
+    else if text.lastIndexOf("\r") is text.length - 1
       'linewise'
     else
       'character'

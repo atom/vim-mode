@@ -64,12 +64,12 @@ class SearchBase extends MotionWithInput
       new RegExp(_.escapeRegExp(term), modFlags)
 
   updateCurrentSearch: ->
-    @vimState.globalVimState.currentSearch.reverse = @reverse;
-    @vimState.globalVimState.currentSearch.initiallyReversed = @initiallyReversed;
+    @vimState.globalVimState.currentSearch.reverse = @reverse
+    @vimState.globalVimState.currentSearch.initiallyReversed = @initiallyReversed
 
   replicateCurrentSearch: ->
-    @reverse = @vimState.globalVimState.currentSearch.reverse;
-    @initiallyReversed = @vimState.globalVimState.currentSearch.initiallyReversed;
+    @reverse = @vimState.globalVimState.currentSearch.reverse
+    @initiallyReversed = @vimState.globalVimState.currentSearch.initiallyReversed
 
 class Search extends SearchBase
   constructor: (@editor, @vimState) ->
@@ -116,7 +116,7 @@ class SearchCurrentWord extends SearchBase
   cursorIsOnEOF: (cursor) ->
     pos = cursor.getNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
     eofPos = @editor.getEofBufferPosition()
-    pos.row == eofPos.row && pos.column == eofPos.column
+    pos.row is eofPos.row and pos.column is eofPos.column
 
   getCurrentWordMatch: ->
     characters = @getCurrentWord()

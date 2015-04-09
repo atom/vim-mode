@@ -195,16 +195,16 @@ describe "Motions", ->
       beforeEach -> editor.setCursorScreenPosition([0, 0])
 
       it "moves the cursor to the beginning of the next word", ->
-        keydown('W', shift:true)
+        keydown('W', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 7]
 
-        keydown('W', shift:true)
+        keydown('W', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-        keydown('W', shift:true)
+        keydown('W', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-        keydown('W', shift:true)
+        keydown('W', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
     describe "as a selection", ->
@@ -212,14 +212,14 @@ describe "Motions", ->
         it "selects to the end of the whole word", ->
           editor.setCursorScreenPosition([0, 0])
           keydown('y')
-          keydown('W', shift:true)
+          keydown('W', shift: true)
           expect(vimState.getRegister('"').text).toBe 'cde1+- '
 
       it "continues past blank lines", ->
         editor.setCursorScreenPosition([2, 0])
 
         keydown('d')
-        keydown('W', shift:true)
+        keydown('W', shift: true)
         expect(editor.getText()).toBe "cde1+- ab \n xyz\nzip"
         expect(vimState.getRegister('"').text).toBe '\n'
 
@@ -227,7 +227,7 @@ describe "Motions", ->
         editor.setCursorScreenPosition([3, 0])
 
         keydown('d')
-        keydown('W', shift:true)
+        keydown('W', shift: true)
         expect(editor.getText()).toBe "cde1+- ab \n xyz\n\n"
         expect(vimState.getRegister('"').text).toBe 'zip'
 
@@ -443,32 +443,32 @@ describe "Motions", ->
       beforeEach -> editor.setCursorScreenPosition([4, 1])
 
       it "moves the cursor to the beginning of the previous word", ->
-        keydown('B', shift:true)
+        keydown('B', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [3, 1]
 
-        keydown('B', shift:true)
+        keydown('B', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-        keydown('B', shift:true)
+        keydown('B', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
-        keydown('B', shift:true)
+        keydown('B', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 7]
 
-        keydown('B', shift:true)
+        keydown('B', shift: true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "as a selection", ->
       it "selects to the beginning of the whole word", ->
         editor.setCursorScreenPosition([1, 10])
         keydown('y')
-        keydown('B', shift:true)
+        keydown('B', shift: true)
         expect(vimState.getRegister('"').text).toBe 'xyz-123'
 
       it "doesn't go past the beginning of the file", ->
         editor.setCursorScreenPosition([0, 0])
         keydown('y')
-        keydown('B', shift:true)
+        keydown('B', shift: true)
         expect(vimState.getRegister('"').text).toBe ''
 
   describe "the ^ keybinding", ->

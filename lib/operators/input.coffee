@@ -9,7 +9,7 @@ settings = require '../settings'
 class Insert extends Operator
   standalone: true
 
-  isComplete: -> @standalone || super
+  isComplete: -> @standalone or super
 
   confirmTransaction: (transaction) ->
     bundler = new TransactionBundler(transaction)

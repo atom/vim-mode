@@ -34,5 +34,5 @@ class FocusPreviousPaneView extends FocusAction
     atom.workspace.activatePreviousPane()
     @focusCursor()
 
-module.exports = { FocusPaneViewOnLeft, FocusPaneViewOnRight,
-  FocusPaneViewAbove, FocusPaneViewBelow, FocusPreviousPaneView }
+module.exports = {FocusPaneViewOnLeft, FocusPaneViewOnRight,
+  FocusPaneViewAbove, FocusPaneViewBelow, FocusPreviousPaneView}

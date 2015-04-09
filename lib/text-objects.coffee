@@ -24,10 +24,10 @@ class SelectInsideQuotes extends TextObject
     pos = pos.copy()
     while pos.row >= 0
       line = @editor.lineTextForBufferRow(pos.row)
-      pos.column = line.length - 1 if pos.column == -1
+      pos.column = line.length - 1 if pos.column is -1
       while pos.column >= 0
-        if line[pos.column] == @char
-          if pos.column == 0 or line[pos.column - 1] != '\\'
+        if line[pos.column] is @char
+          if pos.column is 0 or line[pos.column - 1] isnt '\\'
             if @isStartQuote(pos)
               return pos
             else
@@ -58,9 +58,9 @@ class SelectInsideQuotes extends TextObject
     while end.row < @editor.getLineCount()
       endLine = @editor.lineTextForBufferRow(end.row)
       while end.column < endLine.length
-        if endLine[end.column] == '\\'
+        if endLine[end.column] is '\\'
           ++ end.column
-        else if endLine[end.column] == @char
+        else if endLine[end.column] is @char
           -- start.column if @includeQuotes
           ++ end.column if @includeQuotes
           return end
@@ -91,7 +91,7 @@ class SelectInsideBrackets extends TextObject
     depth = 0
     while pos.row >= 0
       line = @editor.lineTextForBufferRow(pos.row)
-      pos.column = line.length - 1 if pos.column == -1
+      pos.column = line.length - 1 if pos.column is -1
       while pos.column >= 0
         switch line[pos.column]
           when @endChar then ++ depth

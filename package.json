@@ -27,5 +27,8 @@
         "0.1.0": "provideVimMode"
       }
     }
+  },
+  "devDependencies": {
+    "coffeelint": "^1.9.3"
   }
 }

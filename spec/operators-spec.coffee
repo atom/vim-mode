@@ -498,16 +498,16 @@ describe "Operators", ->
           editor.setCursorScreenPosition([1,0])
           keydown('c')
           keydown('G', shift: true)
-          keydown('escape');
-          expect(editor.getText()).toBe("12345\n\n");
+          keydown('escape')
+          expect(editor.getText()).toBe("12345\n\n")
 
       describe "on the middle of the second line", ->
         it "deletes the bottom two lines", ->
           editor.setCursorScreenPosition([1,2])
           keydown('c')
           keydown('G', shift: true)
-          keydown('escape');
-          expect(editor.getText()).toBe("12345\n\n");
+          keydown('escape')
+          expect(editor.getText()).toBe("12345\n\n")
 
     describe "when followed by a goto line G", ->
       beforeEach ->
@@ -519,7 +519,7 @@ describe "Operators", ->
           keydown('c')
           keydown('2')
           keydown('G', shift: true)
-          keydown('escape');
+          keydown('escape')
           expect(editor.getText()).toBe("12345\n\nABCDE")
 
       describe "on the middle of the second line", ->
@@ -528,7 +528,7 @@ describe "Operators", ->
           keydown('c')
           keydown('2')
           keydown('G', shift: true)
-          keydown('escape');
+          keydown('escape')
           expect(editor.getText()).toBe("12345\n\nABCDE")
 
   describe "the C keybinding", ->
