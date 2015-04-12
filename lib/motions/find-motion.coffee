@@ -51,4 +51,17 @@ class Till extends Find
     super(@editor, @vimState)
     @offset = 1
 
+  match: ->
+    @selectAtLeastOne = false
+    retval = super
+    if retval? and not @backwards
+      @selectAtLeastOne = true
+    retval
+
+  moveSelectionInclusively: (selection, count, options) ->
+    super
+    if selection.isEmpty() and @selectAtLeastOne
+      selection.modifySelection ->
+        selection.cursor.moveRight()
+
 module.exports = {Find, Till}

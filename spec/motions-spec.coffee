@@ -1600,7 +1600,7 @@ describe "Motions", ->
       editor.setCursorBufferPosition([0, 0])
       keydown('d')
       keydown('t')
-      commandModeInputKeydown('b')
+      normalModeInputKeydown('b')
       expect(editor.getText()).toBe 'bcabcabcabc\n'
 
   describe 'the V keybinding', ->
