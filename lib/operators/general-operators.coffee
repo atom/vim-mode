@@ -94,7 +94,8 @@ class Delete extends Operator
   execute: (count) ->
     if _.contains(@motion.select(count, @selectOptions), true)
       @setTextRegister(@register, @editor.getSelectedText())
-      @editor.delete()
+      for selection in @editor.getSelections()
+        selection.delete() unless selection.isEmpty()
       for cursor in @editor.getCursors()
         if @motion.isLinewise?()
           cursor.moveToBeginningOfLine()

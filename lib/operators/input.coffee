@@ -100,7 +100,8 @@ class Change extends Insert
         @editor.insertNewline()
         @editor.moveLeft()
       else
-        @editor.delete()
+        for selection in @editor.getSelections()
+          selection.delete() unless selection.isEmpty()
 
     return super if @typingCompleted
 
