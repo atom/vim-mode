@@ -54,7 +54,7 @@ class Operator
         text += '\n'
     else
       type = Utils.copyType(text)
-    @vimState.setRegister(register, {text, type})
+    @vimState.setRegister(register, {text, type}) unless text is ''
 
 # Public: Generic class for an operator that requires extra input
 class OperatorWithInput extends Operator

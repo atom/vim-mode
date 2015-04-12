@@ -467,9 +467,10 @@ describe "Motions", ->
 
       it "doesn't go past the beginning of the file", ->
         editor.setCursorScreenPosition([0, 0])
+        vimState.setRegister('"', text: 'abc')
         keydown('y')
         keydown('B', shift: true)
-        expect(vimState.getRegister('"').text).toBe ''
+        expect(vimState.getRegister('"').text).toBe 'abc'
 
   describe "the ^ keybinding", ->
     beforeEach ->
