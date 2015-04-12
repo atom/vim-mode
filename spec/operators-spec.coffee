@@ -390,7 +390,7 @@ describe "Operators", ->
 
     describe "with multiple cursors", ->
       it "deletes each selection", ->
-        editor.setText("abcd\n1234\nABCD")
+        editor.setText("abcd\n1234\nABCD\n")
         editor.setCursorBufferPosition([0, 1])
         editor.addCursorAtBufferPosition([1, 2])
         editor.addCursorAtBufferPosition([2, 3])
@@ -403,6 +403,23 @@ describe "Operators", ->
           [0, 0],
           [1, 1],
           [2, 2],
+        ]
+
+      it "doesn't delete empty selections", ->
+        editor.setText("abcd\nabc\nabd")
+        editor.setCursorBufferPosition([0, 0])
+        editor.addCursorAtBufferPosition([1, 0])
+        editor.addCursorAtBufferPosition([2, 0])
+
+        keydown('d')
+        keydown('t')
+        commandModeInputKeydown('d')
+
+        expect(editor.getText()).toBe "d\nabc\nd"
+        expect(editor.getCursorBufferPositions()).toEqual [
+          [0, 0],
+          [1, 0],
+          [2, 0],
         ]
 
   describe "the D keybinding", ->
