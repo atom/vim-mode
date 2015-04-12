@@ -117,8 +117,7 @@ class Substitute extends Insert
     @vimState.setInsertionCheckpoint() unless @typingCompleted
     _.times count, =>
       @editor.selectRight()
-    text = @editor.getLastSelection().getText()
-    @setTextRegister(@register, text)
+    @setTextRegister(@register, @editor.getSelectedText())
     @editor.delete()
 
     if @typingCompleted
@@ -140,8 +139,7 @@ class SubstituteLine extends Insert
     _.times count, =>
       @editor.selectToEndOfLine()
       @editor.selectRight()
-    text = @editor.getLastSelection().getText()
-    @setTextRegister(@register, text)
+    @setTextRegister(@register, @editor.getSelectedText())
     @editor.delete()
     @editor.insertNewlineAbove()
     @editor.getLastCursor().skipLeadingWhitespace()
