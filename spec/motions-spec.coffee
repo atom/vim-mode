@@ -1596,6 +1596,13 @@ describe "Motions", ->
       normalModeInputKeydown('b')
       expect(editor.getText()).toBe 'abcbcabc\n'
 
+    it "selects character under cursor even when no movement happens", ->
+      editor.setCursorBufferPosition([0, 0])
+      keydown('d')
+      keydown('t')
+      commandModeInputKeydown('b')
+      expect(editor.getText()).toBe 'bcabcabcabc\n'
+
   describe 'the V keybinding', ->
     beforeEach ->
       editor.setText("01\n002\n0003\n00004\n000005\n")
