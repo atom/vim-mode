@@ -76,10 +76,6 @@ class Search extends SearchBase
     super(@editor, @vimState)
     @viewModel = new SearchViewModel(@)
 
-  compose: (input) ->
-    super(input)
-    @viewModel.value = @input.characters
-
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null
 
