@@ -998,6 +998,14 @@ describe "Motions", ->
         keydown('n')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
+      it "uses ? as a literal string", ->
+        editor.setText("abc\n[a?c?\n")
+        keydown('/')
+        submitCommandModeInputText '?'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 2]
+        keydown('n')
+        expect(editor.getCursorBufferPosition()).toEqual [1, 4]
+
       it 'works with selection in visual mode', ->
         editor.setText('one two three')
         keydown('v')
@@ -1067,6 +1075,16 @@ describe "Motions", ->
           keydown('/')
           submitCommandModeInputText 'def'
 
+        it "repeats previous search with /<enter>", ->
+          keydown('/')
+          submitCommandModeInputText('')
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
+        it "repeats previous search with //", ->
+          keydown('/')
+          submitCommandModeInputText('/')
+          expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
         describe "the n keybinding", ->
           it "repeats the last search", ->
             keydown('n')
@@ -1101,10 +1119,30 @@ describe "Motions", ->
         submitCommandModeInputText('def')
         expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
+      it "accepts / as a literal search pattern", ->
+        editor.setText("abc\nd/f\nabc\nd/f\n")
+        editor.setCursorBufferPosition([0, 0])
+        keydown('?')
+        submitCommandModeInputText('/')
+        expect(editor.getCursorBufferPosition()).toEqual [3, 1]
+        keydown('?')
+        submitCommandModeInputText('/')
+        expect(editor.getCursorBufferPosition()).toEqual [1, 1]
+
       describe "repeating", ->
         beforeEach ->
           keydown('?')
           submitCommandModeInputText('def')
+
+        it "repeats previous search as reversed with ?<enter>", ->
+          keydown('?')
+          submitCommandModeInputText('')
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        it "repeats previous search as reversed with ??", ->
+          keydown('?')
+          submitCommandModeInputText('?')
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
         describe 'the n keybinding', ->
           it "repeats the last search backwards", ->
