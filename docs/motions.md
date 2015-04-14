@@ -34,3 +34,4 @@
 * [T](http://vimhelp.appspot.com/motion.txt.html#T)
 * [;](http://vimhelp.appspot.com/motion.txt.html#%3B)
 * [,](http://vimhelp.appspot.com/motion.txt.html#%2C)
+* [/ and ?](http://vimhelp.appspot.com/pattern.txt.html#search-commands) (including `//` and `??`)

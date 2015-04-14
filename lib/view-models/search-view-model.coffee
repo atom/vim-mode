@@ -30,5 +30,13 @@ class SearchViewModel extends ViewModel
       @restoreHistory(@historyIndex)
 
   confirm: (view) =>
+    repeatChar = if @searchMotion.initiallyReversed then '?' else '/'
+    if @view.value is '' or @view.value is repeatChar
+      lastSearch = @history(0)
+      if lastSearch?
+        @view.value = lastSearch
+      else
+        @view.value = ''
+        atom.beep()
     super(view)
-    @vimState.pushSearchHistory(@value)
+    @vimState.pushSearchHistory(@view.value)
