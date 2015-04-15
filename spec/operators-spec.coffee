@@ -1244,6 +1244,13 @@ describe "Operators", ->
       commandModeInputKeydown('x')
       expect(editor.getText()).toBe 'x2\nx4\n\n'
 
+    it "does nothing when cancelled", ->
+      keydown('r')
+      expect(editorElement.classList.contains('operator-pending-mode')).toBe(true)
+      keydown('escape')
+      expect(editor.getText()).toBe '12\n34\n\n'
+      expect(editorElement.classList.contains('command-mode')).toBe(true)
+
     it "replaces a single character with a line break", ->
       keydown('r')
       atom.commands.dispatch(editor.commandModeInputView.editorElement, 'core:confirm')
