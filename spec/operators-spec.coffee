@@ -621,6 +621,12 @@ describe "Operators", ->
       it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
+      it "does not yank when motion fails", ->
+        keydown('y')
+        keydown('t')
+        commandModeInputKeydown('x')
+        expect(vimState.getRegister('"').text).toBe '345'
+
     describe "with a text object", ->
       it "moves the cursor to the beginning of the text object", ->
         editor.setCursorBufferPosition([0, 5])
