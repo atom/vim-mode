@@ -438,7 +438,7 @@ class VimState
     @updateStatusBar()
 
   # Private: Used to re-enable visual mode
-  resetVisualMode: () ->
+  resetVisualMode: ->
     @activateVisualMode(@submode)
 
   # Private: Used to enable operator-pending mode.
