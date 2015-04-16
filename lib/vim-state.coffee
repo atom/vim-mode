@@ -9,7 +9,6 @@ Motions = require './motions/index'
 
 TextObjects = require './text-objects'
 Utils = require './utils'
-Panes = require './panes'
 Scroll = require './scroll'
 
 module.exports =
@@ -149,11 +148,6 @@ class VimState
       'repeat': (e) => new Operators.Repeat(@editor, @)
       'repeat-search': (e) => new Motions.RepeatSearch(@editor, @)
       'repeat-search-backwards': (e) => new Motions.RepeatSearch(@editor, @).reversed()
-      'focus-pane-view-on-left': -> new Panes.FocusPaneViewOnLeft()
-      'focus-pane-view-on-right': -> new Panes.FocusPaneViewOnRight()
-      'focus-pane-view-above': -> new Panes.FocusPaneViewAbove()
-      'focus-pane-view-below': -> new Panes.FocusPaneViewBelow()
-      'focus-previous-pane-view': -> new Panes.FocusPreviousPaneView()
       'move-to-mark': (e) => new Motions.MoveToMark(@editor, @)
       'move-to-mark-literal': (e) => new Motions.MoveToMark(@editor, @, false)
       'mark': (e) => new Operators.Mark(@editor, @)
