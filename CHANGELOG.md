@@ -1,5 +1,11 @@
 ## HEAD
 
+## 0.44
+
+* Fixed issue where canceling the replace operator would delete text - @jacekkopecky
+* Implemented repeat search commands: '//', '??', etc - @jacekkopecky
+* Fixed issue where registers' contents were overwritten with the empty string - @jacekkopecky
+
 ## 0.43
 
 * Made '%', '\*' and '\#' interact properly with search history @jacekkopecky
