@@ -745,8 +745,9 @@ describe "Operators", ->
 
   describe "the y keybinding", ->
     beforeEach ->
-      editor.getBuffer().setText("012 345\nabc\n")
+      editor.getBuffer().setText("012 345\nabc\ndefg\n")
       editor.setCursorScreenPosition([0, 4])
+      vimState.setRegister('"', text: '345')
 
     describe "when selected lines in visual linewise mode", ->
       beforeEach ->
@@ -857,6 +858,18 @@ describe "Operators", ->
       it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
+    describe "with an up motion", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([2, 2])
+        keydown 'y'
+        keydown 'k'
+
+      it "saves both full lines to the default register", ->
+        expect(vimState.getRegister('"').text).toBe "abc\ndefg\n"
+
+      it "puts the cursor on the first line and the original column", ->
+        expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
     describe "when followed by a G", ->
       beforeEach ->
         originalText = "12345\nabcde\nABCDE"
@@ -912,6 +925,48 @@ describe "Operators", ->
 
         expect(vimState.getRegister('"').text).toBe '123'
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 2]]
+
+    describe "in a long file", ->
+      beforeEach ->
+        editor.setHeight(400)
+        editor.setLineHeightInPixels(10)
+        editor.setDefaultCharWidth(10)
+        text = ""
+        for i in [1..200]
+          text += "#{i}\n"
+        editor.setText(text)
+
+      describe "yanking many lines forward", ->
+        it "does not scroll the window", ->
+          editor.setCursorBufferPosition [40, 1]
+          top40 = editor.getScrollTop()
+
+          # yank many lines
+          keydown('y')
+          keydown('1')
+          keydown('6')
+          keydown('0')
+          keydown('G', shift: true)
+
+          expect(editor.getScrollTop()).toEqual(top40)
+          expect(editor.getCursorBufferPosition()).toEqual [40, 1]
+          expect(vimState.getRegister('"').text.split('\n').length).toBe 121
+
+      describe "yanking many lines backwards", ->
+        it "scrolls the window", ->
+          editor.setCursorBufferPosition [140, 1]
+          top140 = editor.getScrollTop()
+
+          # yank many lines
+          keydown('y')
+          keydown('6')
+          keydown('0')
+          keydown('G', shift: true)
+
+          expect(editor.getScrollTop()).toNotEqual top140
+          expect(editor.getCursorBufferPosition()).toEqual [59, 1]
+          expect(vimState.getRegister('"').text.split('\n').length).toBe 83
+
 
   describe "the yy keybinding", ->
     describe "on a single line file", ->

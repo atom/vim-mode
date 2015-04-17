@@ -18,6 +18,39 @@ describe "Scrolling", ->
     options.element ?= editorElement
     helpers.keydown(key, options)
 
+  describe "normal movements (sanity check for scrolling)", ->
+    beforeEach ->
+      editor.setHeight(400)
+      editor.setLineHeightInPixels(10)
+      editor.setDefaultCharWidth(10)
+      text = ""
+      for i in [1..200]
+        text += "#{i}\n"
+      editor.setText(text)
+
+    describe "the G keybinding", ->
+      it "scrolls the window", ->
+        editor.setCursorBufferPosition [0, 0]
+        top0 = editor.getScrollTop()
+
+        editor.setCursorBufferPosition [100, 0]
+        top100 = editor.getScrollTop()
+        expect(top100).toBeGreaterThan(top0)
+
+        editor.setCursorBufferPosition [101, 0]
+        top101 = editor.getScrollTop()
+        expect(top101-top100).toEqual(10)
+
+        editor.setCursorBufferPosition [161, 0]
+        top161 = editor.getScrollTop()
+        expect(top161-top100).toEqual(610)
+
+        editor.setCursorBufferPosition [0, 0]
+        expect(editor.getScrollTop()).toNotBe top101
+        editor.setCursorBufferPosition [101, 0]
+        expect(editor.getScrollTop()).toBe top101
+
+
   describe "scrolling keybindings", ->
     beforeEach ->
       editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10")
