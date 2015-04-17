@@ -120,32 +120,3 @@ describe "Scrolling", ->
         keydown('b')
         expect(editor.setScrollTop).toHaveBeenCalledWith(860)
         expect(editor.moveToFirstCharacterOfLine).not.toHaveBeenCalled()
-
-  describe "scrolling half screen keybindings", ->
-    beforeEach ->
-      text = ""
-      for i in [1..80]
-        text += "#{i}\n"
-      editor.setText(text)
-
-      spyOn(editor, 'setScrollTop')
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(40)
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(60)
-      spyOn(editor, 'getHeight').andReturn(400)
-      spyOn(editor, 'getScrollTop').andReturn(600)
-
-    describe "the ctrl-u keybinding", ->
-      beforeEach ->
-        spyOn(editor, 'setCursorScreenPosition')
-
-      it "moves the screen down by half screen size and keeps cursor onscreen", ->
-        keydown('u', ctrl: true)
-        expect(editor.setScrollTop).toHaveBeenCalledWith(400)
-
-    describe "the ctrl-d keybinding", ->
-      beforeEach ->
-        spyOn(editor, 'setCursorScreenPosition')
-
-      it "moves the screen down by half screen size and keeps cursor onscreen", ->
-        keydown('d', ctrl: true)
-        expect(editor.setScrollTop).toHaveBeenCalledWith(800)

@@ -1755,3 +1755,80 @@ describe "Motions", ->
       expect(editor.getCursorBufferPosition()).toEqual [0, 60]
       keydown('n')
       expect(editor.getCursorBufferPosition()).toEqual [0, 31]
+
+  describe "scrolling screen and keeping cursor in the same screen position", ->
+    beforeEach ->
+      editor.setText([0...80].join("\n"))
+      editor.setHeight(20 * 10)
+      editor.setLineHeightInPixels(10)
+      editor.setScrollTop(40 * 10)
+      editor.setCursorBufferPosition([42, 0])
+
+    describe "the ctrl-u keybinding", ->
+      it "moves the screen down by half screen size and keeps cursor onscreen", ->
+        keydown('u', ctrl: true)
+        expect(editor.getScrollTop()).toEqual 300
+        expect(editor.getCursorBufferPosition()).toEqual [32, 0]
+
+      it "selects on visual mode", ->
+        editor.setCursorBufferPosition([42, 1])
+        vimState.activateVisualMode()
+        keydown('u', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [32..42].join("\n")
+
+      it "selects on linewise mode", ->
+        vimState.activateVisualMode('linewise')
+        keydown('u', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [32..42].join("\n").concat("\n")
+
+    describe "the ctrl-b keybinding", ->
+      it "moves screen up one page", ->
+        keydown('b', ctrl: true)
+        expect(editor.getScrollTop()).toEqual 200
+        expect(editor.getCursorScreenPosition()).toEqual [22, 0]
+
+      it "selects on visual mode", ->
+        editor.setCursorBufferPosition([42, 1])
+        vimState.activateVisualMode()
+        keydown('b', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [22..42].join("\n")
+
+      it "selects on linewise mode", ->
+        vimState.activateVisualMode('linewise')
+        keydown('b', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [22..42].join("\n").concat("\n")
+
+
+    describe "the ctrl-d keybinding", ->
+      it "moves the screen down by half screen size and keeps cursor onscreen", ->
+        keydown('d', ctrl: true)
+        expect(editor.getScrollTop()).toEqual 500
+        expect(editor.getCursorBufferPosition()).toEqual [52, 0]
+
+      it "selects on visual mode", ->
+        editor.setCursorBufferPosition([42, 1])
+        vimState.activateVisualMode()
+        keydown('d', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [42..52].join("\n").slice(1, -1)
+
+      it "selects on linewise mode", ->
+        vimState.activateVisualMode('linewise')
+        keydown('d', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [42..52].join("\n").concat("\n")
+
+    describe "the ctrl-f keybinding", ->
+      it "moves screen down one page", ->
+        keydown('f', ctrl: true)
+        expect(editor.getScrollTop()).toEqual 600
+        expect(editor.getCursorScreenPosition()).toEqual [62, 0]
+
+      it "selects on visual mode", ->
+        editor.setCursorBufferPosition([42, 1])
+        vimState.activateVisualMode()
+        keydown('f', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [42..62].join("\n").slice(1, -1)
+
+      it "selects on linewise mode", ->
+        vimState.activateVisualMode('linewise')
+        keydown('f', ctrl: true)
+        expect(editor.getSelectedText()).toEqual [42..62].join("\n").concat("\n")

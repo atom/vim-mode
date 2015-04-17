@@ -83,37 +83,5 @@ class ScrollCursorToBottom extends ScrollCursor
   moveToFirstNonBlank: ->
     @editor.moveToFirstCharacterOfLine()
 
-class ScrollHalfScreenUp extends Scroll
-  execute: ->
-    @scrollDown()
-    @moveCursor()
-
-  moveCursor: ->
-    {row, column} = @editor.getCursorScreenPosition()
-    currentFirstScreenRow = @editor.getFirstVisibleScreenRow()
-    dest = currentFirstScreenRow + row - @rows.first
-    if dest >= 0
-      @editor.setCursorScreenPosition([dest, column])
-
-  scrollDown: ->
-    dest = @editor.getScrollTop() - Math.floor(@editor.getHeight() / 2)
-    @editor.setScrollTop(dest)
-
-class ScrollHalfScreenDown extends Scroll
-  execute: ->
-    @scrollUp()
-    @moveCursor()
-
-  moveCursor: ->
-    {row, column} = @editor.getCursorScreenPosition()
-    currentFirstScreenRow = @editor.getFirstVisibleScreenRow()
-    dest = currentFirstScreenRow + row - @rows.first
-    if dest <= @rows.final
-      @editor.setCursorScreenPosition([dest, column])
-
-  scrollUp: ->
-    dest = @editor.getScrollTop() + Math.floor(@editor.getHeight() / 2)
-    @editor.setScrollTop(dest)
-
 module.exports = {ScrollDown, ScrollUp, ScrollCursorToTop, ScrollCursorToMiddle,
-  ScrollCursorToBottom, ScrollHalfScreenUp, ScrollHalfScreenDown}
+  ScrollCursorToBottom}
