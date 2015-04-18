@@ -387,12 +387,14 @@ class ScrollKeepingCursor extends MoveToLine
     super(@editor, @vimState)
 
   select: (count, options) ->
-    @scrollScreen(count)
+    final_destination = @scrollScreen(count)
     super(count, options)
+    @editor.setScrollTop(final_destination)
 
   execute: (count) ->
-    @scrollScreen(count)
+    final_destination = @scrollScreen(count)
     super(count)
+    @editor.setScrollTop(final_destination)
 
   moveCursor: (cursor, count=1) ->
     cursor.setScreenPosition([@getDestinationRow(count), 0])
@@ -403,12 +405,15 @@ class ScrollKeepingCursor extends MoveToLine
 
   scrollScreen: (count = 1) ->
     @previousFirstScreenRow = @editor.getFirstVisibleScreenRow()
-    @editor.setScrollTop(@scrollDestination(count))
+    destination = @scrollDestination(count)
+    @editor.setScrollTop(destination)
     @currentFirstScreenRow = @editor.getFirstVisibleScreenRow()
+    destination
 
 class ScrollHalfUpKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
-    @editor.getScrollTop() - (count * Math.floor(@editor.getHeight() / 2))
+    half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
+    @editor.getScrollTop() - count * half
 
 class ScrollFullUpKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
@@ -416,7 +421,8 @@ class ScrollFullUpKeepCursor extends ScrollKeepingCursor
 
 class ScrollHalfDownKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
-    @editor.getScrollTop() + (count * Math.floor(@editor.getHeight() / 2))
+    half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
+    @editor.getScrollTop() + count * half
 
 class ScrollFullDownKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
