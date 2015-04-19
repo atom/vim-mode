@@ -3,8 +3,8 @@
 {Point, Range} = require 'atom'
 
 class Find extends MotionWithInput
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editorElement, @vimState) ->
+    super(@editorElement, @vimState)
     @vimState.currentFind = @
     @viewModel = new ViewModel(@, class: 'find', singleChar: true, hidden: true)
     @backwards = false
@@ -47,8 +47,8 @@ class Find extends MotionWithInput
     @
 
 class Till extends Find
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editorElement, @vimState) ->
+    super(@editorElement, @vimState)
     @offset = 1
 
 module.exports = {Find, Till}

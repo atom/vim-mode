@@ -14,7 +14,8 @@ class Motion
   operatesInclusively: true
   operatesLinewise: false
 
-  constructor: (@editor, @vimState) ->
+  constructor: (@editorElemnt, @vimState) ->
+    @editor = @editorElemnt.getModel()
 
   select: (count, options) ->
     value = for selection in @editor.getSelections()
@@ -374,8 +375,8 @@ class MoveToBottomOfScreen extends MoveToScreenLine
 
 class MoveToMiddleOfScreen extends MoveToScreenLine
   getDestinationRow: (count) ->
-    firstScreenRow = @editor.getFirstVisibleScreenRow()
-    lastScreenRow = @editor.getLastVisibleScreenRow()
+    firstScreenRow = @editorElemnt.getFirstVisibleScreenRow()
+    lastScreenRow = @editorElemnt.getLastVisibleScreenRow()
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
@@ -401,10 +402,10 @@ class ScrollKeepingCursor extends MoveToLine
     @currentFirstScreenRow - @previousFirstScreenRow + row
 
   scrollScreen: (count = 1) ->
-    @previousFirstScreenRow = @editor.getFirstVisibleScreenRow()
+    @previousFirstScreenRow = @editorElemnt.getFirstVisibleScreenRow()
     destination = @scrollDestination(count)
     @editor.setScrollTop(destination)
-    @currentFirstScreenRow = @editor.getFirstVisibleScreenRow()
+    @currentFirstScreenRow = @editorElemnt.getFirstVisibleScreenRow()
     destination
 
 class ScrollHalfUpKeepCursor extends ScrollKeepingCursor

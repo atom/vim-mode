@@ -6,8 +6,8 @@ module.exports =
 class MoveToMark extends MotionWithInput
   operatesInclusively: false
 
-  constructor: (@editor, @vimState, @linewise=true) ->
-    super(@editor, @vimState)
+  constructor: (@editorElement, @vimState, @linewise=true) ->
+    super(@editorElement, @vimState)
     @operatesLinewise = @linewise
     @viewModel = new ViewModel(@, class: 'move-to-mark', singleChar: true, hidden: true)
 

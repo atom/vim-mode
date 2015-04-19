@@ -8,8 +8,8 @@ settings = require '../settings'
 class SearchBase extends MotionWithInput
   operatesInclusively: false
 
-  constructor: (@editor, @vimState, options = {}) ->
-    super(@editor, @vimState)
+  constructor: (@editorElement, @vimState, options = {}) ->
+    super(@editorElement, @vimState)
     @reverse = @initiallyReversed = false
     @updateCurrentSearch() unless options.dontUpdateCurrentSearch
 
@@ -79,8 +79,8 @@ class Search extends SearchBase
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null
 
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editorElement, @vimState) ->
+    super(@editorElement, @vimState)
 
     # FIXME: This must depend on the current language
     defaultIsKeyword = "[@a-zA-Z0-9_\-]+"
@@ -195,8 +195,8 @@ class BracketMatchingMotion extends SearchBase
       cursor.setBufferPosition(matchPosition)
 
 class RepeatSearch extends SearchBase
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState, dontUpdateCurrentSearch: true)
+  constructor: (@editorElement, @vimState) ->
+    super(@editorElement, @vimState, dontUpdateCurrentSearch: true)
     @input = new Input(@vimState.getSearchHistoryItem(0) ? "")
     @replicateCurrentSearch()
 
