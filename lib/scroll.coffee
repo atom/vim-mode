@@ -1,11 +1,12 @@
 class Scroll
   isComplete: -> true
   isRecordable: -> false
-  constructor: (@editor) ->
+  constructor: (@editorElement) ->
     @scrolloff = 2 # atom default
+    @editor = @editorElement.getModel()
     @rows =
-      first: @editor.getFirstVisibleScreenRow()
-      last: @editor.getLastVisibleScreenRow()
+      first: @editorElement.getFirstVisibleScreenRow()
+      last: @editorElement.getLastVisibleScreenRow()
       final: @editor.getLastScreenRow()
 
 class ScrollDown extends Scroll
