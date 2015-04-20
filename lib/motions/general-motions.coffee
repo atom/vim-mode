@@ -379,11 +379,59 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
+class ScrollKeepingCursor extends MoveToLine
+  previousFirstScreenRow: 0
+  currentFirstScreenRow: 0
+
+  select: (count, options) ->
+    finalDestination = @scrollScreen(count)
+    super(count, options)
+    @editor.setScrollTop(finalDestination)
+
+  execute: (count) ->
+    finalDestination = @scrollScreen(count)
+    super(count)
+    @editor.setScrollTop(finalDestination)
+
+  moveCursor: (cursor, count=1) ->
+    cursor.setScreenPosition([@getDestinationRow(count), 0])
+
+  getDestinationRow: (count) ->
+    {row, column} = @editor.getCursorScreenPosition()
+    @currentFirstScreenRow - @previousFirstScreenRow + row
+
+  scrollScreen: (count = 1) ->
+    @previousFirstScreenRow = @editor.getFirstVisibleScreenRow()
+    destination = @scrollDestination(count)
+    @editor.setScrollTop(destination)
+    @currentFirstScreenRow = @editor.getFirstVisibleScreenRow()
+    destination
+
+class ScrollHalfUpKeepCursor extends ScrollKeepingCursor
+  scrollDestination: (count) ->
+    half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
+    @editor.getScrollTop() - count * half
+
+class ScrollFullUpKeepCursor extends ScrollKeepingCursor
+  scrollDestination: (count) ->
+    @editor.getScrollTop() - (count * @editor.getHeight())
+
+class ScrollHalfDownKeepCursor extends ScrollKeepingCursor
+  scrollDestination: (count) ->
+    half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
+    @editor.getScrollTop() + count * half
+
+class ScrollFullDownKeepCursor extends ScrollKeepingCursor
+  scrollDestination: (count) ->
+    @editor.getScrollTop() + (count * @editor.getHeight())
+
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine, MoveToStartOfFile,
-  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError
+  MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError,
+  ScrollHalfUpKeepCursor, ScrollFullUpKeepCursor,
+  ScrollHalfDownKeepCursor, ScrollFullDownKeepCursor
 }
