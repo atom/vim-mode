@@ -383,18 +383,15 @@ class ScrollKeepingCursor extends MoveToLine
   previousFirstScreenRow: 0
   currentFirstScreenRow: 0
 
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
-
   select: (count, options) ->
-    final_destination = @scrollScreen(count)
+    finalDestination = @scrollScreen(count)
     super(count, options)
-    @editor.setScrollTop(final_destination)
+    @editor.setScrollTop(finalDestination)
 
   execute: (count) ->
-    final_destination = @scrollScreen(count)
+    finalDestination = @scrollScreen(count)
     super(count)
-    @editor.setScrollTop(final_destination)
+    @editor.setScrollTop(finalDestination)
 
   moveCursor: (cursor, count=1) ->
     cursor.setScreenPosition([@getDestinationRow(count), 0])
