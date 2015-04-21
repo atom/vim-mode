@@ -14,8 +14,8 @@ class Motion
   operatesInclusively: true
   operatesLinewise: false
 
-  constructor: (@editorElemnt, @vimState) ->
-    @editor = @editorElemnt.getModel()
+  constructor: (@editorElement, @vimState) ->
+    @editor = @editorElement.getModel()
 
   select: (count, options) ->
     value = for selection in @editor.getSelections()
@@ -112,8 +112,9 @@ class Motion
     @vimState.mode is 'visual' or @operatesInclusively
 
 class CurrentSelection extends Motion
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editorElement, @vimState) ->
+    @editor = @editorElement.getModel()
+    super(@editorElement, @vimState)
     @selection = @editor.getSelectedBufferRanges()
 
   execute: (count=1) ->
@@ -125,8 +126,9 @@ class CurrentSelection extends Motion
 
 # Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editorElement, @vimState) ->
+    @editor = @editorElement.getModel()
+    super(@editorElement, @vimState)
     @complete = false
 
   isComplete: -> @complete
@@ -286,9 +288,10 @@ class MoveToRelativeLine extends MoveToLine
     cursor.setBufferPosition([row + (count - 1), 0])
 
 class MoveToScreenLine extends MoveToLine
-  constructor: (@editor, @vimState, @scrolloff) ->
+  constructor: (@editorElement, @vimState, @scrolloff) ->
+    @editor = @editorElement.getModel()
     @scrolloff = 2 # atom default
-    super(@editor, @vimState)
+    super(@editorElement, @vimState)
 
   moveCursor: (cursor, count=1) ->
     {row, column} = cursor.getBufferPosition()
@@ -402,10 +405,10 @@ class ScrollKeepingCursor extends MoveToLine
     @currentFirstScreenRow - @previousFirstScreenRow + row
 
   scrollScreen: (count = 1) ->
-    @previousFirstScreenRow = @editorElemnt.getFirstVisibleScreenRow()
+    @previousFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
     destination = @scrollDestination(count)
     @editor.setScrollTop(destination)
-    @currentFirstScreenRow = @editorElemnt.getFirstVisibleScreenRow()
+    @currentFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
     destination
 
 class ScrollHalfUpKeepCursor extends ScrollKeepingCursor

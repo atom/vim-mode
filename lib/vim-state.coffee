@@ -78,16 +78,16 @@ class VimState
       'insert-below-with-newline': => new Operators.InsertBelowWithNewline(@editor, @)
       'delete': => @linewiseAliasedOperator(Operators.Delete)
       'change': => @linewiseAliasedOperator(Operators.Change)
-      'change-to-last-character-of-line': => [new Operators.Change(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor, @)]
-      'delete-right': => [new Operators.Delete(@editor, @), new Motions.MoveRight(@editor, @)]
-      'delete-left': => [new Operators.Delete(@editor, @), new Motions.MoveLeft(@editor, @)]
-      'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editor, @)]
+      'change-to-last-character-of-line': => [new Operators.Change(@editor, @), new Motions.MoveToLastCharacterOfLine(@editorElement, @)]
+      'delete-right': => [new Operators.Delete(@editor, @), new Motions.MoveRight(@editorElement, @)]
+      'delete-left': => [new Operators.Delete(@editor, @), new Motions.MoveLeft(@editorElement, @)]
+      'delete-to-last-character-of-line': => [new Operators.Delete(@editor, @), new Motions.MoveToLastCharacterOfLine(@editorElement, @)]
       'toggle-case': => new Operators.ToggleCase(@editor, @)
       'upper-case': => new Operators.UpperCase(@editor, @)
       'lower-case': => new Operators.LowerCase(@editor, @)
       'toggle-case-now': => new Operators.ToggleCase(@editor, @, complete: true)
       'yank': => @linewiseAliasedOperator(Operators.Yank)
-      'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToRelativeLine(@editor, @)]
+      'yank-line': => [new Operators.Yank(@editor, @), new Motions.MoveToRelativeLine(@editorElement, @)]
       'put-before': => new Operators.Put(@editor, @, location: 'before')
       'put-after': => new Operators.Put(@editor, @, location: 'after')
       'join': => new Operators.Join(@editor, @)
@@ -148,23 +148,23 @@ class VimState
       'select-around-parentheses': => new TextObjects.SelectInsideBrackets(@editor, '(', ')', true)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
-      'repeat-search': (e) => new Motions.RepeatSearch(@editor, @)
-      'repeat-search-backwards': (e) => new Motions.RepeatSearch(@editor, @).reversed()
-      'move-to-mark': (e) => new Motions.MoveToMark(@editor, @)
-      'move-to-mark-literal': (e) => new Motions.MoveToMark(@editor, @, false)
+      'repeat-search': (e) => new Motions.RepeatSearch(@editorElement, @)
+      'repeat-search-backwards': (e) => new Motions.RepeatSearch(@editorElement, @).reversed()
+      'move-to-mark': (e) => new Motions.MoveToMark(@editorElement, @)
+      'move-to-mark-literal': (e) => new Motions.MoveToMark(@editorElement, @, false)
       'mark': (e) => new Operators.Mark(@editor, @)
-      'find': (e) => new Motions.Find(@editor, @)
-      'find-backwards': (e) => new Motions.Find(@editor, @).reverse()
-      'till': (e) => new Motions.Till(@editor, @)
-      'till-backwards': (e) => new Motions.Till(@editor, @).reverse()
+      'find': (e) => new Motions.Find(@editorElement, @)
+      'find-backwards': (e) => new Motions.Find(@editorElement, @).reverse()
+      'till': (e) => new Motions.Till(@editorElement, @)
+      'till-backwards': (e) => new Motions.Till(@editorElement, @).reverse()
       'repeat-find': (e) => @currentFind.repeat() if @currentFind?
       'repeat-find-reverse': (e) => @currentFind.repeat(reverse: true) if @currentFind?
       'replace': (e) => new Operators.Replace(@editor, @)
-      'search': (e) => new Motions.Search(@editor, @)
-      'reverse-search': (e) => (new Motions.Search(@editor, @)).reversed()
-      'search-current-word': (e) => new Motions.SearchCurrentWord(@editor, @)
-      'bracket-matching-motion': (e) => new Motions.BracketMatchingMotion(@editor,@)
-      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editor, @)).reversed()
+      'search': (e) => new Motions.Search(@editorElement, @)
+      'reverse-search': (e) => (new Motions.Search(@editorElement, @)).reversed()
+      'search-current-word': (e) => new Motions.SearchCurrentWord(@editorElement, @)
+      'bracket-matching-motion': (e) => new Motions.BracketMatchingMotion(@editorElement,@)
+      'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editorElement, @)).reversed()
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
@@ -211,7 +211,7 @@ class VimState
       # If we've received an operator in visual mode, mark the current
       # selection as the motion to operate on.
       if @mode is 'visual' and operation instanceof Operators.Operator
-        @opStack.push(new Motions.CurrentSelection(@editor, @))
+        @opStack.push(new Motions.CurrentSelection(@editorElement, @))
 
       @processOpStack()
 
@@ -506,7 +506,7 @@ class VimState
       @repeatPrefix(e)
       null
     else
-      new Motions.MoveToBeginningOfLine(@editor, @)
+      new Motions.MoveToBeginningOfLine(@editorElement, @)
 
   # Private: A generic way to handle Operators that can be repeated for
   # their linewise form.
@@ -516,7 +516,7 @@ class VimState
   # Returns nothing.
   linewiseAliasedOperator: (constructor) ->
     if @isOperatorPending(constructor)
-      new Motions.MoveToRelativeLine(@editor, @)
+      new Motions.MoveToRelativeLine(@editorElement, @)
     else
       new constructor(@editor, @)
 
