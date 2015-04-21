@@ -375,8 +375,8 @@ class MoveToBottomOfScreen extends MoveToScreenLine
 
 class MoveToMiddleOfScreen extends MoveToScreenLine
   getDestinationRow: (count) ->
-    firstScreenRow = @editorElemnt.getFirstVisibleScreenRow()
-    lastScreenRow = @editorElemnt.getLastVisibleScreenRow()
+    firstScreenRow = @editorElement.getFirstVisibleScreenRow()
+    lastScreenRow = @editorElement.getLastVisibleScreenRow()
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
