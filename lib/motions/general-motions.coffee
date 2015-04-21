@@ -113,7 +113,6 @@ class Motion
 
 class CurrentSelection extends Motion
   constructor: (@editorElement, @vimState) ->
-    @editor = @editorElement.getModel()
     super(@editorElement, @vimState)
     @selection = @editor.getSelectedBufferRanges()
 
@@ -127,7 +126,6 @@ class CurrentSelection extends Motion
 # Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
   constructor: (@editorElement, @vimState) ->
-    @editor = @editorElement.getModel()
     super(@editorElement, @vimState)
     @complete = false
 
@@ -289,7 +287,6 @@ class MoveToRelativeLine extends MoveToLine
 
 class MoveToScreenLine extends MoveToLine
   constructor: (@editorElement, @vimState, @scrolloff) ->
-    @editor = @editorElement.getModel()
     @scrolloff = 2 # atom default
     super(@editorElement, @vimState)
 
