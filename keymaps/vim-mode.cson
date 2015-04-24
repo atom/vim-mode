@@ -142,6 +142,10 @@
   '8': 'vim-mode:repeat-prefix'
   '9': 'vim-mode:repeat-prefix'
 
+  ': w enter': 'core:save'
+  ': q enter': 'core:close'
+  '/': 'find-and-replace:show'
+
 'atom-text-editor.vim-mode.command-mode':
   'i': 'vim-mode:activate-insert-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'
