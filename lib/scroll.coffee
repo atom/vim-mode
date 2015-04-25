@@ -93,7 +93,7 @@ class ScrollHorizontal
     @cursor = @editor.getLastCursor()
 
   putCursorOnScreen: ->
-    @cursor.autoscroll({center: false})
+    @editor.scrollToCursorPosition({center: false})
 
 class ScrollCursorToLeft extends ScrollHorizontal
   execute: ->
