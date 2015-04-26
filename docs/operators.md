@@ -14,6 +14,8 @@
   * `cc` - linewise
   * `c2c` - repeated linewise
   * `C` - change to the end of the line
+* [Adding and subtracting](http://vimhelp.appspot.com/change.txt.html#CTRL-A)
+  * `ctrl-a` and `ctrl-x` in command mode to increase/decrease numbers in text
 * [Yank](http://vimhelp.appspot.com/change.txt.html#yank)
   * `vwy` - works in visual mode
   * `yw` - with a motion
