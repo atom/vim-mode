@@ -163,6 +163,9 @@
   'ctrl-]': 'symbols-view:go-to-declaration'
   'ctrl-T': 'symbols-view:return-from-declaration'
 
+  'ctrl-a': 'vim-mode:increase'
+  'ctrl-x': 'vim-mode:decrease'
+
   '" a': 'vim-mode:register-prefix'
   '" b': 'vim-mode:register-prefix'
   '" c': 'vim-mode:register-prefix'
