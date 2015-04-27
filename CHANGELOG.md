@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.45
+
+* Added `ctrl-x` and `ctrl-a` for incrementing and decrementing numbers - @jacekkopecky
+* Fixed the behavior of scrolling motions in visual mode - @daniloisr
+
 ## 0.44
 
 * Fixed issue where canceling the replace operator would delete text - @jacekkopecky
