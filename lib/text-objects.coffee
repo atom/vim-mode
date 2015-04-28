@@ -140,4 +140,14 @@ class SelectAWord extends TextObject
         selection.selectRight()
       true
 
-module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets, SelectAWord}
+
+class SelectInsideParagraph extends TextObject
+  constructor: (@editor, @inclusive) ->
+  select: ->
+    for selection in @editor.getSelections()
+      range = selection.cursor.getCurrentParagraphBufferRange()
+      if range?
+        selection.setBufferRange(range)
+      true
+
+module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets, SelectAWord, SelectInsideParagraph}

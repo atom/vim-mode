@@ -239,6 +239,7 @@
   'i (': 'vim-mode:select-inside-parentheses'
   'i )': 'vim-mode:select-inside-parentheses'
   'i b': 'vim-mode:select-inside-parentheses'
+  'i p': 'vim-mode:select-inside-paragraph'
   'a w': 'vim-mode:select-a-word'
   'a "': 'vim-mode:select-around-double-quotes'
   'a \'': 'vim-mode:select-around-single-quotes'
@@ -253,6 +254,7 @@
   'a (': 'vim-mode:select-around-parentheses'
   'a )': 'vim-mode:select-around-parentheses'
   'a b': 'vim-mode:select-around-parentheses'
+  'a p': 'vim-mode:select-around-paragraph'
   'x': 'vim-mode:reset-command-mode'
 
 'atom-text-editor.vim-mode.visual-mode':
