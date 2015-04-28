@@ -149,16 +149,16 @@ class MoveLeft extends Motion
 class MoveRight extends Motion
   operatesInclusively: false
 
-  # MoveRight can be combined with Delete, which will indicate it by the presence of options.deleting
   moveCursor: (cursor, count=1, options={}) ->
     _.times count, =>
-      goingToNextLine = settings.wrapLeftRightMotion()
+      wrapToNextLine = settings.wrapLeftRightMotion()
 
-      if not cursor.isAtEndOfLine() # the line is not empty
-        cursor.moveRight()
-        goingToNextLine = false if options.deleting # when deleting, wrapLeftRightMotion only works on an empty line
+      # when the motion is combined with an operator, we will only wrap to the next line
+      # if we are already at the end of the line (after the last character)
+      wrapToNextLine = false if @vimState.mode is 'operator-pending' and not cursor.isAtEndOfLine()
 
-      cursor.moveRight() if cursor.isAtEndOfLine() and goingToNextLine
+      cursor.moveRight() unless cursor.isAtEndOfLine()
+      cursor.moveRight() if wrapToNextLine and cursor.isAtEndOfLine()
       @ensureCursorIsWithinLine(cursor)
 
 class MoveUp extends Motion
