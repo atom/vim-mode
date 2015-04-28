@@ -164,6 +164,31 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('command-mode')).toBe(true)
 
+  describe "the 'ip' text object", ->
+    beforeEach ->
+      editor.setText("\nParagraph-1\nParagraph-1\nParagraph-1\n\n")
+      editor.setCursorScreenPosition([2, 2])
+
+    it "applies operators inside the current paragraph in operator-pending mode", ->
+
+      keydown('y')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getText()).toBe "\nParagraph-1\nParagraph-1\nParagraph-1\n\n"
+      expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+      expect(vimState.getRegister('"').text).toBe "Paragraph-1\nParagraph-1\nParagraph-1"
+      expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
+      expect(editorElement.classList.contains('command-mode')).toBe(true)
+
+    it "selects inside the current paragraph in visual mode", ->
+      keydown('v')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [3, 11]]
+
+
   describe "the 'i[' text object", ->
     beforeEach ->
       editor.setText("[ something in here and in [here] ]")

@@ -140,7 +140,6 @@ class SelectAWord extends TextObject
         selection.selectRight()
       true
 
-
 class SelectInsideParagraph extends TextObject
   constructor: (@editor, @inclusive) ->
   select: ->
