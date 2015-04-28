@@ -377,6 +377,9 @@ class VimState
 
     @clearOpStack()
     selection.clear(autoscroll: false) for selection in @editor.getSelections()
+    for cursor in @editor.getCursors()
+      if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
+        cursor.moveLeft()
 
     @updateStatusBar()
 

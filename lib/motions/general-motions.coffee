@@ -151,8 +151,14 @@ class MoveRight extends Motion
 
   moveCursor: (cursor, count=1) ->
     _.times count, =>
+      wrapToNextLine = settings.wrapLeftRightMotion()
+
+      # when the motion is combined with an operator, we will only wrap to the next line
+      # if we are already at the end of the line (after the last character)
+      wrapToNextLine = false if @vimState.mode is 'operator-pending' and not cursor.isAtEndOfLine()
+
       cursor.moveRight() unless cursor.isAtEndOfLine()
-      cursor.moveRight() if settings.wrapLeftRightMotion() and cursor.isAtEndOfLine()
+      cursor.moveRight() if wrapToNextLine and cursor.isAtEndOfLine()
       @ensureCursorIsWithinLine(cursor)
 
 class MoveUp extends Motion

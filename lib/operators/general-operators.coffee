@@ -100,7 +100,7 @@ class Delete extends Operator
         if @motion.isLinewise?()
           cursor.moveToBeginningOfLine()
         else
-          cursor.moveLeft() if cursor.isAtEndOfLine()
+          cursor.moveLeft() if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
 
     @vimState.activateCommandMode()
 
