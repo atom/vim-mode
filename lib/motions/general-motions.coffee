@@ -149,7 +149,7 @@ class MoveLeft extends Motion
 class MoveRight extends Motion
   operatesInclusively: false
 
-  moveCursor: (cursor, count=1, options={}) ->
+  moveCursor: (cursor, count=1) ->
     _.times count, =>
       wrapToNextLine = settings.wrapLeftRightMotion()
 
