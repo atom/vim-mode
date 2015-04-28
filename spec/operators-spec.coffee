@@ -1495,6 +1495,13 @@ describe "Operators", ->
       keydown("e")
       expect(editor.getText()).toBe 'ABC\nXyZ'
 
+      editor.setCursorBufferPosition([1, 0])
+      keydown("g")
+      keydown("U", shift: true)
+      keydown("$")
+      expect(editor.getText()).toBe 'ABC\nXYZ'
+      expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
     it "makes the selected text uppercase in visual mode", ->
       keydown("V", shift: true)
       keydown("U", shift: true)
@@ -1508,8 +1515,9 @@ describe "Operators", ->
     it "makes text lowercase with g and motion", ->
       keydown("g")
       keydown("u")
-      keydown("e")
+      keydown("$")
       expect(editor.getText()).toBe 'abc\nXyZ'
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     it "makes the selected text lowercase in visual mode", ->
       keydown("V", shift: true)
