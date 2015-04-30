@@ -396,9 +396,10 @@ describe "Operators", ->
         expect(editorElement.classList.contains('command-mode')).toBe(true)
 
     describe "when followed by an j", ->
+      originalText = "12345\nabcde\nABCDE"
+
       beforeEach ->
-        @originalText = "12345\nabcde\nABCDE"
-        editor.setText(@originalText)
+        editor.setText(originalText)
 
       describe "on the beginning of the file", ->
         beforeEach ->
@@ -414,7 +415,7 @@ describe "Operators", ->
         it "deletes nothing", ->
           keydown('d')
           keydown('j')
-          expect(editor.getText()).toBe(@originalText)
+          expect(editor.getText()).toBe(originalText)
 
       describe "on the middle of second line", ->
         beforeEach ->
@@ -425,9 +426,10 @@ describe "Operators", ->
           expect(editor.getText()).toBe("12345")
 
     describe "when followed by an k", ->
+      originalText = "12345\nabcde\nABCDE"
+
       beforeEach ->
-        @originalText = "12345\nabcde\nABCDE"
-        editor.setText(@originalText)
+        editor.setText(originalText)
 
       describe "on the end of the file", ->
         beforeEach ->
@@ -443,7 +445,7 @@ describe "Operators", ->
         it "deletes nothing", ->
           keydown('d')
           keydown('k')
-          expect(editor.getText()).toBe(@originalText)
+          expect(editor.getText()).toBe(originalText)
 
       describe "when on the middle of second line", ->
         beforeEach ->
