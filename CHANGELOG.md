@@ -1,5 +1,11 @@
 ## HEAD
 
+## 0.46
+
+* Fix issues with deleting when there are multiple selections - @jacekkopecky
+* Add paragraph text-objects 'ip' and 'ap' - @t9md
+* Fix use of a deprecated method - @akonwi
+
 ## 0.45
 
 * Added `ctrl-x` and `ctrl-a` for incrementing and decrementing numbers - @jacekkopecky
