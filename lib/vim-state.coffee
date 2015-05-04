@@ -475,7 +475,7 @@ class VimState
   # Returns nothing.
   registerPrefix: (e) ->
     keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
-    name = atom.keymap.keystrokeForKeyboardEvent(keyboardEvent)
+    name = atom.keymaps.keystrokeForKeyboardEvent(keyboardEvent)
     if name.lastIndexOf('shift-', 0) is 0
       name = name.slice(6)
     new Prefixes.Register(name)
@@ -487,7 +487,7 @@ class VimState
   # Returns nothing.
   repeatPrefix: (e) ->
     keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
-    num = parseInt(atom.keymap.keystrokeForKeyboardEvent(keyboardEvent))
+    num = parseInt(atom.keymaps.keystrokeForKeyboardEvent(keyboardEvent))
     if @topOperation() instanceof Prefixes.Repeat
       @topOperation().addDigit(num)
     else
