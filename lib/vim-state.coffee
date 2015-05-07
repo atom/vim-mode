@@ -276,7 +276,7 @@ class VimState
       type = Utils.copyType(text)
       {text, type}
     else if name is '%'
-      text = @editor.getUri()
+      text = @editor.getURI()
       type = Utils.copyType(text)
       {text, type}
     else if name is "_" # Blackhole always returns nothing
