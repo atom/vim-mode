@@ -136,7 +136,7 @@ describe "Prefixes", ->
 
     describe "the % register", ->
       beforeEach ->
-        spyOn(editor, 'getUri').andReturn('/Users/atom/known_value.txt')
+        spyOn(editor, 'getURI').andReturn('/Users/atom/known_value.txt')
 
       describe "reading", ->
         it "returns the filename of the current editor", ->
