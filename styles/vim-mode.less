@@ -56,3 +56,11 @@ atom-text-editor.vim-mode.visual-mode
     }
   }
 }
+
+atom-text-editor,
+atom-text-editor::shadow {
+  .yank-highlight .region {
+    border-radius: @component-border-radius;
+    border: 1px solid @syntax-result-marker-color;
+  }
+}
