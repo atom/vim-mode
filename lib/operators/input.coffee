@@ -11,8 +11,8 @@ class Insert extends Operator
 
   isComplete: -> @standalone or super
 
-  confirmTransaction: (transaction) ->
-    bundler = new TransactionBundler(transaction)
+  confirmChanges: (changes) ->
+    bundler = new TransactionBundler(changes)
     @typedText = bundler.buildInsertText()
 
   execute: ->
@@ -155,32 +155,32 @@ class SubstituteLine extends Insert
 # Takes a transaction and turns it into a string of what was typed.
 # This class is an implementation detail of Insert
 class TransactionBundler
-  constructor: (@transaction) ->
+  constructor: (@changes) ->
     @position = null
     @content = ""
 
   buildInsertText: ->
-    @addPatch(patch) for patch in @transaction.patches ? []
+    @addChange(change) for change in @changes
     @content
 
-  addPatch: (patch) ->
-    return unless patch.newRange?
-    if @isAppending(patch)
-      @content += patch.newText
-      @position = patch.newRange.end
-    else if @isRemovingFromEnd(patch)
-      @content = @content.substring(0, @content.length - patch.oldText.length)
-      @position = patch.newRange.end
+  addChange: (change) ->
+    return unless change.newRange?
+    if @isAppending(change)
+      @content += change.newText
+      @position = change.newRange.end
+    else if @isRemovingFromEnd(change)
+      @content = @content.substring(0, @content.length - change.oldText.length)
+      @position = change.newRange.end
 
-  isAppending: (patch) ->
-    (patch.newText.length > 0) and
-      (patch.oldText.length is 0) and
-      ((not @position) or @position.isEqual(patch.newRange.start))
+  isAppending: (change) ->
+    (change.newText.length > 0) and
+      (change.oldText.length is 0) and
+      ((not @position) or @position.isEqual(change.newRange.start))
 
-  isRemovingFromEnd: (patch) ->
-    (patch.newText.length is 0) and
-      (patch.oldText.length > 0) and
-      (@position and @position?.isEqual(patch.oldRange.end))
+  isRemovingFromEnd: (change) ->
+    (change.newText.length is 0) and
+      (change.oldText.length > 0) and
+      (@position and @position?.isEqual(change.oldRange.end))
 
 module.exports = {
   Insert,
