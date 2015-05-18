@@ -291,9 +291,9 @@ class MoveToRelativeLine extends MoveToLine
     cursor.setBufferPosition([row + (count - 1), 0])
 
 class MoveToScreenLine extends MoveToLine
-  constructor: (@editor, @vimState, @scrolloff) ->
+  constructor: (@editorElement, @vimState, @scrolloff) ->
     @scrolloff = 2 # atom default
-    super(@editor, @vimState)
+    super(@editorElement.getModel(), @vimState)
 
   moveCursor: (cursor, count=1) ->
     {row, column} = cursor.getBufferPosition()
@@ -361,7 +361,7 @@ class MoveToStartOfFile extends MoveToLine
 
 class MoveToTopOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
-    firstScreenRow = @editor.getFirstVisibleScreenRow()
+    firstScreenRow = @editorElement.getFirstVisibleScreenRow()
     if firstScreenRow > 0
       offset = Math.max(count - 1, @scrolloff)
     else
@@ -370,7 +370,7 @@ class MoveToTopOfScreen extends MoveToScreenLine
 
 class MoveToBottomOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->
-    lastScreenRow = @editor.getLastVisibleScreenRow()
+    lastScreenRow = @editorElement.getLastVisibleScreenRow()
     lastRow = @editor.getBuffer().getLastRow()
     if lastScreenRow isnt lastRow
       offset = Math.max(count - 1, @scrolloff)
@@ -380,14 +380,17 @@ class MoveToBottomOfScreen extends MoveToScreenLine
 
 class MoveToMiddleOfScreen extends MoveToScreenLine
   getDestinationRow: (count) ->
-    firstScreenRow = @editor.getFirstVisibleScreenRow()
-    lastScreenRow = @editor.getLastVisibleScreenRow()
+    firstScreenRow = @editorElement.getFirstVisibleScreenRow()
+    lastScreenRow = @editorElement.getLastVisibleScreenRow()
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
 class ScrollKeepingCursor extends MoveToLine
   previousFirstScreenRow: 0
   currentFirstScreenRow: 0
+
+  constructor: (@editorElement, @vimState) ->
+    super(@editorElement.getModel(), @vimState)
 
   select: (count, options) ->
     finalDestination = @scrollScreen(count)
@@ -407,10 +410,10 @@ class ScrollKeepingCursor extends MoveToLine
     @currentFirstScreenRow - @previousFirstScreenRow + row
 
   scrollScreen: (count = 1) ->
-    @previousFirstScreenRow = @editor.getFirstVisibleScreenRow()
+    @previousFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
     destination = @scrollDestination(count)
     @editor.setScrollTop(destination)
-    @currentFirstScreenRow = @editor.getFirstVisibleScreenRow()
+    @currentFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
     destination
 
 class ScrollHalfUpKeepCursor extends ScrollKeepingCursor
