@@ -401,11 +401,11 @@ class VimState
     return unless @mode in [null, 'insert']
     @editorElement.component.setInputEnabled(false)
     @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
-    @insertionCheckpoint = null
-    transaction = _.last(@editor.buffer.history.undoStack)
+    changes = getChangesSinceCheckpoint(@editor.buffer, @insertionCheckpoint)
     item = @inputOperator(@history[0])
-    if item? and transaction?
-      item.confirmTransaction(transaction)
+    @insertionCheckpoint = null
+    if item?
+      item.confirmChanges(changes)
     for cursor in @editor.getCursors()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
@@ -542,3 +542,14 @@ class VimState
 
   updateStatusBar: ->
     @statusBarManager.update(@mode, @submode)
+
+# This uses private APIs and may break if TextBuffer is refactored.
+# Package authors - copy and paste this code at your own risk.
+getChangesSinceCheckpoint = (buffer, checkpoint) ->
+  {history} = buffer
+
+  # TODO: remove this conditional once Atom 0.200 has been out for a while.
+  if index = history.getCheckpointIndex?(checkpoint)
+    history.undoStack.slice(index)
+  else
+    []
