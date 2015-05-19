@@ -1,5 +1,13 @@
 ## HEAD
 
+## 0.48
+
+* Fix usages of deprecated APIs
+
+## 0.47
+
+* Fix usages of deprecated APIs - @hitsmaxft, @jacekkopecky
+
 ## 0.46
 
 * Fix issues with deleting when there are multiple selections - @jacekkopecky
