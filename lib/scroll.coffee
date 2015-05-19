@@ -40,10 +40,10 @@ class ScrollUp extends Scroll
     @editor.scrollToScreenPosition([firstScreenRow - count, 0])
 
 class ScrollCursor extends Scroll
-  constructor: (@editor, @opts={}) ->
+  constructor: (@editorElement, @opts={}) ->
     super
     cursor = @editor.getCursorScreenPosition()
-    @pixel = @editor.pixelPositionForScreenPosition(cursor).top
+    @pixel = @editorElement.pixelPositionForScreenPosition(cursor).top
 
 class ScrollCursorToTop extends ScrollCursor
   execute: ->
