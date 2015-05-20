@@ -25,8 +25,6 @@ more often than other developers. Adding a feature can be quick and easy. Check
 out the [closed pull requests](https://github.com/atom/vim-mode/pulls?direction=desc&page=1&sort=created&state=closed)
 to see examples of community contributions. We're looking forward to yours, too.
 
-
-
 ### Documentation
 
 * [Overview](https://github.com/atom/vim-mode/blob/master/docs/overview.md)
