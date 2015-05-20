@@ -18,6 +18,8 @@ class VimState
   mode: null
   submode: null
   destroyed: false
+  blockwiseStart: null
+  blockwiseEnd: null
 
   constructor: (@editorElement, @statusBarManager, @globalVimState) ->
     @emitter = new Emitter
@@ -30,7 +32,7 @@ class VimState
 
     @subscriptions.add @editor.onDidChangeSelectionRange =>
       if _.all(@editor.getSelections(), (selection) -> selection.isEmpty())
-        @activateCommandMode() if @mode is 'visual'
+        @activateCommandMode() if @mode is 'visual' and @submode isnt 'blockwise'
       else
         @activateVisualMode('characterwise') if @mode is 'command'
 
@@ -411,6 +413,8 @@ class VimState
 
   deactivateVisualMode: ->
     return unless @mode is 'visual'
+    @visualStart = null
+    @visualEnd = null
     for selection in @editor.getSelections()
       selection.cursor.moveLeft() unless selection.isEmpty()
 
@@ -437,6 +441,10 @@ class VimState
       @editor.selectLinesContainingCursors()
     else if @editor.getSelectedText() is ''
       @editor.selectRight()
+
+    if @submode is 'blockwise'
+      @blockwiseStart = @editor.getCursorBufferPosition()
+      @blockwiseEnd = @blockwiseStart
 
     @updateStatusBar()
 

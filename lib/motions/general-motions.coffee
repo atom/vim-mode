@@ -17,6 +17,10 @@ class Motion
   constructor: (@editor, @vimState) ->
 
   select: (count, options) ->
+    if @isBlockwise()
+      @moveSelectionBlockwise(count, options)
+      return false
+
     value = for selection in @editor.getSelections()
       if @isLinewise()
         @moveSelectionLinewise(selection, count, options)
@@ -27,13 +31,43 @@ class Motion
       not selection.isEmpty()
 
     @editor.mergeCursors()
-    @editor.mergeIntersectingSelections()
+    unless @isBlockwise()
+      @editor.mergeIntersectingSelections()
     value
 
   execute: (count) ->
     for cursor in @editor.getCursors()
       @moveCursor(cursor, count)
     @editor.mergeCursors()
+
+  moveSelectionBlockwise: (count, options) ->
+    cursor = @editor.getLastCursor()
+    lastCol = cursor.getBufferColumn()
+    for sel in @editor.getSelections()
+      range = sel.getBufferRange()
+      lastCol = Math.max(Math.max(range.start.column, range.end.column), lastCol)
+
+    @moveCursor(cursor, count, options)
+
+    @vimState.blockwiseEnd = cursor.getBufferPosition()
+
+    if @operatesLinewise # maintain col
+      @vimState.blockwiseEnd.column = lastCol
+
+    startRow = Math.min(@vimState.blockwiseStart.row, @vimState.blockwiseEnd.row)
+    startCol = Math.min(@vimState.blockwiseStart.column - 1, @vimState.blockwiseEnd.column)
+
+    endRow = Math.max(@vimState.blockwiseStart.row, @vimState.blockwiseEnd.row)
+    endCol = Math.max(@vimState.blockwiseStart.column, @vimState.blockwiseEnd.column)
+
+    bufferRanges = []
+    for row in [startRow..endRow]
+      range = [[row, startCol], [row, endCol]]
+      if @editor.getTextInBufferRange(range).length > 0
+        bufferRanges.push(range)
+
+    if bufferRanges.length > 0
+      @editor.setSelectedBufferRanges bufferRanges
 
   moveSelectionLinewise: (selection, count, options) ->
     selection.modifySelection =>
@@ -63,6 +97,7 @@ class Motion
   moveSelectionInclusively: (selection, count, options) ->
     selection.modifySelection =>
       range = selection.getBufferRange()
+      console.log range
       [oldStart, oldEnd] = [range.start, range.end]
 
       wasEmpty = selection.isEmpty()
@@ -100,6 +135,11 @@ class Motion
   isComplete: -> true
 
   isRecordable: -> false
+
+  isBlockwise: ->
+    if @vimState?.mode is 'visual'
+      return @vimState?.submode is 'blockwise'
+    false
 
   isLinewise: ->
     if @vimState?.mode is 'visual'
