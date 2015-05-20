@@ -14,6 +14,9 @@ Sizable portions of Vim's command mode work as you'd expect, including
 many complex combinations. Even so, this package is far from finished (Vim
 wasn't built in a day).
 
+If you want the vim ex line (for `:w`, `:s`, etc.), you can try [ex-mode](https://atom.io/packages/ex-mode)
+which works in conjuction with this plugin.
+
 Currently, vim-mode requires soft line wraps to be disabled, and has some issues
 with international keyboard layouts.
 
