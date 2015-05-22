@@ -28,11 +28,12 @@ class VimState
     @marks = {}
     @subscriptions.add @editor.onDidDestroy => @destroy()
 
-    @subscriptions.add @editor.onDidChangeSelectionRange =>
-      if _.all(@editor.getSelections(), (selection) -> selection.isEmpty())
+    @subscriptions.add @editor.onDidChangeSelectionRange _.debounce(=>
+      if @editor.getSelections().every((selection) -> selection.isEmpty())
         @activateCommandMode() if @mode is 'visual'
       else
         @activateVisualMode('characterwise') if @mode is 'command'
+    , 100)
 
     @editorElement.classList.add("vim-mode")
     @setupCommandMode()

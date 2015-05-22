@@ -1,3 +1,4 @@
+_ = require 'underscore-plus'
 helpers = require './spec-helper'
 VimState = require '../lib/vim-state'
 StatusBarManager = require '../lib/status-bar-manager'
@@ -116,9 +117,14 @@ describe "VimState", ->
 
     describe "selecting text", ->
       it "puts the editor into visual mode", ->
+        spyOn(_._, "now").andCallFake -> window.now
+
         editor.setText("abc def")
         expect(vimState.mode).toEqual 'command'
         editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
+
+        advanceClock(100)
+
         expect(vimState.mode).toEqual 'visual'
         expect(vimState.submode).toEqual 'characterwise'
         expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 3]]])
