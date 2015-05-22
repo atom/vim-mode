@@ -111,6 +111,7 @@ class VimState
       'move-to-first-character-of-line': => new Motions.MoveToFirstCharacterOfLine(@editor, @)
       'move-to-first-character-of-line-and-down': => new Motions.MoveToFirstCharacterOfLineAndDown(@editor, @)
       'move-to-last-character-of-line': => new Motions.MoveToLastCharacterOfLine(@editor, @)
+      'move-to-last-nonblank-character-of-line-and-down': => new Motions.MoveToLastNonblankCharacterOfLineAndDown(@editor, @)
       'move-to-beginning-of-line': (e) => @moveOrRepeat(e)
       'move-to-first-character-of-line-up': => new Motions.MoveToFirstCharacterOfLineUp(@editor, @)
       'move-to-first-character-of-line-down': => new Motions.MoveToFirstCharacterOfLineDown(@editor, @)
