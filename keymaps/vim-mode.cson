@@ -38,6 +38,7 @@
   '^': 'vim-mode:move-to-first-character-of-line'
   '_': 'vim-mode:move-to-first-character-of-line-and-down'
   '$': 'vim-mode:move-to-last-character-of-line'
+  'g _': 'vim-mode:move-to-last-nonblank-character-of-line-and-down'
   '-': 'vim-mode:move-to-first-character-of-line-up'
   '+': 'vim-mode:move-to-first-character-of-line-down'
   'enter': 'vim-mode:move-to-first-character-of-line-down'

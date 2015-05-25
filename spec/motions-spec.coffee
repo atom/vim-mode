@@ -925,6 +925,40 @@ describe "Motions", ->
         it "moves the cursor to a specified line", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
+  describe "the g_ keybinding", ->
+    beforeEach ->
+      editor.setText("1  \n    2  \n 3abc\n ")
+
+    describe "as a motion", ->
+      it "moves the cursor to the last nonblank character", ->
+        editor.setCursorScreenPosition([1, 0])
+        keydown('g')
+        keydown('_')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+
+      it "will move the cursor to the beginning of the line if necessary", ->
+        editor.setCursorScreenPosition([0, 2])
+        keydown('g')
+        keydown('_')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a repeated motion", ->
+      it "moves the cursor downward and outward", ->
+        editor.setCursorScreenPosition([0, 0])
+        keydown('2')
+        keydown('g')
+        keydown('_')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 4]
+
+    describe "as a selection", ->
+      it "selects the current line excluding whitespace", ->
+        editor.setCursorScreenPosition([1, 2])
+        vimState.activateVisualMode()
+        keydown('2')
+        keydown('g')
+        keydown('_')
+        expect(editor.getSelectedText()).toEqual "  2  \n 3abc"
+
   describe "the G keybinding", ->
     beforeEach ->
       editor.setText("1\n    2\n 3abc\n ")

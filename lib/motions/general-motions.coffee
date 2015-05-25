@@ -333,6 +333,25 @@ class MoveToLastCharacterOfLine extends Motion
       cursor.goalColumn = Infinity
       @ensureCursorIsWithinLine(cursor)
 
+class MoveToLastNonblankCharacterOfLineAndDown extends Motion
+  operatesInclusively: true
+
+  # moves cursor to the last non-whitespace character on the line
+  # similar to skipLeadingWhitespace() in atom's cursor.coffee
+  skipTrailingWhitespace: (cursor) ->
+    position = cursor.getBufferPosition()
+    scanRange = cursor.getCurrentLineBufferRange()
+    startOfTrailingWhitespace = [scanRange.end.row, scanRange.end.column - 1]
+    @editor.scanInBufferRange /[ \t]+$/, scanRange, ({range}) ->
+      startOfTrailingWhitespace = range.start
+      startOfTrailingWhitespace.column -= 1
+    cursor.setBufferPosition(startOfTrailingWhitespace)
+
+  moveCursor: (cursor, count=1) ->
+    _.times count-1, ->
+      cursor.moveDown()
+    @skipTrailingWhitespace(cursor)
+
 class MoveToFirstCharacterOfLineUp extends Motion
   operatesLinewise: true
   operatesInclusively: true
@@ -439,7 +458,8 @@ module.exports = {
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
-  MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine, MoveToStartOfFile,
+  MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine,
+  MoveToLastNonblankCharacterOfLineAndDown, MoveToStartOfFile,
   MoveToTopOfScreen, MoveToBottomOfScreen, MoveToMiddleOfScreen, MoveToEndOfWholeWord, MotionError,
   ScrollHalfUpKeepCursor, ScrollFullUpKeepCursor,
   ScrollHalfDownKeepCursor, ScrollFullDownKeepCursor
