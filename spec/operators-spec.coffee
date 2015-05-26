@@ -328,6 +328,16 @@ describe "Operators", ->
         expect(editor.getText()).toBe "12345\nabcde\n"
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
+      it "leaves the cursor on the first nonblank character", ->
+        editor.setText("12345\n  abcde\n")
+        editor.setCursorScreenPosition([0, 4])
+
+        keydown('d')
+        keydown('d')
+
+        expect(editor.getText()).toBe "  abcde\n"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
     describe "undo behavior", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")

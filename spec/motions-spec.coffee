@@ -677,8 +677,7 @@ describe "Motions", ->
 
         it "deletes the current line plus that many previous lines", ->
           expect(editor.getText()).toBe "1\n6\n"
-          # commented out because the column is wrong due to a bug in `k`; re-enable when `k` is fixed
-          #expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the + keybinding", ->
     beforeEach ->
@@ -738,8 +737,7 @@ describe "Motions", ->
 
         it "selects to the first character of the next line", ->
           expect(editor.getText()).toBe "abcdefg\n"
-          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
-          #expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+          expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
     describe "with a count", ->
       beforeEach ->
@@ -762,8 +760,7 @@ describe "Motions", ->
 
         it "deletes the current line plus that many following lines", ->
           expect(editor.getText()).toBe "1\n6\n"
-          # commented out because the column is wrong due to a bug in `j`; re-enable when `j` is fixed
-          #expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the _ keybinding", ->
     beforeEach ->

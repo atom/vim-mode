@@ -98,7 +98,7 @@ class Delete extends Operator
         selection.deleteSelectedText()
       for cursor in @editor.getCursors()
         if @motion.isLinewise?()
-          cursor.moveToBeginningOfLine()
+          cursor.skipLeadingWhitespace()
         else
           cursor.moveLeft() if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
 
