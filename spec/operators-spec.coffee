@@ -1447,7 +1447,7 @@ describe "Operators", ->
       commandModeInputKeydown('a')
       expect(vimState.getMark('a')).toEqual [0,1]
 
-  describe 'the ~ keybinding', ->
+  describe 'the g~ keybinding', ->
     beforeEach ->
       editor.setText('aBc\nXyZ')
       editor.setCursorBufferPosition([0, 0])
@@ -1489,7 +1489,19 @@ describe "Operators", ->
         keydown("l")
         expect(editor.getText()).toBe 'Abc\nXyZ'
 
-  describe 'the U keybinding', ->
+    describe "when followed by g~", ->
+      it "toggles the case of the whole line, and the cursor ends up on the first character of that line", ->
+        editor.setCursorBufferPosition([1, 1])
+
+        keydown('g')
+        keydown('~')
+        keydown('g')
+        keydown('~')
+
+        expect(editor.getText()).toBe "aBc\nxYz"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+  describe 'the gU keybinding', ->
     beforeEach ->
       editor.setText('aBc\nXyZ')
       editor.setCursorBufferPosition([0, 0])
@@ -1517,7 +1529,19 @@ describe "Operators", ->
       keydown("U", shift: true)
       expect(editor.getText()).toBe 'ABC\nXyZ'
 
-  describe 'the u keybinding', ->
+    describe "when followed by gU", ->
+      it "makes the whole line uppercase, and the cursor ends up on the first character of that line", ->
+        editor.setCursorBufferPosition([1, 1])
+
+        keydown('g')
+        keydown('U', shift: true)
+        keydown('g')
+        keydown('U', shift: true)
+
+        expect(editor.getText()).toBe "aBc\nXYZ"
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+  describe 'the gu keybinding', ->
     beforeEach ->
       editor.setText('aBc\nXyZ')
       editor.setCursorBufferPosition([0, 0])
@@ -1533,6 +1557,18 @@ describe "Operators", ->
       keydown("V", shift: true)
       keydown("u")
       expect(editor.getText()).toBe 'abc\nXyZ'
+
+    describe "when followed by gu", ->
+      it "makes the whole line lowercase, and the cursor ends up on the first character of that line", ->
+        editor.setCursorBufferPosition([1, 1])
+
+        keydown('g')
+        keydown('u')
+        keydown('g')
+        keydown('u')
+
+        expect(editor.getText()).toBe "aBc\nxyz"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
   describe "the i keybinding", ->
     beforeEach ->

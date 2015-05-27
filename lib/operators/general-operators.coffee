@@ -142,6 +142,10 @@ class ToggleCase extends Operator
 
     @vimState.activateCommandMode()
 
+    if @motion? and @motion.isLinewise?()
+      @editor.moveToPreviousWordBoundary()
+      @editor.moveToFirstCharacterOfLine()
+
 #
 # In visual mode or after `g` with a motion, it makes the selection uppercase
 #
@@ -156,6 +160,10 @@ class UpperCase extends Operator
 
     @vimState.activateCommandMode()
 
+    if @motion? and @motion.isLinewise?()
+      @editor.moveToPreviousWordBoundary()
+      @editor.moveToFirstCharacterOfLine()
+
 #
 # In visual mode or after `g` with a motion, it makes the selection lowercase
 #
@@ -169,6 +177,10 @@ class LowerCase extends Operator
         text.toLowerCase()
 
     @vimState.activateCommandMode()
+
+    if @motion and @motion.isLinewise?()
+      @editor.moveToPreviousWordBoundary()
+      @editor.moveToFirstCharacterOfLine()
 
 #
 # It copies everything selected by the following motion.
