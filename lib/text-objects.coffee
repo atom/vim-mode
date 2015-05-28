@@ -147,6 +147,18 @@ class SelectInsideParagraph extends TextObject
       range = selection.cursor.getCurrentParagraphBufferRange()
       if range?
         selection.setBufferRange(range)
+        selection.selectToBeginningOfNextParagraph()
       true
 
-module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets, SelectAWord, SelectInsideParagraph}
+class SelectAParagraph extends TextObject
+  constructor: (@editor, @inclusive) ->
+  select: ->
+    for selection in @editor.getSelections()
+      range = selection.cursor.getCurrentParagraphBufferRange()
+      if range?
+        selection.setBufferRange(range)
+        selection.selectToBeginningOfNextParagraph()
+        selection.selectDown()
+      true
+
+module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets, SelectAWord, SelectInsideParagraph, SelectAParagraph}
