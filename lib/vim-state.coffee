@@ -151,7 +151,7 @@ class VimState
       'select-around-angle-brackets': => new TextObjects.SelectInsideBrackets(@editor, '<', '>', true)
       'select-around-square-brackets': => new TextObjects.SelectInsideBrackets(@editor, '[', ']', true)
       'select-around-parentheses': => new TextObjects.SelectInsideBrackets(@editor, '(', ')', true)
-      'select-around-paragraph': => new TextObjects.SelectInsideParagraph(@editor, true)
+      'select-around-paragraph': => new TextObjects.SelectAParagraph(@editor, true)
       'register-prefix': (e) => @registerPrefix(e)
       'repeat': (e) => new Operators.Repeat(@editor, @)
       'repeat-search': (e) => new Motions.RepeatSearch(@editor, @)
