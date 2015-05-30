@@ -321,3 +321,7 @@
   '" +': 'vim-mode:register-prefix'
   '" %': 'vim-mode:register-prefix'
   '" _': 'vim-mode:register-prefix'
+
+'.tree-view':
+  'ctrl-w v': 'tree-view:open-selected-entry-right'
+  'ctrl-w s': 'tree-view:open-selected-entry-down'
