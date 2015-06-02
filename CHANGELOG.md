@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.50
+
+* Fix cursor position after `dd` command - @bronson
+* Implement `ap` text-object differently than `ip` - MarkusSN
+
 ## 0.49
 
 * Fix an issue that caused the cursor to move left incorrectly when near
