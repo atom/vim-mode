@@ -7,12 +7,12 @@ module.exports =
 class Replace extends OperatorWithInput
   constructor: (@editor, @vimState, {@selectOptions}={}) ->
     super(@editor, @vimState)
-    @viewModel = new ViewModel(@, class: 'replace', hidden: true, singleChar: true, defaultText: '\n')
+    @viewModel = new ViewModel(this, class: 'replace', hidden: true, singleChar: true, defaultText: '\n')
 
   execute: (count=1) ->
     if @input.characters is ""
       # replace canceled
-      
+
       if @vimState.mode is "visual"
         @vimState.resetVisualMode()
       else

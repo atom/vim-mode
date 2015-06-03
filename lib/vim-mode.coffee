@@ -46,5 +46,5 @@ module.exports =
       @statusBarManager.detach()
 
   provideVimMode: ->
-    getGlobalState: @getGlobalState.bind(@)
-    getEditorState: @getEditorState.bind(@)
+    getGlobalState: @getGlobalState.bind(this)
+    getEditorState: @getEditorState.bind(this)

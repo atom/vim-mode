@@ -16,7 +16,7 @@ class SearchBase extends MotionWithInput
   reversed: =>
     @initiallyReversed = @reverse = true
     @updateCurrentSearch()
-    @
+    this
 
   moveCursor: (cursor, count=1) ->
     ranges = @scan(cursor)
@@ -74,7 +74,7 @@ class SearchBase extends MotionWithInput
 class Search extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @viewModel = new SearchViewModel(@)
+    @viewModel = new SearchViewModel(this)
 
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null
@@ -204,7 +204,7 @@ class RepeatSearch extends SearchBase
 
   reversed: ->
     @reverse = not @initiallyReversed
-    @
+    this
 
 
 module.exports = {Search, SearchCurrentWord, BracketMatchingMotion, RepeatSearch}
