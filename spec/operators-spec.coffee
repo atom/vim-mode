@@ -341,7 +341,7 @@ describe "Operators", ->
     describe "undo behavior", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
-        editor.setCursorScreenPosition([1,1])
+        editor.setCursorScreenPosition([1, 1])
 
         keydown('d')
         keydown('2')
@@ -418,14 +418,14 @@ describe "Operators", ->
             expect(editor.getText()).toBe("ABCDE")
 
         describe "on the end of the file", ->
-          editor.setCursorScreenPosition([4,2])
+          editor.setCursorScreenPosition([4, 2])
           it "deletes nothing", ->
             keydown('d')
             keydown('j')
             expect(editor.getText()).toBe(originalText)
 
         describe "on the middle of second line", ->
-          editor.setCursorScreenPosition([2,1])
+          editor.setCursorScreenPosition([2, 1])
           it "deletes the last two lines", ->
             keydown('d')
             keydown('j')
@@ -444,14 +444,14 @@ describe "Operators", ->
             expect(editor.getText()).toBe("ABCDE")
 
         describe "on the beginning of the file", ->
-          editor.setCursorScreenPosition([0,0])
+          editor.setCursorScreenPosition([0, 0])
           it "deletes nothing", ->
             keydown('d')
             keydown('k')
             expect(editor.getText()).toBe(originalText)
 
         describe "when on the middle of second line", ->
-          editor.setCursorScreenPosition([2,1])
+          editor.setCursorScreenPosition([2, 1])
           it "deletes the first two lines", ->
             keydown('d')
             keydown('k')
@@ -464,14 +464,14 @@ describe "Operators", ->
 
       describe "on the beginning of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,0])
+          editor.setCursorScreenPosition([1, 0])
           keydown('d')
           keydown('G', shift: true)
           expect(editor.getText()).toBe("12345\n")
 
       describe "on the middle of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('d')
           keydown('G', shift: true)
           expect(editor.getText()).toBe("12345\n")
@@ -483,7 +483,7 @@ describe "Operators", ->
 
       describe "on the beginning of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,0])
+          editor.setCursorScreenPosition([1, 0])
           keydown('d')
           keydown('2')
           keydown('G', shift: true)
@@ -491,7 +491,7 @@ describe "Operators", ->
 
       describe "on the middle of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('d')
           keydown('2')
           keydown('G', shift: true)
@@ -636,7 +636,7 @@ describe "Operators", ->
 
       describe "on the beginning of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,0])
+          editor.setCursorScreenPosition([1, 0])
           keydown('c')
           keydown('G', shift: true)
           keydown('escape')
@@ -644,7 +644,7 @@ describe "Operators", ->
 
       describe "on the middle of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('c')
           keydown('G', shift: true)
           keydown('escape')
@@ -656,7 +656,7 @@ describe "Operators", ->
 
       describe "on the beginning of the second line", ->
         it "deletes all the text on the line", ->
-          editor.setCursorScreenPosition([1,0])
+          editor.setCursorScreenPosition([1, 0])
           keydown('c')
           keydown('2')
           keydown('G', shift: true)
@@ -665,7 +665,7 @@ describe "Operators", ->
 
       describe "on the middle of the second line", ->
         it "deletes all the text on the line", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('c')
           keydown('2')
           keydown('G', shift: true)
@@ -805,7 +805,7 @@ describe "Operators", ->
 
       describe "on the beginning of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,0])
+          editor.setCursorScreenPosition([1, 0])
           keydown('y')
           keydown('G', shift: true)
           keydown('P', shift: true)
@@ -813,7 +813,7 @@ describe "Operators", ->
 
       describe "on the middle of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('y')
           keydown('G', shift: true)
           keydown('P', shift: true)
@@ -826,7 +826,7 @@ describe "Operators", ->
 
       describe "on the beginning of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,0])
+          editor.setCursorScreenPosition([1, 0])
           keydown('y')
           keydown('2')
           keydown('G', shift: true)
@@ -835,7 +835,7 @@ describe "Operators", ->
 
       describe "on the middle of the second line", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('y')
           keydown('2')
           keydown('G', shift: true)
@@ -1139,18 +1139,18 @@ describe "Operators", ->
 
     describe "at the beginning of a line", ->
       it "switches to insert mode at the end of the line", ->
-        editor.setCursorScreenPosition([0,0])
+        editor.setCursorScreenPosition([0, 0])
         keydown('A', shift: true)
 
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
       it "repeats always as insert at the end of the line", ->
-        editor.setCursorScreenPosition([0,0])
+        editor.setCursorScreenPosition([0, 0])
         keydown('A', shift: true)
         editor.insertText("abc")
         keydown 'escape'
-        editor.setCursorScreenPosition([1,0])
+        editor.setCursorScreenPosition([1, 0])
         keydown '.'
 
         expect(editor.getText()).toBe "11abc\n22abc\n"
@@ -1163,26 +1163,26 @@ describe "Operators", ->
 
     describe "at the end of a line", ->
       it "switches to insert mode at the beginning of the line", ->
-        editor.setCursorScreenPosition([0,2])
+        editor.setCursorScreenPosition([0, 2])
         keydown('I', shift: true)
 
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
         expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
       it "switches to insert mode after leading whitespace", ->
-        editor.setCursorScreenPosition([1,4])
+        editor.setCursorScreenPosition([1, 4])
         keydown('I', shift: true)
 
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
         expect(editor.getCursorScreenPosition()).toEqual [1, 2]
 
       it "repeats always as insert at the first character of the line", ->
-        editor.setCursorScreenPosition([0,2])
+        editor.setCursorScreenPosition([0, 2])
         keydown('I', shift: true)
         editor.insertText("abc")
         keydown 'escape'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
-        editor.setCursorScreenPosition([1,4])
+        editor.setCursorScreenPosition([1, 4])
         keydown '.'
 
         expect(editor.getText()).toBe "abc11\n  abc22\n"
@@ -1362,7 +1362,7 @@ describe "Operators", ->
   describe "the . keybinding", ->
     beforeEach ->
       editor.setText("12\n34\n56\n78")
-      editor.setCursorScreenPosition([0,0])
+      editor.setCursorScreenPosition([0, 0])
 
     it "repeats the last operation", ->
       keydown '2'
@@ -1383,7 +1383,7 @@ describe "Operators", ->
   describe "the r keybinding", ->
     beforeEach ->
       editor.setText("12\n34\n\n")
-      editor.setCursorBufferPosition([0,0])
+      editor.setCursorBufferPosition([0, 0])
       editor.addCursorAtBufferPosition([1, 0])
 
     it "replaces a single character", ->
@@ -1440,12 +1440,12 @@ describe "Operators", ->
   describe 'the m keybinding', ->
     beforeEach ->
       editor.setText('12\n34\n56\n')
-      editor.setCursorBufferPosition([0,1])
+      editor.setCursorBufferPosition([0, 1])
 
     it 'marks a position', ->
       keydown('m')
       commandModeInputKeydown('a')
-      expect(vimState.getMark('a')).toEqual [0,1]
+      expect(vimState.getMark('a')).toEqual [0, 1]
 
   describe 'the ~ keybinding', ->
     beforeEach ->

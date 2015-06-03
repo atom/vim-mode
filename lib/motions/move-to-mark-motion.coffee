@@ -9,7 +9,7 @@ class MoveToMark extends MotionWithInput
   constructor: (@editor, @vimState, @linewise=true) ->
     super(@editor, @vimState)
     @operatesLinewise = @linewise
-    @viewModel = new ViewModel(@, class: 'move-to-mark', singleChar: true, hidden: true)
+    @viewModel = new ViewModel(this, class: 'move-to-mark', singleChar: true, hidden: true)
 
   isLinewise: -> @linewise
 

@@ -63,13 +63,13 @@ describe "Motions", ->
         expect(editor.getCursorScreenPosition()).toEqual [2, 1]
 
       it "moves the cursor to the end of the line, not past it", ->
-        editor.setCursorScreenPosition([0,4])
+        editor.setCursorScreenPosition([0, 4])
 
         keydown('j')
         expect(editor.getCursorScreenPosition()).toEqual [1, 3]
 
       it "remembers the position it column it was in after moving to shorter line", ->
-        editor.setCursorScreenPosition([0,4])
+        editor.setCursorScreenPosition([0, 4])
 
         keydown('j')
         expect(editor.getCursorScreenPosition()).toEqual [1, 3]
@@ -383,7 +383,7 @@ describe "Motions", ->
     beforeEach -> editor.setText(" ab cde1+- \n xyz\n\nzip }\n last")
 
     describe "as a motion", ->
-      beforeEach -> editor.setCursorScreenPosition([4,1])
+      beforeEach -> editor.setCursorScreenPosition([4, 1])
 
       it "moves the cursor to the beginning of the previous word", ->
         keydown('b')
@@ -593,7 +593,7 @@ describe "Motions", ->
       beforeEach -> keydown('0')
 
       it "moves the cursor to the beginning of the line", ->
-        expect(editor.getCursorScreenPosition()).toEqual [0,0]
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
   describe "the - keybinding", ->
     beforeEach ->
@@ -985,7 +985,7 @@ describe "Motions", ->
         expect(editor.getSelectedText()).toBe "    2\n 3abc\n "
 
       it "moves the cursor to the last line after whitespace", ->
-        expect(editor.getCursorScreenPosition()).toEqual [3,1]
+        expect(editor.getCursorScreenPosition()).toEqual [3, 1]
 
   describe "the / keybinding", ->
     pane = null
@@ -1056,7 +1056,7 @@ describe "Motions", ->
         expect(start.row).toEqual 0
         expect(end.row).toEqual 1
         keydown('n')
-        {start,end} = editor.getSelectedBufferRange()
+        {start, end} = editor.getSelectedBufferRange()
         expect(start.row).toEqual 0
         expect(end.row).toEqual 2
 
@@ -1399,64 +1399,64 @@ describe "Motions", ->
   describe 'the mark keybindings', ->
     beforeEach ->
       editor.setText('  12\n    34\n56\n')
-      editor.setCursorBufferPosition([0,1])
+      editor.setCursorBufferPosition([0, 1])
 
     it 'moves to the beginning of the line of a mark', ->
-      editor.setCursorBufferPosition([1,1])
+      editor.setCursorBufferPosition([1, 1])
       keydown('m')
       commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([0,0])
+      editor.setCursorBufferPosition([0, 0])
       keydown('\'')
       commandModeInputKeydown('a')
-      expect(editor.getCursorBufferPosition()).toEqual [1,4]
+      expect(editor.getCursorBufferPosition()).toEqual [1, 4]
 
     it 'moves literally to a mark', ->
-      editor.setCursorBufferPosition([1,1])
+      editor.setCursorBufferPosition([1, 1])
       keydown('m')
       commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([0,0])
+      editor.setCursorBufferPosition([0, 0])
       keydown('`')
       commandModeInputKeydown('a')
-      expect(editor.getCursorBufferPosition()).toEqual [1,1]
+      expect(editor.getCursorBufferPosition()).toEqual [1, 1]
 
     it 'deletes to a mark by line', ->
-      editor.setCursorBufferPosition([1,5])
+      editor.setCursorBufferPosition([1, 5])
       keydown('m')
       commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([0,0])
+      editor.setCursorBufferPosition([0, 0])
       keydown('d')
       keydown('\'')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual '56\n'
 
     it 'deletes before to a mark literally', ->
-      editor.setCursorBufferPosition([1,5])
+      editor.setCursorBufferPosition([1, 5])
       keydown('m')
       commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([0,1])
+      editor.setCursorBufferPosition([0, 1])
       keydown('d')
       keydown('`')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual ' 4\n56\n'
 
     it 'deletes after to a mark literally', ->
-      editor.setCursorBufferPosition([1,5])
+      editor.setCursorBufferPosition([1, 5])
       keydown('m')
       commandModeInputKeydown('a')
-      editor.setCursorBufferPosition([2,1])
+      editor.setCursorBufferPosition([2, 1])
       keydown('d')
       keydown('`')
       commandModeInputKeydown('a')
       expect(editor.getText()).toEqual '  12\n    36\n'
 
     it 'moves back to previous', ->
-      editor.setCursorBufferPosition([1,5])
+      editor.setCursorBufferPosition([1, 5])
       keydown('`')
       commandModeInputKeydown('`')
-      editor.setCursorBufferPosition([2,1])
+      editor.setCursorBufferPosition([2, 1])
       keydown('`')
       commandModeInputKeydown('`')
-      expect(editor.getCursorBufferPosition()).toEqual [1,5]
+      expect(editor.getCursorBufferPosition()).toEqual [1, 5]
 
   describe 'the f/F keybindings', ->
     beforeEach ->
@@ -1518,7 +1518,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "composes with d", ->
-      editor.setCursorScreenPosition([0,3])
+      editor.setCursorScreenPosition([0, 3])
       keydown('d')
       keydown('2')
       keydown('f')
@@ -1589,7 +1589,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "composes with d", ->
-      editor.setCursorScreenPosition([0,3])
+      editor.setCursorScreenPosition([0, 3])
       keydown('d')
       keydown('2')
       keydown('t')
@@ -1627,7 +1627,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 8]
 
     it "repeat F in same direction", ->
-      editor.setCursorScreenPosition([0,10])
+      editor.setCursorScreenPosition([0, 10])
       keydown('F', shift: true)
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 8]
@@ -1637,7 +1637,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     it "repeat f in opposite direction", ->
-      editor.setCursorScreenPosition([0,6])
+      editor.setCursorScreenPosition([0, 6])
       keydown('f')
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 8]
@@ -1647,7 +1647,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     it "repeat F in opposite direction", ->
-      editor.setCursorScreenPosition([0,4])
+      editor.setCursorScreenPosition([0, 4])
       keydown('F', shift: true)
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
@@ -1666,7 +1666,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     it "alternate repeat F in same direction and reverse", ->
-      editor.setCursorScreenPosition([0,10])
+      editor.setCursorScreenPosition([0, 10])
       keydown('F', shift: true)
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 8]
@@ -1683,7 +1683,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
     it "repeat T in same direction", ->
-      editor.setCursorScreenPosition([0,10])
+      editor.setCursorScreenPosition([0, 10])
       keydown('T', shift: true)
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 9]
@@ -1691,7 +1691,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "repeat t in opposite direction first, and then reverse", ->
-      editor.setCursorScreenPosition([0,3])
+      editor.setCursorScreenPosition([0, 3])
       keydown('t')
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 4]
@@ -1701,7 +1701,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
     it "repeat T in opposite direction first, and then reverse", ->
-      editor.setCursorScreenPosition([0,4])
+      editor.setCursorScreenPosition([0, 4])
       keydown('T', shift: true)
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 3]
@@ -1711,7 +1711,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
     it "repeat with count in same direction", ->
-      editor.setCursorScreenPosition([0,0])
+      editor.setCursorScreenPosition([0, 0])
       keydown('f')
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
@@ -1720,7 +1720,7 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 8]
 
     it "repeat with count in reverse direction", ->
-      editor.setCursorScreenPosition([0,6])
+      editor.setCursorScreenPosition([0, 6])
       keydown('f')
       commandModeInputKeydown('c')
       expect(editor.getCursorScreenPosition()).toEqual [0, 8]

@@ -5,8 +5,8 @@
 class Find extends MotionWithInput
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @vimState.currentFind = @
-    @viewModel = new ViewModel(@, class: 'find', singleChar: true, hidden: true)
+    @vimState.currentFind = this
+    @viewModel = new ViewModel(this, class: 'find', singleChar: true, hidden: true)
     @backwards = false
     @repeatReversed = false
     @offset = 0
@@ -32,7 +32,7 @@ class Find extends MotionWithInput
 
   reverse: ->
     @backwards = not @backwards
-    @
+    this
 
   moveCursor: (cursor, count=1) ->
     if (match = @match(cursor, count))?
@@ -44,7 +44,7 @@ class Find extends MotionWithInput
     if opts.reverse isnt @repeatReversed
       @reverse()
       @repeatReversed = opts.reverse
-    @
+    this
 
 class Till extends Find
   constructor: (@editor, @vimState) ->
