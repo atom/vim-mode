@@ -116,10 +116,11 @@ describe "VimState", ->
         expect(editorElement.classList.contains('command-mode')).toBe(false)
 
     describe "selecting text", ->
-      it "puts the editor into visual mode", ->
+      beforeEach ->
         spyOn(_._, "now").andCallFake -> window.now
-
         editor.setText("abc def")
+
+      it "puts the editor into visual mode", ->
         expect(vimState.mode).toEqual 'command'
         editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
 
@@ -128,6 +129,12 @@ describe "VimState", ->
         expect(vimState.mode).toEqual 'visual'
         expect(vimState.submode).toEqual 'characterwise'
         expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 3]]])
+
+      it "handles the editor being destroyed shortly after selecting text", ->
+        editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
+        editor.destroy()
+        vimState.destroy()
+        advanceClock(100)
 
     describe "the i keybinding", ->
       beforeEach -> keydown('i')

@@ -29,6 +29,7 @@ class VimState
     @subscriptions.add @editor.onDidDestroy => @destroy()
 
     @subscriptions.add @editor.onDidChangeSelectionRange _.debounce(=>
+      return unless @editor?
       if @editor.getSelections().every((selection) -> selection.isEmpty())
         @activateCommandMode() if @mode is 'visual'
       else
