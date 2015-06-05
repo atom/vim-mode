@@ -231,6 +231,16 @@ describe "VimState", ->
       expect(editorElement.classList.contains('command-mode')).toBe(true)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
+    it "puts the editor into command mode when <escape> is pressed on selection is reversed", ->
+      expect(editor.getSelectedText()).toBe("t")
+      keydown("h")
+      keydown("h")
+      expect(editor.getSelectedText()).toBe("e t")
+      expect(editor.getLastSelection().isReversed()).toBe(true)
+      keydown('escape')
+      expect(editorElement.classList.contains('command-mode')).toBe(true)
+      expect(editor.getCursorBufferPositions()).toEqual [[0, 2]]
+
     describe "motions", ->
       it "transforms the selection", ->
         keydown('w')
