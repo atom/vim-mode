@@ -440,9 +440,29 @@ class VimState
       if @submode is type
         @activateCommandMode()
         return
-      else
-        # TODO
-        return
+
+      @submode = type
+      if @submode is 'linewise'
+        for selection in @editor.getSelections()
+          # Keep original range as marker's property to get back
+          # to characterwise.
+          # Since selectLine lost original cursor column.
+          originalRange = selection.getBufferRange()
+          selection.marker.setProperties({originalRange})
+          [start, end] = selection.getBufferRowRange()
+          selection.selectLine(row) for row in [start..end]
+          
+      else if @submode in ['characterwise', 'blockwise']
+        # Currently, 'blockwise' is not yet implemented.
+        # So treat as characterwise.
+        # Recover original range.
+        for selection in @editor.getSelections()
+          {originalRange} = selection.marker.getProperties()
+          if originalRange
+            [startRow, endRow] = selection.getBufferRowRange()
+            originalRange.start.row = startRow
+            originalRange.end.row   = endRow
+            selection.setBufferRange(originalRange)
     else
       @deactivateInsertMode()
       @mode = 'visual'
