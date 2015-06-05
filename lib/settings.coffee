@@ -13,6 +13,10 @@ settings =
     useClipboardAsDefaultRegister:
       type: 'boolean'
       default: false
+    numberRegex:
+      type: 'string'
+      default: '-?[0-9]+'
+      description: 'Use this to control how Ctrl-A/Ctrl-X finds numbers; use "(?:\\B-)?[0-9]+" to treat numbers as positive if the minus is preceded by a character, e.g. in "identifier-1".'
 
 Object.keys(settings.config).forEach (k) ->
   settings[k] = ->

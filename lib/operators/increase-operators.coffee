@@ -1,16 +1,17 @@
 {Operator} = require './general-operators'
 {Range} = require 'atom'
+settings = require '../settings'
 
 #
 # It increases or decreases the next number on the line
 #
 class Increase extends Operator
   step: 1
-  numberRegex: new RegExp("-?[0-9]+")
 
   constructor: ->
     super
     @complete = true
+    @numberRegex = new RegExp(settings.numberRegex())
 
   execute: (count=1) ->
     @editor.transact =>
