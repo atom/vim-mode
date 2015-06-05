@@ -431,17 +431,30 @@ class VimState
   #
   # Returns nothing.
   activateVisualMode: (type) ->
-    @deactivateInsertMode()
-    @mode = 'visual'
-    @submode = type
-    @changeModeClass('visual-mode')
+    # Already in 'visual', this means one of following command is
+    # executed within `vim-mode.visual-mode`
+    #  * activate-blockwise-visual-mode
+    #  * activate-characterwise-visual-mode
+    #  * activate-linewise-visual-mode
+    if @mode is 'visual'
+      if @submode is type
+        @activateCommandMode()
+        return
+      else
+        # TODO
+        return
+    else
+      @deactivateInsertMode()
+      @mode = 'visual'
+      @submode = type
+      @changeModeClass('visual-mode')
 
-    if @submode is 'linewise'
-      @editor.selectLinesContainingCursors()
-    else if @editor.getSelectedText() is ''
-      @editor.selectRight()
+      if @submode is 'linewise'
+        @editor.selectLinesContainingCursors()
+      else if @editor.getSelectedText() is ''
+        @editor.selectRight()
 
-    @updateStatusBar()
+      @updateStatusBar()
 
   # Private: Used to re-enable visual mode
   resetVisualMode: ->
