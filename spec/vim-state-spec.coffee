@@ -355,17 +355,17 @@ describe "VimState", ->
 
           expect(_.map(editor.getSelections(), (selection) ->
             selection.getText())
-          ).toEqual(['one','three'])
+          ).toEqual(['one', 'three'])
 
           keydown('V', shift: true)
           expect(_.map(editor.getSelections(), (selection) ->
             selection.getText())
-          ).toEqual(["line one\n","line three\n"])
+          ).toEqual(["line one\n", "line three\n"])
 
           keydown('v', ctrl: true)
           expect(_.map(editor.getSelections(), (selection) ->
             selection.getText())
-          ).toEqual(['one','three'])
+          ).toEqual(['one', 'three'])
 
   describe "marks", ->
     beforeEach ->  editor.setText("text in line 1\ntext in line 2\ntext in line 3")
