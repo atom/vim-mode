@@ -454,7 +454,7 @@ class VimState
 
       else if @submode in ['characterwise', 'blockwise']
         # Currently, 'blockwise' is not yet implemented.
-        # So treat as characterwise.
+        # So treat it as characterwise.
         # Recover original range.
         for selection in @editor.getSelections()
           {originalRange} = selection.marker.getProperties()
