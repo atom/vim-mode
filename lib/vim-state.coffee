@@ -451,7 +451,7 @@ class VimState
           selection.marker.setProperties({originalRange})
           [start, end] = selection.getBufferRowRange()
           selection.selectLine(row) for row in [start..end]
-          
+
       else if @submode in ['characterwise', 'blockwise']
         # Currently, 'blockwise' is not yet implemented.
         # So treat as characterwise.
@@ -474,7 +474,7 @@ class VimState
       else if @editor.getSelectedText() is ''
         @editor.selectRight()
 
-      @updateStatusBar()
+    @updateStatusBar()
 
   # Private: Used to re-enable visual mode
   resetVisualMode: ->
