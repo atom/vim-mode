@@ -415,7 +415,7 @@ class VimState
   deactivateVisualMode: ->
     return unless @mode is 'visual'
     for selection in @editor.getSelections()
-      selection.cursor.moveLeft() unless selection.isEmpty()
+      selection.cursor.moveLeft() unless (selection.isEmpty() or selection.isReversed())
 
   # Private: Get the input operator that needs to be told about about the
   # typed undo transaction in a recently completed operation, if there
