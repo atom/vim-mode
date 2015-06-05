@@ -1,4 +1,5 @@
 helpers = require './spec-helper'
+settings = require '../lib/settings'
 
 describe "Operators", ->
   [editor, editorElement, vimState] = []
@@ -1598,6 +1599,7 @@ describe "Operators", ->
 
   describe "the ctrl-a/ctrl-x keybindings", ->
     beforeEach ->
+      atom.config.set 'vim-mode.numberRegex', settings.config.numberRegex.default
       editor.setText('123\nab45\ncd-67ef\nab-5\na-bcdef')
       editor.setCursorBufferPosition [0, 0]
       editor.addCursorAtBufferPosition [1, 0]
@@ -1644,6 +1646,18 @@ describe "Operators", ->
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
         expect(editor.getText()).toBe '\n'
 
+      it "honours the vim-mode:numberRegex setting", ->
+        editor.setText('123\nab45\ncd -67ef\nab-5\na-bcdef')
+        editor.setCursorBufferPosition [0, 0]
+        editor.addCursorAtBufferPosition [1, 0]
+        editor.addCursorAtBufferPosition [2, 0]
+        editor.addCursorAtBufferPosition [3, 3]
+        editor.addCursorAtBufferPosition [4, 0]
+        atom.config.set('vim-mode.numberRegex', '(?:\\B-)?[0-9]+')
+        keydown('a', ctrl: true)
+        expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 5], [3, 3], [4, 0]]
+        expect(editor.getText()).toBe '124\nab46\ncd -66ef\nab-6\na-bcdef'
+
     describe "decreasing numbers", ->
       it "decreases the next number", ->
         keydown('x', ctrl: true)
@@ -1682,3 +1696,15 @@ describe "Operators", ->
         keydown 'x', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
         expect(editor.getText()).toBe '\n'
+
+      it "honours the vim-mode:numberRegex setting", ->
+        editor.setText('123\nab45\ncd -67ef\nab-5\na-bcdef')
+        editor.setCursorBufferPosition [0, 0]
+        editor.addCursorAtBufferPosition [1, 0]
+        editor.addCursorAtBufferPosition [2, 0]
+        editor.addCursorAtBufferPosition [3, 3]
+        editor.addCursorAtBufferPosition [4, 0]
+        atom.config.set('vim-mode.numberRegex', '(?:\\B-)?[0-9]+')
+        keydown('x', ctrl: true)
+        expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 5], [3, 3], [4, 0]]
+        expect(editor.getText()).toBe '122\nab44\ncd -68ef\nab-4\na-bcdef'
