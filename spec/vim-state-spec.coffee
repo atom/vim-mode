@@ -304,7 +304,7 @@ describe "VimState", ->
         expect(vimState.submode).toEqual 'characterwise'
         expect(editorElement.classList.contains('command-mode')).toBe(false)
 
-        keydown('escape')
+        keydown('v')
         expect(vimState.mode).toEqual 'command'
         expect(editorElement.classList.contains('command-mode')).toBe(true)
 
@@ -313,7 +313,7 @@ describe "VimState", ->
         expect(vimState.submode).toEqual 'linewise'
         expect(editorElement.classList.contains('command-mode')).toBe(false)
 
-        keydown('escape')
+        keydown('V', shift: true)
         expect(vimState.mode).toEqual 'command'
         expect(editorElement.classList.contains('command-mode')).toBe(true)
 
@@ -322,7 +322,7 @@ describe "VimState", ->
         expect(vimState.submode).toEqual 'blockwise'
         expect(editorElement.classList.contains('command-mode')).toBe(false)
 
-        keydown('escape')
+        keydown('v', ctrl: true)
         expect(vimState.mode).toEqual 'command'
         expect(editorElement.classList.contains('command-mode')).toBe(true)
 
@@ -347,6 +347,12 @@ describe "VimState", ->
           expect(editorElement.classList.contains('visual-mode')).toBe(true)
           expect(vimState.submode).toEqual 'blockwise'
           expect(editorElement.classList.contains('command-mode')).toBe(false)
+
+          keydown('v')
+          expect(editorElement.classList.contains('visual-mode')).toBe(true)
+          expect(vimState.submode).toEqual 'characterwise'
+          expect(editorElement.classList.contains('command-mode')).toBe(false)
+
 
         it "recover original range when shift from linewse to characterwise", ->
           keydown('v')
