@@ -553,8 +553,7 @@ class VimState
 getChangesSinceCheckpoint = (buffer, checkpoint) ->
   {history} = buffer
 
-  # TODO: remove this conditional once Atom 0.200 has been out for a while.
-  if index = history.getCheckpointIndex?(checkpoint)
+  if (index = history.getCheckpointIndex(checkpoint))?
     history.undoStack.slice(index)
   else
     []
