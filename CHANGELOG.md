@@ -1,5 +1,12 @@
 ## HEAD
 
+## 0.52
+
+* Fix incorrect cursor motion when exiting visual mode w/ a reversed
+  selection - @t9md
+* Add setting to configure the regexp used for numbers and the `ctrl-a`
+  and `ctrl-x` keybindings - @jacekkopecky
+
 ## 0.50
 
 * Fix cursor position after `dd` command - @bronson
