@@ -433,15 +433,48 @@ class VimState
   #
   # Returns nothing.
   activateVisualMode: (type) ->
-    @deactivateInsertMode()
-    @mode = 'visual'
-    @submode = type
-    @changeModeClass('visual-mode')
+    # Already in 'visual', this means one of following command is
+    # executed within `vim-mode.visual-mode`
+    #  * activate-blockwise-visual-mode
+    #  * activate-characterwise-visual-mode
+    #  * activate-linewise-visual-mode
+    if @mode is 'visual'
+      if @submode is type
+        @activateCommandMode()
+        return
 
-    if @submode is 'linewise'
-      @editor.selectLinesContainingCursors()
-    else if @editor.getSelectedText() is ''
-      @editor.selectRight()
+      @submode = type
+      if @submode is 'linewise'
+        for selection in @editor.getSelections()
+          # Keep original range as marker's property to get back
+          # to characterwise.
+          # Since selectLine lost original cursor column.
+          originalRange = selection.getBufferRange()
+          selection.marker.setProperties({originalRange})
+          [start, end] = selection.getBufferRowRange()
+          selection.selectLine(row) for row in [start..end]
+
+      else if @submode in ['characterwise', 'blockwise']
+        # Currently, 'blockwise' is not yet implemented.
+        # So treat it as characterwise.
+        # Recover original range.
+        for selection in @editor.getSelections()
+          {originalRange} = selection.marker.getProperties()
+          if originalRange
+            [startRow, endRow] = selection.getBufferRowRange()
+            originalRange.start.row = startRow
+            originalRange.end.row   = endRow
+            selection.setBufferRange(originalRange)
+    else
+      @deactivateInsertMode()
+      @mode = 'visual'
+      @submode = type
+      @changeModeClass('visual-mode')
+
+      if @submode is 'linewise'
+        @editor.selectLinesContainingCursors()
+      else if @editor.getSelectedText() is ''
+        @editor.selectRight()
 
     @updateStatusBar()
 
