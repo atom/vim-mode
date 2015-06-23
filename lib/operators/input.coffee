@@ -28,6 +28,15 @@ class Insert extends Operator
 
   inputOperator: -> true
 
+# an insert operation following cursor motion in insert mode can be cancelled
+# and forgotten like it never happened
+class InsertCancellable extends Insert
+
+  confirmTransaction: (transaction) ->
+    super
+    if @typedText?.length is 0
+      @vimState.history.shift() if @vimState.history[0] is this
+
 class InsertAfter extends Insert
   execute: ->
     @editor.moveRight() unless @editor.getLastCursor().isAtEndOfLine()
@@ -189,6 +198,7 @@ module.exports = {
   InsertAtBeginningOfLine,
   InsertAboveWithNewline,
   InsertBelowWithNewline,
+  InsertCancellable,
   Change,
   Substitute,
   SubstituteLine
