@@ -409,23 +409,23 @@ class VimState
   deactivateInsertMode: ->
     return unless @mode in [null, 'insert']
     @editorElement.component.setInputEnabled(false)
-    @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
     changes = getChangesSinceCheckpoint(@editor.buffer, @insertionCheckpoint)
     item = @inputOperator(@history[0])
-    @insertionCheckpoint = null
     if item?
-      item.confirmChanges(changes)
+      item.confirmChanges(changes, @insertionCheckpoint)
+    @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
+    @insertionCheckpoint = null
     for cursor in @editor.getCursors()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
 
   interruptInsertMode: ->
     return unless @mode is 'insert'
-    @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
     changes = getChangesSinceCheckpoint(@editor.buffer, @insertionCheckpoint)
     item = @inputOperator(@history[0])
-    @insertionCheckpoint = null
     if item?
-      item.confirmChanges(changes, interrupted: true)
+      item.confirmChanges(changes, @insertionCheckpoint, interrupted: true)
+    @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
+    @insertionCheckpoint = null
     @setInsertionCheckpoint()
 
 

@@ -1408,6 +1408,7 @@ describe "Operators", ->
       keydown 'd'
       keydown 'd'
       keydown 'u'
+      editor.setCursorScreenPosition([0, 0])
       keydown '2'
       keydown '.'
       keydown '.'
