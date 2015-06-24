@@ -39,8 +39,8 @@ class InsertCancellable extends Insert
 
   confirmTransaction: (transaction) ->
     super
-    if @typedText?.length == 0
-      @vimState.history.shift() if @vimState.history[0] is @
+    if @typedText?.length is 0
+      @vimState.history.shift() if @vimState.history[0] is this
 
 class InsertAfter extends Insert
   execute: ->
