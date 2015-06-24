@@ -235,6 +235,20 @@ describe "Operators", ->
       keydown('.')
       expect(editor.getText()).toBe 'abab'
 
+    it "is repeatable with a new count", ->
+      keydown('3')
+      keydown('s')
+      editor.insertText("ab")
+      keydown('escape')
+      expect(editor.getText()).toBe '0ab45'
+      keydown('1')
+      keydown('.')
+      expect(editor.getText()).toBe '0aab45'
+      editor.setCursorScreenPosition([0, 0])
+      keydown('3')
+      keydown('.')
+      expect(editor.getText()).toBe 'abb45'
+
     it "is undoable", ->
       editor.setCursorScreenPosition([0, 0])
       keydown('3')
@@ -1373,13 +1387,33 @@ describe "Operators", ->
 
       expect(editor.getText()).toBe ""
 
-    it "composes with motions", ->
+    it "composes with prefix", ->
       keydown 'd'
       keydown 'd'
       keydown '2'
       keydown '.'
 
       expect(editor.getText()).toBe "78"
+
+    it "changes previous prefix", ->
+      keydown '2'
+      keydown 'd'
+      keydown 'd'
+      keydown '1'
+      keydown '.'
+
+      expect(editor.getText()).toBe "78"
+
+    it "adds prefix if none was there", ->
+      keydown 'd'
+      keydown 'd'
+      keydown 'u'
+      editor.setCursorScreenPosition([0, 0])
+      keydown '2'
+      keydown '.'
+      keydown '.'
+
+      expect(editor.getText()).toBe ""
 
   describe "the r keybinding", ->
     beforeEach ->
@@ -1560,6 +1594,29 @@ describe "Operators", ->
       keydown 'u'
       expect(editor.getText()).toBe "123\n4567"
 
+    it "allows count prefix", ->
+      keydown '3'
+      keydown 'i'
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abcabcabc123\nabcabcabc4567"
+
+      keydown 'u'
+      expect(editor.getText()).toBe "123\n4567"
+
+      keydown '.'
+      keydown '.'
+      expect(editor.getText()).toBe "abcabcababcabcabcc123\nabcabcababcabcabcc4567"
+
+      keydown 'u'
+      expect(editor.getText()).toBe "abcabcabc123\nabcabcabc4567"
+
+      editor.setText('123\n4567')
+      editor.setCursorBufferPosition([0, 0])
+      keydown '2'
+      keydown '.'
+      expect(editor.getText()).toBe "abcabc123\n4567"
+
     it "allows repeating typing", ->
       keydown 'i'
       editor.insertText("abcXX")
@@ -1573,6 +1630,31 @@ describe "Operators", ->
 
       keydown '.'
       expect(editor.getText()).toBe "abababccc123\nabababccc4567"
+
+    it "gets prefix from .", ->
+      keydown 'i'
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abc123\nabc4567"
+
+      keydown '2'
+      keydown '.'
+      expect(editor.getText()).toBe "ababcabcc123\nababcabcc4567"
+
+      keydown '.'
+      expect(editor.getText()).toBe "ababcababcabccc123\nababcababcabccc4567"
+
+    it "stores for repeating only the last batch of characters", ->
+      keydown '2'
+      keydown 'i'
+      editor.insertText("abc")
+      atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+      editor.insertText("de")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abdec123\nabdec4567"
+
+      keydown '.'
+      expect(editor.getText()).toBe "abddeec123\nabddeec4567"
 
   describe 'the a keybinding', ->
     beforeEach ->
@@ -1596,6 +1678,33 @@ describe "Operators", ->
       keydown '.'
       expect(editor.getText()).toBe "abcabc"
       expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
+    it "combines with a prefix", ->
+      keydown '2'
+      keydown 'a'
+      editor.insertText("abc")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abcabc"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+      keydown '.'
+      expect(editor.getText()).toBe "abcabcabcabc"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 11]
+      keydown '1'
+      keydown '.'
+      expect(editor.getText()).toBe "abcabcabcabcabc"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 14]
+
+    it "stores for repeating only the last batch of characters, repeats as insert", ->
+      keydown 'a'
+      editor.insertText("abc")
+      atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+      editor.insertText("de")
+      keydown 'escape'
+      expect(editor.getText()).toBe "abdec"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      keydown '.'
+      expect(editor.getText()).toBe "abddeec"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
   describe "the ctrl-a/ctrl-x keybindings", ->
     beforeEach ->
