@@ -1550,7 +1550,9 @@ describe "Operators", ->
       expect(editor.getText()).toBe "abc123\nabc4567"
 
       keydown 'i'
-      editor.insertText("def")
+      editor.insertText "d"
+      editor.insertText "e"
+      editor.insertText "f"
       keydown 'escape'
       expect(editor.getText()).toBe "abdefc123\nabdefc4567"
 
@@ -1573,6 +1575,27 @@ describe "Operators", ->
 
       keydown '.'
       expect(editor.getText()).toBe "abababccc123\nabababccc4567"
+
+    describe 'with nonlinear input', ->
+      beforeEach ->
+        editor.setText ''
+        editor.setCursorBufferPosition [0, 0]
+
+      it 'deals with auto-matched brackets', ->
+        keydown 'i'
+        # this sequence simulates what the bracket-matcher package does
+        # when the user types (a)b<enter>
+        editor.insertText '()'
+        editor.moveLeft()
+        editor.insertText 'a'
+        editor.moveRight()
+        editor.insertText 'b\n'
+        keydown 'escape'
+        expect(editor.getCursorScreenPosition()).toEqual [1,  0]
+
+        keydown '.'
+        expect(editor.getText()).toBe '(a)b\n(a)b\n'
+        expect(editor.getCursorScreenPosition()).toEqual [2,  0]
 
   describe 'the a keybinding', ->
     beforeEach ->
