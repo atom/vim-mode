@@ -168,10 +168,10 @@ class TransactionBundler
 
   addChange: (change) ->
     return unless change.newRange?
-    if @isAddingWithinPrevious(change)
-      @addRange change.newRange
     if @isRemovingFromPrevious(change)
       @subtractRange change.oldRange
+    if @isAddingWithinPrevious(change)
+      @addRange change.newRange
 
   isAddingWithinPrevious: (change) ->
     return false unless @isAdding(change)
@@ -188,12 +188,10 @@ class TransactionBundler
       @end.isGreaterThanOrEqual(change.oldRange.end)
 
   isAdding: (change) ->
-    (change.newText.length > 0) and
-      (change.oldText.length is 0)
+    change.newText.length > 0
 
   isRemoving: (change) ->
-    (change.newText.length is 0) and
-      (change.oldText.length > 0)
+    change.oldText.length > 0
 
   addRange: (range) ->
     if @start is null
