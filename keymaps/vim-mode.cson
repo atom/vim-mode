@@ -286,6 +286,7 @@
 
 'atom-text-editor.vim-mode.operator-pending-mode, atom-text-editor.vim-mode.visual-mode':
   'i w': 'vim-mode:select-inside-word'
+  'i W': 'vim-mode:select-inside-whole-word'
   'i "': 'vim-mode:select-inside-double-quotes'
   'i \'': 'vim-mode:select-inside-single-quotes'
   'i `': 'vim-mode:select-inside-back-ticks'
@@ -302,6 +303,7 @@
   'i b': 'vim-mode:select-inside-parentheses'
   'i p': 'vim-mode:select-inside-paragraph'
   'a w': 'vim-mode:select-a-word'
+  'a W': 'vim-mode:select-a-whole-word'
   'a "': 'vim-mode:select-around-double-quotes'
   'a \'': 'vim-mode:select-around-single-quotes'
   'a `': 'vim-mode:select-around-back-ticks'

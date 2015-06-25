@@ -1,5 +1,6 @@
 {Range} = require 'atom'
 AllWhitespace = /^\s$/
+WholeWordRegex = /\S+/
 
 class TextObject
   constructor: (@editor, @state) ->
@@ -11,6 +12,13 @@ class SelectInsideWord extends TextObject
   select: ->
     @editor.selectWordsContainingCursors()
     [true]
+
+class SelectInsideWholeWord extends TextObject
+  select: ->
+    for selection in @editor.getSelections()
+      range = selection.cursor.getCurrentWordBufferRange({wordRegex: WholeWordRegex})
+      selection.setBufferRange(range)
+      true
 
 # SelectInsideQuotes and the next class defined (SelectInsideBrackets) are
 # almost-but-not-quite-repeated code. They are different because of the depth
@@ -140,6 +148,18 @@ class SelectAWord extends TextObject
         selection.selectRight()
       true
 
+class SelectAWholeWord extends TextObject
+  select: ->
+    for selection in @editor.getSelections()
+      range = selection.cursor.getCurrentWordBufferRange({wordRegex: WholeWordRegex})
+      selection.setBufferRange(range)
+      loop
+        endPoint = selection.getBufferRange().end
+        char = @editor.getTextInRange(Range.fromPointWithDelta(endPoint, 0, 1))
+        break unless AllWhitespace.test(char)
+        selection.selectRight()
+      true
+
 class SelectInsideParagraph extends TextObject
   constructor: (@editor, @inclusive) ->
   select: ->
@@ -161,4 +181,5 @@ class SelectAParagraph extends TextObject
         selection.selectDown()
       true
 
-module.exports = {TextObject, SelectInsideWord, SelectInsideQuotes, SelectInsideBrackets, SelectAWord, SelectInsideParagraph, SelectAParagraph}
+module.exports = {TextObject, SelectInsideWord, SelectInsideWholeWord, SelectInsideQuotes,
+  SelectInsideBrackets, SelectAWord, SelectAWholeWord, SelectInsideParagraph, SelectAParagraph}

@@ -54,6 +54,29 @@ describe "TextObjects", ->
         [[0, 0], [0, 5]]
       ]
 
+  describe "the 'iW' text object", ->
+    beforeEach ->
+      editor.setText("12(45 ab'de ABCDE")
+      editor.setCursorScreenPosition([0, 9])
+
+    it "applies operators inside the current whole word in operator-pending mode", ->
+      keydown('d')
+      keydown('i')
+      keydown('W', shift: true)
+
+      expect(editor.getText()).toBe "12(45  ABCDE"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+      expect(vimState.getRegister('"').text).toBe "ab'de"
+      expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "selects inside the current whole word in visual mode", ->
+      keydown('v')
+      keydown('i')
+      keydown('W', shift: true)
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 11]]
+
   describe "the 'i(' text object", ->
     beforeEach ->
       editor.setText("( something in here and in (here) )")
@@ -211,7 +234,7 @@ describe "TextObjects", ->
       keydown('p')
 
       expect(editor.getSelectedScreenRange()).toEqual [[2, 0], [6, 0]]
-      
+
   describe "the 'i[' text object", ->
     beforeEach ->
       editor.setText("[ something in here and in [here] ]")
@@ -333,6 +356,49 @@ describe "TextObjects", ->
       keydown("v")
       keydown("a")
       keydown("w")
+
+      expect(editor.getSelectedBufferRanges()).toEqual [[[0, 0], [0, 5]]]
+
+    it "doesn't span special characters", ->
+      editor.setText("1(345\nabcde ABCDE")
+      editor.setCursorBufferPosition([0, 3])
+
+      keydown("v")
+      keydown("a")
+      keydown("w")
+
+      expect(editor.getSelectedBufferRanges()).toEqual [[[0, 2], [0, 5]]]
+
+  describe "the 'aW' text object", ->
+    beforeEach ->
+      editor.setText("12(45 ab'de ABCDE")
+      editor.setCursorScreenPosition([0, 9])
+
+    it "applies operators from the start of the current whole word to the start of the next whole word in operator-pending mode", ->
+      keydown('d')
+      keydown('a')
+      keydown('W', shift: true)
+
+      expect(editor.getText()).toBe "12(45 ABCDE"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+      expect(vimState.getRegister('"').text).toBe "ab'de "
+      expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "selects from the start of the current whole word to the start of the next whole word in visual mode", ->
+      keydown('v')
+      keydown('a')
+      keydown('W', shift: true)
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 12]]
+
+    it "doesn't span newlines", ->
+      editor.setText("12(45\nab'de ABCDE")
+      editor.setCursorBufferPosition([0, 4])
+
+      keydown('v')
+      keydown('a')
+      keydown('W', shift: true)
 
       expect(editor.getSelectedBufferRanges()).toEqual [[[0, 0], [0, 5]]]
 
