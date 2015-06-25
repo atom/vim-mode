@@ -12,7 +12,7 @@ class Insert extends Operator
   isComplete: -> @standalone or super
 
   confirmChanges: (changes) ->
-    bundler = new TransactionBundler(changes)
+    bundler = new TransactionBundler(changes, @editor)
     @typedText = bundler.buildInsertText()
 
   execute: ->
@@ -155,32 +155,68 @@ class SubstituteLine extends Insert
 # Takes a transaction and turns it into a string of what was typed.
 # This class is an implementation detail of Insert
 class TransactionBundler
-  constructor: (@changes) ->
-    @position = null
-    @content = ""
+  constructor: (@changes, @editor) ->
+    @start = null
+    @end = null
 
   buildInsertText: ->
     @addChange(change) for change in @changes
-    @content
+    if @start?
+      @editor.getTextInBufferRange [@start, @end]
+    else
+      ""
 
   addChange: (change) ->
     return unless change.newRange?
-    if @isAppending(change)
-      @content += change.newText
-      @position = change.newRange.end
-    else if @isRemovingFromEnd(change)
-      @content = @content.substring(0, @content.length - change.oldText.length)
-      @position = change.newRange.end
+    if @isRemovingFromPrevious(change)
+      @subtractRange change.oldRange
+    if @isAddingWithinPrevious(change)
+      @addRange change.newRange
 
-  isAppending: (change) ->
-    (change.newText.length > 0) and
-      (change.oldText.length is 0) and
-      ((not @position) or @position.isEqual(change.newRange.start))
+  isAddingWithinPrevious: (change) ->
+    return false unless @isAdding(change)
 
-  isRemovingFromEnd: (change) ->
-    (change.newText.length is 0) and
-      (change.oldText.length > 0) and
-      (@position and @position?.isEqual(change.oldRange.end))
+    return true if @start is null
+
+    @start.isLessThanOrEqual(change.newRange.start) and
+      @end.isGreaterThanOrEqual(change.newRange.start)
+
+  isRemovingFromPrevious: (change) ->
+    return false unless @isRemoving(change) and @start?
+
+    @start.isLessThanOrEqual(change.oldRange.start) and
+      @end.isGreaterThanOrEqual(change.oldRange.end)
+
+  isAdding: (change) ->
+    change.newText.length > 0
+
+  isRemoving: (change) ->
+    change.oldText.length > 0
+
+  addRange: (range) ->
+    if @start is null
+      {@start, @end} = range
+      return
+
+    rows = range.end.row - range.start.row
+
+    if (range.start.row is @end.row)
+      cols = range.end.column - range.start.column
+    else
+      cols = 0
+
+    @end = @end.translate [rows, cols]
+
+  subtractRange: (range) ->
+    rows = range.end.row - range.start.row
+
+    if (range.end.row is @end.row)
+      cols = range.end.column - range.start.column
+    else
+      cols = 0
+
+    @end = @end.translate [-rows, -cols]
+
 
 module.exports = {
   Insert,
