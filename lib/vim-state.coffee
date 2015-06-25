@@ -210,8 +210,8 @@ class VimState
       # if we have started an operation that responds to canComposeWith check if it can compose
       # with the operation we're going to push onto the stack
       if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
-        @emitter.emit('failed-to-compose')
         @resetCommandMode()
+        @emitter.emit('failed-to-compose')
         break
 
       @opStack.push(operation)
