@@ -1744,6 +1744,25 @@ describe "Motions", ->
       keydown(',')
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+    it "gets state from GlobalVimState", ->
+      keydown('f')
+      normalModeInputKeydown('c')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+      # store the current find for 'c'
+      findFC = vimState.globalVimState.currentFind
+
+      keydown('t')
+      normalModeInputKeydown('b')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+      # simulate a find for 'c' being done elsewhere
+      vimState.globalVimState.currentFind = findFC
+      keydown(';')
+      expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
   describe 'the % motion', ->
     beforeEach ->
       editor.setText("( ( ) )--{ text in here; and a function call(with parameters) }\n")
