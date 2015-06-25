@@ -1597,6 +1597,21 @@ describe "Operators", ->
         expect(editor.getText()).toBe '(a)b\n(a)b\n'
         expect(editor.getCursorScreenPosition()).toEqual [2,  0]
 
+      it 'deals with autocomplete', ->
+        keydown 'i'
+        # this sequence simulates autocompletion of 'add' to 'addFoo'
+        editor.insertText 'a'
+        editor.insertText 'd'
+        editor.insertText 'd'
+        editor.setTextInBufferRange [[0, 0], [0, 3]], 'addFoo'
+        keydown 'escape'
+        expect(editor.getCursorScreenPosition()).toEqual [0,  5]
+        expect(editor.getText()).toBe 'addFoo'
+
+        keydown '.'
+        expect(editor.getText()).toBe 'addFoaddFooo'
+        expect(editor.getCursorScreenPosition()).toEqual [0,  10]
+
   describe 'the a keybinding', ->
     beforeEach ->
       editor.setText('')
