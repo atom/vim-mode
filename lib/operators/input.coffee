@@ -12,7 +12,8 @@ class Insert extends Operator
 
   isComplete: -> @standalone or super
 
-  confirmChanges: (changes, insertionCheckpoint, {interrupted}={}) ->
+  confirmChanges: (changes, insertionCheckpoint, options) ->
+    interrupted = options?.interrupted
     bundler = new TransactionBundler(changes)
     @typedText = bundler.buildInsertText()
     if @count > 1 and not interrupted
