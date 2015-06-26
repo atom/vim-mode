@@ -112,6 +112,8 @@
   'ctrl-w q': 'core:close'
   'g t': 'pane:show-next-item'
   'g T': 'pane:show-previous-item'
+  'ctrl-6': 'vim-mode:focus-recent-tab'
+  'ctrl-^': 'vim-mode:focus-recent-tab'
 
   'm': 'vim-mode:mark'
   '`': 'vim-mode:move-to-mark-literal'
