@@ -1454,6 +1454,43 @@ describe "Motions", ->
       normalModeInputKeydown('`')
       expect(editor.getCursorBufferPosition()).toEqual [1, 5]
 
+  describe 'the gd/gD keybindings', ->
+
+    it 'moves to the definition of a js variable', ->
+      editor.setText('var myVar;\nmyVar')
+      editor.setCursorBufferPosition([1, 1])
+      keydown('g')
+      keydown('d')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 4]
+
+    it 'moves to the definition of a php variable', ->
+      editor.setText('$myVar = 20;\n$myVar')
+      editor.setCursorBufferPosition([1, 1])
+      keydown('g')
+      keydown('d')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+    it 'moves to the definition of a class', ->
+      editor.setText('class myClass {}\nmyClass')
+      editor.setCursorBufferPosition([1, 1])
+      keydown('g')
+      keydown('d')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 6]
+
+    it 'moves to the definition of a global variable', ->
+      editor.setText('bar = 10\nbar')
+      editor.setCursorBufferPosition([1, 1])
+      keydown('g')
+      keydown('d')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+    it 'moves to the definition of a variable with many keywords', ->
+      editor.setText('public static int bar = 10\nbar')
+      editor.setCursorBufferPosition([1, 1])
+      keydown('g')
+      keydown('d')
+      expect(editor.getCursorBufferPosition()).toEqual [0, 18]
+
   describe 'the f/F keybindings', ->
     beforeEach ->
       editor.setText("abcabcabcabc\n")
