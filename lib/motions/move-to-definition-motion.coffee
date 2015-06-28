@@ -19,14 +19,14 @@ class MoveToDefinition extends SearchCurrentWord
     searchString = @getCurrentWordMatch()
     @input = new Input(searchString)
 
-  getSearchTerm: (term)->
+  getSearchTerm: (term) ->
     search = "(\\w )?#{term}\\s?=?"
     search = search.replace /([$])/g, '\\$1'
     new RegExp search, 'gmi'
 
   scan: (cursor) ->
     actualRange = null
-    @editor.scan @getSearchTerm(@input.characters), (iteration) =>
+    @editor.scan @getSearchTerm(@input.characters), (iteration) ->
       actualRange = iteration.range
 
       # if there are two filled matches, that means
