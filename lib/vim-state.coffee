@@ -173,6 +173,7 @@ class VimState
       'search-current-word': (e) => new Motions.SearchCurrentWord(@editor, this)
       'bracket-matching-motion': (e) => new Motions.BracketMatchingMotion(@editor, this)
       'reverse-search-current-word': (e) => (new Motions.SearchCurrentWord(@editor, this)).reversed()
+      'open-file-under-cursor': (e) => new Motions.OpenFileUnderCursor(@editor, this)
 
   # Private: Register multiple command handlers via an {Object} that maps
   # command names to command handler functions.
