@@ -16,7 +16,7 @@ class OpenFileUnderCursor extends Motion
       //github.com
     ###
     wordRegex = /[a-z0-9\.\-_\/\\%:]+/i
-    for cursor in @editor.getCursors()
+    @editor.getCursors().forEach (cursor) =>
       range = cursor.getCurrentWordBufferRange wordRegex: wordRegex
       selectedPath = @editor.getTextInRange range
 
