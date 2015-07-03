@@ -3,6 +3,7 @@ path = require 'path'
 {Directory} = require 'atom'
 shell = require 'shell'
 {exec} = require 'child_process'
+utils = require '../utils'
 
 class OpenFileUnderCursor extends Motion
   execute: (count) ->
@@ -17,8 +18,11 @@ class OpenFileUnderCursor extends Motion
     ###
     wordRegex = /[a-z0-9\.\-_\/\\%:]+/i
     @editor.getCursors().forEach (cursor) =>
-      range = cursor.getCurrentWordBufferRange wordRegex: wordRegex
-      selectedPath = @editor.getTextInRange range
+      currentWord = utils.getCurrentWord @editor, cursor, wordRegex
+      # range = cursor.getCurrentWordBufferRange wordRegex: wordRegex
+      # selectedPath = @editor.getTextInRange range
+      range = currentWord.range
+      selectedPath = currentWord.word
 
       # exit early for url match
       if /^https?:/i.test(selectedPath)
