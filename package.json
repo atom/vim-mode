@@ -29,6 +29,7 @@
     }
   },
   "devDependencies": {
-    "coffeelint": "^1.10.1"
+    "coffeelint": "^1.10.1",
+    "grim": "^1.2.1"
   }
 }
