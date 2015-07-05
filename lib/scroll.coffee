@@ -87,9 +87,10 @@ class ScrollCursorToBottom extends ScrollCursor
 class ScrollHorizontal
   isComplete: -> true
   isRecordable: -> false
-  constructor: (@editor) ->
+  constructor: (@editorElement) ->
+    @editor = @editorElement.getModel()
     cursorPos = @editor.getCursorScreenPosition()
-    @pixel = @editor.pixelPositionForScreenPosition(cursorPos).left
+    @pixel = @editorElement.pixelPositionForScreenPosition(cursorPos).left
     @cursor = @editor.getLastCursor()
 
   putCursorOnScreen: ->
