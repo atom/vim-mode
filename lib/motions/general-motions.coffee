@@ -110,14 +110,50 @@ class Motion
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @selection = @editor.getSelectedBufferRanges()
+    @lastSelection = @editor.getSelectedBufferRange()
+    @wasLinewise = @isLinewise()
 
   execute: (count=1) ->
     _.times(count, -> true)
 
   select: (count=1) ->
-    @editor.setSelectedBufferRanges(@selection)
+    # in visual mode, the current selections are already there
+    # if we're not in visual mode, we are repeating some operation and need to re-do the selections
+    unless @vimState.mode is 'visual'
+      if @wasLinewise
+        @selectLines()
+      else
+        @selectCharacters()
+
     _.times(count, -> true)
+
+  selectLines: ->
+    {start, end} = @lastSelection
+    lineCount = end.row - start.row
+    for selection in @editor.getSelections()
+      cursor = selection.cursor.getBufferPosition()
+      selection.setBufferRange
+        start:
+          row: cursor.row
+          column: 0
+        end:
+          row: cursor.row + end.row - start.row
+          column: 0
+
+  selectCharacters: ->
+    {start, end} = @lastSelection
+    if @lastSelection.isSingleLine()
+      count = end.column - start.column
+      wrap = settings.wrapLeftRightMotion()
+      for selection in @editor.getSelections()
+        _.times count, ->
+          selection.selectRight() if wrap or not selection.cursor.isAtEndOfLine()
+    else
+      for selection in @editor.getSelections()
+        cursor = selection.cursor.getBufferPosition()
+        selection.selectToBufferPosition
+          row: cursor.row + end.row - start.row
+          column: end.column
 
 # Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
