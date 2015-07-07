@@ -88,6 +88,19 @@ describe "Operators", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 0]
           expect(vimState.getRegister('"').text).toBe 'bc'
 
+      describe "with multiple cursors", ->
+        beforeEach ->
+          editor.setText "abc\n012345\n\nxyz"
+          editor.setCursorScreenPosition [1, 4]
+          editor.addCursorAtBufferPosition [0, 1]
+
+        it "is undone as one operation", ->
+          keydown('x')
+          expect(editor.getText()).toBe "ac\n01235\n\nxyz"
+          keydown('u')
+          expect(editor.getText()).toBe "abc\n012345\n\nxyz"
+
+
       describe "with vim-mode.wrapLeftRightMotion", ->
         beforeEach ->
           editor.setText("abc\n012345\n\nxyz")
@@ -344,15 +357,29 @@ describe "Operators", ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
         editor.setCursorScreenPosition([1, 1])
 
+      it "undoes both lines", ->
         keydown('d')
         keydown('2')
         keydown('d')
 
         keydown('u')
 
-      it "undoes both lines", ->
         expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
         expect(editor.getSelectedText()).toBe ''
+
+      describe "with multiple cursors", ->
+        beforeEach ->
+          editor.setCursorBufferPosition([1, 1])
+          editor.addCursorAtBufferPosition([0, 0])
+
+        it "is undone as one operation", ->
+          keydown('d')
+          keydown('l')
+
+          keydown('u')
+
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE\nQWERT"
+          expect(editor.getSelectedText()).toBe ''
 
     describe "when followed by a w", ->
       it "deletes the next word until the end of the line and exits operator-pending mode", ->
