@@ -406,57 +406,59 @@ describe "Operators", ->
         expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
         expect(editorElement.classList.contains('command-mode')).toBe(true)
 
-    describe "when followed by an j", ->
+    describe "when followed by a j", ->
+      originalText = "12345\nabcde\nABCDE\n"
+
       beforeEach ->
-        originalText = "12345\nabcde\nABCDE"
         editor.setText(originalText)
 
-        describe "on the beginning of the file", ->
+      describe "on the beginning of the file", ->
+        it "deletes the next two lines", ->
           editor.setCursorScreenPosition([0, 0])
-          it "deletes the next two lines", ->
-            keydown('d')
-            keydown('j')
-            expect(editor.getText()).toBe("ABCDE")
+          keydown('d')
+          keydown('j')
+          expect(editor.getText()).toBe("ABCDE\n")
 
-        describe "on the end of the file", ->
-          editor.setCursorScreenPosition([4, 2])
-          it "deletes nothing", ->
-            keydown('d')
-            keydown('j')
-            expect(editor.getText()).toBe(originalText)
+      describe "on the end of the file", ->
+        it "deletes nothing", ->
+          editor.setCursorScreenPosition([4, 0])
+          keydown('d')
+          keydown('j')
+          expect(editor.getText()).toBe(originalText)
 
-        describe "on the middle of second line", ->
-          editor.setCursorScreenPosition([2, 1])
-          it "deletes the last two lines", ->
-            keydown('d')
-            keydown('j')
-            expect(editor.getText()).toBe("12345")
+      describe "on the middle of second line", ->
+        it "deletes the last two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('d')
+          keydown('j')
+          expect(editor.getText()).toBe("12345\n")
 
     describe "when followed by an k", ->
+      originalText = "12345\nabcde\nABCDE"
+
       beforeEach ->
-        originalText = "12345\nabcde\nABCDE"
         editor.setText(originalText)
 
-        describe "on the end of the file", ->
-          editor.setCursorScreenPosition([4, 2])
-          it "deletes the bottom two lines", ->
-            keydown('d')
-            keydown('k')
-            expect(editor.getText()).toBe("ABCDE")
+      describe "on the end of the file", ->
+        it "deletes the bottom two lines", ->
+          editor.setCursorScreenPosition([2,4])
+          keydown('d')
+          keydown('k')
+          expect(editor.getText()).toBe("12345\n")
 
-        describe "on the beginning of the file", ->
+      describe "on the beginning of the file", ->
+        xit "deletes nothing", ->
           editor.setCursorScreenPosition([0, 0])
-          it "deletes nothing", ->
-            keydown('d')
-            keydown('k')
-            expect(editor.getText()).toBe(originalText)
+          keydown('d')
+          keydown('k')
+          expect(editor.getText()).toBe(originalText)
 
-        describe "when on the middle of second line", ->
-          editor.setCursorScreenPosition([2, 1])
-          it "deletes the first two lines", ->
-            keydown('d')
-            keydown('k')
-            expect(editor.getText()).toBe("12345")
+      describe "when on the middle of second line", ->
+        it "deletes the first two lines", ->
+          editor.setCursorScreenPosition([1,2])
+          keydown('d')
+          keydown('k')
+          expect(editor.getText()).toBe("ABCDE")
 
     describe "when followed by a G", ->
       beforeEach ->
@@ -782,11 +784,11 @@ describe "Operators", ->
         keydown('y')
         keydown('h')
 
-        it "saves the left letter to the default register", ->
-          expect(vimState.getRegister('"').text).toBe " "
+      it "saves the left letter to the default register", ->
+        expect(vimState.getRegister('"').text).toBe " "
 
-        it "moves the cursor position to the left", ->
-          expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      it "moves the cursor position to the left", ->
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
     describe "with a down motion", ->
       beforeEach ->
