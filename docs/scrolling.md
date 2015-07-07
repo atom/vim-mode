@@ -12,3 +12,5 @@
 * [zz](http://vimhelp.appspot.com/scroll.txt.html#zz)
 * [z-](http://vimhelp.appspot.com/scroll.txt.html#z-)
 * [zb](http://vimhelp.appspot.com/scroll.txt.html#zb)
+* [zs](http://vimhelp.appspot.com/scroll.txt.html#zs)
+* [ze](http://vimhelp.appspot.com/scroll.txt.html#ze)

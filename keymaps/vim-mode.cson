@@ -55,6 +55,8 @@
   'z z': 'vim-mode:scroll-cursor-to-middle-leave'
   'z -': 'vim-mode:scroll-cursor-to-bottom'
   'z b': 'vim-mode:scroll-cursor-to-bottom-leave'
+  'z s': 'vim-mode:scroll-cursor-to-left'
+  'z e': 'vim-mode:scroll-cursor-to-right'
   'z M': 'editor:fold-all'
   'z R': 'editor:unfold-all'
   'z c': 'editor:fold-current-row'

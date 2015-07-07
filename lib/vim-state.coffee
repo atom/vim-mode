@@ -135,6 +135,8 @@ class VimState
       'scroll-full-screen-up': => new Motions.ScrollFullUpKeepCursor(@editorElement, this)
       'scroll-half-screen-down': => new Motions.ScrollHalfDownKeepCursor(@editorElement, this)
       'scroll-full-screen-down': => new Motions.ScrollFullDownKeepCursor(@editorElement, this)
+      'scroll-cursor-to-left': => new Scroll.ScrollCursorToLeft(@editorElement)
+      'scroll-cursor-to-right': => new Scroll.ScrollCursorToRight(@editorElement)
       'select-inside-word': => new TextObjects.SelectInsideWord(@editor)
       'select-inside-double-quotes': => new TextObjects.SelectInsideQuotes(@editor, '"', false)
       'select-inside-single-quotes': => new TextObjects.SelectInsideQuotes(@editor, '\'', false)
