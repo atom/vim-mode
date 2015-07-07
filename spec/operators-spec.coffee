@@ -428,7 +428,7 @@ describe "Operators", ->
 
       describe "on the middle of second line", ->
         it "deletes the last two lines", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('d')
           keydown('j')
           expect(editor.getText()).toBe("12345\n")
@@ -441,7 +441,7 @@ describe "Operators", ->
 
       describe "on the end of the file", ->
         it "deletes the bottom two lines", ->
-          editor.setCursorScreenPosition([2,4])
+          editor.setCursorScreenPosition([2, 4])
           keydown('d')
           keydown('k')
           expect(editor.getText()).toBe("12345\n")
@@ -455,7 +455,7 @@ describe "Operators", ->
 
       describe "when on the middle of second line", ->
         it "deletes the first two lines", ->
-          editor.setCursorScreenPosition([1,2])
+          editor.setCursorScreenPosition([1, 2])
           keydown('d')
           keydown('k')
           expect(editor.getText()).toBe("ABCDE")
