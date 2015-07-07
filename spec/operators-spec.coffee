@@ -1584,6 +1584,63 @@ describe "Operators", ->
       keydown '.'
       expect(editor.getText()).toBe "abddeec123\nabddeec4567"
 
+    describe "without wrapLeftRightMotion", ->
+      it "handles right motions correctly", ->
+        editor.setCursorBufferPosition [0, 0]
+        keydown 'i'
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 1]
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 2]
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 3]
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 3]
+        editor.insertText "de"
+        expect(editor.getText()).toBe "123de\n4567"
+
+      it "handles left motions correctly", ->
+        editor.setCursorBufferPosition [1, 1]
+        keydown 'i'
+        atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        editor.insertText "de"
+        expect(editor.getText()).toBe "123\nde4567"
+
+    describe "with wrapLeftRightMotion", ->
+      beforeEach ->
+        atom.config.set('vim-mode.wrapLeftRightMotion', true)
+
+      it "handles right motions correctly", ->
+        editor.setCursorBufferPosition [0, 0]
+        keydown 'i'
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 1]
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 2]
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 3]
+        atom.commands.dispatch editorElement, 'vim-mode:move-right-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        editor.insertText "de"
+        expect(editor.getText()).toBe "123\nde4567"
+
+      it "handles left motions correctly", ->
+        editor.setCursorBufferPosition [1, 2]
+        keydown 'i'
+        atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 1]
+        atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+        atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 3]
+        atom.commands.dispatch editorElement, 'vim-mode:move-left-insert'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 2]
+        editor.insertText "de"
+        expect(editor.getText()).toBe "12de3\n4567"
+
   describe 'the a keybinding', ->
     beforeEach ->
       editor.setText('')
