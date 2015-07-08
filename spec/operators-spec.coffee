@@ -1295,15 +1295,13 @@ describe "Operators", ->
         keydown('v', shift: true)
         keydown('>')
 
-      it "indents the current line and remains in visual mode", ->
-        expect(editorElement.classList.contains('visual-mode')).toBe(true)
+      it "indents the current line and exits visual mode", ->
+        expect(editorElement.classList.contains('command-mode')).toBe(true)
         expect(editor.getText()).toBe "  12345\nabcde\nABCDE"
-        expect(editor.getSelectedText()).toBe "  12345\n"
+        expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 2], [0, 2]] ]
 
       it "allows repeating the operation", ->
-        keydown("escape")
         keydown(".")
-        expect(editorElement.classList.contains('command-mode')).toBe(true)
         expect(editor.getText()).toBe "    12345\nabcde\nABCDE"
 
   describe "the < keybinding", ->
@@ -1341,10 +1339,10 @@ describe "Operators", ->
         keydown('v', shift: true)
         keydown('<')
 
-      it "indents the current line and remains in visual mode", ->
-        expect(editorElement.classList.contains('visual-mode')).toBe(true)
+      it "indents the current line and exits visual mode", ->
+        expect(editorElement.classList.contains('command-mode')).toBe(true)
         expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
-        expect(editor.getSelectedText()).toBe "12345\n"
+        expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 0], [0, 0]] ]
 
   describe "the = keybinding", ->
     oldGrammar = []
