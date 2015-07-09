@@ -31,8 +31,8 @@
 * [Put](http://vimhelp.appspot.com/change.txt.html#p)
   * `p` - default register
   * `P` - pastes the default register before the current cursor.
-  * `"ap` - supports registers (only named a-h, pending more
-    advanced atom keymap support)
+  * `"ap` - supports registers
+  * `ctrl-r a` or `ctrl-r "` etc. - supports pasting register content in insert mode
 * [Join](http://vimhelp.appspot.com/change.txt.html#J)
   * `J` - joins the current line with the immediately following line.
 * [Mark](http://vimhelp.appspot.com/motion.txt.html#m)
