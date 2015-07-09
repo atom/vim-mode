@@ -207,7 +207,18 @@ class MoveToNextWord extends Motion
   wordRegex: null
   operatesInclusively: false
 
+  wordRegExp: (cursor, {includeNonWordCharacters}={}) ->
+    includeNonWordCharacters ?= true
+    nonWordCharacters = atom.config.get('editor.nonWordCharacters', scope: cursor.getScopeDescriptor())
+    segments = ["^[\t ]*$"]
+    segments.push("[^\\s#{_.escapeRegExp(nonWordCharacters)}]+")
+    segments.push("$")
+    if includeNonWordCharacters
+      segments.push("[#{_.escapeRegExp(nonWordCharacters)}]+")
+    new RegExp(segments.join("|"), "g")
+
   moveCursor: (cursor, count=1, options) ->
+    @wordRegex = @wordRegExp(cursor) if options?.allowEOL
     _.times count, =>
       current = cursor.getBufferPosition()
 

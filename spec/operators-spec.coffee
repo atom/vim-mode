@@ -390,9 +390,10 @@ describe "Operators", ->
         keydown('w')
 
         # Incompatibility with VIM. In vim, `w` behaves differently as an
-        # operator than as a motion; it stops at the end of a line.expect(editor.getText()).toBe "abcd abc"
-        expect(editor.getText()).toBe "abcd abc"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+        # operator than as a motion; it stops at the end of a line
+        # and removes the preceding space: `expect(editor.getText()).toBe "abcd\nabc"`
+        expect(editor.getText()).toBe "abcd \nabc"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
         expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
         expect(editorElement.classList.contains('command-mode')).toBe(true)
