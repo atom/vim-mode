@@ -1,35 +1,49 @@
 ## HEAD
 
+## 0.55
+
+* Fixed indentation commands so that they exit visual mode - @bronson
+* Implemented horizontal scrolling commands `z s` and `z e` - @jacekkopecky
+
+## 0.54
+
+* Fixed an error where repeating an insertion command would not handle
+  characters inserted by packages like autocomplete or bracket-matcher - @jacekkopecky
+
+## 0.53
+
+* Fixed an exception that would occur when using `.` to repeat in certain cases.
+
 ## 0.52
 
-* Fix incorrect cursor motion when exiting visual mode w/ a reversed
+* Fixed incorrect cursor motion when exiting visual mode w/ a reversed
   selection - @t9md
-* Add setting to configure the regexp used for numbers and the `ctrl-a`
+* Added setting to configure the regexp used for numbers and the `ctrl-a`
   and `ctrl-x` keybindings - @jacekkopecky
 
 ## 0.50
 
-* Fix cursor position after `dd` command - @bronson
+* Fixed cursor position after `dd` command - @bronson
 * Implement `ap` text-object differently than `ip` - MarkusSN
 
 ## 0.49
 
-* Fix an issue that caused the cursor to move left incorrectly when near
+* Fixed an issue that caused the cursor to move left incorrectly when near
   the end of a line.
 
 ## 0.48
 
-* Fix usages of deprecated APIs
+* Fixed usages of deprecated APIs
 
 ## 0.47
 
-* Fix usages of deprecated APIs - @hitsmaxft, @jacekkopecky
+* Fixed usages of deprecated APIs - @hitsmaxft, @jacekkopecky
 
 ## 0.46
 
-* Fix issues with deleting when there are multiple selections - @jacekkopecky
-* Add paragraph text-objects 'ip' and 'ap' - @t9md
-* Fix use of a deprecated method - @akonwi
+* Fixed issues with deleting when there are multiple selections - @jacekkopecky
+* Added paragraph text-objects 'ip' and 'ap' - @t9md
+* Fixed use of a deprecated method - @akonwi
 
 ## 0.45
 
