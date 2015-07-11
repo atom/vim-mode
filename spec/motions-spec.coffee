@@ -1296,6 +1296,73 @@ describe "Motions", ->
           keydown("*")
           expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
+  describe "the : keybinding", ->
+
+    beforeEach ->
+      editor.setText("abc\ndef\nabc\ndef")
+
+    describe "as a motion", ->
+      beforeEach ->
+        editor.setCursorBufferPosition([0, 0])
+
+      it "moves the cursor to a specific line", ->
+        keydown(':')
+        submitCommandModeInputText '2'
+
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+      it "moves to the second address", ->
+        keydown(':')
+        submitCommandModeInputText '1,3'
+
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+      it "works with offsets", ->
+        keydown(':')
+        submitCommandModeInputText '2+1'
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        keydown(':')
+        submitCommandModeInputText '-2'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+      it "doesn't move when the address is the current line", ->
+        keydown(':')
+        submitCommandModeInputText '.'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+        keydown(':')
+        submitCommandModeInputText ','
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+      it "moves to the last line", ->
+        keydown(':')
+        submitCommandModeInputText '$'
+        expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
+      it "moves to a mark's line", ->
+        keydown('l')
+        keydown('m')
+        keydown('a')
+        keydown('j')
+        keydown(':')
+        submitCommandModeInputText "'a"
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+      it "moves to a specified search", ->
+        keydown(':')
+        submitCommandModeInputText '/def'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        keydown(':')
+        submitCommandModeInputText '?abc'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+
+        editor.setCursorBufferPosition([3, 0])
+        keydown(':')
+        submitCommandModeInputText '/def'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
   describe "the hash keybinding", ->
     describe "as a motion", ->
       it "moves cursor to previous occurence of word under cursor", ->
