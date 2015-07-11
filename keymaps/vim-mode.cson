@@ -193,6 +193,8 @@
 
   '%': 'vim-mode:bracket-matching-motion'
 
+  ':': 'vim-mode:activate-ex-mode'
+
   '1': 'vim-mode:repeat-prefix'
   '2': 'vim-mode:repeat-prefix'
   '3': 'vim-mode:repeat-prefix'
