@@ -71,6 +71,7 @@
   'ctrl-r %': 'vim-mode:insert-mode-put'
   'ctrl-r _': 'vim-mode:insert-mode-put'
   'ctrl-r "': 'vim-mode:insert-mode-put'
+  'ctrl-r escape': 'abort!'
 
 'atom-text-editor.vim-mode:not(.insert-mode)':
   'h': 'vim-mode:move-left'
