@@ -36,6 +36,12 @@ class VimState
         @activateVisualMode('characterwise') if @mode is 'command'
     , 100)
 
+    @subscriptions.add atom.keymaps.onDidFailToMatchBinding (e) =>
+      return unless e.keyboardEventTarget is @editorElement
+      if @mode is 'operator-pending'
+        atom.keymaps.cancelPendingState()
+        @resetCommandMode()
+
     @editorElement.classList.add("vim-mode")
     @setupCommandMode()
     if settings.startInInsertMode()
