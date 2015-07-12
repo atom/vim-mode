@@ -144,15 +144,6 @@ describe "Motions", ->
         keydown('w')
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-        # FIXME: The definition of Cursor#getEndOfCurrentWordBufferPosition,
-        # means that the end of the word can't be the current cursor
-        # position (even though it is when your cursor is on a new line).
-        #
-        # Therefore it picks the end of the next word here (which is [3,3])
-        # to start looking for the next word, which is also the end of the
-        # buffer so the cursor never advances.
-        #
-        # See atom/vim-mode#3
         keydown('w')
         expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
