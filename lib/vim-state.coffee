@@ -550,8 +550,8 @@ class VimState
         @pushOperations(new Prefixes.Repeat(num))
 
   reverseSelections: ->
+    reversed = not @editor.getLastSelection().isReversed()
     for selection in @editor.getSelections()
-      reversed = not selection.isReversed()
       selection.setBufferRange(selection.getBufferRange(), {reversed})
 
   # Private: Figure out whether or not we are in a repeat sequence or we just

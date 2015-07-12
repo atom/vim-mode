@@ -302,6 +302,32 @@ describe "VimState", ->
           [0, 8]
         ])
 
+      it "harmonizes selection directions", ->
+        keydown("i")
+        keydown("w")
+        editor.addCursorAtBufferPosition([0, Infinity])
+        keydown("h")
+
+        expect(editor.getSelectedBufferRanges()).toEqual([
+          [[0, 4], [0, 6]],
+          [[0, 12], [0, 13]]
+        ])
+        expect(editor.getCursorBufferPositions()).toEqual([
+          [0, 6]
+          [0, 12]
+        ])
+
+        keydown("o")
+
+        expect(editor.getSelectedBufferRanges()).toEqual([
+          [[0, 4], [0, 6]],
+          [[0, 12], [0, 13]]
+        ])
+        expect(editor.getCursorBufferPositions()).toEqual([
+          [0, 6]
+          [0, 13]
+        ])
+
     describe "activate visualmode witin visualmode", ->
       beforeEach ->
         keydown('escape')
