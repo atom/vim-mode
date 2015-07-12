@@ -218,7 +218,8 @@ class MoveToNextWord extends Motion
 
   moveCursorToNextSubword: (cursor, count, options) ->
     @subwordRegex ?= cursor.subwordRegExp()
-    @moveCursorByRegex(cursor, count, options, @subwordRegex)
+    # HACK: expected behavior got changed with https://github.com/atom/atom/commit/ba3ab41
+    @moveCursorByRegex(cursor, count, options, new RegExp("^[\t ]*$|"+@subwordRegex.source.substring(14), "g"))
 
   moveCursorByRegex: (cursor, count, options, wordRegex) ->
     _.times count, =>
