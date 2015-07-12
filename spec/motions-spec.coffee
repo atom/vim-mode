@@ -126,7 +126,7 @@ describe "Motions", ->
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
   fdescribe "the w and alt-w keybindings", ->
-    itMovesByWord = (key) ->
+    itMovesByWord = (key, options) ->
       describe "moving by word", ->
         beforeEach -> editor.setText("ab cDeFg1+- \n xyz\n\nzip")
 
@@ -134,32 +134,32 @@ describe "Motions", ->
           beforeEach -> editor.setCursorScreenPosition([0, 0])
 
           it "moves the cursor to the beginning of the next word", ->
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 9]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
             # After cursor gets to the EOF, it should stay there.
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
           it "moves the cursor to the end of the word if last word in file", ->
             editor.setText("abc")
             editor.setCursorScreenPosition([0, 0])
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual([0, 3])
 
         describe "as a selection", ->
@@ -167,7 +167,7 @@ describe "Motions", ->
             beforeEach ->
               editor.setCursorScreenPosition([0, 3])
               keydown('y')
-              keydown(key)
+              keydown(key, options)
 
             it "selects to the beginning of the next word", ->
               expect(vimState.getRegister('"').text).toBe 'cDeFg1'
@@ -176,12 +176,12 @@ describe "Motions", ->
             beforeEach ->
               editor.setCursorScreenPosition([0, 2])
               keydown('y')
-              keydown(key)
+              keydown(key, options)
 
             it "selects the whitespace", ->
               expect(vimState.getRegister('"').text).toBe ' '
 
-    itMovesBySubword = (key) ->
+    itMovesBySubword = (key, options) ->
       describe "moving by subword", ->
         beforeEach -> editor.setText("ab cDeFg1+- \n xyz\n\nzip")
 
@@ -189,41 +189,41 @@ describe "Motions", ->
           beforeEach -> editor.setCursorScreenPosition([0, 0])
 
           it "moves the cursor to the beginning of the next subword", ->
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 8]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 9]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
             # After cursor gets to the EOF, it should stay there.
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
           it "moves the cursor to the end of the word if last word in file", ->
             editor.setText("abc")
             editor.setCursorScreenPosition([0, 0])
-            keydown(key)
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual([0, 3])
 
         describe "as a selection", ->
@@ -231,7 +231,7 @@ describe "Motions", ->
             beforeEach ->
               editor.setCursorScreenPosition([0, 3])
               keydown('y')
-              keydown(key)
+              keydown(key, options)
 
             it "selects to the beginning of the next word", ->
               expect(vimState.getRegister('"').text).toBe 'c'
@@ -240,7 +240,7 @@ describe "Motions", ->
             beforeEach ->
               editor.setCursorScreenPosition([0, 2])
               keydown('y')
-              keydown(key)
+              keydown(key, options)
 
             it "selects the whitespace", ->
               expect(vimState.getRegister('"').text).toBe ' '
@@ -255,6 +255,17 @@ describe "Motions", ->
         beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', true)
 
         itMovesBySubword('w')
+
+    describe "the alt-w keybinding", ->
+      describe "with it configured to be camel-case insensitive", ->
+        beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', true)
+
+        itMovesByWord('w', alt: true)
+
+      describe "with it configured to be camel-case sensitive", ->
+        beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', false)
+
+        itMovesBySubword('w', alt: true)
 
   fdescribe "the W keybinding", ->
     beforeEach -> editor.setText("cde1+- ab \n xyz\n\nzip")
