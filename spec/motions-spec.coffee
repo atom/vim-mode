@@ -1363,6 +1363,37 @@ describe "Motions", ->
         submitCommandModeInputText '/def'
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
+  describe "using command history", ->
+    commandEditor = null
+
+    beforeEach ->
+      editor.setText("abc\ndef\nabc\ndef")
+      keydown(':')
+      submitCommandModeInputText('4')
+      keydown(':')
+      submitCommandModeInputText('-2')
+      expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+      commandEditor = editor.commandModeInputView.editorElement
+
+    it "allows searching history in the input field", ->
+      keydown(':')
+      atom.commands.dispatch(commandEditor, 'core:move-up')
+      expect(commandEditor.getModel().getText()).toEqual('-2')
+      atom.commands.dispatch(commandEditor, 'core:move-up')
+      expect(commandEditor.getModel().getText()).toEqual('4')
+      atom.commands.dispatch(commandEditor, 'core:move-down')
+      expect(commandEditor.getModel().getText()).toEqual('-2')
+      atom.commands.dispatch(commandEditor, 'core:move-down')
+      expect(commandEditor.getModel().getText()).toEqual('')
+
+    it "doesn't use the same history as the search", ->
+      keydown('/')
+      submitCommandModeInputText('/abc')
+      keydown(':')
+      atom.commands.dispatch(commandEditor, 'core:move-up')
+      expect(commandEditor.getModel().getText()).toEqual('-2')
+
   describe "the hash keybinding", ->
     describe "as a motion", ->
       it "moves cursor to previous occurence of word under cursor", ->

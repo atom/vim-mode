@@ -356,21 +356,25 @@ class VimState
       marker = @editor.markBufferRange(new Range(pos, pos), {invalidate: 'never', persistent: false})
       @marks[name] = marker
 
-  # Public: Append a search to the search history.
+  # Public: Append an item to a custom history (e.g. the search history).
   #
-  # Motions.Search - The confirmed search motion to append
+  # historyName - The name of the history to append to
+  # item        - The item to append to the history
   #
   # Returns nothing
-  pushSearchHistory: (search) ->
-    @globalVimState.searchHistory.unshift search
+  pushCustomHistory: (historyName, item) ->
+    @globalVimState.histories[historyName] ?= []
+    @globalVimState.histories[historyName].unshift item
 
-  # Public: Get the search history item at the given index.
+  # Public: Get the custom history item at the given index.
   #
-  # index - the index of the search history item
+  # historyName - The name of the custom history
+  # index       - the index of the custom history item (default: 0)
   #
   # Returns a search motion
-  getSearchHistoryItem: (index = 0) ->
-    @globalVimState.searchHistory[index]
+  getCustomHistoryItem: (historyName, index = 0) ->
+    @globalVimState.histories[historyName] ?= []
+    @globalVimState.histories[historyName][index]
 
   ##############################################################################
   # Mode Switching

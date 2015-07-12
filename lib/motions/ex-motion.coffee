@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
-SearchViewModel = require '../view-models/search-view-model'
+ViewModelWithHistory = require '../view-models/view-model-with-history'
 {scanEditor} = require '../utils'
 
 cmp = (x, y) -> if x > y then 1 else if x < y then -1 else 0
@@ -14,7 +14,7 @@ class ExMode extends MotionWithInput
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
     @commands = {}
-    @viewModel = new SearchViewModel(this)
+    @viewModel = new ViewModelWithHistory(this, 'ex')
     @registerCommands
       'quit':
         priority: 1000

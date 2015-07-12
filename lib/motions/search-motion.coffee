@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
-SearchViewModel = require '../view-models/search-view-model'
+ViewModelWithHistory = require '../view-models/view-model-with-history'
 {Input} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
 settings = require '../settings'
@@ -38,7 +38,7 @@ class SearchBase extends MotionWithInput
 class Search extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @viewModel = new SearchViewModel(this)
+    @viewModel = new ViewModelWithHistory(this, 'search')
 
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null
@@ -53,7 +53,7 @@ class SearchCurrentWord extends SearchBase
 
     searchString = @getCurrentWordMatch()
     @input = new Input(searchString)
-    @vimState.pushSearchHistory(searchString) unless searchString is @vimState.getSearchHistoryItem()
+    @vimState.pushCustomHistory('search', searchString) unless searchString is @vimState.getCustomHistoryItem('search')
 
   getCurrentWord: ->
     cursor = @editor.getLastCursor()
@@ -161,7 +161,7 @@ class BracketMatchingMotion extends SearchBase
 class RepeatSearch extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState, dontUpdateCurrentSearch: true)
-    @input = new Input(@vimState.getSearchHistoryItem(0) ? "")
+    @input = new Input(@vimState.getCustomHistoryItem('search', 0) ? "")
     @replicateCurrentSearch()
 
   isComplete: -> true
