@@ -144,30 +144,21 @@ describe "Motions", ->
         keydown('w')
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-        # FIXME: The definition of Cursor#getEndOfCurrentWordBufferPosition,
-        # means that the end of the word can't be the current cursor
-        # position (even though it is when your cursor is on a new line).
-        #
-        # Therefore it picks the end of the next word here (which is [3,3])
-        # to start looking for the next word, which is also the end of the
-        # buffer so the cursor never advances.
-        #
-        # See atom/vim-mode#3
         keydown('w')
         expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
         keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+        expect(editor.getCursorScreenPosition()).toEqual [3, 2]
 
-        # After cursor gets to the EOF, it should stay there.
+        # When the cursor gets to the EOF, it should stay there.
         keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+        expect(editor.getCursorScreenPosition()).toEqual [3, 2]
 
       it "moves the cursor to the end of the word if last word in file", ->
         editor.setText("abc")
         editor.setCursorScreenPosition([0, 0])
         keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual([0, 3])
+        expect(editor.getCursorScreenPosition()).toEqual([0, 2])
 
     describe "as a selection", ->
       describe "within a word", ->
@@ -463,7 +454,7 @@ describe "Motions", ->
         editor.setCursorScreenPosition([1, 10])
         keydown('y')
         keydown('B', shift: true)
-        expect(vimState.getRegister('"').text).toBe 'xyz-123'
+        expect(vimState.getRegister('"').text).toBe 'xyz-12' # because cursor is on the `3`
 
       it "doesn't go past the beginning of the file", ->
         editor.setCursorScreenPosition([0, 0])
@@ -965,7 +956,7 @@ describe "Motions", ->
       beforeEach -> keydown('G', shift: true)
 
       it "moves the cursor to the last line after whitespace", ->
-        expect(editor.getCursorScreenPosition()).toEqual [3, 1]
+        expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
     describe "as a repeated motion", ->
       beforeEach ->
@@ -1262,14 +1253,9 @@ describe "Motions", ->
 
         it "doesn't move cursor unless next match has exact word ending", ->
           editor.setText("abc\n@def\nabc\n@def1\n")
-          # FIXME: I suspect there is a bug laying around
-          # Cursor#getEndOfCurrentWordBufferPosition, this function
-          # is returning '@' as a word, instead of returning the whole
-          # word '@def', this behavior is avoided in this test, when we
-          # execute the '*' command when cursor is on character after '@'
-          # (in this particular example, the 'd' char)
           editor.setCursorBufferPosition([1, 1])
           keydown("*")
+          # this is because of the default isKeyword value of vim-mode that includes @
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
         # FIXME: This behavior is different from the one found in
