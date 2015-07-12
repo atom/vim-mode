@@ -181,11 +181,80 @@ describe "Motions", ->
             it "selects the whitespace", ->
               expect(vimState.getRegister('"').text).toBe ' '
 
+    itMovesBySubword = (key) ->
+      describe "moving by subword", ->
+        beforeEach -> editor.setText("ab cDeFg1+- \n xyz\n\nzip")
+
+        describe "as a motion", ->
+          beforeEach -> editor.setCursorScreenPosition([0, 0])
+
+          it "moves the cursor to the beginning of the next subword", ->
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 8]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+
+            # After cursor gets to the EOF, it should stay there.
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+
+          it "moves the cursor to the end of the word if last word in file", ->
+            editor.setText("abc")
+            editor.setCursorScreenPosition([0, 0])
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual([0, 3])
+
+        describe "as a selection", ->
+          describe "within a word", ->
+            beforeEach ->
+              editor.setCursorScreenPosition([0, 3])
+              keydown('y')
+              keydown(key)
+
+            it "selects to the beginning of the next word", ->
+              expect(vimState.getRegister('"').text).toBe 'c'
+
+          describe "between words", ->
+            beforeEach ->
+              editor.setCursorScreenPosition([0, 2])
+              keydown('y')
+              keydown(key)
+
+            it "selects the whitespace", ->
+              expect(vimState.getRegister('"').text).toBe ' '
+
     describe "the w keybinding", ->
       describe "with it configured to be camel-case insensitive", ->
         beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', false)
 
         itMovesByWord('w')
+
+      describe "with it configured to be camel-case sensitive", ->
+        beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', true)
+
+        itMovesBySubword('w')
 
   fdescribe "the W keybinding", ->
     beforeEach -> editor.setText("cde1+- ab \n xyz\n\nzip")
