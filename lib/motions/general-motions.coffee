@@ -204,17 +204,30 @@ class MoveToPreviousWholeWord extends Motion
     not cur.row and not cur.column
 
 class MoveToNextWord extends Motion
-  wordRegex: null
+  subwordRegex: null
   operatesInclusively: false
 
   moveCursor: (cursor, count=1, options) ->
+    if settings.defaultWordIsCamelCaseSensitive()
+      @moveCursorToNextSubword(cursor, count, options)
+    else
+      @moveCursorToNextWord(cursor, count, options)
+
+  moveCursorToNextWord: (cursor, count, options) ->
+    @moveCursorByRegex(cursor, count, options, null)
+
+  moveCursorToNextSubword: (cursor, count, options) ->
+    @subwordRegex ?= cursor.subwordRegExp()
+    @moveCursorByRegex(cursor, count, options, @subwordRegex)
+
+  moveCursorByRegex: (cursor, count, options, wordRegex) ->
     _.times count, =>
       current = cursor.getBufferPosition()
 
       next = if options?.excludeWhitespace
-        cursor.getEndOfCurrentWordBufferPosition(wordRegex: @wordRegex)
+        cursor.getEndOfCurrentWordBufferPosition(wordRegex: wordRegex)
       else
-        cursor.getBeginningOfNextWordBufferPosition(wordRegex: @wordRegex)
+        cursor.getBeginningOfNextWordBufferPosition(wordRegex: wordRegex)
 
       return if @isEndOfFile(cursor)
 
@@ -233,7 +246,15 @@ class MoveToNextWord extends Motion
     cur.row is eof.row and cur.column is eof.column
 
 class MoveToNextWholeWord extends MoveToNextWord
-  wordRegex: WholeWordOrEmptyLineRegex
+  moveCursor: (cursor, count=1, options) ->
+    @moveCursorByRegex(cursor, count, options, WholeWordOrEmptyLineRegex)
+
+class MoveToNextAltWord extends MoveToNextWord
+  moveCursor: (cursor, count=1, options) ->
+    if settings.defaultWordIsCamelCaseSensitive()
+      @moveCursorToNextWord(cursor, count, options)
+    else
+      @moveCursorToNextSubword(cursor, count, options)
 
 class MoveToEndOfWord extends Motion
   wordRegex: null
@@ -455,7 +476,7 @@ class ScrollFullDownKeepCursor extends ScrollKeepingCursor
 
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
-  MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
+  MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord, MoveToNextAltWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine,
