@@ -997,6 +997,10 @@ describe "Motions", ->
       editor.setText("abc\ndef\nabc\ndef\n")
       editor.setCursorBufferPosition([0, 0])
 
+      # clear search history
+      vimState.globalVimState.searchHistory = []
+      vimState.globalVimState.currentSearch = {}
+
     describe "as a motion", ->
       it "moves the cursor to the specified search pattern", ->
         keydown('/')
@@ -1100,9 +1104,14 @@ describe "Motions", ->
 
       describe "repeating", ->
         it "does nothing with no search history", ->
-          # This tests that no exception is raised
+          editor.setCursorBufferPosition([0, 0])
           keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+          editor.setCursorBufferPosition([1, 1])
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [1, 1]
 
+      describe "repeating with search history", ->
         beforeEach ->
           keydown('/')
           submitCommandModeInputText 'def'

@@ -27,6 +27,8 @@ class SearchBase extends MotionWithInput
       atom.beep()
 
   scan: (cursor) ->
+    return [] if @input.characters is ""
+
     currentPosition = cursor.getBufferPosition()
 
     [rangesBefore, rangesAfter] = [[], []]
