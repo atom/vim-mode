@@ -27,7 +27,7 @@ class Prefix
     @composedObject.select?(@count)
 
   isLinewise: ->
-    @composedObject.isLinewise()
+    @composedObject.isLinewise?()
 
 #
 # Used to track the number of times either a motion or operator should
