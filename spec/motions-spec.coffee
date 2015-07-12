@@ -125,7 +125,7 @@ describe "Motions", ->
           keydown('l')
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-  describe "the w and alt-w keybindings", ->
+  fdescribe "the w and alt-w keybindings", ->
     itMovesByWord = (key) ->
       describe "moving by word", ->
         beforeEach -> editor.setText("ab cDeFg1+- \n xyz\n\nzip")
@@ -187,7 +187,7 @@ describe "Motions", ->
 
         itMovesByWord('w')
 
-  describe "the W keybinding", ->
+  fdescribe "the W keybinding", ->
     beforeEach -> editor.setText("cde1+- ab \n xyz\n\nzip")
 
     describe "as a motion", ->
