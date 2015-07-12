@@ -1343,7 +1343,7 @@ describe "Motions", ->
       it "moves to a mark's line", ->
         keydown('l')
         keydown('m')
-        keydown('a')
+        commandModeInputKeydown 'a'
         keydown('j')
         keydown(':')
         submitCommandModeInputText "'a"

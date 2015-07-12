@@ -1,6 +1,7 @@
+_ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
 SearchViewModel = require '../view-models/search-view-model'
-_ = require 'underscore-plus'
+{scanEditor} = require '../utils'
 
 cmp = (x, y) -> if x > y then 1 else if x < y then -1 else 0
 
@@ -39,27 +40,28 @@ class ExMode extends MotionWithInput
         priority: commands[name].priority
         fn: commands[name].fn
 
-  parseAddress: (str, pos) ->
+  parseAddress: (str, cursor) ->
+    row = cursor.getBufferRow()
     if str is '.'
-      addr = pos.row
+      addr = row
     else if str is '$'
       # Lines are 0-indexed in Atom, but 1-indexed in vim.
       addr = @editor.getBuffer().lines.length - 1
     else if str[0] in ["+", "-"]
-      addr = pos.row + @parseOffset(str)
+      addr = row + @parseOffset(str)
     else if not isNaN(str)
       addr = parseInt(str) - 1
     else if str[0] is "'" # Parse Mark...
       mark = @vimState.marks[str[1]]
       unless mark?
         throw new CommandError("Mark #{str} not set.")
-      addr = mark.bufferMarker.range.end.row
+      addr = mark.getEndBufferPosition().row
     else if str[0] is "/"
-      addr = Find.findNextInBuffer(@editor.buffer, pos, str[1...-1])
+      addr = scanEditor(str[1...-1], @editor, cursor)[0].start.row
       unless addr?
         throw new CommandError("Pattern not found: #{str[1...-1]}")
     else if str[0] is "?"
-      addr = Find.findPreviousInBuffer(@editor.buffer, pos, str[1...-1])
+      addr = scanEditor(str[1...-1], @editor, cursor, true)[0].start.row
       unless addr?
         throw new CommandError("Pattern not found: #{str[1...-1]}")
 
@@ -98,25 +100,25 @@ class ExMode extends MotionWithInput
       commandLine = commandLine[1..]
     else
       addrPattern = ///^
-        (?:                               # First address
+        (?:                       # First address
         (
-        \.|                               # Current line
-        \$|                               # Last line
-        \d+|                              # n-th line
-        '[\[\]<>'`"^.(){}a-zA-Z]|         # Marks
-        /.*?[^\\]/|                       # Regex
-        \?.*?[^\\]\?|                     # Backwards search
-        [+-]\d*                           # Current line +/- a number of lines
-        )((?:\s*[+-]\d*)*)                # Line offset
+        \.|                       # Current line
+        \$|                       # Last line
+        \d+|                      # n-th line
+        '[\[\]<>'`"^.(){}a-zA-Z]| # Marks
+        /.*?[^\\](?:/|$)|         # Regex
+        \?.*?[^\\](?:\?|$)|       # Backwards search
+        [+-]\d*                   # Current line +/- a number of lines
+        )((?:\s*[+-]\d*)*)        # Line offset
         )?
-        (?:,                              # Second address
-        (                                 # Same as first address
+        (?:,                      # Second address
+        (                         # Same as first address
         \.|
         \$|
         \d+|
         '[\[\]<>'`"^.(){}a-zA-Z]|
-        /.*?[^\\]/|
-        \?.*?[^\\]\?|
+        /.*?[^\\](?:/|$)|
+        \?.*?[^\\](?:\?|$)|
         [+-]\d*
         )((?:\s*[+-]\d*)*)
         )?
@@ -125,7 +127,7 @@ class ExMode extends MotionWithInput
       [match, addr1, off1, addr2, off2] = commandLine.match(addrPattern)
 
       if addr1?
-        address1 = @parseAddress(addr1, cursor.getBufferPosition())
+        address1 = @parseAddress(addr1, cursor)
       else
         # If no addr1 is given (e.g. `,+3`), assume it is '.'
         address1 = cursor.getBufferRow()
@@ -138,7 +140,7 @@ class ExMode extends MotionWithInput
         throw new CommandError('Invalid range')
 
       if addr2?
-        address2 = @parseAddress(addr2, cursor.getBufferPosition())
+        address2 = @parseAddress(addr2, cursor)
       if off2?
         address2 += @parseOffset(off2)
 
@@ -157,7 +159,7 @@ class ExMode extends MotionWithInput
     # Step 6a: If no command is specified, go to the last specified address
     if commandLine.length is 0
       cursor.setBufferPosition([range[1], 0])
-      return [range, '', []]
+      return [range, undefined, []]
     else
 
     # Skip steps 6b, 6c and 7a since flags are not yet implpemented.
@@ -198,6 +200,6 @@ class ExMode extends MotionWithInput
       unless e instanceof CommandError
         throw e
       atom.notifications.addError("Command Error: #{e.message}")
-    command(args, range, @vimState)
+    command?(args, range, @vimState)
 
 module.exports = ExMode
