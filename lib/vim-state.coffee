@@ -38,6 +38,8 @@ class VimState
 
     @subscriptions.add atom.keymaps.onDidFailToMatchBinding (e) =>
       return unless e.keyboardEventTarget is @editorElement
+      return if Utils.isAtomModifier(e.keystrokes)
+      
       atom.keymaps.cancelPendingState()
       if @mode is 'operator-pending'
         @resetCommandMode()
