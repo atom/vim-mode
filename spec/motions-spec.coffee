@@ -165,12 +165,12 @@ describe "Motions", ->
         describe "as a selection", ->
           describe "within a word", ->
             beforeEach ->
-              editor.setCursorScreenPosition([0, 0])
+              editor.setCursorScreenPosition([0, 3])
               keydown('y')
               keydown(key)
 
-            it "selects to the end of the word", ->
-              expect(vimState.getRegister('"').text).toBe 'ab '
+            it "selects to the beginning of the next word", ->
+              expect(vimState.getRegister('"').text).toBe 'cDeFg1'
 
           describe "between words", ->
             beforeEach ->
