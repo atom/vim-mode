@@ -125,59 +125,67 @@ describe "Motions", ->
           keydown('l')
           expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-  describe "the w keybinding", ->
-    beforeEach -> editor.setText("ab cde1+- \n xyz\n\nzip")
+  describe "the w and alt-w keybindings", ->
+    itMovesByWord = (key) ->
+      describe "moving by word", ->
+        beforeEach -> editor.setText("ab cDeFg1+- \n xyz\n\nzip")
 
-    describe "as a motion", ->
-      beforeEach -> editor.setCursorScreenPosition([0, 0])
+        describe "as a motion", ->
+          beforeEach -> editor.setCursorScreenPosition([0, 0])
 
-      it "moves the cursor to the beginning of the next word", ->
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+          it "moves the cursor to the beginning of the next word", ->
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 9]
 
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
-        # After cursor gets to the EOF, it should stay there.
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual [3, 3]
+            # After cursor gets to the EOF, it should stay there.
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 3]
 
-      it "moves the cursor to the end of the word if last word in file", ->
-        editor.setText("abc")
-        editor.setCursorScreenPosition([0, 0])
-        keydown('w')
-        expect(editor.getCursorScreenPosition()).toEqual([0, 3])
+          it "moves the cursor to the end of the word if last word in file", ->
+            editor.setText("abc")
+            editor.setCursorScreenPosition([0, 0])
+            keydown(key)
+            expect(editor.getCursorScreenPosition()).toEqual([0, 3])
 
-    describe "as a selection", ->
-      describe "within a word", ->
-        beforeEach ->
-          editor.setCursorScreenPosition([0, 0])
-          keydown('y')
-          keydown('w')
+        describe "as a selection", ->
+          describe "within a word", ->
+            beforeEach ->
+              editor.setCursorScreenPosition([0, 0])
+              keydown('y')
+              keydown(key)
 
-        it "selects to the end of the word", ->
-          expect(vimState.getRegister('"').text).toBe 'ab '
+            it "selects to the end of the word", ->
+              expect(vimState.getRegister('"').text).toBe 'ab '
 
-      describe "between words", ->
-        beforeEach ->
-          editor.setCursorScreenPosition([0, 2])
-          keydown('y')
-          keydown('w')
+          describe "between words", ->
+            beforeEach ->
+              editor.setCursorScreenPosition([0, 2])
+              keydown('y')
+              keydown(key)
 
-        it "selects the whitespace", ->
-          expect(vimState.getRegister('"').text).toBe ' '
+            it "selects the whitespace", ->
+              expect(vimState.getRegister('"').text).toBe ' '
+
+    describe "the w keybinding", ->
+      describe "with it configured to be camel-case insensitive", ->
+        beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', false)
+
+        itMovesByWord('w')
 
   describe "the W keybinding", ->
     beforeEach -> editor.setText("cde1+- ab \n xyz\n\nzip")
