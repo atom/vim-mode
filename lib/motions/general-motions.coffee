@@ -183,8 +183,25 @@ class MoveToPreviousWord extends Motion
   operatesInclusively: false
 
   moveCursor: (cursor, count=1) ->
+    if settings.defaultWordIsCamelCaseSensitive()
+      @moveCursorToPreviousSubword(cursor, count)
+    else
+      @moveCursorToPreviousWord(cursor, count)
+
+  moveCursorToPreviousSubword: (cursor, count) ->
+    _.times count, ->
+      cursor.moveToPreviousSubwordBoundary()
+
+  moveCursorToPreviousWord: (cursor, count) ->
     _.times count, ->
       cursor.moveToBeginningOfWord()
+
+class MoveToPreviousAltWord extends MoveToPreviousWord
+  moveCursor: (cursor, count=1) ->
+    if settings.defaultWordIsCamelCaseSensitive()
+      @moveCursorToPreviousWord(cursor, count)
+    else
+      @moveCursorToPreviousSubword(cursor, count)
 
 class MoveToPreviousWholeWord extends Motion
   operatesInclusively: false
@@ -477,7 +494,7 @@ class ScrollFullDownKeepCursor extends ScrollKeepingCursor
 
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
-  MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord, MoveToNextAltWord,
+  MoveToPreviousWord, MoveToPreviousAltWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord, MoveToNextAltWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine,

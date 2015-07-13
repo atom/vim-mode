@@ -110,6 +110,7 @@ class VimState
       'move-to-end-of-word': => new Motions.MoveToEndOfWord(@editor, this)
       'move-to-end-of-whole-word': => new Motions.MoveToEndOfWholeWord(@editor, this)
       'move-to-previous-word': => new Motions.MoveToPreviousWord(@editor, this)
+      'move-to-previous-alt-word': => new Motions.MoveToPreviousAltWord(@editor, this)
       'move-to-previous-whole-word': => new Motions.MoveToPreviousWholeWord(@editor, this)
       'move-to-next-paragraph': => new Motions.MoveToNextParagraph(@editor, this)
       'move-to-previous-paragraph': => new Motions.MoveToPreviousParagraph(@editor, this)
