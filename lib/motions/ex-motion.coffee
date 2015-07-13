@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
-ViewModelWithHistory = require '../view-models/view-model-with-history'
+{ViewModelWithHistory} = require '../view-models/view-model-with-history'
 {scanEditor} = require '../utils'
 
 cmp = (x, y) -> if x > y then 1 else if x < y then -1 else 0
@@ -47,7 +47,7 @@ class ExMode extends MotionWithInput
     else if str is '$'
       # Lines are 0-indexed in Atom, but 1-indexed in vim.
       addr = @editor.getBuffer().lines.length - 1
-    else if str[0] in ["+", "-"]
+    else if str[0] in ['+', '-']
       addr = row + @parseOffset(str)
     else if not isNaN(str)
       addr = parseInt(str) - 1
@@ -56,14 +56,18 @@ class ExMode extends MotionWithInput
       unless mark?
         throw new CommandError("Mark #{str} not set.")
       addr = mark.getEndBufferPosition().row
-    else if str[0] is "/"
-      addr = scanEditor(str[1...-1], @editor, cursor)[0].start.row
+    else if (first = str[0]) in ['/', '?']
+      reversed = first is '?'
+      str = @viewModel.checkForRepeatSearch(str[1..], reversed)
+      throw new CommandError('No previous regular expression') if str is ''
+      str = str[...-1] if str[str.length - 1] is first
+      @regex = str
+      lineRange = cursor.getCurrentLineBufferRange()
+      pos = if reversed then lineRange.start else lineRange.end
+      addr = scanEditor(str, @editor, pos, reversed)[0]
       unless addr?
         throw new CommandError("Pattern not found: #{str[1...-1]}")
-    else if str[0] is "?"
-      addr = scanEditor(str[1...-1], @editor, cursor, true)[0].start.row
-      unless addr?
-        throw new CommandError("Pattern not found: #{str[1...-1]}")
+      addr = addr.start.row
 
     return addr
 
@@ -106,8 +110,8 @@ class ExMode extends MotionWithInput
         \$|                       # Last line
         \d+|                      # n-th line
         '[\[\]<>'`"^.(){}a-zA-Z]| # Marks
-        /.*?[^\\](?:/|$)|         # Regex
-        \?.*?[^\\](?:\?|$)|       # Backwards search
+        /.*?(?:[^\\]/|$)|         # Regex
+        \?.*?(?:[^\\]\?|$)|       # Backwards search
         [+-]\d*                   # Current line +/- a number of lines
         )((?:\s*[+-]\d*)*)        # Line offset
         )?
@@ -144,6 +148,9 @@ class ExMode extends MotionWithInput
       if off2?
         address2 += @parseOffset(off2)
 
+      if @regex?
+        @vimState.pushCustomHistory('search', @regex)
+
       if address2 < 0 or address2 > lastLine
         throw new CommandError('Invalid range')
 
@@ -178,7 +185,7 @@ class ExMode extends MotionWithInput
     commandLineRE = new RegExp("^" + _.escapeRegExp(command))
     matching = []
 
-    for name of @commands
+    for name in Object.keys(@commands)
       if commandLineRE.test(name)
         command = @commands[name]
         if matching.length is 0

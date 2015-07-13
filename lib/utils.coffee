@@ -1,5 +1,5 @@
-settings = require './settings'
 _ = require 'underscore-plus'
+settings = require './settings'
 
 getSearchTerm = (term) ->
   modifiers = {'g': true}
@@ -33,26 +33,24 @@ module.exports =
     else
       'character'
 
-  # Public: Scans an editor for occurences of a term relative to a cursor
+  # Public: Scans an editor for occurences of a term relative to a position
   #
-  # term    - The string to find
-  # editor  - The editor to scan
-  # cursor  - The cursor before/after which to scan
-  # reverse - Whether or not to search in reverse (default: false)
+  # term     - The string to find
+  # editor   - The editor to scan
+  # position - The position before/after which to scan
+  # reverse  - Whether or not to search in reverse (default: false)
   #
   # Returns an array of ranges of all occurences of `term` in `editor`.
   #  The array is sorted so that the first occurences after the cursor come
   #  first (and the search wraps around). If `reverse` is true, the array is
   #  reversed so that the first occurence before the cursor comes first.
-  scanEditor: (term, editor, cursor, reverse = false) ->
-    currentPosition = cursor.getBufferPosition()
-
+  scanEditor: (term, editor, position, reverse = false) ->
     [rangesBefore, rangesAfter] = [[], []]
     editor.scan getSearchTerm(term), ({range}) ->
       isBefore = if reverse
-        range.start.compare(currentPosition) < 0
+        range.start.compare(position) < 0
       else
-        range.start.compare(currentPosition) <= 0
+        range.start.compare(position) <= 0
 
       if isBefore
         rangesBefore.push(range)

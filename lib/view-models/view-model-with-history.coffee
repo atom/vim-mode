@@ -1,9 +1,8 @@
 {ViewModel} = require './view-model'
 
-module.exports =
 class ViewModelWithHistory extends ViewModel
   constructor: (@searchMotion, @historyName) ->
-    super(@searchMotion, class: 'search')
+    super(@searchMotion, class: @historyName)
     @historyIndex = -1
 
     atom.commands.add(@view.editorElement, 'core:move-up', @increaseHistory)
@@ -29,14 +28,29 @@ class ViewModelWithHistory extends ViewModel
       @historyIndex -= 1
       @restoreHistory(@historyIndex)
 
-  confirm: (view) =>
-    repeatChar = if @searchMotion.initiallyReversed then '?' else '/'
-    if @view.value is '' or @view.value is repeatChar
-      lastSearch = @history(0)
+  checkForRepeatSearch: (term, reversed=@searchMotion.initiallyReversed) ->
+    repeatChar = if reversed then '?' else '/'
+    if term is '' or term[0] is repeatChar
+      lastSearch = @vimState.getCustomHistoryItem('search', 0)
       if lastSearch?
-        @view.value = lastSearch
+        term = lastSearch
       else
-        @view.value = ''
+        term = ''
         atom.beep()
+    term
+
+  confirm: (view) =>
     super(view)
-    @vimState.pushCustomHistory(@historyName, @view.value) unless @view.value is ''
+    @vimState.pushCustomHistory(@historyName, @view.value) unless @view.value in ['', @history(0)]
+
+class SearchViewModel extends ViewModelWithHistory
+  constructor: (@searchMotion) ->
+    super(@searchMotion, 'search')
+
+  confirm: (view) =>
+    @view.value = @checkForRepeatSearch(@view.value)
+    super(view)
+
+module.exports =
+  ViewModelWithHistory: ViewModelWithHistory
+  SearchViewModel: SearchViewModel

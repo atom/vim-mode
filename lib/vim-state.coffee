@@ -376,6 +376,12 @@ class VimState
     @globalVimState.histories[historyName] ?= []
     @globalVimState.histories[historyName][index]
 
+  # Public: Resets a custom history.
+  #
+  # historyName - The name of the custom history
+  resetCustomHistory: (historyName) ->
+    @globalVimState.histories[historyName] = []
+
   ##############################################################################
   # Mode Switching
   ##############################################################################

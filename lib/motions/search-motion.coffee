@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
-ViewModelWithHistory = require '../view-models/view-model-with-history'
+{SearchViewModel} = require '../view-models/view-model-with-history'
 {Input} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
 settings = require '../settings'
@@ -20,7 +20,7 @@ class SearchBase extends MotionWithInput
     this
 
   moveCursor: (cursor, count=1) ->
-    ranges = scanEditor(@input.characters, @editor, cursor, @reverse)
+    ranges = scanEditor(@input.characters, @editor, cursor.getBufferPosition(), @reverse)
     if ranges.length > 0
       range = ranges[(count - 1) % ranges.length]
       cursor.setBufferPosition(range.start)
@@ -38,7 +38,7 @@ class SearchBase extends MotionWithInput
 class Search extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @viewModel = new ViewModelWithHistory(this, 'search')
+    @viewModel = new SearchViewModel(this, 'search')
 
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null

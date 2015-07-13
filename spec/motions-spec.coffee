@@ -1117,6 +1117,10 @@ describe "Motions", ->
           submitCommandModeInputText('/')
           expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
+          keydown('/')
+          submitCommandModeInputText('/test/test///')
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
         describe "the n keybinding", ->
           it "repeats the last search", ->
             keydown('n')
@@ -1192,6 +1196,8 @@ describe "Motions", ->
       commandEditor = null
 
       beforeEach ->
+        vimState.resetCustomHistory('search')
+
         keydown('/')
         submitCommandModeInputText('def')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
@@ -1221,6 +1227,14 @@ describe "Motions", ->
         expect(commandEditor.getModel().getText()).toEqual('abc')
         atom.commands.dispatch(commandEditor, 'core:move-down')
         expect(commandEditor.getModel().getText()).toEqual ''
+
+      it "doesn't add the same term to the history more than once", ->
+        keydown('/')
+        submitCommandModeInputText('abc')
+        keydown('/')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        expect(commandEditor.getModel().getText()).toEqual 'def'
 
   describe "the * keybinding", ->
     beforeEach ->
@@ -1360,39 +1374,56 @@ describe "Motions", ->
 
         editor.setCursorBufferPosition([3, 0])
         keydown(':')
-        submitCommandModeInputText '/def'
+        submitCommandModeInputText '/ef'
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-  describe "using command history", ->
-    commandEditor = null
+    describe "using command history", ->
+      commandEditor = null
 
-    beforeEach ->
-      editor.setText("abc\ndef\nabc\ndef")
-      keydown(':')
-      submitCommandModeInputText('4')
-      keydown(':')
-      submitCommandModeInputText('-2')
-      expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+      beforeEach ->
+        editor.setText("abc\ndef\nabc\ndef")
+        keydown(':')
+        submitCommandModeInputText('4')
+        keydown(':')
+        submitCommandModeInputText('-2')
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-      commandEditor = editor.commandModeInputView.editorElement
+        commandEditor = editor.commandModeInputView.editorElement
 
-    it "allows searching history in the input field", ->
-      keydown(':')
-      atom.commands.dispatch(commandEditor, 'core:move-up')
-      expect(commandEditor.getModel().getText()).toEqual('-2')
-      atom.commands.dispatch(commandEditor, 'core:move-up')
-      expect(commandEditor.getModel().getText()).toEqual('4')
-      atom.commands.dispatch(commandEditor, 'core:move-down')
-      expect(commandEditor.getModel().getText()).toEqual('-2')
-      atom.commands.dispatch(commandEditor, 'core:move-down')
-      expect(commandEditor.getModel().getText()).toEqual('')
+      it "allows searching history in the input field", ->
+        keydown(':')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        expect(commandEditor.getModel().getText()).toEqual('-2')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        expect(commandEditor.getModel().getText()).toEqual('4')
+        atom.commands.dispatch(commandEditor, 'core:move-down')
+        expect(commandEditor.getModel().getText()).toEqual('-2')
+        atom.commands.dispatch(commandEditor, 'core:move-down')
+        expect(commandEditor.getModel().getText()).toEqual('')
 
-    it "doesn't use the same history as the search", ->
-      keydown('/')
-      submitCommandModeInputText('/abc')
-      keydown(':')
-      atom.commands.dispatch(commandEditor, 'core:move-up')
-      expect(commandEditor.getModel().getText()).toEqual('-2')
+      it "doesn't use the same history as the search", ->
+        keydown('/')
+        submitCommandModeInputText('/abc')
+        keydown(':')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        expect(commandEditor.getModel().getText()).toEqual('-2')
+
+      it "integrates the search history for :/", ->
+        keydown('/')
+        submitCommandModeInputText('def')
+        expect(editor.getCursorBufferPosition()).toEqual([3, 0])
+        keydown(':')
+        submitCommandModeInputText('//')
+        expect(editor.getCursorBufferPosition()).toEqual([1, 0])
+
+        keydown(':')
+        submitCommandModeInputText('/ef/,/abc/+2')
+        keydown('/')
+        commandEditor = editor.commandModeInputView.editorElement
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        expect(commandEditor.getModel().getText()).toEqual('abc')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        expect(commandEditor.getModel().getText()).not.toEqual('/ef')
 
   describe "the hash keybinding", ->
     describe "as a motion", ->
