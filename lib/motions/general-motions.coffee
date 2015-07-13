@@ -263,16 +263,16 @@ class MoveToNextWord extends Motion
     eof = @editor.getEofBufferPosition()
     cur.row is eof.row and cur.column is eof.column
 
-class MoveToNextWholeWord extends MoveToNextWord
-  moveCursor: (cursor, count=1, options) ->
-    @moveCursorByRegex(cursor, count, options, WholeWordOrEmptyLineRegex)
-
 class MoveToNextAltWord extends MoveToNextWord
   moveCursor: (cursor, count=1, options) ->
     if settings.defaultWordIsCamelCaseSensitive()
       @moveCursorToNextWord(cursor, count, options)
     else
       @moveCursorToNextSubword(cursor, count, options)
+
+class MoveToNextWholeWord extends MoveToNextWord
+  moveCursor: (cursor, count=1, options) ->
+    @moveCursorByRegex(cursor, count, options, WholeWordOrEmptyLineRegex)
 
 class MoveToEndOfWord extends Motion
   wordRegex: null
@@ -494,7 +494,7 @@ class ScrollFullDownKeepCursor extends ScrollKeepingCursor
 
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
-  MoveToPreviousWord, MoveToPreviousAltWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord, MoveToNextAltWord,
+  MoveToPreviousWord, MoveToPreviousAltWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextAltWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine,
