@@ -111,11 +111,11 @@ class Change extends Insert
   #
   # Returns nothing.
   execute: (count) ->
-    # If we've typed, we're being repeated. If we're being repeated,
-    # undo transactions are already handled.
-    @vimState.setInsertionCheckpoint() unless @typingCompleted
-
     if _.contains(@motion.select(count, excludeWhitespace: true), true)
+      # If we've typed, we're being repeated. If we're being repeated,
+      # undo transactions are already handled.
+      @vimState.setInsertionCheckpoint() unless @typingCompleted
+
       @setTextRegister(@register, @editor.getSelectedText())
       if @motion.isLinewise?() and not @typingCompleted
         for selection in @editor.getSelections()
@@ -125,10 +125,12 @@ class Change extends Insert
         for selection in @editor.getSelections()
           selection.deleteSelectedText()
 
-    return super if @typingCompleted
+      return super if @typingCompleted
 
-    @vimState.activateInsertMode()
-    @typingCompleted = true
+      @vimState.activateInsertMode()
+      @typingCompleted = true
+    else
+      @vimState.activateCommandMode()
 
 class SubstituteLine extends Change
   standalone: true
