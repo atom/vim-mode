@@ -128,7 +128,7 @@ describe "Motions", ->
   describe "the w and alt-w keybindings", ->
     itMovesByWord = (key, options) ->
       describe "moving by word", ->
-        beforeEach -> editor.setText("ab cDeFg1+- \n xyz\n\nzip")
+        beforeEach -> editor.setText("ab = cDeFg1+- \n xyz\n\nzip")
 
         describe "as a motion", ->
           beforeEach -> editor.setCursorScreenPosition([0, 0])
@@ -138,7 +138,10 @@ describe "Motions", ->
             expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
             keydown(key, options)
-            expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+            expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 11]
 
             keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [1, 1]
@@ -165,7 +168,7 @@ describe "Motions", ->
         describe "as a selection", ->
           describe "within a word", ->
             beforeEach ->
-              editor.setCursorScreenPosition([0, 3])
+              editor.setCursorScreenPosition([0, 5])
               keydown('y')
               keydown(key, options)
 
@@ -183,7 +186,7 @@ describe "Motions", ->
 
     itMovesBySubword = (key, options) ->
       describe "moving by subword", ->
-        beforeEach -> editor.setText("ab cDeFg1+- \n xyz\n\nzip")
+        beforeEach -> editor.setText("ab = cDeFg1+- \n xyz\n\nzip")
 
         describe "as a motion", ->
           beforeEach -> editor.setCursorScreenPosition([0, 0])
@@ -193,7 +196,7 @@ describe "Motions", ->
             expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
             keydown(key, options)
-            expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+            expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
             keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 6]
@@ -202,7 +205,10 @@ describe "Motions", ->
             expect(editor.getCursorScreenPosition()).toEqual [0, 8]
 
             keydown(key, options)
-            expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+            expect(editor.getCursorScreenPosition()).toEqual [0, 10]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 11]
 
             keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [1, 1]
@@ -229,7 +235,7 @@ describe "Motions", ->
         describe "as a selection", ->
           describe "within a word", ->
             beforeEach ->
-              editor.setCursorScreenPosition([0, 3])
+              editor.setCursorScreenPosition([0, 5])
               keydown('y')
               keydown(key, options)
 
@@ -238,7 +244,7 @@ describe "Motions", ->
 
           describe "between words", ->
             beforeEach ->
-              editor.setCursorScreenPosition([0, 2])
+              editor.setCursorScreenPosition([0, 4])
               keydown('y')
               keydown(key, options)
 
