@@ -607,6 +607,17 @@ describe "Motions", ->
 
         itMovesBySubword('b')
 
+    describe "the alt-b keybinding", ->
+      describe "with it configured to be camel-case insensitive", ->
+        beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', true)
+
+        itMovesByWord('b', alt: true)
+
+      describe "with it configured to be camel-case sensitive", ->
+        beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', false)
+
+        itMovesBySubword('b', alt: true)
+
   describe "the B keybinding", ->
     beforeEach -> editor.setText("cde1+- ab \n\t xyz-123\n\n zip")
 
