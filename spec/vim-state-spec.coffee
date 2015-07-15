@@ -154,8 +154,7 @@ describe "VimState", ->
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
 
-      # FIXME: See atom/vim-mode#2
-      xdescribe "on a line with content", ->
+      describe "on a line with content", ->
         beforeEach -> editor.setCursorScreenPosition([0, 6])
 
         it "does not allow the cursor to be placed on the \n character", ->
