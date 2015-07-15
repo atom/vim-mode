@@ -473,54 +473,124 @@ describe "Motions", ->
           beforeEach -> editor.setCursorScreenPosition([4, 1])
 
           it "moves the cursor to the beginning of the previous word", ->
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 4]
 
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [3, 0]
 
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [2, 0]
 
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [1, 1]
 
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 12]
 
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
             # Go to start of the file, after moving past the first word
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
             # Stay at the start of the file
-            keydown('b')
+            keydown(key, options)
             expect(editor.getCursorScreenPosition()).toEqual [0, 0]
 
         describe "as a selection", ->
           describe "within a word", ->
             beforeEach ->
-              editor.setCursorScreenPosition([0, 2])
+              editor.setCursorScreenPosition([0, 10])
               keydown('y')
-              keydown('b')
+              keydown(key, options)
 
             it "selects to the beginning of the current word", ->
-              expect(vimState.getRegister('"').text).toBe 'a'
-              expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+              expect(vimState.getRegister('"').text).toBe "cDeF"
+              expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
           describe "between words", ->
             beforeEach ->
               editor.setCursorScreenPosition([0, 4])
               keydown('y')
-              keydown('b')
+              keydown(key, options)
+
+            it "selects to the beginning of the last word", ->
+              expect(vimState.getRegister('"').text).toBe 'ab '
+              expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+    itMovesBySubword = (key, options) ->
+      describe "moving by subword", ->
+        beforeEach -> editor.setText(" ab = cDeFg1+- \n xyz\n\nzip }\n last")
+
+        describe "as a motion", ->
+          beforeEach -> editor.setCursorScreenPosition([4, 1])
+
+          it "moves the cursor to the beginning of the previous word", ->
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 4]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [3, 0]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [1, 1]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 12]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 11]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 1]
+
+            # Go to start of the file, after moving past the first word
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+            # Stay at the start of the file
+            keydown(key, options)
+            expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+        describe "as a selection", ->
+          describe "within a word", ->
+            beforeEach ->
+              editor.setCursorScreenPosition([0, 10])
+              keydown('y')
+              keydown(key, options)
+
+            it "selects to the beginning of the current word", ->
+              expect(vimState.getRegister('"').text).toBe "F"
+              expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+
+          describe "between words", ->
+            beforeEach ->
+              editor.setCursorScreenPosition([0, 4])
+              keydown('y')
+              keydown(key, options)
 
             it "selects to the beginning of the last word", ->
               expect(vimState.getRegister('"').text).toBe 'ab '
@@ -531,6 +601,11 @@ describe "Motions", ->
         beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', false)
 
         itMovesByWord('b')
+
+      describe "with it configured to be camel-case sensitive", ->
+        beforeEach -> atom.config.set('vim-mode.defaultWordIsCamelCaseSensitive', true)
+
+        itMovesBySubword('b')
 
   describe "the B keybinding", ->
     beforeEach -> editor.setText("cde1+- ab \n\t xyz-123\n\n zip")
