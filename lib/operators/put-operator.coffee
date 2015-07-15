@@ -9,7 +9,7 @@ module.exports =
 class Put extends Operator
   register: null
 
-  constructor: (@editor, @vimState, {@location, @selectOptions}={}) ->
+  constructor: (@editor, @vimState, {@location}={}) ->
     @location ?= 'after'
     @complete = true
     @register = settings.defaultRegister()
