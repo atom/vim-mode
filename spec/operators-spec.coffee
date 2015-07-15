@@ -709,6 +709,89 @@ describe "Operators", ->
           keydown('escape')
           expect(editor.getText()).toBe("12345\n\n")
 
+    describe "when followed by a %", ->
+      beforeEach ->
+        editor.setText("12345(67)8\nabc(d)e\nA()BCDE")
+
+      describe "before brackets or on the first one", ->
+        it "replaces inclusively until matching bracket", ->
+          editor.setCursorScreenPosition([0, 1])
+          editor.addCursorAtScreenPosition([1, 1])
+          editor.addCursorAtScreenPosition([2, 1])
+          keydown('c')
+          keydown('%')
+          editor.insertText('x')
+          expect(editor.getText()).toBe("1x8\naxe\nAxBCDE")
+          expect(vimState.mode).toBe "insert"
+
+      describe "inside brackets or on the ending one", ->
+        it "replaces inclusively backwards until matching bracket", ->
+          editor.setCursorScreenPosition([0, 6])
+          editor.addCursorAtScreenPosition([1, 5])
+          editor.addCursorAtScreenPosition([2, 2])
+          keydown('c')
+          keydown('%')
+          editor.insertText('x')
+          # this differs from VIM, which deletes the character originally under cursor
+          expect(editor.getText()).toBe("12345x67)8\nabcx)e\nAx)BCDE")
+          expect(vimState.mode).toBe "insert"
+
+      describe "after or without brackets", ->
+        it "deletes nothing", ->
+          editor.setText("12345(67)8\nabc(d)e\nABCDE")
+          editor.setCursorScreenPosition([0, 9])
+          editor.addCursorAtScreenPosition([2, 2])
+          keydown('c')
+          keydown('%')
+          expect(editor.getText()).toBe("12345(67)8\nabc(d)e\nABCDE")
+          expect(vimState.mode).toBe "command"
+
+      describe "repeats correctly with .", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 1])
+          keydown('c')
+          keydown('%')
+          editor.insertText('x')
+          keydown('escape')
+
+        it "undoes correctly with u", ->
+          expect(editor.getText()).toBe("1x8\nabc(d)e\nA()BCDE")
+          expect(vimState.mode).toBe "command"
+          keydown 'u'
+          expect(editor.getText()).toBe("12345(67)8\nabc(d)e\nA()BCDE")
+
+        it "repeats correctly before a bracket", ->
+          editor.setCursorScreenPosition([1, 0])
+          keydown('.')
+          expect(editor.getText()).toBe("1x8\nxe\nA()BCDE")
+          expect(vimState.mode).toBe "command"
+
+        it "repeats correctly on the opening bracket", ->
+          editor.setCursorScreenPosition([1, 3])
+          keydown('.')
+          expect(editor.getText()).toBe("1x8\nabcxe\nA()BCDE")
+          expect(vimState.mode).toBe "command"
+
+        it "repeats correctly inside brackets", ->
+          editor.setCursorScreenPosition([1, 4])
+          keydown('.')
+          # this differs from VIM, which deletes the character originally under cursor
+          expect(editor.getText()).toBe("1x8\nabcxd)e\nA()BCDE")
+          expect(vimState.mode).toBe "command"
+
+        it "repeats correctly on the closing bracket", ->
+          editor.setCursorScreenPosition([1, 5])
+          keydown('.')
+          # this differs from VIM, which deletes the character originally under cursor
+          expect(editor.getText()).toBe("1x8\nabcx)e\nA()BCDE")
+          expect(vimState.mode).toBe "command"
+
+        it "does nothing when repeated after a bracket", ->
+          editor.setCursorScreenPosition([2, 3])
+          keydown('.')
+          expect(editor.getText()).toBe("1x8\nabc(d)e\nA()BCDE")
+          expect(vimState.mode).toBe "command"
+
     describe "when followed by a goto line G", ->
       beforeEach ->
         editor.setText "12345\nabcde\nABCDE"
