@@ -73,11 +73,8 @@ class OperatorWithInput extends Operator
 #
 class Delete extends Operator
   register: null
-  allowEOL: null
 
-  # allowEOL - Determines whether the cursor should be allowed to rest on the
-  #            end of line character or not.
-  constructor: (@editor, @vimState, {@allowEOL}={}) ->
+  constructor: (@editor, @vimState) ->
     @complete = false
     @register = settings.defaultRegister()
 
@@ -172,7 +169,7 @@ class LowerCase extends Operator
 class Yank extends Operator
   register: null
 
-  constructor: (@editor, @vimState, {@allowEOL}={}) ->
+  constructor: (@editor, @vimState) ->
     @register = settings.defaultRegister()
 
   # Public: Copies the text selected by the given motion.
