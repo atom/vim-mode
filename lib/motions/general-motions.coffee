@@ -190,6 +190,7 @@ class MoveToPreviousWord extends Motion
 
   moveCursorToPreviousSubword: (cursor, count) ->
     _.times count, ->
+      # XXX: Doesn't actually work as it also moves to the ending of the previous subword
       cursor.moveToPreviousSubwordBoundary()
 
   moveCursorToPreviousWord: (cursor, count) ->
