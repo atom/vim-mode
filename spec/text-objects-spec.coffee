@@ -18,9 +18,6 @@ describe "TextObjects", ->
     options.element ?= editorElement
     helpers.keydown(key, options)
 
-  normalModeInputKeydown = (key, opts = {}) ->
-    editor.normalModeInputView.editorElement.getModel().setText(key)
-
   describe "Text Object commands in normal mode not preceded by an operator", ->
     beforeEach ->
       vimState.activateNormalMode()
