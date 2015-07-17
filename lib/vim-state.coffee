@@ -92,6 +92,7 @@ class VimState
       'toggle-case-now': => new Operators.ToggleCase(@editor, this, complete: true)
       'yank': => @linewiseAliasedOperator(Operators.Yank)
       'yank-line': => [new Operators.Yank(@editor, this), new Motions.MoveToRelativeLine(@editor, this)]
+      'yank-to-last-character-of-line': => [new Operators.Yank(@editor, this), new Motions.MoveToLastCharacterOfLine(@editor, this)]
       'put-before': => new Operators.Put(@editor, this, location: 'before')
       'put-after': => new Operators.Put(@editor, this, location: 'after')
       'join': => new Operators.Join(@editor, this)
