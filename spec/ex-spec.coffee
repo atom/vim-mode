@@ -305,6 +305,18 @@ describe "Ex", ->
           expect(pane.promptToSaveItem).toHaveBeenCalled()
           expect(pane.getItems().length).toBe(0)
 
+    describe ":qall", ->
+      beforeEach ->
+        waitsForPromise ->
+          atom.workspace.open().then -> atom.workspace.open()
+            .then -> atom.workspace.open()
+
+      it "closes the window", ->
+        spyOn(atom, 'close')
+        keydown(':')
+        submitCommandModeInputText('qall')
+        expect(atom.close).toHaveBeenCalled()
+
     describe ":tabnext", ->
       pane = null
       beforeEach ->
@@ -344,3 +356,88 @@ describe "Ex", ->
         keydown(':')
         submitCommandModeInputText('tabprevious')
         expect(pane.getActiveItemIndex()).toBe(2)
+
+    describe ":update", ->
+      it "acts as an alias to :write", ->
+        spyOn(vimState.globalVimState.exCommands.commands.update, 'callback')
+          .andCallThrough()
+        spyOn(vimState.globalVimState.exCommands.commands.write, 'callback')
+        keydown(':')
+        submitCommandModeInputText('update')
+        expect(vimState.globalVimState.exCommands.commands.write.callback)
+          .toHaveBeenCalledWith(vimState.globalVimState.exCommands.commands
+            .update.callback.calls[0].args[0])
+
+    describe ":wall", ->
+      it "saves all open files", ->
+        spyOn(atom.workspace, 'saveAll')
+        keydown(':')
+        submitCommandModeInputText('wall')
+        expect(atom.workspace.saveAll).toHaveBeenCalled()
+
+    describe ":wq", ->
+      beforeEach ->
+        spyOn(vimState.globalVimState.exCommands.commands.write, 'callback')
+          .andCallThrough()
+        spyOn(vimState.globalVimState.exCommands.commands.quit, 'callback')
+
+      it "writes the file, then quits", ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(projectPath('wq-1'))
+        keydown(':')
+        submitCommandModeInputText('wq')
+        expect(vimState.globalVimState.exCommands.commands.write.callback)
+          .toHaveBeenCalled()
+        # Since `:wq` only calls `:quit` after `:write` is finished, we need to
+        #  wait a bit for the `:quit` call to occur
+        waitsFor((->
+          vimState.globalVimState.exCommands.commands.quit.callback.wasCalled),
+          "The :quit command should have been called", 100)
+
+      it "doesn't quit when the file is new and no path is specified in the save dialog", ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(undefined)
+        keydown(':')
+        submitCommandModeInputText('wq')
+        expect(vimState.globalVimState.exCommands.commands.write.callback)
+          .toHaveBeenCalled()
+        wasNotCalled = false
+        # FIXME: This seems dangerous, but setTimeout somehow doesn't work.
+        setImmediate((->
+          wasNotCalled = not vimState.globalVimState.exCommands.commands.quit
+            .callback.wasCalled))
+        waitsFor((-> wasNotCalled), 100)
+
+      it "passes the file name", ->
+        keydown(':')
+        submitCommandModeInputText('wq wq-2')
+        expect(vimState.globalVimState.exCommands.commands.write.callback)
+          .toHaveBeenCalled()
+        expect(vimState.globalVimState.exCommands.commands.write.callback
+          .calls[0].args[0].args).toEqual('wq-2')
+        waitsFor((->
+          vimState.globalVimState.exCommands.commands.quit.callback.wasCalled),
+          "The :quit command should have been called", 100)
+
+    describe ":xit", ->
+      it "acts as an alias to :wq", ->
+        spyOn(vimState.globalVimState.exCommands.commands.wq, 'callback')
+        keydown(':')
+        submitCommandModeInputText('xit')
+        expect(vimState.globalVimState.exCommands.commands.wq.callback)
+          .toHaveBeenCalled()
+
+    describe ":exit", ->
+      it "is an alias to :xit", ->
+        spyOn(vimState.globalVimState.exCommands.commands.xit, 'callback')
+        keydown(':')
+        submitCommandModeInputText('exit')
+        expect(vimState.globalVimState.exCommands.commands.xit.callback)
+          .toHaveBeenCalled()
+
+    describe ":xall", ->
+      it "saves all open files and closes the window", ->
+        spyOn(atom.workspace, 'saveAll')
+        spyOn(atom, 'close')
+        keydown(':')
+        submitCommandModeInputText('xall')
+        expect(atom.workspace.saveAll).toHaveBeenCalled()
+        expect(atom.close).toHaveBeenCalled()
