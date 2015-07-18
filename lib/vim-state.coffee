@@ -39,10 +39,15 @@ class VimState
     @subscriptions.add atom.keymaps.onDidFailToMatchBinding (e) =>
       return unless e.keyboardEventTarget is @editorElement
       return if Utils.isAtomModifier(e.keystrokes)
-      
-      atom.keymaps.cancelPendingState()
+
       if @mode is 'operator-pending'
+        atom.keymaps.cancelPendingState()
+        atom.beep()
         @resetCommandMode()
+
+      if @mode is 'visual'
+        atom.keymaps.cancelPendingState()
+        atom.beep()
 
     @editorElement.classList.add("vim-mode")
     @setupCommandMode()
