@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "underscore-plus": "1.x",
-    "event-kit": "^0.7.2"
+    "event-kit": "^0.7.2",
+    "fs-plus": "^2.2.8"
   },
   "consumedServices": {
     "status-bar": {
@@ -29,6 +30,7 @@
     }
   },
   "devDependencies": {
-    "coffeelint": "^1.10.1"
+    "coffeelint": "^1.10.1",
+    "node-uuid": "^1.4.2"
   }
 }

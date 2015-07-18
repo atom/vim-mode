@@ -1,4 +1,6 @@
 _ = require 'underscore-plus'
+fs = require 'fs-plus'
+path = require 'path'
 settings = require './settings'
 
 getSearchTerm = (term) ->
@@ -61,6 +63,25 @@ module.exports =
       rangesAfter.concat(rangesBefore).reverse()
     else
       rangesAfter.concat(rangesBefore)
+
+  # Public: Save the given editor's contents at a given path
+  #
+  # filePath - The path to save the file at
+  # editor - The TextEditor of which to save the text
+  saveAs: (filePath, editor) ->
+    fs.writeFileSync(filePath, editor.getText())
+
+  # Public: Get the full path for a given relative path, expanding `~` to the
+  #  home directory and using the first project path as root path for relative
+  #  paths
+  #
+  # filePath - The relative path to expand
+  #
+  # Returns the expanded path
+  getFullPath: (filePath) ->
+    filePath = fs.normalize(filePath)
+    return filePath if path.isAbsolute(filePath)
+    return path.join(atom.project.getPaths()[0], filePath)
 
   # Public: Makes a RegExp from a term. Respects the Smartcase setting and \c
   #

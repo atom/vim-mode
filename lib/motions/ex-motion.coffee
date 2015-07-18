@@ -1,9 +1,39 @@
 _ = require 'underscore-plus'
+fs = require 'fs-plus'
 {MotionWithInput} = require './general-motions'
 {ViewModelWithHistory} = require '../view-models/view-model-with-history'
-{scanEditor} = require '../utils'
+{scanEditor, saveAs, getFullPath} = require '../utils'
 
 cmp = (x, y) -> if x > y then 1 else if x < y then -1 else 0
+
+trySave = (func) ->
+  deferred = Promise.defer()
+
+  try
+    func()
+    deferred.resolve()
+  catch error
+    if error.message.endsWith('is a directory')
+      atom.notifications.addWarning("Unable to save file: #{error.message}")
+    else if error.path?
+      if error.code is 'EACCES'
+        atom.notifications
+          .addWarning("Unable to save file: Permission denied '#{error.path}'")
+      else if error.code in ['EPERM', 'EBUSY', 'UNKNOWN', 'EEXIST']
+        atom.notifications.addWarning("Unable to save file '#{error.path}'",
+          detail: error.message)
+      else if error.code is 'EROFS'
+        atom.notifications.addWarning(
+          "Unable to save file: Read-only file system '#{error.path}'")
+    else if (errorMatch =
+        /ENOTDIR, not a directory '([^']+)'/.exec(error.message))
+      fileName = errorMatch[1]
+      atom.notifications.addWarning("Unable to save file: A directory in the "+
+        "path '#{fileName}' could not be written to")
+    else
+      throw error
+
+  deferred.promise
 
 class CommandError
   constructor: (@message) ->
@@ -13,21 +43,51 @@ class ExMode extends MotionWithInput
 
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @commands = {}
-    @viewModel = new ViewModelWithHistory(this, 'ex')
-    @registerCommands
+    @commands =
       'quit':
         priority: 1000
-        fn: ->
+        callback: ->
           atom.workspace.getActivePane().destroyActiveItem()
       'tabnext':
         priority: 1000
-        fn: ->
+        callback: ->
           atom.workspace.getActivePane().activateNextItem()
       'tabprevious':
         priority: 1000
-        fn: ->
+        callback: ->
           atom.workspace.getActivePane().activatePreviousItem()
+      'write':
+        priority: 1001
+        callback: ({args}) =>
+          if args[0] is '!'
+            force = true
+            args = args[1..]
+
+          filePath = args.trimLeft()
+          if /[^\\] /.test(filePath)
+            throw new CommandError('Only one file name allowed')
+          filePath = filePath.replace('\\ ', ' ')
+
+          deferred = Promise.defer()
+
+          if filePath.length isnt 0
+            fullPath = getFullPath(filePath)
+          else if @editor.getPath()?
+            trySave(=> @editor.save())
+              .then(deferred.reolve)
+          else
+            fullPath = atom.showSaveDialogSync()
+
+          if fullPath?
+            if not force and fullPath isnt @editor.getPath() and \
+                fs.existsSync(fullPath)
+              throw new CommandError("File exists (add ! to override)")
+            trySave(=> saveAs(fullPath, @editor))
+              .then(deferred.resolve)
+
+          deferred.promise
+
+    @viewModel = new ViewModelWithHistory(this, 'ex')
 
   registerCommand: (name, priority, fn) ->
     @commands[name] =
@@ -198,15 +258,15 @@ class ExMode extends MotionWithInput
     unless command?
       throw new CommandError("Not an editor command: #{_commandLine}")
 
-    return [range, command?.fn, args.trimLeft()]
+    return [range, command?.callback, args.trimLeft()]
 
   moveCursor: (cursor, count=1) ->
     try
       [range, command, args] = @parse(@input.characters, cursor)
+      command?({args, range, @vimState})
     catch e
       unless e instanceof CommandError
         throw e
       atom.notifications.addError("Command Error: #{e.message}")
-    command?(args, range, @vimState)
 
 module.exports = ExMode
