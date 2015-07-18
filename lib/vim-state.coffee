@@ -44,6 +44,12 @@ class VimState
     else
       @activateNormalMode()
 
+    @subscriptions.add atom.keymaps.onDidFailToMatchBinding (e) =>
+      return unless e.keyboardEventTarget is @editorElement
+      return if Utils.isAtomModifier(e.keystrokes)
+      if e.keystrokes.indexOf(' ') < 0 and @mode isnt "insert"
+        atom.beep()
+
   destroy: ->
     unless @destroyed
       @destroyed = true
