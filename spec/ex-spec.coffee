@@ -266,3 +266,81 @@ describe "Ex", ->
             submitCommandModeInputText("write! #{existsPath}")
             expect(atom.notifications.notifications).toEqual([])
             expect(fs.readFileSync(existsPath, 'utf-8')).toEqual('abc\ndef')
+
+    describe ":quit", ->
+      pane = null
+      beforeEach ->
+        waitsForPromise ->
+          pane = atom.workspace.getActivePane()
+          spyOn(pane, 'destroyActiveItem')
+            .andCallThrough()
+          atom.workspace.open()
+
+      it "closes the active pane item if not modified", ->
+        keydown(':')
+        submitCommandModeInputText('quit')
+        expect(pane.destroyActiveItem).toHaveBeenCalled()
+
+      describe "when the active pane item is modified", ->
+        beforeEach ->
+          editor.getBuffer().setText('def')
+
+        it "opens the prompt to save", ->
+          spyOn(pane, 'promptToSaveItem')
+          keydown(':')
+          submitCommandModeInputText('quit')
+          expect(pane.promptToSaveItem).toHaveBeenCalled()
+
+        it "doesn't close the active pane item if Cancel is clicked", ->
+          spyOn(pane, 'promptToSaveItem').andReturn(false)
+          keydown(':')
+          submitCommandModeInputText('quit')
+          expect(pane.promptToSaveItem).toHaveBeenCalled()
+          expect(pane.getItems().length).toBe(1)
+
+        it "closes the active pane item if Save or Don't Save is clicked", ->
+          spyOn(pane, 'promptToSaveItem').andReturn(true)
+          keydown(':')
+          submitCommandModeInputText('quit')
+          expect(pane.promptToSaveItem).toHaveBeenCalled()
+          expect(pane.getItems().length).toBe(0)
+
+    describe ":tabnext", ->
+      pane = null
+      beforeEach ->
+        waitsForPromise ->
+          pane = atom.workspace.getActivePane()
+          atom.workspace.open().then -> atom.workspace.open()
+            .then -> atom.workspace.open()
+
+      it "switches to the next tab", ->
+        pane.activateItemAtIndex(1)
+        keydown(':')
+        submitCommandModeInputText('tabnext')
+        expect(pane.getActiveItemIndex()).toBe(2)
+
+      it "wraps around", ->
+        pane.activateItemAtIndex(2)
+        keydown(':')
+        submitCommandModeInputText('tabnext')
+        expect(pane.getActiveItemIndex()).toBe(0)
+
+    describe ":tabprevious", ->
+      pane = null
+      beforeEach ->
+        waitsForPromise ->
+          pane = atom.workspace.getActivePane()
+          atom.workspace.open().then -> atom.workspace.open()
+            .then -> atom.workspace.open()
+
+      it "switches to the previous tab", ->
+        pane.activateItemAtIndex(1)
+        keydown(':')
+        submitCommandModeInputText('tabprevious')
+        expect(pane.getActiveItemIndex()).toBe(0)
+
+      it "wraps around", ->
+        pane.activateItemAtIndex(0)
+        keydown(':')
+        submitCommandModeInputText('tabprevious')
+        expect(pane.getActiveItemIndex()).toBe(2)
