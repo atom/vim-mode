@@ -441,3 +441,96 @@ describe "Ex", ->
         submitCommandModeInputText('xall')
         expect(atom.workspace.saveAll).toHaveBeenCalled()
         expect(atom.close).toHaveBeenCalled()
+
+    describe ":edit", ->
+      describe "without a file name", ->
+        it "reloads the file from the disk", ->
+          filePath = projectPath("edit-1")
+          editor.getBuffer().setText('abc')
+          editor.saveAs(filePath)
+          fs.writeFileSync(filePath, 'def')
+          keydown(':')
+          submitCommandModeInputText('edit')
+          # Reloading takes a bit
+          waitsFor((-> editor.getText() is 'def'),
+            "the editor's content to change", 50)
+
+        it "doesn't reload when the file has been modified", ->
+          filePath = projectPath("edit-2")
+          editor.getBuffer().setText('abc')
+          editor.saveAs(filePath)
+          editor.getBuffer().setText('abcd')
+          fs.writeFileSync(filePath, 'def')
+          keydown(':')
+          submitCommandModeInputText('edit')
+          expect(atom.notifications.notifications[0].message).toEqual(
+            'Command Error: No write since last change (add ! to override)')
+          isntDef = false
+          setImmediate(-> isntDef = editor.getText() isnt 'def')
+          waitsFor((-> isntDef), "the editor's content not to change", 50)
+
+        it "reloads when the file has been modified and it is forced", ->
+          filePath = projectPath("edit-3")
+          editor.getBuffer().setText('abc')
+          editor.saveAs(filePath)
+          editor.getBuffer().setText('abcd')
+          fs.writeFileSync(filePath, 'def')
+          keydown(':')
+          submitCommandModeInputText('edit!')
+          expect(atom.notifications.notifications.length).toBe(0)
+          waitsFor((-> editor.getText() is 'def')
+            "the editor's content to change", 50)
+
+        it "throws an error when editing a new file", ->
+          editor.getBuffer().reload()
+          keydown(':')
+          submitCommandModeInputText('edit')
+          expect(atom.notifications.notifications[0].message).toEqual(
+            'Command Error: No file name')
+          keydown(':')
+          submitCommandModeInputText('edit!')
+          expect(atom.notifications.notifications[1].message).toEqual(
+            'Command Error: No file name')
+
+      describe "with a file name", ->
+        beforeEach ->
+          spyOn(atom.workspace, 'open')
+          editor.getBuffer().reload()
+
+        it "opens the specified path", ->
+          filePath = projectPath('edit-new-test')
+          keydown(':')
+          submitCommandModeInputText("edit #{filePath}")
+          expect(atom.workspace.open).toHaveBeenCalledWith(filePath)
+
+        it "allows for spaces in file names if escaped with \\", ->
+          filePath = projectPath('edit\\ new\\ test')
+          keydown(':')
+          submitCommandModeInputText(
+            "edit #{projectPath('edit\\ new\\ test')}")
+          expect(atom.workspace.open).toHaveBeenCalledWith(
+            projectPath('edit new test'))
+
+        it "opens a relative path", ->
+          keydown(':')
+          submitCommandModeInputText('edit edit-relative-test')
+          expect(atom.workspace.open).toHaveBeenCalledWith(
+            projectPath('edit-relative-test'))
+
+        it "throws an error if trying to open more than one file", ->
+          keydown(':')
+          submitCommandModeInputText('edit edit-new-test-1 edit-new-test-2')
+          expect(atom.workspace.open.callCount).toBe(0)
+          expect(atom.notifications.notifications[0].message).toEqual(
+            'Command Error: Only one file name allowed')
+
+    describe ":tabedit", ->
+      it "acts as an alias to :edit", ->
+        spyOn(vimState.globalVimState.exCommands.commands.tabedit, 'callback')
+          .andCallThrough()
+        spyOn(vimState.globalVimState.exCommands.commands.edit, 'callback')
+        keydown(':')
+        submitCommandModeInputText('tabedit tabedit-test')
+        expect(vimState.globalVimState.exCommands.commands.edit.callback)
+          .toHaveBeenCalledWith(vimState.globalVimState.exCommands.commands
+            .tabedit.callback.calls[0].args[0])

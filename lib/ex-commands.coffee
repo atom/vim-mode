@@ -44,11 +44,11 @@ module.exports =
           atom.close()
       'tabnext':
         priority: 1000
-        callback: ({editor}) ->
+        callback: ->
           atom.workspace.getActivePane().activateNextItem()
       'tabprevious':
         priority: 1000
-        callback: ({editor}) ->
+        callback: ->
           atom.workspace.getActivePane().activatePreviousItem()
       'write':
         priority: 1001
@@ -60,7 +60,7 @@ module.exports =
           filePath = args.trimLeft()
           if /[^\\] /.test(filePath)
             throw new CommandError('Only one file name allowed')
-          filePath = filePath.replace('\\ ', ' ')
+          filePath = filePath.replace(/\\ /g, ' ')
 
           deferred = Promise.defer()
 
@@ -104,7 +104,39 @@ module.exports =
         priority: 1000
         callback: (ev) =>
           atom.workspace.saveAll()
-          @callCommand('qall')
+          @callCommand('qall', ev)
+      'edit':
+        priority: 1001
+        callback: ({args, editor}) ->
+          args = args.trim()
+          if args[0] is '!'
+            force = true
+            args = args[1..]
+
+          if editor.isModified() and not force
+            throw new CommandError(
+              'No write since last change (add ! to override)')
+
+          filePath = args.trimLeft()
+          if /[^\\] /.test(filePath)
+            throw new CommandError('Only one file name allowed')
+          filePath = filePath.replace(/\\ /g, ' ')
+
+          if filePath.length isnt 0
+            fullPath = getFullPath(filePath)
+            if fullPath is editor.getPath()
+              editor.getBuffer().reload()
+            else
+              atom.workspace.open(fullPath)
+          else
+            if editor.getPath()?
+              editor.getBuffer().reload()
+            else
+              throw new CommandError('No file name')
+      'tabedit':
+        priority: 1000
+        callback: (ev) =>
+          @callCommand('edit', ev)
 
     @registerCommand: ({name, priority, callback}) =>
       @commands[name] = {priority, callback}
