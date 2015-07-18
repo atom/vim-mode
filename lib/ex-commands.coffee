@@ -38,6 +38,10 @@ module.exports =
         priority: 1000
         callback: ->
           atom.workspace.getActivePane().destroyActiveItem()
+      'tabclose':
+        priority: 1000
+        callback: (ev) =>
+          @callCommand('quit', ev)
       'qall':
         priority: 1000
         callback: ->
@@ -137,6 +141,56 @@ module.exports =
         priority: 1000
         callback: (ev) =>
           @callCommand('edit', ev)
+      'split':
+        priority: 1000
+        callback: ({args}) ->
+          filePath = args.trim()
+          if /[^\\] /.test(filePath)
+            throw new CommandError('Only one file name allowed')
+          filePath = filePath.replace(/\\ /g, ' ')
+
+          pane = atom.workspace.getActivePane()
+          if filePath.length isnt 0
+            # FIXME: This is horribly slow
+            atom.workspace.openURIInPane(getFullPath(filePath), pane.splitUp())
+          else
+            pane.splitUp(copyActiveItem: true)
+      'new':
+        priority: 1000
+        callback: ({args}) ->
+          filePath = args.trim()
+          if /[^\\] /.test(filePath)
+            throw new CommandError('Only one file name allowed')
+          filePath = filePath.replace(/\\ /g, ' ')
+          filePath = undefined if filePath.length is 0
+          # FIXME: This is horribly slow
+          atom.workspace.openURIInPane(filePath,
+            atom.workspace.getActivePane().splitUp())
+      'vsplit':
+        priority: 1000
+        callback: ({args}) ->
+          filePath = args.trim()
+          if /[^\\] /.test(filePath)
+            throw new CommandError('Only one file name allowed')
+          filePath = filePath.replace(/\\ /g, ' ')
+
+          pane = atom.workspace.getActivePane()
+          if filePath.length isnt 0
+            atom.workspace.openURIInPane(getFullPath(filePath),
+              pane.splitLeft())
+          else
+            pane.splitLeft(copyActiveItem: true)
+      'vnew':
+        priority: 1000
+        callback: ({args}) ->
+          filePath = args.trim()
+          if /[^\\] /.test(filePath)
+            throw new CommandError('Only one file name allowed')
+          filePath = filePath.replace(/\\ /g, ' ')
+          filePath = undefined if filePath.length is 0
+          # FIXME: This is horribly slow
+          atom.workspace.openURIInPane(filePath,
+            atom.workspace.getActivePane().splitLeft())
 
     @registerCommand: ({name, priority, callback}) =>
       @commands[name] = {priority, callback}

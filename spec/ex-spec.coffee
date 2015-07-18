@@ -17,6 +17,7 @@ describe "Ex", ->
       vimState = editorElement.vimState
       vimState.activateCommandMode()
       vimState.resetCommandMode()
+      editor.setText("abc\ndef\nabc\ndef")
 
   keydown = (key, options={}) ->
     options.element ?= editorElement
@@ -29,9 +30,6 @@ describe "Ex", ->
     commandEditor = editor.commandModeInputView.editorElement
     commandEditor.getModel().setText(text)
     atom.commands.dispatch(commandEditor, "core:confirm")
-
-  beforeEach ->
-    editor.setText("abc\ndef\nabc\ndef")
 
   describe "as a motion", ->
     beforeEach ->
@@ -305,6 +303,17 @@ describe "Ex", ->
           expect(pane.promptToSaveItem).toHaveBeenCalled()
           expect(pane.getItems().length).toBe(0)
 
+    describe ":tabclose", ->
+      it "acts as an alias to :quit", ->
+        spyOn(vimState.globalVimState.exCommands.commands.tabclose, 'callback')
+          .andCallThrough()
+        spyOn(vimState.globalVimState.exCommands.commands.quit, 'callback')
+        keydown(':')
+        submitCommandModeInputText('tabclose')
+        expect(vimState.globalVimState.exCommands.commands.quit.callback)
+          .toHaveBeenCalledWith(vimState.globalVimState.exCommands.commands
+            .tabclose.callback.calls[0].args[0])
+
     describe ":qall", ->
       beforeEach ->
         waitsForPromise ->
@@ -534,3 +543,45 @@ describe "Ex", ->
         expect(vimState.globalVimState.exCommands.commands.edit.callback)
           .toHaveBeenCalledWith(vimState.globalVimState.exCommands.commands
             .tabedit.callback.calls[0].args[0])
+
+    describe ":split", ->
+      it "splits the current file upwards", ->
+        pane = atom.workspace.getActivePane()
+        spyOn(pane, 'splitUp').andCallThrough()
+        filePath = projectPath('split')
+        editor.saveAs(filePath)
+        keydown(':')
+        submitCommandModeInputText('split')
+        expect(pane.splitUp).toHaveBeenCalled()
+        # FIXME: Should test whether the new pane contains a TextEditor
+        #        pointing to the same path
+
+    describe ":new", ->
+      it "splits a new file upwards", ->
+        pane = atom.workspace.getActivePane()
+        spyOn(pane, 'splitUp').andCallThrough()
+        keydown(':')
+        submitCommandModeInputText('new')
+        expect(pane.splitUp).toHaveBeenCalled()
+        # FIXME: Should test whether the new pane contains an empty file
+
+    describe ":vsplit", ->
+      it "splits the current file to the left", ->
+        pane = atom.workspace.getActivePane()
+        spyOn(pane, 'splitLeft').andCallThrough()
+        filePath = projectPath('vsplit')
+        editor.saveAs(filePath)
+        keydown(':')
+        submitCommandModeInputText('vsplit')
+        expect(pane.splitLeft).toHaveBeenCalled()
+        # FIXME: Should test whether the new pane contains a TextEditor
+        #        pointing to the same path
+
+    describe ":vnew", ->
+      it "splits a new file to the left", ->
+        pane = atom.workspace.getActivePane()
+        spyOn(pane, 'splitLeft').andCallThrough()
+        keydown(':')
+        submitCommandModeInputText('vnew')
+        expect(pane.splitLeft).toHaveBeenCalled()
+        # FIXME: Should test whether the new pane contains an empty file
