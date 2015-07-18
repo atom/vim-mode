@@ -585,3 +585,31 @@ describe "Ex", ->
         submitCommandModeInputText('vnew')
         expect(pane.splitLeft).toHaveBeenCalled()
         # FIXME: Should test whether the new pane contains an empty file
+
+    describe ":delete", ->
+      beforeEach ->
+        editor.setText('abc\ndef\nghi\njkl')
+        editor.setCursorBufferPosition([2, 0])
+
+      it "deletes the current line", ->
+        keydown(':')
+        submitCommandModeInputText('delete')
+        expect(editor.getText()).toEqual('abc\ndef\njkl')
+
+      it "deletes the lines in the given range", ->
+        keydown(':')
+        submitCommandModeInputText('1,2delete')
+        expect(editor.getText()).toEqual('ghi\njkl')
+
+        editor.setText('abc\ndef\nghi\njkl')
+        editor.setCursorBufferPosition([1, 1])
+        keydown(':')
+        submitCommandModeInputText(',/k/delete')
+        expect(editor.getText()).toEqual('abc\n')
+
+      it "undos deleting several lines at once", ->
+        keydown(':')
+        submitCommandModeInputText('-1,delete')
+        expect(editor.getText()).toEqual('abc\njkl')
+        keydown('u')
+        expect(editor.getText()).toEqual('abc\ndef\nghi\njkl')

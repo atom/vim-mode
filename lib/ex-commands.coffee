@@ -191,6 +191,11 @@ module.exports =
           # FIXME: This is horribly slow
           atom.workspace.openURIInPane(filePath,
             atom.workspace.getActivePane().splitLeft())
+      'delete':
+        priority: 1000
+        callback: ({range, editor}) ->
+          range = [[range[0], 0], [range[1] + 1, 0]]
+          editor.setTextInBufferRange(range, '')
 
     @registerCommand: ({name, priority, callback}) =>
       @commands[name] = {priority, callback}

@@ -15,7 +15,7 @@ class ExMode extends MotionWithInput
 
   parseAddress: (str, cursor) ->
     row = cursor.getBufferRow()
-    if str is '.'
+    if str in ['', '.']
       addr = row
     else if str is '$'
       # Lines are 0-indexed in Atom, but 1-indexed in vim.
@@ -96,7 +96,8 @@ class ExMode extends MotionWithInput
         '[\[\]<>'`"^.(){}a-zA-Z]|
         /.*?[^\\](?:/|$)|
         \?.*?[^\\](?:\?|$)|
-        [+-]\d*
+        [+-]\d*|
+                                  # Empty second address
         )((?:\s*[+-]\d*)*)
         )?
       ///
