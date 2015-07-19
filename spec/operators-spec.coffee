@@ -737,8 +737,7 @@ describe "Operators", ->
           keydown('c')
           keydown('%')
           editor.insertText('x')
-          # this differs from VIM, which deletes the character originally under cursor
-          expect(editor.getText()).toBe("12345x67)8\nabcx)e\nAx)BCDE")
+          expect(editor.getText()).toBe("12345x7)8\nabcxe\nAxBCDE")
           expect(vimState.mode).toBe "insert"
 
       describe "after or without brackets", ->
@@ -774,15 +773,13 @@ describe "Operators", ->
         it "repeats correctly inside brackets", ->
           editor.setCursorScreenPosition([1, 4])
           keydown('.')
-          # this differs from VIM, which deletes the character originally under cursor
-          expect(editor.getText()).toBe("1x8\nabcxd)e\nA()BCDE")
+          expect(editor.getText()).toBe("1x8\nabcx)e\nA()BCDE")
           expect(vimState.mode).toBe "normal"
 
         it "repeats correctly on the closing bracket", ->
           editor.setCursorScreenPosition([1, 5])
           keydown('.')
-          # this differs from VIM, which deletes the character originally under cursor
-          expect(editor.getText()).toBe("1x8\nabcx)e\nA()BCDE")
+          expect(editor.getText()).toBe("1x8\nabcxe\nA()BCDE")
           expect(vimState.mode).toBe "normal"
 
         it "does nothing when repeated after a bracket", ->
