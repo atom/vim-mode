@@ -1,5 +1,5 @@
 fs = require 'fs-plus'
-{saveAs, getFullPath} = require './utils'
+{saveAs, getFullPath, replaceGroups, getSearchTerm} = require './utils'
 CommandError = require './command-error'
 
 trySave = (func) ->
@@ -176,6 +176,7 @@ module.exports =
 
           pane = atom.workspace.getActivePane()
           if filePath.length isnt 0
+            # FIXME: This is horribly slow
             atom.workspace.openURIInPane(getFullPath(filePath),
               pane.splitLeft())
           else
@@ -196,6 +197,66 @@ module.exports =
         callback: ({range, editor}) ->
           range = [[range[0], 0], [range[1] + 1, 0]]
           editor.setTextInBufferRange(range, '')
+      'substitute':
+        priority: 1001
+        callback: ({range, args, editor, vimState}) ->
+          args_ = args.trimLeft()
+          delim = args_[0]
+          if /[a-z]/i.test(delim)
+            throw new CommandError(
+              "Regular expressions can't be delimited by letters")
+          if delim is '\\'
+            throw new CommandError(
+              "Regular expressions can't be delimited by \\")
+          args_ = args_[1..]
+          parsed = ['', '', '']
+          parsing = 0
+          escaped = false
+          while (char = args_[0])?
+            args_ = args_[1..]
+            if char is delim
+              if not escaped
+                parsing++
+                if parsing > 2
+                  throw new CommandError('Trailing characters')
+              else
+                parsed[parsing] = parsed[parsing][...-1]
+            else if char is '\\' and not escaped
+              parsed[parsing] += char
+              escaped = true
+            else
+              escaped = false
+              parsed[parsing] += char
+
+          [pattern, substition, flags] = parsed
+          if pattern is ''
+            pattern = vimState.getCustomHistoryItem('search', 0)
+            if not pattern?
+              atom.beep()
+              throw new CommandError('No previous regular expression')
+          else
+            vimState.pushCustomHistory('search', pattern)
+
+          try
+            flagsObj = {}
+            flags.split('').forEach((flag) -> flagsObj[flag] = true)
+            patternRE = getSearchTerm(pattern, flagsObj)
+          catch e
+            if e.message.indexOf('Invalid flags supplied to RegExp constructor') is 0
+              throw new CommandError("Invalid flags: #{e.message[45..]}")
+            else if e.message.indexOf('Invalid regular expression: ') is 0
+              throw new CommandError("Invalid RegEx: #{e.message[27..]}")
+            else
+              throw e
+
+          editor.transact ->
+            for line in [range[0]..range[1]]
+              editor.scanInBufferRange(
+                patternRE,
+                [[line, 0], [line + 1, 0]],
+                ({match, replace}) ->
+                  replace(replaceGroups(match[..], substition))
+              )
 
     @registerCommand: ({name, priority, callback}) =>
       @commands[name] = {priority, callback}

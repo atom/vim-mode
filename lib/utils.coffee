@@ -3,14 +3,32 @@ fs = require 'fs-plus'
 path = require 'path'
 settings = require './settings'
 
-getSearchTerm = (term) ->
-  modifiers = {'g': true}
+getSearchTerm = (term, modifiers = {'g': true}) ->
 
-  if not term.match('[A-Z]') and settings.useSmartcaseForSearch()
-    modifiers['i'] = true
+  escaped = false
+  hasc = false
+  hasC = false
+  term_ = term
+  term = ''
+  for char in term_
+    if char is '\\' and not escaped
+      escaped = true
+      term += char
+    else
+      if char is 'c' and escaped
+        hasc = true
+        term = term[...-1]
+      else if char is 'C' and escaped
+        hasC = true
+        term = term[...-1]
+      else if char isnt '\\'
+        term += char
+      escaped = false
 
-  if term.indexOf('\\c') >= 0
-    term = term.replace('\\c', '')
+  if hasC
+    modifiers['i'] = false
+  if (not hasC and not term.match('[A-Z]') and \
+      settings.useSmartcaseForSearch()) or hasc
     modifiers['i'] = true
 
   modFlags = Object.keys(modifiers).filter((key) -> modifiers[key]).join('')
@@ -82,6 +100,33 @@ module.exports =
     filePath = fs.normalize(filePath)
     return filePath if path.isAbsolute(filePath)
     return path.join(atom.project.getPaths()[0], filePath)
+
+  # Public: Replace vim style capturing groups (\1, \2 etc.) with the matched
+  #  groups
+  #
+  # groups - An Array of the matched groups
+  # string - The string containing \1, \2 etc.
+  #
+  # Returns `string` with all capturing groups replaced by the corresponding
+  #  entry in `groups` (or '' if there is no corresponding entry)
+  replaceGroups: (groups, string) ->
+    replaced = ''
+    escaped = false
+    while (char = string[0])?
+      string = string[1..]
+      if char is '\\' and not escaped
+        escaped = true
+      else if /\d/.test(char) and escaped
+        console.debug "replacing group #{char}"
+        escaped = false
+        group = groups[parseInt(char)]
+        group ?= ''
+        replaced += group
+      else
+        escaped = false
+        replaced += char
+
+    replaced
 
   # Public: Makes a RegExp from a term. Respects the Smartcase setting and \c
   #

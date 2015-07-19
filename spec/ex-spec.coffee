@@ -613,3 +613,138 @@ describe "Ex", ->
         expect(editor.getText()).toEqual('abc\njkl')
         keydown('u')
         expect(editor.getText()).toEqual('abc\ndef\nghi\njkl')
+
+    describe ":substitute", ->
+      beforeEach ->
+        editor.setText('abcaABC\ndefdDEF\nabcaABC')
+        editor.setCursorBufferPosition([0, 0])
+
+      it "replaces a character on the current line", ->
+        keydown(':')
+        submitCommandModeInputText(':substitute /a/x')
+        expect(editor.getText()).toEqual('xbcaABC\ndefdDEF\nabcaABC')
+
+      it "doesn't need a space before the arguments", ->
+        keydown(':')
+        submitCommandModeInputText(':substitute/a/x')
+        expect(editor.getText()).toEqual('xbcaABC\ndefdDEF\nabcaABC')
+
+      it "respects modifiers passed to it", ->
+        keydown(':')
+        submitCommandModeInputText(':substitute/a/x/g')
+        expect(editor.getText()).toEqual('xbcxABC\ndefdDEF\nabcaABC')
+
+        keydown(':')
+        submitCommandModeInputText(':substitute/a/x/gi')
+        expect(editor.getText()).toEqual('xbcxxBC\ndefdDEF\nabcaABC')
+
+      it "replaces on multiple lines", ->
+        keydown(':')
+        submitCommandModeInputText(':%substitute/abc/ghi')
+        expect(editor.getText()).toEqual('ghiaABC\ndefdDEF\nghiaABC')
+
+        keydown(':')
+        submitCommandModeInputText(':%substitute/abc/ghi/ig')
+        expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nghiaghi')
+
+      it "can't be delimited by letters or \\", ->
+        keydown(':')
+        submitCommandModeInputText(':substitute nanxngi')
+        expect(atom.notifications.notifications[0].message).toEqual(
+          "Command Error: Regular expressions can't be delimited by letters")
+        expect(editor.getText()).toEqual('abcaABC\ndefdDEF\nabcaABC')
+
+        keydown(':')
+        submitCommandModeInputText(':substitute\\a\\x\\gi')
+        expect(atom.notifications.notifications[1].message).toEqual(
+          "Command Error: Regular expressions can't be delimited by \\")
+        expect(editor.getText()).toEqual('abcaABC\ndefdDEF\nabcaABC')
+
+      describe "case sensitivity", ->
+        describe "respects the smartcase setting", ->
+          beforeEach ->
+            editor.setText('abcaABC\ndefdDEF\nabcaABC')
+
+          it "uses case sensitive search if smartcase is off and the pattern is lowercase", ->
+            atom.config.set('vim-mode.useSmartcaseForSearch', false)
+            keydown(':')
+            submitCommandModeInputText(':substitute/abc/ghi/g')
+            expect(editor.getText()).toEqual('ghiaABC\ndefdDEF\nabcaABC')
+
+          it "uses case sensitive search if smartcase is off and the pattern is uppercase", ->
+            editor.setText('abcaABC\ndefdDEF\nabcaABC')
+            keydown(':')
+            submitCommandModeInputText(':substitute/ABC/ghi/g')
+            expect(editor.getText()).toEqual('abcaghi\ndefdDEF\nabcaABC')
+
+          it "uses case insensitive search if smartcase is on and the pattern is lowercase", ->
+            editor.setText('abcaABC\ndefdDEF\nabcaABC')
+            atom.config.set('vim-mode.useSmartcaseForSearch', true)
+            keydown(':')
+            submitCommandModeInputText(':substitute/abc/ghi/g')
+            expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+          it "uses case sensitive search if smartcase is on and the pattern is uppercase", ->
+            editor.setText('abcaABC\ndefdDEF\nabcaABC')
+            keydown(':')
+            submitCommandModeInputText(':substitute/ABC/ghi/g')
+            expect(editor.getText()).toEqual('abcaghi\ndefdDEF\nabcaABC')
+
+        describe "\\c and \\C in the pattern", ->
+          beforeEach ->
+            editor.setText('abcaABC\ndefdDEF\nabcaABC')
+
+          it "uses case insensitive search if smartcase is off and \c is in the pattern", ->
+            atom.config.set('vim-mode.useSmartcaseForSearch', false)
+            keydown(':')
+            submitCommandModeInputText(':substitute/abc\\c/ghi/g')
+            expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+          it "doesn't matter where in the pattern \\c is", ->
+            atom.config.set('vim-mode.useSmartcaseForSearch', false)
+            keydown(':')
+            submitCommandModeInputText(':substitute/a\\cbc/ghi/g')
+            expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+          it "uses case sensitive search if smartcase is on, \\C is in the pattern and the pattern is lowercase", ->
+            atom.config.set('vim-mode.useSmartcaseForSearch', true)
+            keydown(':')
+            submitCommandModeInputText(':substitute/a\\Cbc/ghi/g')
+            expect(editor.getText()).toEqual('ghiaABC\ndefdDEF\nabcaABC')
+
+          it "overrides \\C with \\c if \\C comes first", ->
+            atom.config.set('vim-mode.useSmartcaseForSearch', true)
+            keydown(':')
+            submitCommandModeInputText(':substitute/a\\Cb\\cc/ghi/g')
+            expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+          it "overrides \\C with \\c if \\c comes first", ->
+            atom.config.set('vim-mode.useSmartcaseForSearch', true)
+            keydown(':')
+            submitCommandModeInputText(':substitute/a\\cb\\Cc/ghi/g')
+            expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+          it "overrides an appended /i flag with \\C", ->
+            atom.config.set('vim-mode.useSmartcaseForSearch', true)
+            keydown(':')
+            submitCommandModeInputText(':substitute/ab\\Cc/ghi/gi')
+            expect(editor.getText()).toEqual('ghiaABC\ndefdDEF\nabcaABC')
+
+      describe "capturing groups", ->
+        beforeEach ->
+          editor.setText('abcaABC\ndefdDEF\nabcaABC')
+
+        it "replaces \\1 with the first group", ->
+          keydown(':')
+          submitCommandModeInputText(':substitute/bc(.{2})/X\\1X')
+          expect(editor.getText()).toEqual('aXaAXBC\ndefdDEF\nabcaABC')
+
+        it "replaces multiple groups", ->
+          keydown(':')
+          submitCommandModeInputText(':substitute/a([a-z]*)aA([A-Z]*)/X\\1XY\\2Y')
+          expect(editor.getText()).toEqual('XbcXYBCY\ndefdDEF\nabcaABC')
+
+        it "replaces \\0 with the entire match", ->
+          keydown(':')
+          submitCommandModeInputText(':substitute/ab(ca)AB/X\\0X')
+          expect(editor.getText()).toEqual('XabcaABXC\ndefdDEF\nabcaABC')
