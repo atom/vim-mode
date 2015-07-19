@@ -85,6 +85,12 @@ class Motion
       if wasReversed and not wasEmpty and not isReversed
         selection.setBufferRange([[newStart.row, oldEnd.column - 1], newEnd])
 
+      # keep a single-character selection non-reversed
+      range = selection.getBufferRange()
+      [newStart, newEnd] = [range.start, range.end]
+      if selection.isReversed() and newStart.row is newEnd.row and newStart.column + 1 is newEnd.column
+        selection.setBufferRange(range, reversed: false)
+
   moveSelection: (selection, count, options) ->
     selection.modifySelection => @moveCursor(selection.cursor, count, options)
 

@@ -254,7 +254,6 @@ describe "VimState", ->
         expect(editor.getSelectedText()).toBe("t")
 
         keydown("l")
-        keydown("l")
         expect(editor.getSelectedText()).toBe("tw")
 
     describe "operators", ->
