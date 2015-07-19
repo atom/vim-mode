@@ -142,7 +142,7 @@ describe "Ex", ->
       atom.commands.dispatch(commandEditor, 'core:move-up')
       expect(commandEditor.getModel().getText()).not.toEqual('/ef')
 
-  fdescribe "command parsing", ->
+  describe "command parsing", ->
     ex = null
     beforeEach ->
       ex = new ExMode(editor, vimState)

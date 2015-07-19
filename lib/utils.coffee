@@ -117,7 +117,6 @@ module.exports =
       if char is '\\' and not escaped
         escaped = true
       else if /\d/.test(char) and escaped
-        console.debug "replacing group #{char}"
         escaped = false
         group = groups[parseInt(char)]
         group ?= ''
