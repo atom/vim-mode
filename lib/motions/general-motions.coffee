@@ -20,7 +20,9 @@ class Motion
     value = for selection in @editor.getSelections()
       if @isLinewise()
         @moveSelectionLinewise(selection, count, options)
-      else if @isInclusive()
+      else if @vimState.mode is 'visual'
+        @moveSelectionVisual(selection, count, options)
+      else if @operatesInclusively
         @moveSelectionInclusively(selection, count, options)
       else
         @moveSelection(selection, count, options)
@@ -61,10 +63,27 @@ class Motion
       selection.setBufferRange([[newStartRow, 0], [newEndRow + 1, 0]])
 
   moveSelectionInclusively: (selection, count, options) ->
+    return @moveSelectionVisual(selection, count, options) unless selection.isEmpty()
+
+    selection.modifySelection =>
+      @moveCursor(selection.cursor, count, options)
+      return if selection.isEmpty()
+
+      if selection.isReversed()
+        # for backward motion, add the original starting character of the motion
+        {start, end} = selection.getBufferRange()
+        selection.setBufferRange([start, [end.row, end.column + 1]])
+      else
+        # for forward motion, add the ending character of the motion
+        selection.cursor.moveRight()
+
+  moveSelectionVisual: (selection, count, options) ->
     selection.modifySelection =>
       range = selection.getBufferRange()
       [oldStart, oldEnd] = [range.start, range.end]
 
+      # in visual mode, atom cursor is after the last selected character,
+      # so here put cursor in the expected place for the following motion
       wasEmpty = selection.isEmpty()
       wasReversed = selection.isReversed()
       unless wasEmpty or wasReversed
@@ -72,6 +91,7 @@ class Motion
 
       @moveCursor(selection.cursor, count, options)
 
+      # put cursor back after the last character so it is also selected
       isEmpty = selection.isEmpty()
       isReversed = selection.isReversed()
       unless isEmpty or isReversed
@@ -80,10 +100,15 @@ class Motion
       range = selection.getBufferRange()
       [newStart, newEnd] = [range.start, range.end]
 
+      # if we reversed or emptied a normal selection
+      # we need to select again the last character deselected above the motion
       if (isReversed or isEmpty) and not (wasReversed or wasEmpty)
         selection.setBufferRange([newStart, [newEnd.row, oldStart.column + 1]])
+
+      # if we re-reversed a reversed non-empty selection,
+      # we need to keep the last character of the old selection selected
       if wasReversed and not wasEmpty and not isReversed
-        selection.setBufferRange([[newStart.row, oldEnd.column - 1], newEnd])
+        selection.setBufferRange([[oldEnd.row, oldEnd.column - 1], newEnd])
 
       # keep a single-character selection non-reversed
       range = selection.getBufferRange()
@@ -103,9 +128,6 @@ class Motion
       @vimState?.submode is 'linewise'
     else
       @operatesLinewise
-
-  isInclusive: ->
-    @vimState.mode is 'visual' or @operatesInclusively
 
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
