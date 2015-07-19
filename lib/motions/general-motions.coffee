@@ -11,7 +11,7 @@ class MotionError
     @name = 'Motion Error'
 
 class Motion
-  operatesInclusively: true
+  operatesInclusively: false
   operatesLinewise: false
 
   constructor: (@editor, @vimState) ->
@@ -159,15 +159,11 @@ class MotionWithInput extends Motion
     @complete = true
 
 class MoveLeft extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveLeft() if not cursor.isAtBeginningOfLine() or settings.wrapLeftRightMotion()
 
 class MoveRight extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, =>
       wrapToNextLine = settings.wrapLeftRightMotion()
@@ -196,15 +192,11 @@ class MoveDown extends Motion
         cursor.moveDown()
 
 class MoveToPreviousWord extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToBeginningOfWord()
 
 class MoveToPreviousWholeWord extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, =>
       cursor.moveToBeginningOfWord()
@@ -221,7 +213,6 @@ class MoveToPreviousWholeWord extends Motion
 
 class MoveToNextWord extends Motion
   wordRegex: null
-  operatesInclusively: false
 
   moveCursor: (cursor, count=1, options) ->
     _.times count, =>
@@ -252,6 +243,7 @@ class MoveToNextWholeWord extends MoveToNextWord
   wordRegex: WholeWordOrEmptyLineRegex
 
 class MoveToEndOfWord extends Motion
+  operatesInclusively: true
   wordRegex: null
 
   moveCursor: (cursor, count=1) ->
@@ -276,15 +268,11 @@ class MoveToEndOfWholeWord extends MoveToEndOfWord
   wordRegex: WholeWordRegex
 
 class MoveToNextParagraph extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToBeginningOfNextParagraph()
 
 class MoveToPreviousParagraph extends Motion
-  operatesInclusively: false
-  
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToBeginningOfPreviousParagraph()
@@ -316,15 +304,11 @@ class MoveToScreenLine extends MoveToLine
     cursor.setScreenPosition([@getDestinationRow(count), 0])
 
 class MoveToBeginningOfLine extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToBeginningOfLine()
 
 class MoveToFirstCharacterOfLine extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToBeginningOfLine()
@@ -340,14 +324,14 @@ class MoveToFirstCharacterOfLineAndDown extends Motion
     cursor.moveToFirstCharacterOfLine()
 
 class MoveToLastCharacterOfLine extends Motion
-  operatesInclusively: false
-
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToEndOfLine()
       cursor.goalColumn = Infinity
 
 class MoveToLastNonblankCharacterOfLineAndDown extends Motion
+  operatesInclusively: true
+
   # moves cursor to the last non-whitespace character on the line
   # similar to skipLeadingWhitespace() in atom's cursor.coffee
   skipTrailingWhitespace: (cursor) ->

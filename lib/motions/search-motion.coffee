@@ -6,8 +6,6 @@ SearchViewModel = require '../view-models/search-view-model'
 settings = require '../settings'
 
 class SearchBase extends MotionWithInput
-  operatesInclusively: false
-
   constructor: (@editor, @vimState, options = {}) ->
     super(@editor, @vimState)
     @reverse = @initiallyReversed = false

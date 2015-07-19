@@ -4,8 +4,6 @@
 
 module.exports =
 class MoveToMark extends MotionWithInput
-  operatesInclusively: false
-
   constructor: (@editor, @vimState, @linewise=true) ->
     super(@editor, @vimState)
     @operatesLinewise = @linewise
