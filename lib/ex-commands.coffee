@@ -140,7 +140,14 @@ module.exports =
       'tabedit':
         priority: 1000
         callback: (ev) =>
-          @callCommand('edit', ev)
+          if ev.args.trim() is ''
+            @callCommand('tabnew', ev)
+          else
+            @callCommand('edit', ev)
+      'tabnew':
+        priority: 1000
+        callback: ->
+          atom.workspace.open()
       'split':
         priority: 1000
         callback: ({args}) ->

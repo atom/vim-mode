@@ -3,6 +3,7 @@ path = require 'path'
 os = require 'os'
 uuid = require 'node-uuid'
 helpers = require './spec-helper'
+ExMode = require '../lib/motions/ex-motion'
 
 describe "Ex", ->
   [editor, editorElement, vimState] = []
@@ -140,6 +141,79 @@ describe "Ex", ->
       expect(commandEditor.getModel().getText()).toEqual('abc')
       atom.commands.dispatch(commandEditor, 'core:move-up')
       expect(commandEditor.getModel().getText()).not.toEqual('/ef')
+
+  fdescribe "command parsing", ->
+    ex = null
+    beforeEach ->
+      ex = new ExMode(editor, vimState)
+
+    it "parses a simple command without a range or arguments", ->
+      spyOn(vimState.globalVimState.exCommands.commands.write, 'callback')
+      parsed = ex.parse('write', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.write.callback)
+        .toHaveBeenCalled()
+
+    it "matches the beginning of a command against that command", ->
+      spyOn(vimState.globalVimState.exCommands.commands.write, 'callback')
+      parsed = ex.parse('writ', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.write.callback)
+        .toHaveBeenCalled()
+      parsed = ex.parse('w', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.write.callback)
+        .toHaveBeenCalled()
+
+    it "executes the command with the highest priority when multiple match an input", ->
+      spyOn(vimState.globalVimState.exCommands.commands.substitute, 'callback')
+      spyOn(vimState.globalVimState.exCommands.commands.split, 'callback')
+      parsed = ex.parse('s', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.substitute.callback)
+        .toHaveBeenCalled()
+      expect(vimState.globalVimState.exCommands.commands.split.callback
+        .calls.length).toBe(0)
+
+    it "parses a command with a range", ->
+      spyOn(vimState.globalVimState.exCommands.commands.delete, 'callback')
+      parsed = ex.parse('1,3delete', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.delete.callback)
+        .toHaveBeenCalled()
+      expect(parsed[0]).toEqual([0, 2])
+
+    it "parses a command with an argument when separated by a space", ->
+      spyOn(vimState.globalVimState.exCommands.commands.edit, 'callback')
+      parsed = ex.parse('edit test-file', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.edit.callback)
+        .toHaveBeenCalled()
+      expect(parsed[2]).toEqual('test-file')
+
+    it "parses a command with an argument when starting with a non-alphabetic character", ->
+      spyOn(vimState.globalVimState.exCommands.commands.edit, 'callback')
+      parsed = ex.parse('edit/tmp/test-file', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.edit.callback)
+        .toHaveBeenCalled()
+      expect(parsed[2]).toEqual('/tmp/test-file')
+
+    it "parses a complex command into range, command and arguments", ->
+      spyOn(vimState.globalVimState.exCommands.commands.substitute, 'callback')
+      parsed = ex.parse('1,3s/a/b/g', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.substitute.callback)
+        .toHaveBeenCalled()
+      expect(parsed[0]).toEqual([0, 2])
+      expect(parsed[2]).toEqual('/a/b/g')
+
+    it "ignores leading blanks and colons", ->
+      spyOn(vimState.globalVimState.exCommands.commands.write, 'callback')
+      parsed = ex.parse(' ::: \t : write', editor.getCursors()[0])
+      parsed[1]()
+      expect(vimState.globalVimState.exCommands.commands.write.callback)
+        .toHaveBeenCalled()
 
   describe "the commands", ->
     [dir, dir2] = []
@@ -534,7 +608,7 @@ describe "Ex", ->
             'Command Error: Only one file name allowed')
 
     describe ":tabedit", ->
-      it "acts as an alias to :edit", ->
+      it "acts as an alias to :edit if supplied with a path", ->
         spyOn(vimState.globalVimState.exCommands.commands.tabedit, 'callback')
           .andCallThrough()
         spyOn(vimState.globalVimState.exCommands.commands.edit, 'callback')
@@ -543,6 +617,22 @@ describe "Ex", ->
         expect(vimState.globalVimState.exCommands.commands.edit.callback)
           .toHaveBeenCalledWith(vimState.globalVimState.exCommands.commands
             .tabedit.callback.calls[0].args[0])
+      it "acts as an alias to :tabnew if not supplied with a path", ->
+        spyOn(vimState.globalVimState.exCommands.commands.tabedit, 'callback')
+          .andCallThrough()
+        spyOn(vimState.globalVimState.exCommands.commands.tabnew, 'callback')
+        keydown(':')
+        submitCommandModeInputText('tabedit  ')
+        expect(vimState.globalVimState.exCommands.commands.tabnew.callback)
+          .toHaveBeenCalledWith(vimState.globalVimState.exCommands.commands
+            .tabedit.callback.calls[0].args[0])
+
+    describe ":tabnew", ->
+      it "opens a new tab", ->
+        spyOn(atom.workspace, 'open')
+        keydown(':')
+        submitCommandModeInputText('tabnew')
+        expect(atom.workspace.open).toHaveBeenCalled()
 
     describe ":split", ->
       it "splits the current file upwards", ->
