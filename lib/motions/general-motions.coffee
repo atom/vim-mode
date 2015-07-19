@@ -283,6 +283,8 @@ class MoveToNextParagraph extends Motion
       cursor.moveToBeginningOfNextParagraph()
 
 class MoveToPreviousParagraph extends Motion
+  operatesInclusively: false
+  
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToBeginningOfPreviousParagraph()
