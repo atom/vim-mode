@@ -1,9 +1,10 @@
 _ = require 'underscore-plus'
 {MotionWithInput} = require './general-motions'
-SearchViewModel = require '../view-models/search-view-model'
+{SearchViewModel} = require '../view-models/view-model-with-history'
 {Input} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
 settings = require '../settings'
+{scanEditor} = require '../utils'
 
 class SearchBase extends MotionWithInput
   operatesInclusively: false
@@ -19,49 +20,12 @@ class SearchBase extends MotionWithInput
     this
 
   moveCursor: (cursor, count=1) ->
-    ranges = @scan(cursor)
+    ranges = scanEditor(@input.characters, @editor, cursor.getBufferPosition(), @reverse)
     if ranges.length > 0
       range = ranges[(count - 1) % ranges.length]
       cursor.setBufferPosition(range.start)
     else
       atom.beep()
-
-  scan: (cursor) ->
-    currentPosition = cursor.getBufferPosition()
-
-    [rangesBefore, rangesAfter] = [[], []]
-    @editor.scan @getSearchTerm(@input.characters), ({range}) =>
-      isBefore = if @reverse
-        range.start.compare(currentPosition) < 0
-      else
-        range.start.compare(currentPosition) <= 0
-
-      if isBefore
-        rangesBefore.push(range)
-      else
-        rangesAfter.push(range)
-
-    if @reverse
-      rangesAfter.concat(rangesBefore).reverse()
-    else
-      rangesAfter.concat(rangesBefore)
-
-  getSearchTerm: (term) ->
-    modifiers = {'g': true}
-
-    if not term.match('[A-Z]') and settings.useSmartcaseForSearch()
-      modifiers['i'] = true
-
-    if term.indexOf('\\c') >= 0
-      term = term.replace('\\c', '')
-      modifiers['i'] = true
-
-    modFlags = Object.keys(modifiers).join('')
-
-    try
-      new RegExp(term, modFlags)
-    catch
-      new RegExp(_.escapeRegExp(term), modFlags)
 
   updateCurrentSearch: ->
     @vimState.globalVimState.currentSearch.reverse = @reverse
@@ -74,7 +38,7 @@ class SearchBase extends MotionWithInput
 class Search extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @viewModel = new SearchViewModel(this)
+    @viewModel = new SearchViewModel(this, 'search')
 
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null
@@ -89,7 +53,7 @@ class SearchCurrentWord extends SearchBase
 
     searchString = @getCurrentWordMatch()
     @input = new Input(searchString)
-    @vimState.pushSearchHistory(searchString) unless searchString is @vimState.getSearchHistoryItem()
+    @vimState.pushCustomHistory('search', searchString) unless searchString is @vimState.getCustomHistoryItem('search')
 
   getCurrentWord: ->
     cursor = @editor.getLastCursor()
@@ -197,7 +161,7 @@ class BracketMatchingMotion extends SearchBase
 class RepeatSearch extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState, dontUpdateCurrentSearch: true)
-    @input = new Input(@vimState.getSearchHistoryItem(0) ? "")
+    @input = new Input(@vimState.getCustomHistoryItem('search', 0) ? "")
     @replicateCurrentSearch()
 
   isComplete: -> true
@@ -205,6 +169,5 @@ class RepeatSearch extends SearchBase
   reversed: ->
     @reverse = not @initiallyReversed
     this
-
 
 module.exports = {Search, SearchCurrentWord, BracketMatchingMotion, RepeatSearch}

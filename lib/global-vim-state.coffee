@@ -1,5 +1,7 @@
+ExCommands = require './ex-commands'
 module.exports =
 class GlobalVimState
   registers: {}
-  searchHistory: []
+  histories: {}
   currentSearch: {}
+  exCommands: ExCommands

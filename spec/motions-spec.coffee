@@ -1098,6 +1098,13 @@ describe "Motions", ->
           keydown('n')
           expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
+        it "uses case sensitive search wherever \\C is", ->
+          atom.config.set 'vim-mode.useSmartcaseForSearch', true
+          submitCommandModeInputText 'ab\\Cc'
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+          keydown('n')
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
       describe "repeating", ->
         it "does nothing with no search history", ->
           # This tests that no exception is raised
@@ -1116,6 +1123,10 @@ describe "Motions", ->
           keydown('/')
           submitCommandModeInputText('/')
           expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
+          keydown('/')
+          submitCommandModeInputText('/test/test///')
+          expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
         describe "the n keybinding", ->
           it "repeats the last search", ->
@@ -1192,6 +1203,8 @@ describe "Motions", ->
       commandEditor = null
 
       beforeEach ->
+        vimState.resetCustomHistory('search')
+
         keydown('/')
         submitCommandModeInputText('def')
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
@@ -1221,6 +1234,14 @@ describe "Motions", ->
         expect(commandEditor.getModel().getText()).toEqual('abc')
         atom.commands.dispatch(commandEditor, 'core:move-down')
         expect(commandEditor.getModel().getText()).toEqual ''
+
+      it "doesn't add the same term to the history more than once", ->
+        keydown('/')
+        submitCommandModeInputText('abc')
+        keydown('/')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        atom.commands.dispatch(commandEditor, 'core:move-up')
+        expect(commandEditor.getModel().getText()).toEqual 'def'
 
   describe "the * keybinding", ->
     beforeEach ->
