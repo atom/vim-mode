@@ -424,6 +424,29 @@ describe "VimState", ->
       editor.setText "line one\n line two\n"
       editor.setCursorBufferPosition [0, 0]
 
+      # FIXME: somehow, somewhere, when replaying keyboard events in specs, the event target gets lost
+      # the following code is a workaround for that
+      oldHandleKeyboardEvent = atom.keymaps.handleKeyboardEvent
+      atom.keymaps.handleKeyboardEvent = (event, replaying) ->
+        if event.target?
+          newEvent = event
+        else
+          newEvent = {}
+          newEvent.keyIdentifier = event.keyIdentifier
+          newEvent.keyCode = event.keyCode
+          newEvent.shiftKey = event.shiftKey
+          newEvent.ctrlKey = event.ctrlKey
+          newEvent.altKey = event.altKey
+          newEvent.metaKey = event.metaKey
+          newEvent.location = event.location
+          newEvent.which = event.which
+
+          newEvent.preventDefault = -> event.preventDefault()
+          newEvent.target = editorElement
+
+        oldHandleKeyboardEvent.apply(atom.keymaps, [newEvent, replaying])
+
+
     describe "in operator-pending mode", ->
       beforeEach ->
         keydown 'c'
@@ -437,9 +460,12 @@ describe "VimState", ->
 
       it "cancels long pending operations on unrecognized keybinding", ->
         keydown 'i'
-        keydown '3' #i3 is unrecognized, should cancel the whole `ci3` sequence
+        keydown '3'
+        # i3 typed above is an unrecognized multi-key binding
+        # atom tries to replay `i`, that's unrecognized too so vim-mode cancels `c`
+        # then atom replays `3` which is attached to `w`
         keydown 'w'
-        expect(editor.getCursorBufferPosition()).toEqual [0, 5]
+        expect(editor.getCursorBufferPosition()).toEqual [1, 6]
         expect(editor.getText()).toBe "line one\n line two\n"
         expect(vimState.mode).toEqual 'command'
 
@@ -449,8 +475,11 @@ describe "VimState", ->
 
       it "cancels whole unrecognized keybinding", ->
         keydown 'i'
-        keydown '3' #i3 is unrecognized, should cancel the whole `i3` sequence
+        keydown '3'
+        # i3 typed above is an unrecognized multi-key binding
+        # atom tries to replay `i`, that's unrecognized too so vim-mode in visual mode ignores it
+        # then atom replays `3` which is attached to `w`
         keydown 'w'
-        expect(editor.getCursorBufferPosition()).toEqual [0, 6]
-        expect(editor.getSelectedText()).toBe "line o"
+        expect(editor.getCursorBufferPosition()).toEqual [1, 7]
+        expect(editor.getSelectedText()).toBe "line one\n line t"
         expect(vimState.mode).toEqual 'visual'
