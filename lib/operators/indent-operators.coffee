@@ -10,7 +10,7 @@ class AdjustIndentation extends Operator
 
     @editor.setCursorBufferPosition([start.row, 0])
     @editor.moveToFirstCharacterOfLine()
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 class Indent extends AdjustIndentation
   indent: ->

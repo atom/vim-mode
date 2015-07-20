@@ -1,10 +1,10 @@
-VimCommandModeInputElement = require './vim-command-mode-input-element'
+VimNormalModeInputElement = require './vim-normal-mode-input-element'
 
 class ViewModel
   constructor: (@operation, opts={}) ->
     {@editor, @vimState} = @operation
-    @view = new VimCommandModeInputElement().initialize(this, opts)
-    @editor.commandModeInputView = @view
+    @view = new VimNormalModeInputElement().initialize(this, opts)
+    @editor.normalModeInputView = @view
     @vimState.onDidFailToCompose => @view.remove()
 
   confirm: (view) ->

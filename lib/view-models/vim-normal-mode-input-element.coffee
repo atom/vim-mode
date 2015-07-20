@@ -1,6 +1,6 @@
-class VimCommandModeInputElement extends HTMLDivElement
+class VimNormalModeInputElement extends HTMLDivElement
   createdCallback: ->
-    @className = "command-mode-input"
+    @className = "normal-mode-input"
 
     @editorContainer = document.createElement("div")
     @editorContainer.className = "editor-container"
@@ -58,7 +58,7 @@ class VimCommandModeInputElement extends HTMLDivElement
     @panel.destroy()
 
 module.exports =
-document.registerElement("vim-command-mode-input"
+document.registerElement("vim-normal-mode-input"
   extends: "div",
-  prototype: VimCommandModeInputElement.prototype
+  prototype: VimNormalModeInputElement.prototype
 )

@@ -16,7 +16,7 @@ class Replace extends OperatorWithInput
       if @vimState.mode is "visual"
         @vimState.resetVisualMode()
       else
-        @vimState.activateCommandMode()
+        @vimState.activateNormalMode()
 
       return
 
@@ -47,4 +47,4 @@ class Replace extends OperatorWithInput
             @editor.moveDown()
           @editor.moveToFirstCharacterOfLine()
 
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()

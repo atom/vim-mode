@@ -1,14 +1,14 @@
 'atom-text-editor.vim-mode':
-  'escape': 'vim-mode:reset-command-mode'
-  'ctrl-c': 'vim-mode:reset-command-mode'
-  'ctrl-[': 'vim-mode:reset-command-mode'
+  'escape': 'vim-mode:reset-normal-mode'
+  'ctrl-c': 'vim-mode:reset-normal-mode'
+  'ctrl-[': 'vim-mode:reset-normal-mode'
 
-'atom-text-editor.vim-mode:not(.command-mode)':
-  'escape': 'vim-mode:activate-command-mode'
-  'ctrl-[': 'vim-mode:activate-command-mode'
+'atom-text-editor.vim-mode:not(.normal-mode)':
+  'escape': 'vim-mode:activate-normal-mode'
+  'ctrl-[': 'vim-mode:activate-normal-mode'
 
-'.platform-darwin atom-text-editor.vim-mode:not(.command-mode)':
-  'ctrl-c': 'vim-mode:activate-command-mode'
+'.platform-darwin atom-text-editor.vim-mode:not(.normal-mode)':
+  'ctrl-c': 'vim-mode:activate-normal-mode'
 
 'atom-text-editor.vim-mode.insert-mode':
   'ctrl-w': 'editor:delete-to-beginning-of-word'
@@ -203,7 +203,7 @@
   '8': 'vim-mode:repeat-prefix'
   '9': 'vim-mode:repeat-prefix'
 
-'atom-text-editor.vim-mode.command-mode':
+'atom-text-editor.vim-mode.normal-mode':
   'i': 'vim-mode:activate-insert-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'
   'V': 'vim-mode:activate-linewise-visual-mode'
@@ -316,7 +316,7 @@
   'a )': 'vim-mode:select-around-parentheses'
   'a b': 'vim-mode:select-around-parentheses'
   'a p': 'vim-mode:select-around-paragraph'
-  'x': 'vim-mode:reset-command-mode'
+  'x': 'vim-mode:reset-normal-mode'
 
 'atom-text-editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'

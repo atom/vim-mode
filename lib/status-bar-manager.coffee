@@ -3,7 +3,7 @@
 ContentsByMode =
   'insert': ["status-bar-vim-mode-insert", "Insert"]
   'insert.replace': ["status-bar-vim-mode-insert", "Replace"]
-  'command': ["status-bar-vim-mode-command", "Command"]
+  'normal': ["status-bar-vim-mode-normal", "Normal"]
   'visual': ["status-bar-vim-mode-visual", "Visual"]
   'visual.characterwise': ["status-bar-vim-mode-visual", "Visual"]
   'visual.linewise': ["status-bar-vim-mode-visual", "Visual Line"]

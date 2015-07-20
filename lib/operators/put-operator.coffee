@@ -58,7 +58,7 @@ class Put extends Operator
       @editor.setCursorScreenPosition(originalPosition)
       @editor.moveToFirstCharacterOfLine()
 
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
     if type isnt 'linewise'
       @editor.moveLeft()
 

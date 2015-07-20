@@ -11,8 +11,8 @@ describe "Scrolling", ->
       editorElement = element
       editor = editorElement.getModel()
       vimState = editorElement.vimState
-      vimState.activateCommandMode()
-      vimState.resetCommandMode()
+      vimState.activateNormalMode()
+      vimState.resetNormalMode()
 
   keydown = (key, options={}) ->
     options.element ?= editorElement
