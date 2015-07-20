@@ -1,3 +1,4 @@
+Grim  = require 'grim'
 _ = require 'underscore-plus'
 {Point, Range} = require 'atom'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
@@ -394,6 +395,11 @@ class VimState
         cursor.moveLeft()
 
     @updateStatusBar()
+
+  # TODO: remove this method and bump the `vim-mode` service version number.
+  activateCommandMode: ->
+    Grim.deprecate("Use ::activateNormalMode instead")
+    @activateNormalMode()
 
   # Private: Used to enable insert mode.
   #

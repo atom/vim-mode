@@ -10,8 +10,9 @@
     "atom": ">0.151.0"
   },
   "dependencies": {
-    "underscore-plus": "1.x",
-    "event-kit": "^0.7.2"
+    "event-kit": "^0.7.2",
+    "grim": "^1.4.1",
+    "underscore-plus": "1.x"
   },
   "consumedServices": {
     "status-bar": {
