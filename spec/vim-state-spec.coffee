@@ -198,14 +198,14 @@ describe "VimState", ->
         it "allows the cursor to be placed on the \n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
-    it "puts the editor into command mode when <escape> is pressed", ->
+    it "puts the editor into normal mode when <escape> is pressed", ->
       keydown('escape')
 
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
       expect(editorElement.classList.contains('insert-mode')).toBe(false)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
-    it "puts the editor into command mode when <ctrl-c> is pressed", ->
+    it "puts the editor into normal mode when <ctrl-c> is pressed", ->
       helpers.mockPlatform(editorElement, 'platform-darwin')
       keydown('c', ctrl: true)
       helpers.unmockPlatform(editorElement)
@@ -224,14 +224,14 @@ describe "VimState", ->
       expect(editor.getSelectedBufferRanges()).toEqual [[[0, 4], [0, 5]]]
       expect(editor.getSelectedText()).toBe("t")
 
-    it "puts the editor into command mode when <escape> is pressed", ->
+    it "puts the editor into normal mode when <escape> is pressed", ->
       keydown('escape')
 
       expect(editor.getCursorBufferPositions()).toEqual [[0, 4]]
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
-    it "puts the editor into command mode when <escape> is pressed on selection is reversed", ->
+    it "puts the editor into normal mode when <escape> is pressed on selection is reversed", ->
       expect(editor.getSelectedText()).toBe("t")
       keydown("h")
       keydown("h")
@@ -308,7 +308,7 @@ describe "VimState", ->
         expect(vimState.mode).toEqual 'normal'
         expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
-      it "activateVisualMode with same type puts the editor into command mode", ->
+      it "activateVisualMode with same type puts the editor into normal mode", ->
         keydown('v')
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
         expect(vimState.submode).toEqual 'characterwise'
