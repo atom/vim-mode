@@ -1,5 +1,9 @@
 ## HEAD
 
+## 0.56
+
+* Renamed 'command mode' to 'normal mode' - @coolwanglu
+
 ## 0.55
 
 * Fixed indentation commands so that they exit visual mode - @bronson
