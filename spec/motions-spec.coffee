@@ -22,9 +22,9 @@ describe "Motions", ->
     editor.normalModeInputView.editorElement.getModel().setText(key)
 
   submitNormalModeInputText = (text) ->
-    commandEditor = editor.normalModeInputView.editorElement
-    commandEditor.getModel().setText(text)
-    atom.commands.dispatch(commandEditor, "core:confirm")
+    normalEditor = editor.normalModeInputView.editorElement
+    normalEditor.getModel().setText(text)
+    atom.commands.dispatch(normalEditor, "core:confirm")
 
   describe "simple motions", ->
     beforeEach ->
@@ -850,7 +850,7 @@ describe "Motions", ->
       editor.setCursorScreenPosition([0, 2])
 
     describe "as a motion", ->
-      describe "in command mode", ->
+      describe "in normal mode", ->
         beforeEach ->
           keydown('g')
           keydown('g')
@@ -885,7 +885,7 @@ describe "Motions", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 1]
 
     describe "as a repeated motion", ->
-      describe "in command mode", ->
+      describe "in normal mode", ->
         beforeEach ->
           keydown('2')
           keydown('g')
@@ -1189,7 +1189,7 @@ describe "Motions", ->
             expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
     describe "using search history", ->
-      commandEditor = null
+      normalEditor = null
 
       beforeEach ->
         keydown('/')
@@ -1200,27 +1200,27 @@ describe "Motions", ->
         submitNormalModeInputText('abc')
         expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
-        commandEditor = editor.normalModeInputView.editorElement
+        normalEditor = editor.normalModeInputView.editorElement
 
       it "allows searching history in the search field", ->
         keydown('/')
-        atom.commands.dispatch(commandEditor, 'core:move-up')
-        expect(commandEditor.getModel().getText()).toEqual('abc')
-        atom.commands.dispatch(commandEditor, 'core:move-up')
-        expect(commandEditor.getModel().getText()).toEqual('def')
-        atom.commands.dispatch(commandEditor, 'core:move-up')
-        expect(commandEditor.getModel().getText()).toEqual('def')
+        atom.commands.dispatch(normalEditor, 'core:move-up')
+        expect(normalEditor.getModel().getText()).toEqual('abc')
+        atom.commands.dispatch(normalEditor, 'core:move-up')
+        expect(normalEditor.getModel().getText()).toEqual('def')
+        atom.commands.dispatch(normalEditor, 'core:move-up')
+        expect(normalEditor.getModel().getText()).toEqual('def')
 
       it "resets the search field to empty when scrolling back", ->
         keydown('/')
-        atom.commands.dispatch(commandEditor, 'core:move-up')
-        expect(commandEditor.getModel().getText()).toEqual('abc')
-        atom.commands.dispatch(commandEditor, 'core:move-up')
-        expect(commandEditor.getModel().getText()).toEqual('def')
-        atom.commands.dispatch(commandEditor, 'core:move-down')
-        expect(commandEditor.getModel().getText()).toEqual('abc')
-        atom.commands.dispatch(commandEditor, 'core:move-down')
-        expect(commandEditor.getModel().getText()).toEqual ''
+        atom.commands.dispatch(normalEditor, 'core:move-up')
+        expect(normalEditor.getModel().getText()).toEqual('abc')
+        atom.commands.dispatch(normalEditor, 'core:move-up')
+        expect(normalEditor.getModel().getText()).toEqual('def')
+        atom.commands.dispatch(normalEditor, 'core:move-down')
+        expect(normalEditor.getModel().getText()).toEqual('abc')
+        atom.commands.dispatch(normalEditor, 'core:move-down')
+        expect(normalEditor.getModel().getText()).toEqual ''
 
   describe "the * keybinding", ->
     beforeEach ->
