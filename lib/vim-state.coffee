@@ -61,7 +61,7 @@ class VimState
   #
   # Returns nothing.
   setupNormalMode: ->
-    @registerNormals
+    @registerCommands
       'activate-normal-mode': => @activateNormalMode()
       'activate-linewise-visual-mode': => @activateVisualMode('linewise')
       'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
@@ -72,7 +72,7 @@ class VimState
       'undo': (e) => @undo(e)
       'insert-mode-put': (e) => @insertRegister(@registerName(e))
 
-    @registerOperationNormals
+    @registerOperationCommands
       'activate-insert-mode': => new Operators.Insert(@editor, this)
       'substitute': => new Operators.Substitute(@editor, this)
       'substitute-line': => new Operators.SubstituteLine(@editor, this)
@@ -183,7 +183,7 @@ class VimState
   #
   # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
   # the provided object.
-  registerNormals: (commands) ->
+  registerCommands: (commands) ->
     for commandName, fn of commands
       do (fn) =>
         @subscriptions.add(atom.commands.add(@editorElement, "vim-mode:#{commandName}", fn))
@@ -193,12 +193,12 @@ class VimState
   #
   # Prefixes the given command names with 'vim-mode:' to reduce redundancy in
   # the given object.
-  registerOperationNormals: (operationNormals) ->
+  registerOperationCommands: (operationCommands) ->
     commands = {}
-    for commandName, operationFn of operationNormals
+    for commandName, operationFn of operationCommands
       do (operationFn) =>
         commands[commandName] = (event) => @pushOperations(operationFn(event))
-    @registerNormals(commands)
+    @registerCommands(commands)
 
   # Private: Push the given operations onto the operation stack, then process
   # it.
