@@ -19,6 +19,7 @@ class VimState
   mode: null
   submode: null
   destroyed: false
+  replaceModeListener: null
 
   constructor: (@editorElement, @statusBarManager, @globalVimState) ->
     @emitter = new Emitter
@@ -70,10 +71,12 @@ class VimState
       'repeat-prefix': (e) => @repeatPrefix(e)
       'reverse-selections': (e) => @reverseSelections(e)
       'undo': (e) => @undo(e)
+      'replace-mode-backspace': => @replaceModeUndo()
       'insert-mode-put': (e) => @insertRegister(@registerName(e))
 
     @registerOperationCommands
       'activate-insert-mode': => new Operators.Insert(@editor, this)
+      'activate-replace-mode': => new Operators.ReplaceMode(@editor, this)
       'substitute': => new Operators.Substitute(@editor, this)
       'substitute-line': => new Operators.SubstituteLine(@editor, this)
       'insert-after': => new Operators.InsertAfter(@editor, this)
@@ -404,13 +407,40 @@ class VimState
   # Private: Used to enable insert mode.
   #
   # Returns nothing.
-  activateInsertMode: ->
+  activateInsertMode: (subtype = null) ->
     @mode = 'insert'
     @editorElement.component.setInputEnabled(true)
     @setInsertionCheckpoint()
-    @submode = null
+    @submode = subtype
     @changeModeClass('insert-mode')
     @updateStatusBar()
+
+  activateReplaceMode: ->
+    @activateInsertMode('replace')
+    @replaceModeCheckpoint = null
+    @replaceModeCounter = 0
+    @editorElement.classList.add('replace-mode')
+    @subscriptions.add @replaceModeListener = @editor.onWillInsertText @replaceModeInsertHandler
+    @subscriptions.add @replaceModeUndoListener = @editor.onDidInsertText @replaceModeUndoHandler
+
+  replaceModeInsertHandler: (event) =>
+    chars = event.text?.split('') or []
+    selections = @editor.getSelections()
+    @replaceModeCheckpoint = @editor.createCheckpoint()
+    for char in chars
+      continue if char is '\n'
+      for selection in selections
+        # Delete next character
+        selection.delete() unless selection.cursor.isAtEndOfLine()
+
+  replaceModeUndoHandler: (event) =>
+    @editor.groupChangesSinceCheckpoint(@replaceModeCheckpoint) if @replaceModeCheckpoint?
+    @replaceModeCounter++
+
+  replaceModeUndo: ->
+    if @replaceModeCounter > 0
+      @editor.undo()
+      @replaceModeCounter--
 
   setInsertionCheckpoint: ->
     @insertionCheckpoint = @editor.createCheckpoint() unless @insertionCheckpoint?
@@ -418,6 +448,7 @@ class VimState
   deactivateInsertMode: ->
     return unless @mode in [null, 'insert']
     @editorElement.component.setInputEnabled(false)
+    @editorElement.classList.remove('replace-mode')
     @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
     changes = getChangesSinceCheckpoint(@editor.buffer, @insertionCheckpoint)
     item = @inputOperator(@history[0])
@@ -426,6 +457,13 @@ class VimState
       item.confirmChanges(changes)
     for cursor in @editor.getCursors()
       cursor.moveLeft() unless cursor.isAtBeginningOfLine()
+    if @replaceModeListener?
+      @replaceModeListener.dispose()
+      @subscriptions.remove @replaceModeListener
+      @replaceModeListener = null
+      @replaceModeUndoListener.dispose()
+      @subscriptions.remove @replaceModeUndoListener
+      @replaceModeUndoListener = null
 
   deactivateVisualMode: ->
     return unless @mode is 'visual'
