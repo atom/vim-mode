@@ -714,15 +714,23 @@ describe "Operators", ->
         editor.setText("12345(67)8\nabc(d)e\nA()BCDE")
 
       describe "before brackets or on the first one", ->
-        it "replaces inclusively until matching bracket", ->
+        beforeEach ->
           editor.setCursorScreenPosition([0, 1])
           editor.addCursorAtScreenPosition([1, 1])
           editor.addCursorAtScreenPosition([2, 1])
           keydown('c')
           keydown('%')
           editor.insertText('x')
+
+        it "replaces inclusively until matching bracket", ->
           expect(editor.getText()).toBe("1x8\naxe\nAxBCDE")
           expect(vimState.mode).toBe "insert"
+
+        it "undoes correctly with u", ->
+          keydown('escape')
+          expect(vimState.mode).toBe "command"
+          keydown 'u'
+          expect(editor.getText()).toBe("12345(67)8\nabc(d)e\nA()BCDE")
 
       describe "inside brackets or on the ending one", ->
         it "replaces inclusively backwards until matching bracket", ->
@@ -746,19 +754,13 @@ describe "Operators", ->
           expect(editor.getText()).toBe("12345(67)8\nabc(d)e\nABCDE")
           expect(vimState.mode).toBe "command"
 
-      describe "repeats correctly with .", ->
+      describe "repetition with .", ->
         beforeEach ->
           editor.setCursorScreenPosition([0, 1])
           keydown('c')
           keydown('%')
           editor.insertText('x')
           keydown('escape')
-
-        it "undoes correctly with u", ->
-          expect(editor.getText()).toBe("1x8\nabc(d)e\nA()BCDE")
-          expect(vimState.mode).toBe "command"
-          keydown 'u'
-          expect(editor.getText()).toBe("12345(67)8\nabc(d)e\nA()BCDE")
 
         it "repeats correctly before a bracket", ->
           editor.setCursorScreenPosition([1, 0])
