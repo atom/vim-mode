@@ -193,6 +193,11 @@ class Yank extends Operator
 
     @setTextRegister(@register, text)
 
+    marker = @editor.markBufferRange(@editor.getSelectedBufferRange(), invalidate: 'touch')
+    yankHighlight = @editor.decorateMarker(marker, type: 'highlight', class: 'yank-highlight')
+
+    setTimeout (-> yankHighlight.destroy()), 300
+
     @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
     @vimState.activateNormalMode()
 
