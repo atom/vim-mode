@@ -5,7 +5,7 @@
 * Insert mode can be entered using `i`, `I`, `a`, `A`, `o`, or `O`.
 * Replace mode can be entered using `R`
   * Limitations:
-    * Repeating with `.` may get a bit confused by multiple cursors or when more than one line was typed
+    * If repeating with `.` gets a bit confused (e.g. by multiple cursors or when more than one line was typed), please report it with steps to reproduce if you can.
 * Registers are a work in progress
   * What Exists:
     * `a-z` - Named registers
