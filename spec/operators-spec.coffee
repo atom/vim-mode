@@ -947,6 +947,15 @@ describe "Operators", ->
           expect(editor.getText()).toBe "034512\n"
           expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
+      describe "at the end of a line", ->
+        beforeEach ->
+          editor.setCursorScreenPosition [0, 2]
+          keydown('p')
+
+        it "positions cursor correctly", ->
+          expect(editor.getText()).toBe "012345\n"
+          expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
       describe "when useClipboardAsDefaultRegister enabled", ->
         it "inserts contents from clipboard", ->
           atom.config.set 'vim-mode.useClipboardAsDefaultRegister', true
