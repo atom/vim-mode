@@ -1,5 +1,13 @@
 ## HEAD
 
+## 0.57
+
+* Added replace ('R') mode! - @jacekkopecky
+* Added the `iW` and `aW` text objects! - @jacekkopecky
+* Made the 't' operator behave correctly when the cursor was already on the  
+  searched  character - @jacekkopecky
+* Fixed the position of the cursor after pasting with 'p' - @jacekkopecky
+
 ## 0.56
 
 * Renamed 'command mode' to 'normal mode' - @coolwanglu
