@@ -143,6 +143,14 @@ describe "VimState", ->
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
         expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
+    describe "the R keybinding", ->
+      beforeEach -> keydown('R', shift: true)
+
+      it "puts the editor into replace mode", ->
+        expect(editorElement.classList.contains('insert-mode')).toBe(true)
+        expect(editorElement.classList.contains('replace-mode')).toBe(true)
+        expect(editorElement.classList.contains('normal-mode')).toBe(false)
+
     describe "with content", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
 
@@ -212,6 +220,56 @@ describe "VimState", ->
 
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
       expect(editorElement.classList.contains('insert-mode')).toBe(false)
+      expect(editorElement.classList.contains('visual-mode')).toBe(false)
+
+  describe "replace-mode", ->
+    describe "with content", ->
+      beforeEach -> editor.setText("012345\n\nabcdef")
+
+      describe "when cursor is in the middle of the line", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 3])
+          keydown('R', shift: true)
+
+        it "moves the cursor to the left when exiting replace mode", ->
+          keydown('escape')
+          expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+      describe "when cursor is at the beginning of line", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([1, 0])
+          keydown('R', shift: true)
+
+        it "leaves the cursor at the beginning of line", ->
+          keydown('escape')
+          expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+
+      describe "on a line with content", ->
+        beforeEach ->
+          keydown('R', shift: true)
+          editor.setCursorScreenPosition([0, 6])
+
+        it "allows the cursor to be placed on the \n character", ->
+          expect(editor.getCursorScreenPosition()).toEqual [0, 6]
+
+    it "puts the editor into normal mode when <escape> is pressed", ->
+      keydown('R', shift: true)
+      keydown('escape')
+
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+      expect(editorElement.classList.contains('insert-mode')).toBe(false)
+      expect(editorElement.classList.contains('replace-mode')).toBe(false)
+      expect(editorElement.classList.contains('visual-mode')).toBe(false)
+
+    it "puts the editor into normal mode when <ctrl-c> is pressed", ->
+      keydown('R', shift: true)
+      helpers.mockPlatform(editorElement, 'platform-darwin')
+      keydown('c', ctrl: true)
+      helpers.unmockPlatform(editorElement)
+
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+      expect(editorElement.classList.contains('insert-mode')).toBe(false)
+      expect(editorElement.classList.contains('replace-mode')).toBe(false)
       expect(editorElement.classList.contains('visual-mode')).toBe(false)
 
   describe "visual-mode", ->

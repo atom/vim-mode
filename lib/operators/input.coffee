@@ -28,6 +28,26 @@ class Insert extends Operator
 
   inputOperator: -> true
 
+class ReplaceMode extends Insert
+
+  execute: ->
+    if @typingCompleted
+      return unless @typedText? and @typedText.length > 0
+      @editor.transact =>
+        @editor.insertText(@typedText, normalizeLineEndings: true)
+        toDelete = @typedText.length - @countChars('\n', @typedText)
+        for selection in @editor.getSelections()
+          count = toDelete
+          selection.delete() while count-- and not selection.cursor.isAtEndOfLine()
+        for cursor in @editor.getCursors()
+          cursor.moveLeft() unless cursor.isAtBeginningOfLine()
+    else
+      @vimState.activateReplaceMode()
+      @typingCompleted = true
+
+  countChars: (char, string) ->
+    string.split(char).length - 1
+
 class InsertAfter extends Insert
   execute: ->
     @editor.moveRight() unless @editor.getLastCursor().isAtEndOfLine()
@@ -225,6 +245,7 @@ module.exports = {
   InsertAtBeginningOfLine,
   InsertAboveWithNewline,
   InsertBelowWithNewline,
+  ReplaceMode,
   Change,
   Substitute,
   SubstituteLine

@@ -3,6 +3,9 @@
 * There are only currently two modes, normal mode and insert mode.
 * Motions have repeat support, `d3w` will delete three words.
 * Insert mode can be entered using `i`, `I`, `a`, `A`, `o`, or `O`.
+* Replace mode can be entered using `R`
+  * Limitations:
+    * If repeating with `.` gets a bit confused (e.g. by multiple cursors or when more than one line was typed), please report it with steps to reproduce if you can.
 * Registers are a work in progress
   * What Exists:
     * `a-z` - Named registers

@@ -1773,3 +1773,98 @@ describe "Operators", ->
         keydown('x', ctrl: true)
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 5], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '122\nab44\ncd -68ef\nab-4\na-bcdef'
+
+  describe 'the R keybinding', ->
+    beforeEach ->
+      editor.setText('12345\n67890')
+      editor.setCursorBufferPosition([0, 2])
+
+    it "enters replace mode and replaces characters", ->
+      keydown "R", shift: true
+      expect(editorElement.classList.contains('insert-mode')).toBe true
+      expect(editorElement.classList.contains('replace-mode')).toBe true
+
+      editor.insertText "ab"
+      keydown 'escape'
+
+      expect(editor.getText()).toBe "12ab5\n67890"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+      expect(editorElement.classList.contains('insert-mode')).toBe false
+      expect(editorElement.classList.contains('replace-mode')).toBe false
+      expect(editorElement.classList.contains('normal-mode')).toBe true
+
+    it "continues beyond end of line as insert", ->
+      keydown "R", shift: true
+      expect(editorElement.classList.contains('insert-mode')).toBe true
+      expect(editorElement.classList.contains('replace-mode')).toBe true
+
+      editor.insertText "abcde"
+      keydown 'escape'
+
+      expect(editor.getText()).toBe "12abcde\n67890"
+
+    it "treats backspace as undo", ->
+      editor.insertText "foo"
+      keydown "R", shift: true
+
+      editor.insertText "a"
+      editor.insertText "b"
+      expect(editor.getText()).toBe "12fooab5\n67890"
+
+      keydown 'backspace', raw: true
+      expect(editor.getText()).toBe "12fooa45\n67890"
+
+      editor.insertText "c"
+
+      expect(editor.getText()).toBe "12fooac5\n67890"
+
+      keydown 'backspace', raw: true
+      keydown 'backspace', raw: true
+
+      expect(editor.getText()).toBe "12foo345\n67890"
+
+      keydown 'backspace', raw: true
+      expect(editor.getText()).toBe "12foo345\n67890"
+
+    it "can be repeated", ->
+      keydown "R", shift: true
+      editor.insertText "ab"
+      keydown 'escape'
+      editor.setCursorBufferPosition([1, 2])
+      keydown '.'
+      expect(editor.getText()).toBe "12ab5\n67ab0"
+      expect(editor.getCursorScreenPosition()).toEqual [1, 3]
+
+      editor.setCursorBufferPosition([0, 4])
+      keydown '.'
+      expect(editor.getText()).toBe "12abab\n67ab0"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
+    it "can be interrupted by arrow keys and behave as insert for repeat", ->
+      # FIXME don't know how to test this (also, depends on PR #568)
+
+    it "repeats correctly when backspace was used in the text", ->
+      keydown "R", shift: true
+      editor.insertText "a"
+      keydown 'backspace', raw: true
+      editor.insertText "b"
+      keydown 'escape'
+      editor.setCursorBufferPosition([1, 2])
+      keydown '.'
+      expect(editor.getText()).toBe "12b45\n67b90"
+      expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+      editor.setCursorBufferPosition([0, 4])
+      keydown '.'
+      expect(editor.getText()).toBe "12b4b\n67b90"
+      expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
+    it "doesn't replace a character if newline is entered", ->
+      keydown "R", shift: true
+      expect(editorElement.classList.contains('insert-mode')).toBe true
+      expect(editorElement.classList.contains('replace-mode')).toBe true
+
+      editor.insertText "\n"
+      keydown 'escape'
+
+      expect(editor.getText()).toBe "12\n345\n67890"

@@ -20,6 +20,14 @@
   opacity: 0.5;
 }
 
+.underline-cursor(@visibility: visible) {
+  border: none;
+  border-bottom: .3em solid @syntax-cursor-color;
+  background: none;
+  visibility: @visibility;
+  opacity: 0.5;
+}
+
 atom-text-editor.vim-mode.normal-mode,
 atom-text-editor.vim-mode.operator-pending-mode,
 atom-text-editor.vim-mode.visual-mode,
@@ -27,7 +35,7 @@ atom-text-editor.vim-mode.visual-mode,
   &::shadow, // shadow-DOM enabled
   &           // shadow-DOM disabled
   {
-    .cursor, .cursor.blink-off {
+    .cursor {
       .block-cursor(hidden);
     }
   }
@@ -40,7 +48,7 @@ atom-text-editor.vim-mode.visual-mode.is-focused
   &::shadow, // shadow-DOM enabled
   &           // shadow-DOM disabled
   {
-    .cursor, .cursor.blink-off {
+    .cursor {
       .block-cursor;
     }
   }
@@ -53,6 +61,32 @@ atom-text-editor.vim-mode.visual-mode
   {
     .cursor.hidden-cursor {
       display: block;
+    }
+  }
+}
+
+atom-text-editor.vim-mode.replace-mode
+{
+  &::shadow, // shadow-DOM enabled
+  &           // shadow-DOM disabled
+  {
+    .cursor {
+      .underline-cursor(hidden);
+    }
+  }
+}
+
+atom-text-editor.vim-mode.replace-mode.is-focused
+{
+  &::shadow, // shadow-DOM enabled
+  &           // shadow-DOM disabled
+  {
+    .cursor {
+      .underline-cursor;
+    }
+
+    .cursors.blink-off .cursor {
+      .underline-cursor(hidden);
     }
   }
 }
