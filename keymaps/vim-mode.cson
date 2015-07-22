@@ -226,7 +226,7 @@
   '.': 'vim-mode:repeat'
 
   'ctrl-]': 'symbols-view:go-to-declaration'
-  'ctrl-T': 'symbols-view:return-from-declaration'
+  'ctrl-t': 'symbols-view:return-from-declaration'
 
   'ctrl-a': 'vim-mode:increase'
   'ctrl-x': 'vim-mode:decrease'
