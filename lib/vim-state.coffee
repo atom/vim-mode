@@ -39,7 +39,7 @@ class VimState
         @activateVisualMode('characterwise') if @mode is 'normal'
     , 100)
 
-    @subscriptions.add @editor.onDidChangeCursorPosition @ensureCursorIsWithinLine
+    @subscriptions.add @editor.onDidChangeCursorPosition ({cursor}) => @ensureCursorIsWithinLine(cursor)
     @subscriptions.add @editor.onDidAddCursor @ensureCursorIsWithinLine
 
     @editorElement.classList.add("vim-mode")
@@ -663,13 +663,13 @@ class VimState
     @editor.insertText(text) if text?
 
   ensureCursorIsWithinLine: (cursor) =>
-    return if @processing or @mode is 'visual' or @mode is 'insert'
-
-    if cursor.cursor? then cursor = cursor.cursor # when called by @editor.onDidChangeCursorPosition
+    return if @processing or @mode isnt 'normal'
 
     {goalColumn} = cursor
     if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
+      @processing = true # to ignore the cursor change (and recursion) caused by the next line
       cursor.moveLeft()
+      @processing = false
     cursor.goalColumn = goalColumn
 
 # This uses private APIs and may break if TextBuffer is refactored.
