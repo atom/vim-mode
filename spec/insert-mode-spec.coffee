@@ -51,6 +51,11 @@ describe "Insert mode commands", ->
         expect(editor.getText()).toBe '12a345\n\nabcd\nefadghi'
 
     describe "the ctrl-e command", ->
+      beforeEach ->
+        atom.keymaps.add "test",
+          'atom-text-editor.vim-mode.insert-mode':
+            'ctrl-e': 'vim-mode:copy-from-line-below'
+
       it "copies from the line below", ->
         keydown 'e', ctrl: true
         expect(editor.getText()).toBe '12345\na\nabcd\nefghi'

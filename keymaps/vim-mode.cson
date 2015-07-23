@@ -14,7 +14,8 @@
   'ctrl-w': 'editor:delete-to-beginning-of-word'
   'ctrl-u': 'editor:delete-to-beginning-of-line'
   'ctrl-y': 'vim-mode:copy-from-line-above'
-  'ctrl-e': 'vim-mode:copy-from-line-below'
+  # disabled for compatibility with the common binding for going to the end of the line
+  # 'ctrl-e': 'vim-mode:copy-from-line-below'
 
   'ctrl-r a': 'vim-mode:insert-mode-put'
   'ctrl-r b': 'vim-mode:insert-mode-put'
