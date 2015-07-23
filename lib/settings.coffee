@@ -17,6 +17,10 @@ settings =
       type: 'string'
       default: '-?[0-9]+'
       description: 'Use this to control how Ctrl-A/Ctrl-X finds numbers; use "(?:\\B-)?[0-9]+" to treat numbers as positive if the minus is preceded by a character, e.g. in "identifier-1".'
+    defaultWordIsCamelCaseSensitive:
+      type: 'boolean'
+      default: true
+      description: 'If set to true, the w and similar motions and text objects will be camel-case sensitive. The alt modifier key can be used to access the camel-case insensitive behaviour. Setting to false reverses the bindings.'
 
 Object.keys(settings.config).forEach (k) ->
   settings[k] = ->
