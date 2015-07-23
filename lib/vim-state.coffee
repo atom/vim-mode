@@ -177,8 +177,8 @@ class VimState
       'find-backwards': (e) => new Motions.Find(@editor, this).reverse()
       'till': (e) => new Motions.Till(@editor, this)
       'till-backwards': (e) => new Motions.Till(@editor, this).reverse()
-      'repeat-find': (e) => @currentFind.repeat() if @currentFind?
-      'repeat-find-reverse': (e) => @currentFind.repeat(reverse: true) if @currentFind?
+      'repeat-find': (e) => new @globalVimState.currentFind.constructor(@editor, this, repeated: true) if @globalVimState.currentFind
+      'repeat-find-reverse': (e) => new @globalVimState.currentFind.constructor(@editor, this, repeated: true, reverse: true) if @globalVimState.currentFind
       'replace': (e) => new Operators.Replace(@editor, this)
       'search': (e) => new Motions.Search(@editor, this)
       'reverse-search': (e) => (new Motions.Search(@editor, this)).reversed()

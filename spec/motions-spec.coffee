@@ -19,7 +19,8 @@ describe "Motions", ->
     helpers.keydown(key, options)
 
   normalModeInputKeydown = (key, opts = {}) ->
-    editor.normalModeInputView.editorElement.getModel().setText(key)
+    theEditor = opts.editor or editor
+    theEditor.normalModeInputView.editorElement.getModel().setText(key)
 
   submitNormalModeInputText = (text) ->
     inputEditor = editor.normalModeInputView.editorElement
@@ -1743,6 +1744,38 @@ describe "Motions", ->
       keydown('2')
       keydown(',')
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "shares the most recent find/till command with other editors", ->
+      helpers.getEditorElement (otherEditorElement) ->
+        otherEditor = otherEditorElement.getModel()
+
+        editor.setText("a baz bar\n")
+        editor.setCursorScreenPosition([0, 0])
+
+        otherEditor.setText("foo bar baz")
+        otherEditor.setCursorScreenPosition([0, 0])
+
+        # by default keyDown and such go in the usual editor
+        keydown('f')
+        normalModeInputKeydown('b')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+        expect(otherEditor.getCursorScreenPosition()).toEqual [0, 0]
+
+        # replay same find in the other editor
+        keydown(';', element: otherEditorElement)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+        expect(otherEditor.getCursorScreenPosition()).toEqual [0, 4]
+
+        # do a till in the other editor
+        keydown('t', element: otherEditorElement)
+        normalModeInputKeydown('r', editor: otherEditor)
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+        expect(otherEditor.getCursorScreenPosition()).toEqual [0, 5]
+
+        # and replay in the normal editor
+        keydown(';')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 7]
+        expect(otherEditor.getCursorScreenPosition()).toEqual [0, 5]
 
   describe 'the % motion', ->
     beforeEach ->

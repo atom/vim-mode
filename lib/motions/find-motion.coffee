@@ -3,14 +3,25 @@
 {Point, Range} = require 'atom'
 
 class Find extends MotionWithInput
-  constructor: (@editor, @vimState) ->
+  constructor: (@editor, @vimState, opts={}) ->
     super(@editor, @vimState)
-    @vimState.currentFind = this
-    @viewModel = new ViewModel(this, class: 'find', singleChar: true, hidden: true)
-    @backwards = false
-    @repeatReversed = false
     @offset = 0
-    @repeated = false
+
+    if not opts.repeated
+      @viewModel = new ViewModel(this, class: 'find', singleChar: true, hidden: true)
+      @backwards = false
+      @repeated = false
+      @vimState.globalVimState.currentFind = this
+
+    else
+      @repeated = true
+
+      orig = @vimState.globalVimState.currentFind
+      @backwards = orig.backwards
+      @complete = orig.complete
+      @input = orig.input
+
+      @reverse() if opts.reverse
 
   match: (cursor, count) ->
     currentPosition = cursor.getBufferPosition()
@@ -38,17 +49,9 @@ class Find extends MotionWithInput
     if (match = @match(cursor, count))?
       cursor.setBufferPosition(match)
 
-  repeat: (opts={}) ->
-    opts.reverse = !!opts.reverse
-    @repeated = true
-    if opts.reverse isnt @repeatReversed
-      @reverse()
-      @repeatReversed = opts.reverse
-    this
-
 class Till extends Find
-  constructor: (@editor, @vimState) ->
-    super(@editor, @vimState)
+  constructor: (@editor, @vimState, opts={}) ->
+    super(@editor, @vimState, opts)
     @offset = 1
 
   match: ->
