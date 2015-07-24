@@ -1,3 +1,6 @@
+# copied from atom/atom-keymap src/helpers.coffee
+AtomModifierRegex = /(ctrl|alt|shift|cmd)$/
+
 module.exports =
   # Public: Determines if a string should be considered linewise or character
   #
@@ -12,3 +15,7 @@ module.exports =
       'linewise'
     else
       'character'
+
+  # copied and simplified from atom/atom-keymap src/helpers.coffee
+  isAtomModifier: (keystroke) ->
+    AtomModifierRegex.test(keystroke)
