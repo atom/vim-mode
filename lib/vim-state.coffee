@@ -39,6 +39,9 @@ class VimState
         @activateVisualMode('characterwise') if @mode is 'normal'
     , 100)
 
+    @subscriptions.add @editor.onDidChangeCursorPosition ({cursor}) => @ensureCursorIsWithinLine(cursor)
+    @subscriptions.add @editor.onDidAddCursor @ensureCursorIsWithinLine
+
     @editorElement.classList.add("vim-mode")
     @setupNormalMode()
     if settings.startInInsertMode()
@@ -212,28 +215,33 @@ class VimState
   # it.
   pushOperations: (operations) ->
     return unless operations?
-    operations = [operations] unless _.isArray(operations)
+    try
+      @processing = true
+      operations = [operations] unless _.isArray(operations)
 
-    for operation in operations
-      # Motions in visual mode perform their selections.
-      if @mode is 'visual' and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
-        operation.execute = operation.select
+      for operation in operations
+        # Motions in visual mode perform their selections.
+        if @mode is 'visual' and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
+          operation.execute = operation.select
 
-      # if we have started an operation that responds to canComposeWith check if it can compose
-      # with the operation we're going to push onto the stack
-      if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
-        @resetNormalMode()
-        @emitter.emit('failed-to-compose')
-        break
+        # if we have started an operation that responds to canComposeWith check if it can compose
+        # with the operation we're going to push onto the stack
+        if (topOp = @topOperation())? and topOp.canComposeWith? and not topOp.canComposeWith(operation)
+          @resetNormalMode()
+          @emitter.emit('failed-to-compose')
+          break
 
-      @opStack.push(operation)
+        @opStack.push(operation)
 
-      # If we've received an operator in visual mode, mark the current
-      # selection as the motion to operate on.
-      if @mode is 'visual' and operation instanceof Operators.Operator
-        @opStack.push(new Motions.CurrentSelection(@editor, this))
+        # If we've received an operator in visual mode, mark the current
+        # selection as the motion to operate on.
+        if @mode is 'visual' and operation instanceof Operators.Operator
+          @opStack.push(new Motions.CurrentSelection(@editor, this))
 
-      @processOpStack()
+        @processOpStack()
+    finally
+      @processing = false
+      @ensureCursorIsWithinLine(cursor) for cursor in @editor.getCursors()
 
   onDidFailToCompose: (fn) ->
     @emitter.on('failed-to-compose', fn)
@@ -653,6 +661,16 @@ class VimState
   insertRegister: (name) ->
     text = @getRegister(name)?.text
     @editor.insertText(text) if text?
+
+  ensureCursorIsWithinLine: (cursor) =>
+    return if @processing or @mode isnt 'normal'
+
+    {goalColumn} = cursor
+    if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
+      @processing = true # to ignore the cursor change (and recursion) caused by the next line
+      cursor.moveLeft()
+      @processing = false
+    cursor.goalColumn = goalColumn
 
 # This uses private APIs and may break if TextBuffer is refactored.
 # Package authors - copy and paste this code at your own risk.

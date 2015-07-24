@@ -176,7 +176,7 @@ describe "Scrolling", ->
         expect(editor.getCursorBufferPosition()).toEqual [0, 1]
         pos10 = zsPos(10)
         expect(pos10).toEqual(startPosition)
-        expect(editor.getCursorBufferPosition()).toEqual [0, 5]
+        expect(editor.getCursorBufferPosition()).toEqual [0, 4]
 
 
     describe "the ze keybinding", ->
@@ -227,4 +227,4 @@ describe "Scrolling", ->
         expect(editor.getCursorBufferPosition()).toEqual [0, 1]
         pos10 = zePos(10)
         expect(pos10).toEqual(startPosition)
-        expect(editor.getCursorBufferPosition()).toEqual [0, 5]
+        expect(editor.getCursorBufferPosition()).toEqual [0, 4]
