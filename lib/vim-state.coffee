@@ -430,7 +430,6 @@ class VimState
 
   activateReplaceMode: ->
     @activateInsertMode('replace')
-    @replaceModeCheckpoint = null
     @replaceModeCounter = 0
     @editorElement.classList.add('replace-mode')
     @subscriptions.add @replaceModeListener = @editor.onWillInsertText @replaceModeInsertHandler
@@ -439,20 +438,20 @@ class VimState
   replaceModeInsertHandler: (event) =>
     chars = event.text?.split('') or []
     selections = @editor.getSelections()
-    @replaceModeCheckpoint = @editor.createCheckpoint()
     for char in chars
       continue if char is '\n'
       for selection in selections
-        # Delete next character
         selection.delete() unless selection.cursor.isAtEndOfLine()
+    return
 
   replaceModeUndoHandler: (event) =>
-    @editor.groupChangesSinceCheckpoint(@replaceModeCheckpoint) if @replaceModeCheckpoint?
     @replaceModeCounter++
 
   replaceModeUndo: ->
     if @replaceModeCounter > 0
       @editor.undo()
+      @editor.undo()
+      @editor.moveLeft()
       @replaceModeCounter--
 
   setInsertionCheckpoint: ->

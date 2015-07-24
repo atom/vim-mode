@@ -1831,9 +1831,11 @@ describe "Operators", ->
       keydown 'backspace', raw: true
 
       expect(editor.getText()).toBe "12foo345\n67890"
+      expect(editor.getSelectedText()).toBe ""
 
       keydown 'backspace', raw: true
       expect(editor.getText()).toBe "12foo345\n67890"
+      expect(editor.getSelectedText()).toBe ""
 
     it "can be repeated", ->
       keydown "R", shift: true
