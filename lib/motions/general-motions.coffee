@@ -110,6 +110,13 @@ class Motion
   isInclusive: ->
     @vimState.mode is 'visual' or @operatesInclusively
 
+  getScreenRowCount: (cursor) ->
+    return 1 unless (@editor.isSoftWrapped() and @isLinewise())
+
+    bufferRow = cursor.getBufferRow()
+    bufferRowRange = new Range([bufferRow, 0], [bufferRow, Infinity])
+    @editor.screenRangeForBufferRange(bufferRowRange).getRowCount()
+
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
@@ -167,7 +174,7 @@ class MoveUp extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, =>
       unless cursor.getScreenRow() is 0
-        cursor.moveUp()
+        cursor.moveUp(@getScreenRowCount(cursor))
         @ensureCursorIsWithinLine(cursor)
 
 class MoveDown extends Motion
@@ -176,7 +183,7 @@ class MoveDown extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, =>
       unless cursor.getScreenRow() is @editor.getLastScreenRow()
-        cursor.moveDown()
+        cursor.moveDown(@getScreenRowCount(cursor))
         @ensureCursorIsWithinLine(cursor)
 
 class MoveToPreviousWord extends Motion
