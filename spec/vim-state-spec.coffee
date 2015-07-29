@@ -359,28 +359,30 @@ describe "VimState", ->
         ])
 
       it "harmonizes selection directions", ->
-        keydown("i")
-        keydown("w")
+        editor.setCursorBufferPosition([0, 0])
+        keydown("e")
+        keydown("e")
         editor.addCursorAtBufferPosition([0, Infinity])
+        keydown("h")
         keydown("h")
 
         expect(editor.getSelectedBufferRanges()).toEqual([
-          [[0, 4], [0, 6]],
-          [[0, 12], [0, 13]]
+          [[0, 0], [0, 5]],
+          [[0, 11], [0, 13]]
         ])
         expect(editor.getCursorBufferPositions()).toEqual([
-          [0, 6]
-          [0, 12]
+          [0, 5]
+          [0, 11]
         ])
 
         keydown("o")
 
         expect(editor.getSelectedBufferRanges()).toEqual([
-          [[0, 4], [0, 6]],
-          [[0, 12], [0, 13]]
+          [[0, 0], [0, 5]],
+          [[0, 11], [0, 13]]
         ])
         expect(editor.getCursorBufferPositions()).toEqual([
-          [0, 6]
+          [0, 5]
           [0, 13]
         ])
 
