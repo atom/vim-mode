@@ -173,3 +173,10 @@ describe "Prefixes", ->
         keydown 'r', ctrl: true
         keydown 'a'
         expect(editor.getText()).toBe '01abc2\n'
+
+      it "is cancelled with the escape key", ->
+        keydown 'r', ctrl: true
+        keydown 'escape'
+        expect(editor.getText()).toBe '012\n'
+        expect(vimState.mode).toBe "insert"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
