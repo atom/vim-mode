@@ -590,16 +590,45 @@ describe "Operators", ->
       editor.setText("12345\nabcde\nABCDE")
 
     describe "when followed by a c", ->
-      it "deletes the current line and enters insert mode", ->
-        editor.setCursorScreenPosition([1, 1])
+      describe "with autoindent", ->
+        beforeEach ->
+          editor.setText("12345\n  abcde\nABCDE")
+          editor.setCursorScreenPosition([1, 1])
+          spyOn(editor, 'shouldAutoIndent').andReturn(true)
+          spyOn(editor, 'autoIndentBufferRow').andCallFake (line) ->
+            editor.indent()
+          spyOn(editor.languageMode, 'suggestedIndentForLineAtBufferRow').andCallFake -> 1
 
-        keydown('c')
-        keydown('c')
+        it "deletes the current line and enters insert mode", ->
+          editor.setCursorScreenPosition([1, 1])
 
-        expect(editor.getText()).toBe "12345\n\nABCDE"
-        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
-        expect(editorElement.classList.contains('normal-mode')).toBe(false)
-        expect(editorElement.classList.contains('insert-mode')).toBe(true)
+          keydown('c')
+          keydown('c')
+
+          expect(editor.getText()).toBe "12345\n  \nABCDE"
+          expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+          expect(editorElement.classList.contains('normal-mode')).toBe(false)
+          expect(editorElement.classList.contains('insert-mode')).toBe(true)
+
+        it "is repeatable", ->
+          keydown('c')
+          keydown('c')
+          editor.insertText("abc")
+          keydown 'escape'
+          expect(editor.getText()).toBe "12345\n  abc\nABCDE"
+          editor.setCursorScreenPosition([2, 3])
+          keydown '.'
+          expect(editor.getText()).toBe "12345\n  abc\n  abc\n"
+
+        it "is undoable", ->
+          keydown('c')
+          keydown('c')
+          editor.insertText("abc")
+          keydown 'escape'
+          expect(editor.getText()).toBe "12345\n  abc\nABCDE"
+          keydown 'u'
+          expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
+          expect(editor.getSelectedText()).toBe ''
 
       describe "when the cursor is on the last line", ->
         it "deletes the line's content and enters insert mode on the last line", ->
