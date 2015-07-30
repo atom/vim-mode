@@ -52,7 +52,9 @@ class Put extends Operator
         @editor.moveToBeginningOfLine()
         originalPosition = @editor.getCursorScreenPosition()
 
-    @editor.insertText(textToInsert)
+    range = @editor.insertText(textToInsert)
+    @vimState.setMark '[', range.start
+    @vimState.setMark ']', range.end
 
     if originalPosition?
       @editor.setCursorScreenPosition(originalPosition)
