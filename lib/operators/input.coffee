@@ -12,13 +12,15 @@ class Insert extends Operator
   isComplete: -> @standalone or super
 
   confirmChanges: (changes) ->
-    bundler = new TransactionBundler(changes, @editor)
+    @bundler = new TransactionBundler(changes, @editor)
     @typedText = bundler.buildInsertText()
 
   execute: ->
     if @typingCompleted
       return unless @typedText? and @typedText.length > 0
       @editor.insertText(@typedText, normalizeLineEndings: true)
+      @vimState.setMark '[', @bundler.start
+      @vimState.setMark ']', @bundler.end
       for cursor in @editor.getCursors()
         cursor.moveLeft() unless cursor.isAtBeginningOfLine()
     else
