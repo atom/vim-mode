@@ -21,6 +21,17 @@ describe "TextObjects", ->
   normalModeInputKeydown = (key, opts = {}) ->
     editor.normalModeInputView.editorElement.getModel().setText(key)
 
+  describe "Text Object commands in normal mode not preceded by an operator", ->
+    beforeEach ->
+      vimState.activateNormalMode()
+
+    it "selects the appropriate text", ->
+      editor.setText("<html> text </html>")
+      editor.setCursorScreenPosition([0, 7])
+      # Users could dispatch it via the command palette
+      atom.commands.dispatch(editorElement, "vim-mode:select-inside-tags")
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 12]]
+
   describe "the 'iw' text object", ->
     beforeEach ->
       editor.setText("12345 abcde ABCDE")
