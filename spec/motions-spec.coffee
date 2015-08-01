@@ -1524,10 +1524,10 @@ describe "Motions", ->
     it "cancels c when no match found", ->
       keydown('c')
       keydown('f')
-      commandModeInputKeydown('d')
+      normalModeInputKeydown('d')
       expect(editor.getText()).toBe("abcabcabcabc\n")
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
-      expect(vimState.mode).toBe "command"
+      expect(vimState.mode).toBe "normal"
 
   describe 'the t/T keybindings', ->
     beforeEach ->

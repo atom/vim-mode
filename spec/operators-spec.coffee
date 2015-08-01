@@ -728,7 +728,7 @@ describe "Operators", ->
 
         it "undoes correctly with u", ->
           keydown('escape')
-          expect(vimState.mode).toBe "command"
+          expect(vimState.mode).toBe "normal"
           keydown 'u'
           expect(editor.getText()).toBe("12345(67)8\nabc(d)e\nA()BCDE")
 
@@ -752,7 +752,7 @@ describe "Operators", ->
           keydown('c')
           keydown('%')
           expect(editor.getText()).toBe("12345(67)8\nabc(d)e\nABCDE")
-          expect(vimState.mode).toBe "command"
+          expect(vimState.mode).toBe "normal"
 
       describe "repetition with .", ->
         beforeEach ->
@@ -766,33 +766,33 @@ describe "Operators", ->
           editor.setCursorScreenPosition([1, 0])
           keydown('.')
           expect(editor.getText()).toBe("1x8\nxe\nA()BCDE")
-          expect(vimState.mode).toBe "command"
+          expect(vimState.mode).toBe "normal"
 
         it "repeats correctly on the opening bracket", ->
           editor.setCursorScreenPosition([1, 3])
           keydown('.')
           expect(editor.getText()).toBe("1x8\nabcxe\nA()BCDE")
-          expect(vimState.mode).toBe "command"
+          expect(vimState.mode).toBe "normal"
 
         it "repeats correctly inside brackets", ->
           editor.setCursorScreenPosition([1, 4])
           keydown('.')
           # this differs from VIM, which deletes the character originally under cursor
           expect(editor.getText()).toBe("1x8\nabcxd)e\nA()BCDE")
-          expect(vimState.mode).toBe "command"
+          expect(vimState.mode).toBe "normal"
 
         it "repeats correctly on the closing bracket", ->
           editor.setCursorScreenPosition([1, 5])
           keydown('.')
           # this differs from VIM, which deletes the character originally under cursor
           expect(editor.getText()).toBe("1x8\nabcx)e\nA()BCDE")
-          expect(vimState.mode).toBe "command"
+          expect(vimState.mode).toBe "normal"
 
         it "does nothing when repeated after a bracket", ->
           editor.setCursorScreenPosition([2, 3])
           keydown('.')
           expect(editor.getText()).toBe("1x8\nabc(d)e\nA()BCDE")
-          expect(vimState.mode).toBe "command"
+          expect(vimState.mode).toBe "normal"
 
     describe "when followed by a goto line G", ->
       beforeEach ->
