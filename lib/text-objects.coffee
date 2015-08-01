@@ -169,7 +169,7 @@ class Paragraph extends TextObject
   # Return a range delimted by the start or the end of a paragraph
   paragraphDelimitedRange: (startPoint) ->
     inParagraph = @isParagraphLine(@editor.lineTextForBufferRow(startPoint.row))
-    upperRow = @searchLines(startPoint.row, 0, inParagraph)
+    upperRow = @searchLines(startPoint.row, -1, inParagraph)
     lowerRow = @searchLines(startPoint.row, @editor.getLineCount(), inParagraph)
     new Range([upperRow + 1, 0], [lowerRow, 0])
 

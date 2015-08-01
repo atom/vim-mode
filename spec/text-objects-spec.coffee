@@ -222,6 +222,16 @@ describe "TextObjects", ->
 
       expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [4, 0]]
 
+    it "selects all the lines", ->
+      editor.setText("text\ntext\ntext\n")
+      editor.setCursorBufferPosition([0, 0])
+
+      keydown('v')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 0], [3, 0]]
+
   describe "the 'ap' text object", ->
     beforeEach ->
       editor.setText("text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext")
