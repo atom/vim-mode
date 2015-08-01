@@ -656,7 +656,7 @@ class VimState
   # Returns nothing.
   insertRegister: (name) ->
     text = @getRegister(name)?.text
-    @editor.insertText(text) if text?
+    @editor.insertText(text, groupUndo: true) if text?
 
   ensureCursorIsWithinLine: (cursor) =>
     return if @processing or @mode isnt 'normal'
