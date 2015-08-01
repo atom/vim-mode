@@ -110,7 +110,7 @@ class Motion
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @lastSelection = @editor.getSelectedBufferRange()
+    @lastSelectionRange = @editor.getSelectedBufferRange()
     @wasLinewise = @isLinewise()
 
   execute: (count=1) ->
@@ -128,32 +128,26 @@ class CurrentSelection extends Motion
     _.times(count, -> true)
 
   selectLines: ->
-    {start, end} = @lastSelection
-    lineCount = end.row - start.row
+    lastSelectionExtent = @lastSelectionRange.getExtent()
     for selection in @editor.getSelections()
       cursor = selection.cursor.getBufferPosition()
-      selection.setBufferRange
-        start:
-          row: cursor.row
-          column: 0
-        end:
-          row: cursor.row + end.row - start.row
-          column: 0
+      selection.setBufferRange [[cursor.row, 0], [cursor.row + lastSelectionExtent.row, 0]]
+    return
 
   selectCharacters: ->
-    {start, end} = @lastSelection
-    if @lastSelection.isSingleLine()
-      count = end.column - start.column
-      wrap = settings.wrapLeftRightMotion()
-      for selection in @editor.getSelections()
-        _.times count, ->
-          selection.selectRight() if wrap or not selection.cursor.isAtEndOfLine()
-    else
-      for selection in @editor.getSelections()
-        cursor = selection.cursor.getBufferPosition()
-        selection.selectToBufferPosition
-          row: cursor.row + end.row - start.row
-          column: end.column
+    lastSelectionExtent = @lastSelectionRange.getExtent()
+    wrap = settings.wrapLeftRightMotion()
+    for selection in @editor.getSelections()
+      {start} = selection.getBufferRange()
+      newEnd = start.traverse(lastSelectionExtent)
+      selection.setBufferRange([start, newEnd])
+
+      if wrap
+        columnDifference = newEnd.column - selection.getBufferRange().end.column
+        if columnDifference > 0
+          _.times columnDifference, -> selection.selectRight()
+
+    return
 
 # Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
