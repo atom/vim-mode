@@ -75,7 +75,7 @@ class VimState
       'repeat-prefix': (e) => @repeatPrefix(e)
       'reverse-selections': (e) => @reverseSelections(e)
       'undo': (e) => @undo(e)
-      'replace-mode-backspace': => @replaceModeUndo()
+      'replace-mode-backspace': => @replaceModeBackspace()
       'insert-mode-put': (e) => @insertRegister(@registerName(e))
       'copy-from-line-above': => InsertMode.copyCharacterFromAbove(@editor, this)
       'copy-from-line-below': => InsertMode.copyCharacterFromBelow(@editor, this)
@@ -430,29 +430,29 @@ class VimState
 
   activateReplaceMode: ->
     @activateInsertMode('replace')
+    @replaceModeUndoCheckpoint = @insertionCheckpoint
     @replaceModeCounter = 0
     @editorElement.classList.add('replace-mode')
     @subscriptions.add @replaceModeListener = @editor.onWillInsertText @replaceModeInsertHandler
-    @subscriptions.add @replaceModeUndoListener = @editor.onDidInsertText @replaceModeUndoHandler
 
   replaceModeInsertHandler: (event) =>
     chars = event.text?.split('') or []
     selections = @editor.getSelections()
-    for char in chars
-      continue if char is '\n'
-      for selection in selections
-        selection.delete() unless selection.cursor.isAtEndOfLine()
+    for selection in selections
+      unless selection.cursor.isAtEndOfLine()
+        # transact with a small grouping interval so that the change gets grouped with the following insertion in the undo stack
+        @editor.transact 50, ->
+          for char in chars
+            continue if char is '\n'
+            selection.delete()
+            break if selection.cursor.isAtEndOfLine()
     return
 
-  replaceModeUndoHandler: (event) =>
-    @replaceModeCounter++
-
-  replaceModeUndo: ->
-    if @replaceModeCounter > 0
+  # backspace in replace mode actually does undo, hoping that a single character will be undone
+  # it should actually manipulate history and only undo a single character - FIXME revisit when atom/text-buffer Patch lands
+  replaceModeBackspace: ->
+    if hasChangesAfterCheckpoint @editor, @replaceModeUndoCheckpoint
       @editor.undo()
-      @editor.undo()
-      @editor.moveLeft()
-      @replaceModeCounter--
 
   setInsertionCheckpoint: ->
     @insertionCheckpoint = @editor.createCheckpoint() unless @insertionCheckpoint?
@@ -473,9 +473,6 @@ class VimState
       @replaceModeListener.dispose()
       @subscriptions.remove @replaceModeListener
       @replaceModeListener = null
-      @replaceModeUndoListener.dispose()
-      @subscriptions.remove @replaceModeUndoListener
-      @replaceModeUndoListener = null
 
   deactivateVisualMode: ->
     return unless @mode is 'visual'
@@ -680,3 +677,14 @@ getChangesSinceCheckpoint = (buffer, checkpoint) ->
     history.undoStack.slice(index)
   else
     []
+
+hasChangesAfterCheckpoint = (editor, checkpointId) ->
+  {history} = editor.buffer
+
+  for entry, i in history.undoStack by -1
+    if entry.id? # the entry is a Checkpoint
+      if entry.id <= checkpointId
+        return false
+    else # the entry is not a checkpoint so it's a change
+      return true
+  return null
