@@ -13,6 +13,11 @@ TextObjects = require './text-objects'
 Utils = require './utils'
 Scroll = require './scroll'
 
+isOperator   = (obj) -> obj instanceof Operators.Operator
+isTextObject = (obj) -> obj instanceof TextObjects.TextObject
+isMotion     = (obj) -> obj instanceof Motions.Motion
+isRepeat     = (obj) -> obj instanceof Prefixes.Repeat
+
 module.exports =
 class VimState
   editor: null
@@ -221,7 +226,7 @@ class VimState
 
       for operation in operations
         # Motions in visual mode perform their selections.
-        if @isVisualMode() and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
+        if @isVisualMode() and (isMotion(operation) or isTextObject(operation))
           operation.execute = operation.select
 
         # if we have started an operation that responds to canComposeWith check if it can compose
@@ -235,7 +240,7 @@ class VimState
 
         # If we've received an operator in visual mode, mark the current
         # selection as the motion to operate on.
-        if @isVisualMode() and operation instanceof Operators.Operator
+        if @isVisualMode() and isOperator(operation)
           @opStack.push(new Motions.CurrentSelection(@editor, this))
 
         @processOpStack()
@@ -267,7 +272,7 @@ class VimState
       return
 
     unless @topOperation().isComplete()
-      if @isNormalMode() and @topOperation() instanceof Operators.Operator
+      if @isNormalMode() and isOperator(@topOperation())
         @activateOperatorPendingMode()
       return
 
@@ -597,7 +602,7 @@ class VimState
   repeatPrefix: (e) ->
     keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
     num = parseInt(atom.keymaps.keystrokeForKeyboardEvent(keyboardEvent))
-    if @topOperation() instanceof Prefixes.Repeat
+    if isRepeat(@topOperation())
       @topOperation().addDigit(num)
     else
       if num is 0
@@ -618,7 +623,7 @@ class VimState
   #
   # Returns new motion or nothing.
   moveOrRepeat: (e) ->
-    if @topOperation() instanceof Prefixes.Repeat
+    if isRepeat(@topOperation())
       @repeatPrefix(e)
       null
     else
