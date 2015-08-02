@@ -1327,24 +1327,38 @@ describe "Operators", ->
           it "outdents all three lines", ->
             expect(editor.getText()).toBe "12345\nabcde\nABCDE"
 
-    describe "in visual mode", ->
+    describe "in visual mode linewise", ->
       beforeEach ->
         editor.setCursorScreenPosition([0, 0])
         keydown('v', shift: true)
-        keydown('>')
+        keydown('j')
 
-      it "indents the current line and exits visual mode", ->
-        expect(editorElement.classList.contains('normal-mode')).toBe(true)
-        expect(editor.getText()).toBe "  12345\nabcde\nABCDE"
-        expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 2], [0, 2]] ]
+      describe "single indent multiple lines", ->
+        beforeEach ->
+          keydown('>')
 
-      it "allows repeating the operation", ->
-        keydown(".")
-        expect(editor.getText()).toBe "    12345\nabcde\nABCDE"
+        it "indents both lines once and exits visual mode", ->
+          expect(editorElement.classList.contains('normal-mode')).toBe(true)
+          expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
+          expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 2], [0, 2]] ]
+
+        it "allows repeating the operation", ->
+          keydown('.')
+          expect(editor.getText()).toBe "    12345\n    abcde\nABCDE"
+
+      describe "multiple indent multiple lines", ->
+        beforeEach ->
+          keydown('2')
+          keydown('>')
+
+        it "indents both lines twice and exits visual mode", ->
+          expect(editorElement.classList.contains('normal-mode')).toBe(true)
+          expect(editor.getText()).toBe "    12345\n    abcde\nABCDE"
+          expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 4], [0, 4]] ]
 
   describe "the < keybinding", ->
     beforeEach ->
-      editor.setText("  12345\n  abcde\nABCDE")
+      editor.setText("    12345\n    abcde\nABCDE")
       editor.setCursorScreenPosition([0, 0])
 
     describe "when followed by a <", ->
@@ -1352,9 +1366,9 @@ describe "Operators", ->
         keydown('<')
         keydown('<')
 
-      it "indents the current line", ->
-        expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      it "outdents the current line", ->
+        expect(editor.getText()).toBe "  12345\n    abcde\nABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
     describe "when followed by a repeating <", ->
       beforeEach ->
@@ -1362,25 +1376,43 @@ describe "Operators", ->
         keydown('<')
         keydown('<')
 
-      it "indents multiple lines at once", ->
-        expect(editor.getText()).toBe "12345\nabcde\nABCDE"
-        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+      it "outdents multiple lines at once", ->
+        expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
+        expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
       describe "undo behavior", ->
         beforeEach -> keydown('u')
 
         it "indents both lines", ->
-          expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
+          expect(editor.getText()).toBe "    12345\n    abcde\nABCDE"
 
-    describe "in visual mode", ->
+    describe "in visual mode linewise", ->
       beforeEach ->
         keydown('v', shift: true)
-        keydown('<')
+        keydown('j')
 
-      it "indents the current line and exits visual mode", ->
-        expect(editorElement.classList.contains('normal-mode')).toBe(true)
-        expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
-        expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 0], [0, 0]] ]
+      describe "single outdent multiple lines", ->
+        beforeEach ->
+          keydown('<')
+
+        it "outdents the current line and exits visual mode", ->
+          expect(editorElement.classList.contains('normal-mode')).toBe(true)
+          expect(editor.getText()).toBe "  12345\n  abcde\nABCDE"
+          expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 2], [0, 2]] ]
+
+        it "allows repeating the operation", ->
+          keydown('.')
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+
+      describe "multiple outdent multiple lines", ->
+        beforeEach ->
+          keydown('2')
+          keydown('<')
+
+        it "outdents both lines twice and exits visual mode", ->
+          expect(editorElement.classList.contains('normal-mode')).toBe(true)
+          expect(editor.getText()).toBe "12345\nabcde\nABCDE"
+          expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 0], [0, 0]] ]
 
   describe "the = keybinding", ->
     oldGrammar = []
