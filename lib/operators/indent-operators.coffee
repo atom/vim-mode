@@ -1,3 +1,4 @@
+_ = require 'underscore-plus'
 {Operator} = require './general-operators'
 
 class AdjustIndentation extends Operator
@@ -6,7 +7,11 @@ class AdjustIndentation extends Operator
     @motion.select(count)
     {start} = @editor.getSelectedBufferRange()
 
-    @indent()
+    if mode is 'visual'
+      @editor.transact =>
+        _.times(count, => @indent())
+    else
+      @indent()
 
     @editor.setCursorBufferPosition([start.row, 0])
     @editor.moveToFirstCharacterOfLine()
