@@ -13,6 +13,11 @@ TextObjects = require './text-objects'
 Utils = require './utils'
 Scroll = require './scroll'
 
+isOperator   = (obj) -> obj instanceof Operators.Operator
+isTextObject = (obj) -> obj instanceof TextObjects.TextObject
+isMotion     = (obj) -> obj instanceof Motions.Motion
+isRepeat     = (obj) -> obj instanceof Prefixes.Repeat
+
 module.exports =
 class VimState
   editor: null
@@ -34,9 +39,9 @@ class VimState
     @subscriptions.add @editor.onDidChangeSelectionRange _.debounce(=>
       return unless @editor?
       if @editor.getSelections().every((selection) -> selection.isEmpty())
-        @activateNormalMode() if @mode is 'visual'
+        @activateNormalMode() if @isVisualMode()
       else
-        @activateVisualMode('characterwise') if @mode is 'normal'
+        @activateVisualMode('characterwise') if @isNormalMode()
     , 100)
 
     @subscriptions.add @editor.onDidChangeCursorPosition ({cursor}) => @ensureCursorIsWithinLine(cursor)
@@ -221,7 +226,7 @@ class VimState
 
       for operation in operations
         # Motions in visual mode perform their selections.
-        if @mode is 'visual' and (operation instanceof Motions.Motion or operation instanceof TextObjects.TextObject)
+        if @isVisualMode() and (isMotion(operation) or isTextObject(operation))
           operation.execute = operation.select
 
         # if we have started an operation that responds to canComposeWith check if it can compose
@@ -235,7 +240,7 @@ class VimState
 
         # If we've received an operator in visual mode, mark the current
         # selection as the motion to operate on.
-        if @mode is 'visual' and operation instanceof Operators.Operator
+        if @isVisualMode() and isOperator(operation)
           @opStack.push(new Motions.CurrentSelection(@editor, this))
 
         @processOpStack()
@@ -267,7 +272,7 @@ class VimState
       return
 
     unless @topOperation().isComplete()
-      if @mode is 'normal' and @topOperation() instanceof Operators.Operator
+      if @isNormalMode() and isOperator(@topOperation())
         @activateOperatorPendingMode()
       return
 
@@ -478,7 +483,7 @@ class VimState
       @replaceModeUndoListener = null
 
   deactivateVisualMode: ->
-    return unless @mode is 'visual'
+    return unless @isVisualMode()
     for selection in @editor.getSelections()
       selection.cursor.moveLeft() unless (selection.isEmpty() or selection.isReversed())
 
@@ -501,7 +506,7 @@ class VimState
     #  * activate-blockwise-visual-mode
     #  * activate-characterwise-visual-mode
     #  * activate-linewise-visual-mode
-    if @mode is 'visual'
+    if @isVisualMode()
       if @submode is type
         @activateNormalMode()
         return
@@ -597,7 +602,7 @@ class VimState
   repeatPrefix: (e) ->
     keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
     num = parseInt(atom.keymaps.keystrokeForKeyboardEvent(keyboardEvent))
-    if @topOperation() instanceof Prefixes.Repeat
+    if isRepeat(@topOperation())
       @topOperation().addDigit(num)
     else
       if num is 0
@@ -618,7 +623,7 @@ class VimState
   #
   # Returns new motion or nothing.
   moveOrRepeat: (e) ->
-    if @topOperation() instanceof Prefixes.Repeat
+    if isRepeat(@topOperation())
       @repeatPrefix(e)
       null
     else
@@ -662,7 +667,7 @@ class VimState
     @editor.insertText(text) if text?
 
   ensureCursorIsWithinLine: (cursor) =>
-    return if @processing or @mode isnt 'normal'
+    return if @processing or (not @isNormalMode())
 
     {goalColumn} = cursor
     if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
@@ -670,6 +675,12 @@ class VimState
       cursor.moveLeft()
       @processing = false
     cursor.goalColumn = goalColumn
+
+  isVisualMode: -> @mode is 'visual'
+  isNormalMode: -> @mode is 'normal'
+  isInsertMode: -> @mode is 'insert'
+  isOperatorPendingMode: -> @mode is 'operator-pending'
+
 
 # This uses private APIs and may break if TextBuffer is refactored.
 # Package authors - copy and paste this code at your own risk.
