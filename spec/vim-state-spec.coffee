@@ -475,3 +475,17 @@ describe "VimState", ->
       keydown('`')
       normalModeInputKeydown('q')
       expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
+    it "last-insert marks: '[' and ']'", ->
+      editor.setCursorBufferPosition([1, 0])
+      keydown('y')
+      keydown('y')
+      keydown('p')
+      editor.setCursorBufferPosition([0, 0])
+      keydown('`')
+      normalModeInputKeydown('[')
+      expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+      keydown('escape')
+      keydown('`')
+      normalModeInputKeydown(']')
+      expect(editor.getCursorBufferPosition()).toEqual [2, 13]
