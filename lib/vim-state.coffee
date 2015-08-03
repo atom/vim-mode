@@ -367,8 +367,9 @@ class VimState
   #
   # Returns nothing.
   setMark: (name, pos) ->
-    # check to make sure name is in [a-z] or is `
-    if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
+    # check to make sure name is in [a-z] OR is `, <, >, [ or ]
+    charCode = name.charCodeAt(0)
+    if (charCode >= 96 and charCode <= 122) or (charCode in [60, 62, 91, 93])
       marker = @editor.markBufferRange(new Range(pos, pos), {invalidate: 'never', persistent: false})
       @marks[name] = marker
 
