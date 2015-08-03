@@ -672,6 +672,31 @@ class VimState
       @processing = false
     cursor.goalColumn = goalColumn
 
+  # Private: set marks [ and ] to first and last inserted characters
+  #
+  # range - the range of inserted characters
+  #
+  # Returns nothing.
+  setLastInsertMarks: (range) ->
+    {start, end} = range
+    @setMark '[', start
+    @setMark ']', @getPreviousCharPosition(end)
+
+  # Private: get the buffer position of the previous char
+  #
+  # position - the initial position:{Point}
+  #
+  # Returns the position of the previous char, or Point(0, 0) if point is at
+  # the begining of the file.
+  getPreviousCharPosition: (position) ->
+    {row, column} = position
+    unless column is 0
+      column -= 1
+    else unless row is 0
+      row   -= 1
+      column = @editor.lineTextForBufferRow(row).length - 1
+    return new Point(row, column)
+
 # This uses private APIs and may break if TextBuffer is refactored.
 # Package authors - copy and paste this code at your own risk.
 getChangesSinceCheckpoint = (buffer, checkpoint) ->
