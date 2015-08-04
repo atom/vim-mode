@@ -395,9 +395,9 @@ class VimState
   # Private: Used to enable normal mode.
   #
   # Returns nothing.
-  activateNormalMode: ->
+  activateNormalMode: (options={}) ->
     @deactivateInsertMode()
-    @deactivateVisualMode()
+    @deactivateVisualMode(options.restoreColumn)
 
     @mode = 'normal'
     @submode = null
@@ -477,8 +477,10 @@ class VimState
       @subscriptions.remove @replaceModeUndoListener
       @replaceModeUndoListener = null
 
-  deactivateVisualMode: ->
+  deactivateVisualMode: (restoreColumn=true) ->
     return unless @mode is 'visual'
+    if restoreColumn and @submode is 'linewise'
+      @selectCharacterwise()
     for selection in @editor.getSelections()
       selection.cursor.moveLeft() unless (selection.isEmpty() or selection.isReversed())
 
@@ -508,26 +510,10 @@ class VimState
 
       @submode = type
       if @submode is 'linewise'
-        for selection in @editor.getSelections()
-          # Keep original range as marker's property to get back
-          # to characterwise.
-          # Since selectLine lost original cursor column.
-          originalRange = selection.getBufferRange()
-          selection.marker.setProperties({originalRange})
-          [start, end] = selection.getBufferRowRange()
-          selection.selectLine(row) for row in [start..end]
-
+        @selectLinewise()
       else if @submode in ['characterwise', 'blockwise']
         # Currently, 'blockwise' is not yet implemented.
-        # So treat it as characterwise.
-        # Recover original range.
-        for selection in @editor.getSelections()
-          {originalRange} = selection.marker.getProperties()
-          if originalRange
-            [startRow, endRow] = selection.getBufferRowRange()
-            originalRange.start.row = startRow
-            originalRange.end.row   = endRow
-            selection.setBufferRange(originalRange)
+        @selectCharacterwise()
     else
       @deactivateInsertMode()
       @mode = 'visual'
@@ -535,11 +521,33 @@ class VimState
       @changeModeClass('visual-mode')
 
       if @submode is 'linewise'
-        @editor.selectLinesContainingCursors()
+        @selectLinewise()
       else if @editor.getSelectedText() is ''
         @editor.selectRight()
 
     @updateStatusBar()
+
+  # Private: Select lines containing cursor with saving original column.
+  selectLinewise: ->
+    for selection in @editor.getSelections()
+      # Keep original range as marker's property to get back
+      # to characterwise.
+      # Since selectLine lost original cursor column.
+      originalRange = selection.getBufferRange()
+      selection.marker.setProperties({originalRange})
+      [start, end] = selection.getBufferRowRange()
+      for row in [start..end]
+        selection.selectLine(row)
+
+  # Private: Set column of each selection to saved column.
+  selectCharacterwise: ->
+    for selection in @editor.getSelections()
+      {originalRange} = selection.marker.getProperties()
+      if originalRange
+        [startRow, endRow] = selection.getBufferRowRange()
+        originalRange.start.row = startRow
+        originalRange.end.row   = endRow
+        selection.setBufferRange(originalRange)
 
   # Private: Used to re-enable visual mode
   resetVisualMode: ->
