@@ -193,7 +193,6 @@ describe "TextObjects", ->
       editor.setCursorBufferPosition([2, 2])
 
     it "applies operators inside the current paragraph in operator-pending mode", ->
-
       keydown('y')
       keydown('i')
       keydown('p')
@@ -205,7 +204,6 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
     it "selects inside the current paragraph in visual mode", ->
-
       keydown('v')
       keydown('i')
       keydown('p')
@@ -238,7 +236,6 @@ describe "TextObjects", ->
       editor.setCursorScreenPosition([3, 2])
 
     it "applies operators around the current paragraph in operator-pending mode", ->
-
       keydown('y')
       keydown('a')
       keydown('p')
