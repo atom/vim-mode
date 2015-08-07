@@ -119,7 +119,10 @@ class Change extends Insert
       @setTextRegister(@register, @editor.getSelectedText())
       if @motion.isLinewise?() and not @typingCompleted
         for selection in @editor.getSelections()
-          selection.insertText("\n", autoIndent: true)
+          if selection.getBufferRange().end.row is 0
+            selection.deleteSelectedText()
+          else
+            selection.insertText("\n", autoIndent: true)
           selection.cursor.moveLeft()
       else
         for selection in @editor.getSelections()

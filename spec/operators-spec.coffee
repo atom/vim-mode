@@ -650,7 +650,7 @@ describe "Operators", ->
           keydown('c')
           keydown('c')
 
-          expect(editor.getText()).toBe "\n"
+          expect(editor.getText()).toBe ""
           expect(editor.getCursorScreenPosition()).toEqual [0, 0]
           expect(editorElement.classList.contains('normal-mode')).toBe(false)
           expect(editorElement.classList.contains('insert-mode')).toBe(true)
