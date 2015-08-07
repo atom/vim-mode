@@ -130,14 +130,6 @@ class Change extends Insert
     @vimState.activateInsertMode()
     @typingCompleted = true
 
-class SubstituteLine extends Change
-  standalone: true
-  register: null
-
-  constructor: (@editor, @vimState) ->
-    @register = settings.defaultRegister()
-    @motion = new Motions.MoveToRelativeLine(@editor, @vimState)
-
 # Takes a transaction and turns it into a string of what was typed.
 # This class is an implementation detail of Insert
 class TransactionBundler
@@ -212,6 +204,5 @@ module.exports = {
   InsertAboveWithNewline,
   InsertBelowWithNewline,
   ReplaceMode,
-  Change,
-  SubstituteLine
+  Change
 }
