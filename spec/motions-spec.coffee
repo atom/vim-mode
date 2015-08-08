@@ -1464,6 +1464,9 @@ describe "Motions", ->
       expect(editor.getCursorBufferPosition()).toEqual [0, 4]
 
     it 'moves to the definition of a php variable', ->
+      # a user may choose to include `$` as part of names:
+      atom.config.set('vim-mode.iskeyword', '[$@a-zA-Z0-9_\-]+')
+
       editor.setText('$myVar = 20;\n$myVar')
       editor.setCursorBufferPosition([1, 1])
       keydown('g')

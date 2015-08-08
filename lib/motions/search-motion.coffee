@@ -26,13 +26,13 @@ class SearchBase extends MotionWithInput
     else
       atom.beep()
 
-  scan: (cursor) ->
+  scan: (cursor, returnFirstResult = false) ->
     return [] if @input.characters is ""
-
     currentPosition = cursor.getBufferPosition()
 
     [rangesBefore, rangesAfter] = [[], []]
-    @editor.scan @getSearchTerm(@input.characters), ({range}) =>
+    @editor.scan @getSearchTerm(@input.characters), (iteration) =>
+      range = iteration.range
       isBefore = if @reverse
         range.start.compare(currentPosition) < 0
       else
@@ -42,6 +42,8 @@ class SearchBase extends MotionWithInput
         rangesBefore.push(range)
       else
         rangesAfter.push(range)
+
+      iteration.stop() if returnFirstResult
 
     if @reverse
       rangesAfter.concat(rangesBefore).reverse()
@@ -59,6 +61,9 @@ class SearchBase extends MotionWithInput
       modifiers['i'] = true
 
     modFlags = Object.keys(modifiers).join('')
+
+    # Escape the term for use in regex
+    term = term.replace /([$])/g, '\\$1'
 
     try
       new RegExp(term, modFlags)
