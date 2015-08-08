@@ -1,8 +1,5 @@
 _ = require 'underscore-plus'
-{Motion, MoveToFirstCharacterOfLine} = require './general-motions'
-{ViewModel} = require '../view-models/view-model'
 {Input} = require '../view-models/view-model'
-{Point, Range} = require 'atom'
 {SearchCurrentWord} = require './search-motion'
 
 module.exports =
