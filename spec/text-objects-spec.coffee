@@ -190,10 +190,9 @@ describe "TextObjects", ->
   describe "the 'ip' text object", ->
     beforeEach ->
       editor.setText("\nParagraph-1\nParagraph-1\nParagraph-1\n\n")
-      editor.setCursorScreenPosition([2, 2])
+      editor.setCursorBufferPosition([2, 2])
 
     it "applies operators inside the current paragraph in operator-pending mode", ->
-
       keydown('y')
       keydown('i')
       keydown('p')
@@ -211,20 +210,39 @@ describe "TextObjects", ->
 
       expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [4, 0]]
 
+    it "selects between paragraphs in visual mode if invoked on a empty line", ->
+      editor.setText("text\n\n\n\ntext\n")
+      editor.setCursorBufferPosition([1, 0])
+
+      keydown('v')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [4, 0]]
+
+    it "selects all the lines", ->
+      editor.setText("text\ntext\ntext\n")
+      editor.setCursorBufferPosition([0, 0])
+
+      keydown('v')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 0], [3, 0]]
+
   describe "the 'ap' text object", ->
     beforeEach ->
-      editor.setText("text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\nmoretext")
+      editor.setText("text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext")
       editor.setCursorScreenPosition([3, 2])
 
     it "applies operators around the current paragraph in operator-pending mode", ->
-
       keydown('y')
       keydown('a')
       keydown('p')
 
-      expect(editor.getText()).toBe "text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\nmoretext"
+      expect(editor.getText()).toBe "text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext"
       expect(editor.getCursorScreenPosition()).toEqual [2, 0]
-      expect(vimState.getRegister('"').text).toBe "Paragraph-1\nParagraph-1\nParagraph-1\n\n"
+      expect(vimState.getRegister('"').text).toBe "Paragraph-1\nParagraph-1\nParagraph-1\n\n\n"
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
@@ -233,7 +251,31 @@ describe "TextObjects", ->
       keydown('a')
       keydown('p')
 
-      expect(editor.getSelectedScreenRange()).toEqual [[2, 0], [6, 0]]
+      expect(editor.getSelectedScreenRange()).toEqual [[2, 0], [7, 0]]
+
+    it "applies operators around the next paragraph in operator-pending mode when started from a blank/only-whitespace line", ->
+      editor.setText("text\n\n\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext")
+      editor.setCursorBufferPosition([1, 0])
+
+      keydown('y')
+      keydown('a')
+      keydown('p')
+
+      expect(editor.getText()).toBe "text\n\n\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext"
+      expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+      expect(vimState.getRegister('"').text).toBe "\n\n\nParagraph-1\nParagraph-1\nParagraph-1\n"
+      expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "selects around the next paragraph in visual mode when started from a blank/only-whitespace line", ->
+      editor.setText("text\n\n\n\nparagraph-1\nparagraph-1\nparagraph-1\n\n\nmoretext")
+      editor.setCursorBufferPosition([1, 0])
+
+      keydown('v')
+      keydown('a')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [7, 0]]
 
   describe "the 'i[' text object", ->
     beforeEach ->

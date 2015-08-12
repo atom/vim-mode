@@ -160,26 +160,42 @@ class SelectAWholeWord extends TextObject
         selection.selectRight()
       true
 
-class SelectInsideParagraph extends TextObject
-  constructor: (@editor, @inclusive) ->
-  select: ->
-    for selection in @editor.getSelections()
-      range = selection.cursor.getCurrentParagraphBufferRange()
-      if range?
-        selection.setBufferRange(range)
-        selection.selectToBeginningOfNextParagraph()
-      true
+class Paragraph extends TextObject
 
-class SelectAParagraph extends TextObject
-  constructor: (@editor, @inclusive) ->
   select: ->
     for selection in @editor.getSelections()
-      range = selection.cursor.getCurrentParagraphBufferRange()
-      if range?
-        selection.setBufferRange(range)
-        selection.selectToBeginningOfNextParagraph()
-        selection.selectDown()
-      true
+      @selectParagraph(selection)
+
+  # Return a range delimted by the start or the end of a paragraph
+  paragraphDelimitedRange: (startPoint) ->
+    inParagraph = @isParagraphLine(@editor.lineTextForBufferRow(startPoint.row))
+    upperRow = @searchLines(startPoint.row, -1, inParagraph)
+    lowerRow = @searchLines(startPoint.row, @editor.getLineCount(), inParagraph)
+    new Range([upperRow + 1, 0], [lowerRow, 0])
+
+  searchLines: (startRow, rowLimit, startedInParagraph) ->
+    for currentRow in [startRow..rowLimit]
+      line = @editor.lineTextForBufferRow(currentRow)
+      if startedInParagraph isnt @isParagraphLine(line)
+        return currentRow
+    rowLimit
+
+  isParagraphLine: (line) -> (/\S/.test(line))
+
+class SelectInsideParagraph extends Paragraph
+  selectParagraph: (selection) ->
+    startPoint = selection.getBufferRange().start
+    range = @paragraphDelimitedRange(startPoint)
+    selection.setBufferRange(range)
+    true
+
+class SelectAParagraph extends Paragraph
+  selectParagraph: (selection) ->
+    startPoint = selection.getBufferRange().start
+    range = @paragraphDelimitedRange(startPoint)
+    nextRange = @paragraphDelimitedRange(range.end)
+    selection.setBufferRange([range.start, nextRange.end])
+    true
 
 module.exports = {TextObject, SelectInsideWord, SelectInsideWholeWord, SelectInsideQuotes,
   SelectInsideBrackets, SelectAWord, SelectAWholeWord, SelectInsideParagraph, SelectAParagraph}
