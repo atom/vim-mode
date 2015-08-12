@@ -26,7 +26,11 @@
 * Indent/Outdent/Auto-indent
   * `vw>` - works in visual mode
   * `>>` - indent current line one level
+  * `>2>` - repeated linewise
+  * `v2>` - repeat indent operation in visual mode
   * `<<` - outdent current line one level
+  * `<2<` - repeated linewise
+  * `v2<` - repeat outdent operation in visual mode
   * `==` - auto-indents current line
 * [Put](http://vimhelp.appspot.com/change.txt.html#p)
   * `p` - default register
