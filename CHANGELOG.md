@@ -1,5 +1,16 @@
 ## HEAD
 
+## 0.58
+
+* Fixed repetition of commands executed in visual mode - @jacekkopecky
+* Fixed repetition of indentation commands - @mleeds95
+* Fixed `cc` command's behavior on the file's only line @jacekkopecky
+* Fixed key-binding for return-from-tag - @bronson
+* Implemented shared 'f' and 't' state between editors - @jacekkopecky
+* Added insert-mode commands for copying line above and below - @jacekkopecky
+* Fixed an exception when prefixing a text object with a count - @jacekkopecky
+* Fixed handling of blank lines in the `ip` and `ap` text objects - @MarkusSN
+
 ## 0.57
 
 * Added replace ('R') mode! - @jacekkopecky
