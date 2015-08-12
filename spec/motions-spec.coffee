@@ -1599,6 +1599,24 @@ describe "Motions", ->
       normalModeInputKeydown('b')
       expect(editor.getText()).toBe 'bcabcabcabc\n'
 
+  describe 'the v keybinding', ->
+    beforeEach ->
+      editor.setText("01\n002\n0003\n00004\n000005\n")
+      editor.setCursorScreenPosition([1, 1])
+
+    it "selects down a line", ->
+      keydown('v')
+      keydown('j')
+      keydown('j')
+      expect(editor.getSelectedText()).toBe "02\n0003\n00"
+      expect(editor.getSelectedBufferRange().isSingleLine()).toBeFalsy()
+
+    it "selects right", ->
+      keydown('v')
+      keydown('l')
+      expect(editor.getSelectedText()).toBe "02"
+      expect(editor.getSelectedBufferRange().isSingleLine()).toBeTruthy()
+
   describe 'the V keybinding', ->
     beforeEach ->
       editor.setText("01\n002\n0003\n00004\n000005\n")
@@ -1606,9 +1624,11 @@ describe "Motions", ->
 
     it "selects down a line", ->
       keydown('V', shift: true)
+      expect(editor.getSelectedBufferRange().isSingleLine()).toBeFalsy()
       keydown('j')
       keydown('j')
       expect(editor.getSelectedText()).toBe "002\n0003\n00004\n"
+      expect(editor.getSelectedBufferRange().isSingleLine()).toBeFalsy()
 
     it "selects up a line", ->
       keydown('V', shift: true)

@@ -86,12 +86,18 @@ describe "VimState", ->
         expect(editor.getCursors().length).toBe 1
 
     describe "the v keybinding", ->
-      beforeEach -> keydown('v')
+      beforeEach ->
+        editor.setText("012345\nabcdef")
+        editor.setCursorScreenPosition([0, 0])
+        keydown('v')
 
       it "puts the editor into visual characterwise mode", ->
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
         expect(vimState.submode).toEqual 'characterwise'
         expect(editorElement.classList.contains('normal-mode')).toBe(false)
+
+      it "selects the current character", ->
+        expect(editor.getLastSelection().getText()).toEqual '0'
 
     describe "the V keybinding", ->
       beforeEach ->
