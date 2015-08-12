@@ -119,7 +119,10 @@ class Change extends Insert
       @setTextRegister(@register, @editor.getSelectedText())
       if @motion.isLinewise?() and not @typingCompleted
         for selection in @editor.getSelections()
-          selection.insertText("\n", autoIndent: true)
+          if selection.getBufferRange().end.row is 0
+            selection.deleteSelectedText()
+          else
+            selection.insertText("\n", autoIndent: true)
           selection.cursor.moveLeft()
       else
         for selection in @editor.getSelections()
@@ -129,14 +132,6 @@ class Change extends Insert
 
     @vimState.activateInsertMode()
     @typingCompleted = true
-
-class SubstituteLine extends Change
-  standalone: true
-  register: null
-
-  constructor: (@editor, @vimState) ->
-    @register = settings.defaultRegister()
-    @motion = new Motions.MoveToRelativeLine(@editor, @vimState)
 
 # Takes a transaction and turns it into a string of what was typed.
 # This class is an implementation detail of Insert
@@ -212,6 +207,5 @@ module.exports = {
   InsertAboveWithNewline,
   InsertBelowWithNewline,
   ReplaceMode,
-  Change,
-  SubstituteLine
+  Change
 }
