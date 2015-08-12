@@ -764,7 +764,7 @@ describe "Operators", ->
           keydown '.'
           expect(editor.getText()).toBe "12ab89\nabcab\nfghijklmnopq\nuvwxyz"
 
-        it "can affect newlines when repeated with . near the end of the line with motion wrapping enabled", ->
+        it "repeats shortened with . near the end of the line regardless of whether motion wrapping is enabled", ->
           atom.config.set('vim-mode.wrapLeftRightMotion', true)
           editor.setCursorScreenPosition [0, 2]
           keydown 'v'
@@ -777,7 +777,8 @@ describe "Operators", ->
 
           editor.setCursorScreenPosition [1, 3]
           keydown '.'
-          expect(editor.getText()).toBe "12ab89\nabcabhijklmnopq\nuvwxyz"
+          # this differs from VIM, which would eat the \n before fghij...
+          expect(editor.getText()).toBe "12ab89\nabcab\nfghijklmnopq\nuvwxyz"
 
       describe "is repeatable with characterwise selection over multiple lines", ->
         it "repeats with .", ->

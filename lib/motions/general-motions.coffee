@@ -136,17 +136,10 @@ class CurrentSelection extends Motion
 
   selectCharacters: ->
     lastSelectionExtent = @lastSelectionRange.getExtent()
-    wrap = settings.wrapLeftRightMotion()
     for selection in @editor.getSelections()
       {start} = selection.getBufferRange()
       newEnd = start.traverse(lastSelectionExtent)
       selection.setBufferRange([start, newEnd])
-
-      if wrap
-        columnDifference = newEnd.column - selection.getBufferRange().end.column
-        if columnDifference > 0
-          _.times columnDifference, -> selection.selectRight()
-
     return
 
 # Public: Generic class for motions that require extra input
