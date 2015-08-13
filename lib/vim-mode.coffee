@@ -10,13 +10,13 @@ module.exports =
   activate: (state) ->
     @disposables = new CompositeDisposable
     @globalVimState = new GlobalVimState
-    @statusBarManager = new StatusBarManager
+    @statusBarManager = new StatusBarManager(this)
 
     @vimStates = new Set
     @vimStatesByEditor = new WeakMap
 
     @disposables.add atom.workspace.observeTextEditors (editor) =>
-      return if editor.isMini() or @vimStatesByEditor.get(editor)
+      return if editor.isMini() or @getEditorState(editor)
 
       vimState = new VimState(
         atom.views.getView(editor),

@@ -1,4 +1,4 @@
-{Disposable, CompositeDisposable} = require 'event-kit'
+{CompositeDisposable} = require 'event-kit'
 
 ContentsByMode =
   'insert': ["status-bar-vim-mode-insert", "Insert"]
@@ -11,7 +11,9 @@ ContentsByMode =
 
 module.exports =
 class StatusBarManager
-  constructor: ->
+  constructor: (@vimMode) ->
+    @disposables = new CompositeDisposable
+
     @element = document.createElement("div")
     @element.id = "status-bar-vim-mode"
 
@@ -27,11 +29,22 @@ class StatusBarManager
       [klass, text] = newContents
       @element.className = klass
       @element.textContent = text
+    else
+      @element.className = 'hidden'
+
+  updateToPaneItem: (item) =>
+    vimState = @vimMode.getEditorState(item) if item?
+    if vimState?
+      vimState.updateStatusBar()
+    else
+      @element.className = 'hidden'
 
   # Private
 
   attach: ->
     @tile = @statusBar.addRightTile(item: @container, priority: 20)
+    @disposables.add atom.workspace.onDidChangeActivePaneItem @updateToPaneItem
 
   detach: ->
+    @disposables.dispose()
     @tile.destroy()
