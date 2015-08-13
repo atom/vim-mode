@@ -8,6 +8,8 @@ class TextObject
   isComplete: -> true
   isRecordable: -> false
 
+  execute: -> @select.apply(this, arguments)
+
 class SelectInsideWord extends TextObject
   select: ->
     @editor.selectWordsContainingCursors()
