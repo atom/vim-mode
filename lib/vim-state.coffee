@@ -679,6 +679,7 @@ class VimState
   # Returns nothing.
   setLastInsertMarks: (range) ->
     {start, end} = range
+    return if start.isEqual end
     @setMark '[', start
     @setMark ']', @getPreviousCharPosition(end)
 
