@@ -77,6 +77,16 @@ class Search extends SearchBase
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
     @viewModel = new SearchViewModel(this)
+    @updateViewModel()
+
+  reversed: =>
+    @initiallyReversed = @reverse = true
+    @updateCurrentSearch()
+    @updateViewModel()
+    this
+
+  updateViewModel: ->
+    @viewModel.update(@initiallyReversed)
 
 class SearchCurrentWord extends SearchBase
   @keywordRegex: null

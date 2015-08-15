@@ -124,3 +124,11 @@ atom-text-editor.vim-mode.operator-pending-mode.is-focused
     }
   }
 }
+
+.search-input atom-text-editor[mini]::before {
+  content: '/';
+}
+
+.reverse-search-input atom-text-editor[mini]::before {
+  content: '?';
+}

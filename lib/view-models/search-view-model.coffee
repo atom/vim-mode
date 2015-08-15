@@ -40,3 +40,11 @@ class SearchViewModel extends ViewModel
         atom.beep()
     super(view)
     @vimState.pushSearchHistory(@view.value)
+
+  update: (reverse) ->
+    if reverse
+      @view.editorContainer.classList.add('reverse-search-input')
+      @view.editorContainer.classList.remove('search-input')
+    else
+      @view.editorContainer.classList.add('search-input')
+      @view.editorContainer.classList.remove('reverse-search-input')
