@@ -29,7 +29,7 @@ class StatusBarManager
       @hide()
 
   hide: ->
-      @element.className = 'hidden'
+    @element.className = 'hidden'
 
   # Private
 
