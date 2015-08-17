@@ -54,7 +54,7 @@ class VimNormalModeInputElement extends HTMLDivElement
     if @panel?
       @panel.destroy()
     else
-      this.parentNode.removeChild(this) if this.parentNode?
+      this.remove()
 
 module.exports =
 document.registerElement("vim-normal-mode-input"

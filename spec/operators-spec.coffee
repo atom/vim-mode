@@ -23,7 +23,7 @@ describe "Operators", ->
     editor.normalModeInputView.editorElement.getModel().setText(key)
 
   describe "cancelling operations", ->
-    it "would throw an error when no operation is pending", ->
+    it "throws an error when no operation is pending", ->
       # cancel operation pushes an empty input operation
       # doing this without a pending operation would throw an exception
       expect(-> vimState.pushOperations(new Input(''))).toThrow()
