@@ -395,10 +395,14 @@ describe "VimState", ->
     describe "activate visualmode witin visualmode", ->
       beforeEach ->
         keydown('escape')
+        editor.setText("line one\nline two\nline three\n")
+        editor.setCursorBufferPosition([0, 4])
         expect(vimState.mode).toEqual 'normal'
         expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
-      it "activateVisualMode with same type puts the editor into normal mode", ->
+      it "activateVisualMode with same submode puts the editor into normal mode", ->
+        point = [0, 4]
+
         keydown('v')
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
         expect(vimState.submode).toEqual 'characterwise'
@@ -407,6 +411,7 @@ describe "VimState", ->
         keydown('v')
         expect(vimState.mode).toEqual 'normal'
         expect(editorElement.classList.contains('normal-mode')).toBe(true)
+        expect(editor.getCursorBufferPosition()).toEqual(point)
 
         keydown('V', shift: true)
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
@@ -416,6 +421,7 @@ describe "VimState", ->
         keydown('V', shift: true)
         expect(vimState.mode).toEqual 'normal'
         expect(editorElement.classList.contains('normal-mode')).toBe(true)
+        expect(editor.getCursorBufferPosition()).toEqual(point)
 
         keydown('v', ctrl: true)
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
@@ -425,6 +431,7 @@ describe "VimState", ->
         keydown('v', ctrl: true)
         expect(vimState.mode).toEqual 'normal'
         expect(editorElement.classList.contains('normal-mode')).toBe(true)
+        expect(editor.getCursorBufferPosition()).toEqual(point)
 
       describe "change submode within visualmode", ->
         beforeEach ->

@@ -194,7 +194,7 @@ class Yank extends Operator
     @setTextRegister(@register, text)
 
     @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
-    @vimState.activateNormalMode()
+    @vimState.activateNormalMode(restoreColumn: false)
 
 #
 # It combines the current line with the following line.
