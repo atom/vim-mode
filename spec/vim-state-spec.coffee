@@ -142,6 +142,10 @@ describe "VimState", ->
         vimState.destroy()
         advanceClock(100)
 
+      it "handles native selection such as core:select-all", ->
+        atom.commands.dispatch(editorElement, "core:select-all")
+        expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 7]]])
+
     describe "the i keybinding", ->
       beforeEach -> keydown('i')
 
