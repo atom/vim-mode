@@ -10,7 +10,7 @@ module.exports =
   activate: (state) ->
     @disposables = new CompositeDisposable
     @globalVimState = new GlobalVimState
-    @statusBarManager = new StatusBarManager(this)
+    @statusBarManager = new StatusBarManager
 
     @vimStates = new Set
     @vimStatesByEditor = new WeakMap
@@ -27,6 +27,8 @@ module.exports =
       @vimStates.add(vimState)
       @vimStatesByEditor.set(editor, vimState)
       vimState.onDidDestroy => @vimStates.delete(vimState)
+
+    @disposables.add atom.workspace.onDidChangeActivePaneItem @updateToPaneItem.bind(this)
 
     @disposables.add new Disposable =>
       @vimStates.forEach (vimState) -> vimState.destroy()
@@ -45,6 +47,13 @@ module.exports =
     @statusBarManager.attach()
     @disposables.add new Disposable =>
       @statusBarManager.detach()
+
+  updateToPaneItem: (item) ->
+    vimState = @getEditorState(item) if item?
+    if vimState?
+      vimState.updateStatusBar()
+    else
+      @statusBarManager.hide()
 
   provideVimMode: ->
     getGlobalState: @getGlobalState.bind(this)
