@@ -43,8 +43,8 @@ class SearchViewModel extends ViewModel
 
   update: (reverse) ->
     if reverse
-      @view.editorContainer.classList.add('reverse-search-input')
-      @view.editorContainer.classList.remove('search-input')
+      @view.classList.add('reverse-search-input')
+      @view.classList.remove('search-input')
     else
-      @view.editorContainer.classList.add('search-input')
-      @view.editorContainer.classList.remove('reverse-search-input')
+      @view.classList.add('search-input')
+      @view.classList.remove('reverse-search-input')
