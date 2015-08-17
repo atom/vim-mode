@@ -101,7 +101,6 @@ describe "Operators", ->
           keydown('u')
           expect(editor.getText()).toBe "abc\n012345\n\nxyz"
 
-
       describe "with vim-mode.wrapLeftRightMotion", ->
         beforeEach ->
           editor.setText("abc\n012345\n\nxyz")
@@ -161,7 +160,6 @@ describe "Operators", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 1]
           expect(vimState.getRegister('"').text).toBe '0123\n\nx'
 
-
     describe "on an empty line", ->
       beforeEach ->
         editor.setText("abc\n012345\n\nxyz")
@@ -178,7 +176,6 @@ describe "Operators", ->
         keydown('x')
         expect(editor.getText()).toBe "abc\n012345\nxyz"
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
-
 
   describe "the X keybinding", ->
     describe "on a line with content", ->
@@ -207,7 +204,6 @@ describe "Operators", ->
         expect(editor.getText()).toBe 'ab2345'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
         expect(vimState.getRegister('"').text).toBe '\n'
-
 
     describe "on an empty line", ->
       beforeEach ->
@@ -955,8 +951,9 @@ describe "Operators", ->
 
   describe "the y keybinding", ->
     beforeEach ->
-      editor.getBuffer().setText("012 345\nabc\n")
+      editor.getBuffer().setText("012 345\nabc\ndefg\n")
       editor.setCursorScreenPosition([0, 4])
+      vimState.setRegister('"', text: '345')
 
     describe "when selected lines in visual linewise mode", ->
       beforeEach ->
@@ -1067,6 +1064,18 @@ describe "Operators", ->
       it "leaves the cursor at the starting position", ->
         expect(editor.getCursorScreenPosition()).toEqual [0, 4]
 
+    describe "with an up motion", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([2, 2])
+        keydown 'y'
+        keydown 'k'
+
+      it "saves both full lines to the default register", ->
+        expect(vimState.getRegister('"').text).toBe "abc\ndefg\n"
+
+      it "puts the cursor on the first line and the original column", ->
+        expect(editor.getCursorScreenPosition()).toEqual [1, 2]
+
     describe "when followed by a G", ->
       beforeEach ->
         originalText = "12345\nabcde\nABCDE"
@@ -1122,6 +1131,47 @@ describe "Operators", ->
 
         expect(vimState.getRegister('"').text).toBe '123'
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 2]]
+
+    describe "in a long file", ->
+      beforeEach ->
+        editor.setHeight(400)
+        editor.setLineHeightInPixels(10)
+        editor.setDefaultCharWidth(10)
+        text = ""
+        for i in [1..200]
+          text += "#{i}\n"
+        editor.setText(text)
+
+      describe "yanking many lines forward", ->
+        it "does not scroll the window", ->
+          editor.setCursorBufferPosition [40, 1]
+          previousScrollTop = editor.getScrollTop()
+
+          # yank many lines
+          keydown('y')
+          keydown('1')
+          keydown('6')
+          keydown('0')
+          keydown('G', shift: true)
+
+          expect(editor.getScrollTop()).toEqual(previousScrollTop)
+          expect(editor.getCursorBufferPosition()).toEqual [40, 1]
+          expect(vimState.getRegister('"').text.split('\n').length).toBe 121
+
+      describe "yanking many lines backwards", ->
+        it "scrolls the window", ->
+          editor.setCursorBufferPosition [140, 1]
+          previousScrollTop = editor.getScrollTop()
+
+          # yank many lines
+          keydown('y')
+          keydown('6')
+          keydown('0')
+          keydown('G', shift: true)
+
+          expect(editor.getScrollTop()).toNotEqual previousScrollTop
+          expect(editor.getCursorBufferPosition()).toEqual [59, 1]
+          expect(vimState.getRegister('"').text.split('\n').length).toBe 83
 
   describe "the yy keybinding", ->
     describe "on a single line file", ->
