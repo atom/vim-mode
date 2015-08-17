@@ -28,6 +28,9 @@ getEditorElement = (callback) ->
     element.addEventListener "keydown", (e) ->
       atom.keymaps.handleKeyboardEvent(e)
 
+    # mock parent element for the text editor
+    document.createElement('html').appendChild(atom.views.getView(textEditor))
+
     callback(element)
 
 mockPlatform = (editorElement, platform) ->
