@@ -16,7 +16,7 @@ module.exports =
     @vimStatesByEditor = new WeakMap
 
     @disposables.add atom.workspace.observeTextEditors (editor) =>
-      return if editor.isMini() or @vimStatesByEditor.get(editor)
+      return if editor.isMini() or @getEditorState(editor)
 
       vimState = new VimState(
         atom.views.getView(editor),
@@ -27,6 +27,8 @@ module.exports =
       @vimStates.add(vimState)
       @vimStatesByEditor.set(editor, vimState)
       vimState.onDidDestroy => @vimStates.delete(vimState)
+
+    @disposables.add atom.workspace.onDidChangeActivePaneItem @updateToPaneItem.bind(this)
 
     @disposables.add new Disposable =>
       @vimStates.forEach (vimState) -> vimState.destroy()
@@ -45,6 +47,13 @@ module.exports =
     @statusBarManager.attach()
     @disposables.add new Disposable =>
       @statusBarManager.detach()
+
+  updateToPaneItem: (item) ->
+    vimState = @getEditorState(item) if item?
+    if vimState?
+      vimState.updateStatusBar()
+    else
+      @statusBarManager.hide()
 
   provideVimMode: ->
     getGlobalState: @getGlobalState.bind(this)
