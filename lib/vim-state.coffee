@@ -32,9 +32,12 @@ class VimState
     @subscriptions.add @editor.onDidDestroy => @destroy()
 
     debouncedCheckSelections = _.debounce(@checkSelections, 0)
-    @subscriptions.add @editor.onDidChangeSelectionRange debouncedCheckSelections
-    @subscriptions.add @editor.onDidChangeCursorPosition debouncedCheckSelections
-    @subscriptions.add @editor.onDidAddCursor debouncedCheckSelections
+    guardedCheckSelections = =>
+      return if @processing
+      debouncedCheckSelections()
+    @subscriptions.add @editor.onDidChangeSelectionRange guardedCheckSelections
+    @subscriptions.add @editor.onDidChangeCursorPosition guardedCheckSelections
+    @subscriptions.add @editor.onDidAddCursor guardedCheckSelections
 
     @editorElement.classList.add("vim-mode")
     @setupNormalMode()
@@ -240,7 +243,7 @@ class VimState
         @processOpStack()
     finally
       @processing = false
-      @ensureCursorsWithinLine()
+      @checkSelections()
 
   onDidFailToCompose: (fn) ->
     @emitter.on('failed-to-compose', fn)
