@@ -31,16 +31,10 @@ class VimState
     @marks = {}
     @subscriptions.add @editor.onDidDestroy => @destroy()
 
-    @subscriptions.add @editor.onDidChangeSelectionRange _.debounce(=>
-      return unless @editor?
-      if @editor.getSelections().every((selection) -> selection.isEmpty())
-        @activateNormalMode() if @mode is 'visual'
-      else
-        @activateVisualMode('characterwise') if @mode is 'normal'
-    , 100)
-
-    @subscriptions.add @editor.onDidChangeCursorPosition ({cursor}) => @ensureCursorIsWithinLine(cursor)
-    @subscriptions.add @editor.onDidAddCursor @ensureCursorIsWithinLine
+    debouncedCheckSelections = _.debounce(@checkSelections, 0)
+    @subscriptions.add @editor.onDidChangeSelectionRange debouncedCheckSelections
+    @subscriptions.add @editor.onDidChangeCursorPosition debouncedCheckSelections
+    @subscriptions.add @editor.onDidAddCursor debouncedCheckSelections
 
     @editorElement.classList.add("vim-mode")
     @setupNormalMode()
@@ -49,18 +43,23 @@ class VimState
     else
       @activateNormalMode()
 
+    @editorElement.addEventListener 'mousedown', @onMouseDown
+    @editorElement.addEventListener 'mouseup', @onMouseUp
+
   destroy: ->
     unless @destroyed
       @destroyed = true
-      @emitter.emit 'did-destroy'
       @subscriptions.dispose()
       if @editor.isAlive()
         @deactivateInsertMode()
         @editorElement.component?.setInputEnabled(true)
         @editorElement.classList.remove("vim-mode")
         @editorElement.classList.remove("normal-mode")
+      @editorElement.removeEventListener 'mousedown', @onMouseDown
+      @editorElement.removeEventListener 'mouseup', @onMouseUp
       @editor = null
       @editorElement = null
+      @emitter.emit 'did-destroy'
 
   # Private: Creates the plugin's bindings
   #
@@ -241,7 +240,7 @@ class VimState
         @processOpStack()
     finally
       @processing = false
-      @ensureCursorIsWithinLine(cursor) for cursor in @editor.getCursors()
+      @ensureCursorsWithinLine()
 
   onDidFailToCompose: (fn) ->
     @emitter.on('failed-to-compose', fn)
@@ -406,9 +405,7 @@ class VimState
 
     @clearOpStack()
     selection.clear(autoscroll: false) for selection in @editor.getSelections()
-    for cursor in @editor.getCursors()
-      if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
-        cursor.moveLeft()
+    @ensureCursorsWithinLine()
 
     @updateStatusBar()
 
@@ -661,15 +658,33 @@ class VimState
     text = @getRegister(name)?.text
     @editor.insertText(text) if text?
 
-  ensureCursorIsWithinLine: (cursor) =>
-    return if @processing or @mode isnt 'normal'
+  # Private: a block of functions that ensures the cursor stays within the line as appropriate
 
-    {goalColumn} = cursor
-    if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
-      @processing = true # to ignore the cursor change (and recursion) caused by the next line
-      cursor.moveLeft()
-      @processing = false
-    cursor.goalColumn = goalColumn
+  checkSelections: =>
+    return unless @editor?
+    if @editor.getSelections().every((selection) -> selection.isEmpty())
+      @ensureCursorsWithinLine() if @mode is 'normal'
+      @activateNormalMode() if @mode is 'visual'
+    else
+      @activateVisualMode('characterwise') if @mode is 'normal'
+
+  onMouseDown: =>
+    @dragging = true
+
+  onMouseUp: =>
+    @dragging = false
+    @checkSelections()
+
+  ensureCursorsWithinLine: =>
+    return if @dragging or @processing or @mode isnt 'normal'
+
+    for cursor in @editor.getCursors()
+      {goalColumn} = cursor
+      if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
+        @processing = true # to ignore the cursor change (and recursion) caused by the next line
+        cursor.moveLeft()
+        @processing = false
+      cursor.goalColumn = goalColumn
 
 # This uses private APIs and may break if TextBuffer is refactored.
 # Package authors - copy and paste this code at your own risk.

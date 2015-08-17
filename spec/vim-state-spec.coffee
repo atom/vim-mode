@@ -165,9 +165,9 @@ describe "VimState", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
 
       describe "on a line with content", ->
-        beforeEach -> editor.setCursorScreenPosition([0, 6])
-
         it "does not allow the cursor to be placed on the \n character", ->
+          editor.setCursorScreenPosition([0, 6])
+          advanceClock 200
           expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
       describe "on an empty line", ->
