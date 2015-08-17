@@ -452,10 +452,10 @@ describe "Motions", ->
 
     describe "as a selection", ->
       it "selects to the beginning of the whole word", ->
-        editor.setCursorScreenPosition([1, 10])
+        editor.setCursorScreenPosition([1, 9])
         keydown('y')
         keydown('B', shift: true)
-        expect(vimState.getRegister('"').text).toBe 'xyz-12' # because cursor is on the `3`
+        expect(vimState.getRegister('"').text).toBe 'xyz-12'
 
       it "doesn't go past the beginning of the file", ->
         editor.setCursorScreenPosition([0, 0])
