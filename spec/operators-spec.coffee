@@ -100,7 +100,6 @@ describe "Operators", ->
           keydown('u')
           expect(editor.getText()).toBe "abc\n012345\n\nxyz"
 
-
       describe "with vim-mode.wrapLeftRightMotion", ->
         beforeEach ->
           editor.setText("abc\n012345\n\nxyz")
@@ -160,7 +159,6 @@ describe "Operators", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 1]
           expect(vimState.getRegister('"').text).toBe '0123\n\nx'
 
-
     describe "on an empty line", ->
       beforeEach ->
         editor.setText("abc\n012345\n\nxyz")
@@ -177,7 +175,6 @@ describe "Operators", ->
         keydown('x')
         expect(editor.getText()).toBe "abc\n012345\nxyz"
         expect(editor.getCursorScreenPosition()).toEqual [2, 0]
-
 
   describe "the X keybinding", ->
     describe "on a line with content", ->
@@ -206,7 +203,6 @@ describe "Operators", ->
         expect(editor.getText()).toBe 'ab2345'
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
         expect(vimState.getRegister('"').text).toBe '\n'
-
 
     describe "on an empty line", ->
       beforeEach ->
@@ -939,7 +935,7 @@ describe "Operators", ->
       describe "yanking many lines forward", ->
         it "does not scroll the window", ->
           editor.setCursorBufferPosition [40, 1]
-          top40 = editor.getScrollTop()
+          previousScrollTop = editor.getScrollTop()
 
           # yank many lines
           keydown('y')
@@ -948,14 +944,14 @@ describe "Operators", ->
           keydown('0')
           keydown('G', shift: true)
 
-          expect(editor.getScrollTop()).toEqual(top40)
+          expect(editor.getScrollTop()).toEqual(previousScrollTop)
           expect(editor.getCursorBufferPosition()).toEqual [40, 1]
           expect(vimState.getRegister('"').text.split('\n').length).toBe 121
 
       describe "yanking many lines backwards", ->
         it "scrolls the window", ->
           editor.setCursorBufferPosition [140, 1]
-          top140 = editor.getScrollTop()
+          previousScrollTop = editor.getScrollTop()
 
           # yank many lines
           keydown('y')
@@ -963,10 +959,9 @@ describe "Operators", ->
           keydown('0')
           keydown('G', shift: true)
 
-          expect(editor.getScrollTop()).toNotEqual top140
+          expect(editor.getScrollTop()).toNotEqual previousScrollTop
           expect(editor.getCursorBufferPosition()).toEqual [59, 1]
           expect(vimState.getRegister('"').text.split('\n').length).toBe 83
-
 
   describe "the yy keybinding", ->
     describe "on a single line file", ->
