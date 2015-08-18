@@ -689,6 +689,8 @@ class VimState
         @processing = false
       cursor.goalColumn = goalColumn
 
+    @editor.mergeCursors()
+
 # This uses private APIs and may break if TextBuffer is refactored.
 # Package authors - copy and paste this code at your own risk.
 getChangesSinceCheckpoint = (buffer, checkpoint) ->
