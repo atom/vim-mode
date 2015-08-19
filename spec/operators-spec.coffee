@@ -2032,6 +2032,7 @@ describe "Operators", ->
         keydown 'a', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[2, 5]]
         expect(editor.getText()).toBe '123\nab45\ncd-67ef\nab-5\na-bcdef'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "does nothing on an empty line", ->
         editor.setText('\n')
@@ -2040,6 +2041,7 @@ describe "Operators", ->
         keydown 'a', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
         expect(editor.getText()).toBe '\n'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "honours the vim-mode:numberRegex setting", ->
         editor.setText('123\nab45\ncd -67ef\nab-5\na-bcdef')
@@ -2083,6 +2085,7 @@ describe "Operators", ->
         keydown 'x', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[2, 5]]
         expect(editor.getText()).toBe '123\nab45\ncd-67ef\nab-5\na-bcdef'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "does nothing on an empty line", ->
         editor.setText('\n')
@@ -2091,6 +2094,7 @@ describe "Operators", ->
         keydown 'x', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
         expect(editor.getText()).toBe '\n'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "honours the vim-mode:numberRegex setting", ->
         editor.setText('123\nab45\ncd -67ef\nab-5\na-bcdef')

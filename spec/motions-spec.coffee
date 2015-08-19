@@ -1099,9 +1099,12 @@ describe "Motions", ->
           editor.setCursorBufferPosition([0, 0])
           keydown('n')
           expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+          expect(atom.beep).toHaveBeenCalled()
+
           editor.setCursorBufferPosition([1, 1])
           keydown('n')
           expect(editor.getCursorBufferPosition()).toEqual [1, 1]
+          expect(atom.beep.callCount).toBe 2
 
       describe "repeating with search history", ->
         beforeEach ->

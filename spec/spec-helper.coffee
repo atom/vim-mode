@@ -9,6 +9,7 @@ beforeEach ->
   atom.workspace ||= {}
   statusBarManager = null
   globalVimState = null
+  spyOn(atom, 'beep')
 
 getEditorElement = (callback) ->
   textEditor = null
