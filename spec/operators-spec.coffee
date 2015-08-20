@@ -2007,18 +2007,21 @@ describe "Operators", ->
         keydown('a', ctrl: true)
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 4], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '124\nab46\ncd-66ef\nab-4\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "repeats with .", ->
         keydown 'a', ctrl: true
         keydown '.'
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 4], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '125\nab47\ncd-65ef\nab-3\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "can have a count", ->
         keydown '5'
         keydown 'a', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 4], [3, 2], [4, 0]]
         expect(editor.getText()).toBe '128\nab50\ncd-62ef\nab0\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "can make a negative number positive, change number of digits", ->
         keydown '9'
@@ -2026,12 +2029,14 @@ describe "Operators", ->
         keydown 'a', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 4], [2, 3], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '222\nab144\ncd32ef\nab94\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "does nothing when cursor is after the number", ->
         editor.setCursorBufferPosition [2, 5]
         keydown 'a', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[2, 5]]
         expect(editor.getText()).toBe '123\nab45\ncd-67ef\nab-5\na-bcdef'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "does nothing on an empty line", ->
         editor.setText('\n')
@@ -2040,6 +2045,7 @@ describe "Operators", ->
         keydown 'a', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
         expect(editor.getText()).toBe '\n'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "honours the vim-mode:numberRegex setting", ->
         editor.setText('123\nab45\ncd -67ef\nab-5\na-bcdef')
@@ -2052,24 +2058,28 @@ describe "Operators", ->
         keydown('a', ctrl: true)
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 5], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '124\nab46\ncd -66ef\nab-6\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
     describe "decreasing numbers", ->
       it "decreases the next number", ->
         keydown('x', ctrl: true)
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 4], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '122\nab44\ncd-68ef\nab-6\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "repeats with .", ->
         keydown 'x', ctrl: true
         keydown '.'
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 4], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '121\nab43\ncd-69ef\nab-7\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "can have a count", ->
         keydown '5'
         keydown 'x', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 4], [3, 4], [4, 0]]
         expect(editor.getText()).toBe '118\nab40\ncd-72ef\nab-10\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "can make a positive number negative, change number of digits", ->
         keydown '9'
@@ -2077,12 +2087,14 @@ describe "Operators", ->
         keydown 'x', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 1], [1, 4], [2, 5], [3, 5], [4, 0]]
         expect(editor.getText()).toBe '24\nab-54\ncd-166ef\nab-104\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
       it "does nothing when cursor is after the number", ->
         editor.setCursorBufferPosition [2, 5]
         keydown 'x', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[2, 5]]
         expect(editor.getText()).toBe '123\nab45\ncd-67ef\nab-5\na-bcdef'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "does nothing on an empty line", ->
         editor.setText('\n')
@@ -2091,6 +2103,7 @@ describe "Operators", ->
         keydown 'x', ctrl: true
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
         expect(editor.getText()).toBe '\n'
+        expect(atom.beep).toHaveBeenCalled()
 
       it "honours the vim-mode:numberRegex setting", ->
         editor.setText('123\nab45\ncd -67ef\nab-5\na-bcdef')
@@ -2103,6 +2116,7 @@ describe "Operators", ->
         keydown('x', ctrl: true)
         expect(editor.getCursorBufferPositions()).toEqual [[0, 2], [1, 3], [2, 5], [3, 3], [4, 0]]
         expect(editor.getText()).toBe '122\nab44\ncd -68ef\nab-4\na-bcdef'
+        expect(atom.beep).not.toHaveBeenCalled()
 
   describe 'the R keybinding', ->
     beforeEach ->
