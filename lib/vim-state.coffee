@@ -31,10 +31,13 @@ class VimState
     @marks = {}
     @subscriptions.add @editor.onDidDestroy => @destroy()
 
-    debouncedCheckSelections = _.debounce(@checkSelections, 0)
     guardedCheckSelections = =>
       return if @processing
-      debouncedCheckSelections()
+      @processing = true
+      @editorElement.component.requestAnimationFrame =>
+        @processing = false
+        @checkSelections()
+
     @subscriptions.add @editor.onDidChangeSelectionRange guardedCheckSelections
     @subscriptions.add @editor.onDidChangeCursorPosition guardedCheckSelections
     @subscriptions.add @editor.onDidAddCursor guardedCheckSelections

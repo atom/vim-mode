@@ -124,6 +124,8 @@ describe "VimState", ->
     describe "selecting text", ->
       beforeEach ->
         spyOn(_._, "now").andCallFake -> window.now
+        spyOn(editorElement.component, "requestAnimationFrame").andCallFake (cb) ->
+          setTimeout(cb, 0)
         editor.setText("abc def")
 
       it "puts the editor into visual mode", ->
@@ -162,7 +164,10 @@ describe "VimState", ->
         expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
     describe "with content", ->
-      beforeEach -> editor.setText("012345\n\nabcdef")
+      beforeEach ->
+        spyOn(editorElement.component, "requestAnimationFrame").andCallFake (cb) ->
+          setTimeout(cb, 0)
+        editor.setText("012345\n\nabcdef")
 
       describe "on a line with content", ->
         it "does not allow the cursor to be placed on the \\n character", ->
