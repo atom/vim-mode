@@ -165,7 +165,7 @@ describe "VimState", ->
       beforeEach -> editor.setText("012345\n\nabcdef")
 
       describe "on a line with content", ->
-        it "does not allow the cursor to be placed on the \n character", ->
+        it "does not allow the cursor to be placed on the \\n character", ->
           editor.setCursorScreenPosition([0, 6])
           advanceClock 200
           expect(editor.getCursorScreenPosition()).toEqual [0, 5]
@@ -173,7 +173,7 @@ describe "VimState", ->
       describe "on an empty line", ->
         beforeEach -> editor.setCursorScreenPosition([1, 0])
 
-        it "allows the cursor to be placed on the \n character", ->
+        it "allows the cursor to be placed on the \\n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
     describe 'with character-input operations', ->
@@ -212,7 +212,7 @@ describe "VimState", ->
       describe "on a line with content", ->
         beforeEach -> editor.setCursorScreenPosition([0, 6])
 
-        it "allows the cursor to be placed on the \n character", ->
+        it "allows the cursor to be placed on the \\n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "puts the editor into normal mode when <escape> is pressed", ->
@@ -258,7 +258,7 @@ describe "VimState", ->
           keydown('R', shift: true)
           editor.setCursorScreenPosition([0, 6])
 
-        it "allows the cursor to be placed on the \n character", ->
+        it "allows the cursor to be placed on the \\n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "puts the editor into normal mode when <escape> is pressed", ->
