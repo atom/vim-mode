@@ -5,7 +5,7 @@ class AdjustIndentation extends Operator
   execute: (count=1) ->
     mode = @vimState.mode
     @motion.select(count)
-    {start} = @editor.getSelectedBufferRange()
+    originalRanges = @editor.getSelectedBufferRanges()
 
     if mode is 'visual'
       @editor.transact =>
@@ -13,7 +13,10 @@ class AdjustIndentation extends Operator
     else
       @indent()
 
-    @editor.setCursorBufferPosition([start.row, 0])
+    @editor.clearSelections()
+    @editor.getLastCursor().setBufferPosition([originalRanges.shift().start.row, 0])
+    for range in originalRanges
+      @editor.addCursorAtBufferPosition([range.start.row, 0])
     @editor.moveToFirstCharacterOfLine()
     @vimState.activateNormalMode()
 
