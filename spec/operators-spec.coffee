@@ -1616,6 +1616,18 @@ describe "Operators", ->
           expect(editor.getText()).toBe "    12345\n    abcde\nABCDE"
           expect(editor.getSelectedBufferRanges()).toEqual [ [[0, 4], [0, 4]] ]
 
+    describe "with multiple selections", ->
+      beforeEach ->
+        editor.setCursorScreenPosition([1, 3])
+        keydown('v')
+        keydown('j')
+        editor.addCursorAtScreenPosition([0, 0])
+
+      it "indents the lines and keeps the cursors", ->
+        keydown('>')
+        expect(editor.getText()).toBe "  12345\n  abcde\n  ABCDE"
+        expect(editor.getCursorScreenPositions()).toEqual [[1, 2], [0, 2]]
+
   describe "the < keybinding", ->
     beforeEach ->
       editor.setText("    12345\n    abcde\nABCDE")
