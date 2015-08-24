@@ -1713,6 +1713,16 @@ describe "Operators", ->
         it "indents the current line", ->
           expect(editor.indentationForBufferRow(1)).toBe 0
 
+      describe "when followed by a G", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 0])
+          keydown('=')
+          keydown('G', shift: true)
+
+        it "uses the default count", ->
+          expect(editor.indentationForBufferRow(1)).toBe 0
+          expect(editor.indentationForBufferRow(2)).toBe 0
+
       describe "when followed by a repeating =", ->
         beforeEach ->
           keydown('2')
@@ -1859,6 +1869,13 @@ describe "Operators", ->
         keydown("l")
         expect(editor.getText()).toBe 'Abc\nXyZ'
 
+      it "uses default count", ->
+        editor.setCursorBufferPosition([0, 0])
+        keydown("g")
+        keydown("~")
+        keydown("G", shift: true)
+        expect(editor.getText()).toBe 'AbC\nxYz'
+
   describe 'the U keybinding', ->
     beforeEach ->
       editor.setText('aBc\nXyZ')
@@ -1882,6 +1899,13 @@ describe "Operators", ->
       expect(editor.getText()).toBe 'ABC\nXYZ'
       expect(editor.getCursorScreenPosition()).toEqual [1, 2]
 
+    it "uses default count", ->
+      editor.setCursorBufferPosition([0, 0])
+      keydown("g")
+      keydown("U", shift: true)
+      keydown("G", shift: true)
+      expect(editor.getText()).toBe 'ABC\nXYZ'
+
     it "makes the selected text uppercase in visual mode", ->
       keydown("V", shift: true)
       keydown("U", shift: true)
@@ -1898,6 +1922,13 @@ describe "Operators", ->
       keydown("$")
       expect(editor.getText()).toBe 'abc\nXyZ'
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "uses default count", ->
+      editor.setCursorBufferPosition([0, 0])
+      keydown("g")
+      keydown("u")
+      keydown("G", shift: true)
+      expect(editor.getText()).toBe 'abc\nxyz'
 
     it "makes the selected text lowercase in visual mode", ->
       keydown("V", shift: true)
