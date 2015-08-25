@@ -4,6 +4,7 @@ SearchViewModel = require '../view-models/search-view-model'
 {Input} = require '../view-models/view-model'
 {Point, Range} = require 'atom'
 settings = require '../settings'
+utils = require '../utils'
 
 class SearchBase extends MotionWithInput
   operatesInclusively: false
@@ -104,22 +105,8 @@ class SearchCurrentWord extends SearchBase
     @vimState.pushSearchHistory(searchString) unless searchString is @vimState.getSearchHistoryItem()
 
   getCurrentWord: ->
-    cursor = @editor.getLastCursor()
-    wordStart = cursor.getBeginningOfCurrentWordBufferPosition(wordRegex: @keywordRegex, allowPrevious: false)
-    wordEnd   = cursor.getEndOfCurrentWordBufferPosition      (wordRegex: @keywordRegex, allowNext: false)
-    cursorPosition = cursor.getBufferPosition()
-
-    if wordEnd.column is cursorPosition.column
-      # either we don't have a current word, or it ends on cursor, i.e. precedes it, so look for the next one
-      wordEnd = cursor.getEndOfCurrentWordBufferPosition      (wordRegex: @keywordRegex, allowNext: true)
-      return "" if wordEnd.row isnt cursorPosition.row # don't look beyond the current line
-
-      cursor.setBufferPosition wordEnd
-      wordStart = cursor.getBeginningOfCurrentWordBufferPosition(wordRegex: @keywordRegex, allowPrevious: false)
-
-    cursor.setBufferPosition wordStart
-
-    @editor.getTextInBufferRange([wordStart, wordEnd])
+    {word} = utils.getCurrentWord @editor, @editor.getLastCursor(), @keywordRegex
+    return word
 
   cursorIsOnEOF: (cursor) ->
     pos = cursor.getNextWordBoundaryBufferPosition(wordRegex: @keywordRegex)
