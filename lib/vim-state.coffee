@@ -661,8 +661,6 @@ class VimState
 
   # Private: ensure the cursor stays within the line as appropriate
   ensureCursorsWithinLine: =>
-    return if @mode isnt 'normal'
-
     for cursor in @editor.getCursors()
       {goalColumn} = cursor
       if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
