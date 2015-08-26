@@ -1,6 +1,7 @@
 {Range} = require 'atom'
 AllWhitespace = /^\s$/
 WholeWordRegex = /\S+/
+{mergeRanges} = require './utils'
 
 class TextObject
   constructor: (@editor, @state) ->
@@ -12,14 +13,15 @@ class TextObject
 
 class SelectInsideWord extends TextObject
   select: ->
-    @editor.selectWordsContainingCursors()
+    for selection in @editor.getSelections()
+      selection.expandOverWord()
     [true]
 
 class SelectInsideWholeWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
       range = selection.cursor.getCurrentWordBufferRange({wordRegex: WholeWordRegex})
-      selection.setBufferRange(range)
+      selection.setBufferRange(mergeRanges(selection.getBufferRange(), range))
       true
 
 # SelectInsideQuotes and the next class defined (SelectInsideBrackets) are
@@ -86,7 +88,7 @@ class SelectInsideQuotes extends TextObject
         ++ start.column # skip the opening quote
         end = @findClosingQuote(start)
         if end?
-          selection.setBufferRange([start, end])
+          selection.setBufferRange(mergeRanges(selection.getBufferRange(), [start, end]))
       not selection.isEmpty()
 
 # SelectInsideBrackets and the previous class defined (SelectInsideQuotes) are
@@ -136,13 +138,13 @@ class SelectInsideBrackets extends TextObject
         ++ start.column # skip the opening quote
         end = @findClosingBracket(start)
         if end?
-          selection.setBufferRange([start, end])
+          selection.setBufferRange(mergeRanges(selection.getBufferRange(), [start, end]))
       not selection.isEmpty()
 
 class SelectAWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
-      selection.selectWord()
+      selection.expandOverWord()
       loop
         endPoint = selection.getBufferRange().end
         char = @editor.getTextInRange(Range.fromPointWithDelta(endPoint, 0, 1))
@@ -154,7 +156,7 @@ class SelectAWholeWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
       range = selection.cursor.getCurrentWordBufferRange({wordRegex: WholeWordRegex})
-      selection.setBufferRange(range)
+      selection.setBufferRange(mergeRanges(selection.getBufferRange(), range))
       loop
         endPoint = selection.getBufferRange().end
         char = @editor.getTextInRange(Range.fromPointWithDelta(endPoint, 0, 1))
@@ -186,17 +188,19 @@ class Paragraph extends TextObject
 
 class SelectInsideParagraph extends Paragraph
   selectParagraph: (selection) ->
-    startPoint = selection.getBufferRange().start
-    range = @paragraphDelimitedRange(startPoint)
-    selection.setBufferRange(range)
+    oldRange = selection.getBufferRange()
+    startPoint = oldRange.start
+    newRange = @paragraphDelimitedRange(startPoint)
+    selection.setBufferRange(mergeRanges(oldRange, newRange))
     true
 
 class SelectAParagraph extends Paragraph
   selectParagraph: (selection) ->
-    startPoint = selection.getBufferRange().start
-    range = @paragraphDelimitedRange(startPoint)
-    nextRange = @paragraphDelimitedRange(range.end)
-    selection.setBufferRange([range.start, nextRange.end])
+    oldRange = selection.getBufferRange()
+    startPoint = oldRange.start
+    newRange = @paragraphDelimitedRange(startPoint)
+    nextRange = @paragraphDelimitedRange(newRange.end)
+    selection.setBufferRange(mergeRanges(oldRange, [newRange.start, nextRange.end]))
     true
 
 module.exports = {TextObject, SelectInsideWord, SelectInsideWholeWord, SelectInsideQuotes,
