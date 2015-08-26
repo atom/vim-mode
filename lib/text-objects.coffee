@@ -189,7 +189,7 @@ class Paragraph extends TextObject
 class SelectInsideParagraph extends Paragraph
   selectParagraph: (selection) ->
     oldRange = selection.getBufferRange()
-    startPoint = oldRange.start
+    startPoint = selection.cursor.getBufferPosition()
     newRange = @paragraphDelimitedRange(startPoint)
     selection.setBufferRange(mergeRanges(oldRange, newRange))
     true
@@ -197,7 +197,7 @@ class SelectInsideParagraph extends Paragraph
 class SelectAParagraph extends Paragraph
   selectParagraph: (selection) ->
     oldRange = selection.getBufferRange()
-    startPoint = oldRange.start
+    startPoint = selection.cursor.getBufferPosition()
     newRange = @paragraphDelimitedRange(startPoint)
     nextRange = @paragraphDelimitedRange(newRange.end)
     selection.setBufferRange(mergeRanges(oldRange, [newRange.start, nextRange.end]))
