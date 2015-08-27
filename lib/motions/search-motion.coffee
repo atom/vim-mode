@@ -169,6 +169,7 @@ class BracketMatchingMotion extends SearchBase
 
       if point.column < 0
         point.row--
+        return null if point.row < 0
         lineLength = @editor.lineTextForBufferRow(point.row).length
         point.column = lineLength - 1
       else if point.column >= lineLength
