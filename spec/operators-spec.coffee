@@ -627,6 +627,31 @@ describe "Operators", ->
           expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
           expect(editor.getSelectedText()).toBe ''
 
+        describe "with simulated slow typing", ->
+          beforeEach ->
+            spyOn(Date, "now").andCallFake -> window.now
+            atom.config.set('editor.undoGroupingInterval', 300)
+
+          it "uses Atom undo grouping", ->
+            keydown('c')
+            keydown('c')
+            advanceClock 1000
+            editor.insertText("d", groupUndo: true)
+            advanceClock 100
+            editor.insertText("e", groupUndo: true)
+            advanceClock 500
+            editor.insertText("f", groupUndo: true)
+            keydown 'escape'
+            expect(editor.getText()).toBe "12345\n  def\nABCDE"
+            keydown 'u'
+            expect(editor.getText()).toBe "12345\n  de\nABCDE"
+            # FIXME: if TextBuffer allows Infinity for special case groupingInterval,
+            # the following undo will undo both changes, so the immediate two lines below will go
+            keydown 'u'
+            expect(editor.getText()).toBe "12345\n  \nABCDE"
+            keydown 'u'
+            expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
+
       describe "when the cursor is on the last line", ->
         it "deletes the line's content and enters insert mode on the last line", ->
           editor.setCursorScreenPosition([2, 1])
