@@ -249,7 +249,7 @@ describe "Operators", ->
       editor.setCursorScreenPosition([0, 0])
       keydown('3')
       keydown('s')
-      editor.insertText("ab")
+      editor.insertText("ab", groupUndo: true)
       keydown('escape')
       expect(editor.getText()).toBe 'ab345'
       keydown('u')
@@ -292,7 +292,7 @@ describe "Operators", ->
 
     it "is undoable", ->
       keydown('S', shift: true)
-      editor.insertText("abc")
+      editor.insertText("abc", groupUndo: true)
       keydown 'escape'
       expect(editor.getText()).toBe "12345\nabc\nABCDE"
       keydown 'u'
@@ -620,9 +620,9 @@ describe "Operators", ->
         it "is undoable", ->
           keydown('c')
           keydown('c')
-          editor.insertText("abc")
+          editor.insertText("def", groupUndo: true)
           keydown 'escape'
-          expect(editor.getText()).toBe "12345\n  abc\nABCDE"
+          expect(editor.getText()).toBe "12345\n  def\nABCDE"
           keydown 'u'
           expect(editor.getText()).toBe "12345\n  abcde\nABCDE"
           expect(editor.getSelectedText()).toBe ''
@@ -663,8 +663,7 @@ describe "Operators", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
         expect(editorElement.classList.contains('insert-mode')).toBe(true)
 
-        # Just cannot get "typing" to work correctly in test.
-        editor.setText("12345\nfg\nABCDE")
+        editor.insertText("fg", groupUndo: true)
         keydown('escape')
         expect(editorElement.classList.contains('normal-mode')).toBe(true)
         expect(editor.getText()).toBe "12345\nfg\nABCDE"
@@ -717,7 +716,7 @@ describe "Operators", ->
           editor.addCursorAtScreenPosition([2, 1])
           keydown('c')
           keydown('%')
-          editor.insertText('x')
+          editor.insertText('x', groupUndo: true)
 
         it "replaces inclusively until matching bracket", ->
           expect(editor.getText()).toBe("1x8\naxe\nAxBCDE")
@@ -1395,7 +1394,7 @@ describe "Operators", ->
 
     it "is undoable", ->
       keydown('O', shift: true)
-      editor.insertText "def"
+      editor.insertText "def", groupUndo: true
       keydown 'escape'
       expect(editor.getText()).toBe "  abc\n  def\n  012\n"
       keydown 'u'
@@ -1434,7 +1433,7 @@ describe "Operators", ->
 
     it "is undoable", ->
       keydown('o')
-      editor.insertText "def"
+      editor.insertText "def", groupUndo: true
       keydown 'escape'
       expect(editor.getText()).toBe "abc\n  012\n  def\n"
       keydown 'u'
@@ -1912,16 +1911,17 @@ describe "Operators", ->
 
     it "allows undoing an entire batch of typing", ->
       keydown 'i'
-      editor.insertText("abcXX")
-      editor.backspace()
-      editor.backspace()
+      editor.insertText("abcXX", groupUndo: true)
+      # transact to enable grouping of changes, as is done in TextEditorElement
+      editor.transact 300, -> editor.backspace()
+      editor.transact 300, -> editor.backspace()
       keydown 'escape'
       expect(editor.getText()).toBe "abc123\nabc4567"
 
       keydown 'i'
-      editor.insertText "d"
-      editor.insertText "e"
-      editor.insertText "f"
+      editor.insertText "d", groupUndo: true
+      editor.insertText "e", groupUndo: true
+      editor.insertText "f", groupUndo: true
       keydown 'escape'
       expect(editor.getText()).toBe "abdefc123\nabdefc4567"
 
