@@ -461,7 +461,10 @@ class VimState
     return unless @mode in [null, 'insert']
     @editorElement.component.setInputEnabled(false)
     @editorElement.classList.remove('replace-mode')
-    @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
+
+    # this empty transaction with 0 grouping interval makes sure undo doesn't group changes across here
+    @editor.transact 0, ->
+
     changes = getChangesSinceCheckpoint(@editor.buffer, @insertionCheckpoint)
     item = @inputOperator(@history[0])
     @insertionCheckpoint = null
