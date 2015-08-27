@@ -1882,7 +1882,7 @@ describe "Motions", ->
     it 'stays put', ->
       editor.setText("\n)")
       editor.setCursorScreenPosition([1, 0])
-      expect(-> keydown('%')).not.toThrow();
+      expect(-> keydown('%')).not.toThrow()
 
     it "does not affect search history", ->
       keydown('/')
