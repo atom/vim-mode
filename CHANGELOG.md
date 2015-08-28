@@ -1,5 +1,10 @@
 ## HEAD
 
+## 0.59
+
+* Fixed an issue where normal Atom commands and mouse drags couldn't
+  move the cursor to the end of a line - @jacekkopecky
+
 ## 0.58
 
 * Fixed repetition of commands executed in visual mode - @jacekkopecky
