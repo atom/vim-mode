@@ -114,33 +114,38 @@ describe "VimState", ->
         expect(editor.getLastSelection().getText()).toEqual '012345\n'
 
     describe "the ctrl-v keybinding", ->
-      beforeEach -> keydown('v', ctrl: true)
+      beforeEach ->
+        editor.setText("012345\nabcdef")
+        editor.setCursorScreenPosition([0, 0])
+        keydown('v', ctrl: true)
 
-      it "puts the editor into visual characterwise mode", ->
+      it "puts the editor into visual blockwise mode", ->
         expect(editorElement.classList.contains('visual-mode')).toBe(true)
         expect(vimState.submode).toEqual 'blockwise'
         expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
     describe "selecting text", ->
       beforeEach ->
-        spyOn(_._, "now").andCallFake -> window.now
         editor.setText("abc def")
+        editor.setCursorScreenPosition([0, 0])
 
       it "puts the editor into visual mode", ->
         expect(vimState.mode).toEqual 'normal'
-        editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
-
-        advanceClock(100)
+        atom.commands.dispatch(editorElement, "core:select-right")
 
         expect(vimState.mode).toEqual 'visual'
         expect(vimState.submode).toEqual 'characterwise'
-        expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 3]]])
+        expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 1]]])
 
       it "handles the editor being destroyed shortly after selecting text", ->
         editor.setSelectedBufferRanges([[[0, 0], [0, 3]]])
         editor.destroy()
         vimState.destroy()
         advanceClock(100)
+
+      it "handles native selection such as core:select-all", ->
+        atom.commands.dispatch(editorElement, "core:select-all")
+        expect(editor.getSelectedBufferRanges()).toEqual([[[0, 0], [0, 7]]])
 
     describe "the i keybinding", ->
       beforeEach -> keydown('i')
@@ -158,18 +163,21 @@ describe "VimState", ->
         expect(editorElement.classList.contains('normal-mode')).toBe(false)
 
     describe "with content", ->
-      beforeEach -> editor.setText("012345\n\nabcdef")
+      beforeEach ->
+        editor.setText("012345\n\nabcdef")
+        editor.setCursorScreenPosition([0, 0])
 
       describe "on a line with content", ->
-        beforeEach -> editor.setCursorScreenPosition([0, 6])
-
-        it "does not allow the cursor to be placed on the \n character", ->
+        it "does not allow atom commands to place the cursor on the \\n character", ->
+          atom.commands.dispatch(editorElement, "editor:move-to-end-of-line")
           expect(editor.getCursorScreenPosition()).toEqual [0, 5]
 
       describe "on an empty line", ->
-        beforeEach -> editor.setCursorScreenPosition([1, 0])
+        beforeEach ->
+          editor.setCursorScreenPosition([1, 0])
+          atom.commands.dispatch(editorElement, "editor:move-to-end-of-line")
 
-        it "allows the cursor to be placed on the \n character", ->
+        it "allows the cursor to be placed on the \\n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
     describe 'with character-input operations', ->
@@ -206,9 +214,11 @@ describe "VimState", ->
           expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
       describe "on a line with content", ->
-        beforeEach -> editor.setCursorScreenPosition([0, 6])
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 0])
+          atom.commands.dispatch(editorElement, "editor:move-to-end-of-line")
 
-        it "allows the cursor to be placed on the \n character", ->
+        it "allows the cursor to be placed on the \\n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "puts the editor into normal mode when <escape> is pressed", ->
@@ -252,9 +262,10 @@ describe "VimState", ->
       describe "on a line with content", ->
         beforeEach ->
           keydown('R', shift: true)
-          editor.setCursorScreenPosition([0, 6])
+          editor.setCursorScreenPosition([0, 0])
+          atom.commands.dispatch(editorElement, "editor:move-to-end-of-line")
 
-        it "allows the cursor to be placed on the \n character", ->
+        it "allows the cursor to be placed on the \\n character", ->
           expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
     it "puts the editor into normal mode when <escape> is pressed", ->
@@ -365,15 +376,13 @@ describe "VimState", ->
         ])
 
       it "harmonizes selection directions", ->
-        editor.setCursorBufferPosition([0, 0])
-        keydown("e")
         keydown("e")
         editor.addCursorAtBufferPosition([0, Infinity])
         keydown("h")
         keydown("h")
 
         expect(editor.getSelectedBufferRanges()).toEqual([
-          [[0, 0], [0, 5]],
+          [[0, 4], [0, 5]],
           [[0, 11], [0, 13]]
         ])
         expect(editor.getCursorBufferPositions()).toEqual([
@@ -384,7 +393,7 @@ describe "VimState", ->
         keydown("o")
 
         expect(editor.getSelectedBufferRanges()).toEqual([
-          [[0, 0], [0, 5]],
+          [[0, 4], [0, 5]],
           [[0, 11], [0, 13]]
         ])
         expect(editor.getCursorBufferPositions()).toEqual([
