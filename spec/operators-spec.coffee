@@ -336,8 +336,8 @@ describe "Operators", ->
         keydown('d')
         keydown('d')
 
-        expect(editor.getText()).toBe "12345\nabcde\n"
-        expect(editor.getCursorScreenPosition()).toEqual [2, 0]
+        expect(editor.getText()).toBe "12345\nabcde"
+        expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
       it "leaves the cursor on the first nonblank character", ->
         editor.setText("12345\n  abcde\n")
@@ -431,10 +431,8 @@ describe "Operators", ->
         expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
     describe "when followed by a j", ->
-      originalText = "12345\nabcde\nABCDE\n"
-
       beforeEach ->
-        editor.setText(originalText)
+        editor.setText("12345\nabcde\nABCDE\n")
 
       describe "on the beginning of the file", ->
         it "deletes the next two lines", ->
@@ -444,11 +442,11 @@ describe "Operators", ->
           expect(editor.getText()).toBe("ABCDE\n")
 
       describe "on the end of the file", ->
-        it "deletes nothing", ->
+        it "deletes the last line", ->
           editor.setCursorScreenPosition([4, 0])
           keydown('d')
           keydown('j')
-          expect(editor.getText()).toBe(originalText)
+          expect(editor.getText()).toBe("12345\nabcde\nABCDE")
 
       describe "on the middle of second line", ->
         it "deletes the last two lines", ->

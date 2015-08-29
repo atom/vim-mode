@@ -24,7 +24,7 @@ class Motion
         @moveSelectionInclusively(selection, count, options)
       else
         @moveSelection(selection, count, options)
-      not selection.isEmpty()
+      @isEndOfFile(selection.cursor) or not selection.isEmpty()
 
     @editor.mergeCursors()
     @editor.mergeIntersectingSelections()
@@ -106,6 +106,15 @@ class Motion
 
   isInclusive: ->
     @vimState.mode is 'visual' or @operatesInclusively
+
+  isBeginningOfFile: (cursor) ->
+    cur = cursor.getBufferPosition()
+    not cur.row and not cur.column
+
+  isEndOfFile: (cursor) ->
+    cur = cursor.getBufferPosition()
+    eof = @editor.getEofBufferPosition()
+    cur.row is eof.row and cur.column is eof.column
 
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
@@ -215,10 +224,6 @@ class MoveToPreviousWholeWord extends Motion
     char = cursor.getCurrentWordPrefix().slice(-1)
     AllWhitespace.test(char)
 
-  isBeginningOfFile: (cursor) ->
-    cur = cursor.getBufferPosition()
-    not cur.row and not cur.column
-
 class MoveToNextWord extends Motion
   wordRegex: null
   operatesInclusively: false
@@ -242,11 +247,6 @@ class MoveToNextWord extends Motion
         cursor.moveToEndOfWord()
       else
         cursor.setBufferPosition(next)
-
-  isEndOfFile: (cursor) ->
-    cur = cursor.getBufferPosition()
-    eof = @editor.getEofBufferPosition()
-    cur.row is eof.row and cur.column is eof.column
 
 class MoveToNextWholeWord extends MoveToNextWord
   wordRegex: WholeWordOrEmptyLineRegex

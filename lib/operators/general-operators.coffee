@@ -88,9 +88,13 @@ class Delete extends Operator
       @setTextRegister(@register, @editor.getSelectedText())
       @editor.transact =>
         for selection in @editor.getSelections()
-          selection.deleteSelectedText()
+          if @motion.isLinewise?() and selection.getText() is @editor.lineTextForBufferRow(@editor.getLastBufferRow())
+            selection.deleteLine()
+          else
+            selection.deleteSelectedText()
       for cursor in @editor.getCursors()
         if @motion.isLinewise?()
+          cursor.moveToBeginningOfLine()
           cursor.skipLeadingWhitespace()
         else
           cursor.moveLeft() if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
