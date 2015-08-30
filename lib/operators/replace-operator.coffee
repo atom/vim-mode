@@ -20,6 +20,7 @@ class Replace extends OperatorWithInput
 
       return
 
+    # todo add specs with bracket matcher, for both editor.replaceSelectedText and editor.setTextInBufferRange
     @editor.transact =>
       if @motion?
         if _.contains(@motion.select(), true)

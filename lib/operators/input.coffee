@@ -19,7 +19,8 @@ class Insert extends Operator
   execute: ->
     if @typingCompleted
       return unless @typedText? and @typedText.length > 0
-      @editor.insertText(@typedText, normalizeLineEndings: true, autoIndent: true)
+      # todo add specs with bracket-matcher for this
+      @editor.insertText(@typedText, normalizeLineEndings: true, autoIndent: true, matchBrackets: false)
       for cursor in @editor.getCursors()
         cursor.moveLeft() unless cursor.isAtBeginningOfLine()
     else
@@ -35,7 +36,8 @@ class ReplaceMode extends Insert
     if @typingCompleted
       return unless @typedText? and @typedText.length > 0
       @editor.transact =>
-        @editor.insertText(@typedText, normalizeLineEndings: true)
+        # todo add specs with bracket-matcher for this
+        @editor.insertText(@typedText, normalizeLineEndings: true, matchBrackets: false)
         toDelete = @typedText.length - @countChars('\n', @typedText)
         for selection in @editor.getSelections()
           count = toDelete

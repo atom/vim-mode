@@ -37,6 +37,13 @@ class VimState
         if e.target is @editorElement
           @checkSelections()
 
+    # suppress bracket matching in replace mode
+    # todo add bracket matcher specs for this
+    # FIXME: this doesn't get removed should vim-mode be deactivated
+    _.adviseBefore @editor, 'insertText', (text, options) =>
+      options?.matchBrackets = false if @mode is 'insert' and @submode is 'replace'
+      return true
+
     @editorElement.classList.add("vim-mode")
     @setupNormalMode()
     if settings.startInInsertMode()
@@ -648,7 +655,8 @@ class VimState
   # Returns nothing.
   insertRegister: (name) ->
     text = @getRegister(name)?.text
-    @editor.insertText(text) if text?
+    # todo add specs with bracket-matcher for this
+    @editor.insertText(text, groupUndo: true, matchBrackets: false) if text?
 
   # Private: ensure the mode follows the state of selections
   checkSelections: =>
