@@ -339,7 +339,7 @@ class MoveToFirstCharacterOfLine extends Motion
 class MoveToFirstCharacterOfLineAndDown extends Motion
   operatesLinewise: true
 
-  moveCursor: (cursor, count=0) ->
+  moveCursor: (cursor, count=1) ->
     _.times count-1, ->
       cursor.moveDown()
     cursor.moveToBeginningOfLine()
@@ -415,7 +415,7 @@ class MoveToBottomOfScreen extends MoveToScreenLine
     lastScreenRow - offset
 
 class MoveToMiddleOfScreen extends MoveToScreenLine
-  getDestinationRow: (count) ->
+  getDestinationRow: ->
     firstScreenRow = @editorElement.getFirstVisibleScreenRow()
     lastScreenRow = @editorElement.getLastVisibleScreenRow()
     height = lastScreenRow - firstScreenRow
@@ -445,7 +445,7 @@ class ScrollKeepingCursor extends MoveToLine
     {row, column} = @editor.getCursorScreenPosition()
     @currentFirstScreenRow - @previousFirstScreenRow + row
 
-  scrollScreen: (count = 1) ->
+  scrollScreen: (count=1) ->
     @previousFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
     destination = @scrollDestination(count)
     @editor.setScrollTop(destination)
