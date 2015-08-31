@@ -1565,6 +1565,36 @@ describe "Motions", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
       expect(vimState.mode).toBe "normal"
 
+    describe 'with accented characters', ->
+      buildIMECompositionEvent = (event, {data, target}={}) ->
+        event = new Event(event)
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      buildTextInputEvent = ({data, target}) ->
+        event = new Event('textInput')
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      beforeEach ->
+        editor.setText("abcébcabcébc\n")
+        editor.setCursorScreenPosition([0, 0])
+
+      it 'works with IME composition', ->
+        keydown('f')
+        normalModeEditor = editor.normalModeInputView.editorElement
+        jasmine.attachToDOM(normalModeEditor)
+        domNode = normalModeEditor.component.domNode
+        inputNode = domNode.querySelector('.hidden-input')
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionstart', target: inputNode))
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionupdate', data: "´", target: inputNode))
+        expect(normalModeEditor.getModel().getText()).toEqual '´'
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionend', data: "é", target: inputNode))
+        domNode.dispatchEvent(buildTextInputEvent(data: 'é', target: inputNode))
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
   describe 'the t/T keybindings', ->
     beforeEach ->
       editor.setText("abcabcabcabc\n")

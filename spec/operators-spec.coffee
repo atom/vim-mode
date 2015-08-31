@@ -1804,6 +1804,34 @@ describe "Operators", ->
         normalModeInputKeydown('x')
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
 
+    describe 'with accented characters', ->
+      buildIMECompositionEvent = (event, {data, target}={}) ->
+        event = new Event(event)
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      buildTextInputEvent = ({data, target}) ->
+        event = new Event('textInput')
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      it 'works with IME composition', ->
+        keydown('r')
+        normalModeEditor = editor.normalModeInputView.editorElement
+        jasmine.attachToDOM(normalModeEditor)
+        domNode = normalModeEditor.component.domNode
+        inputNode = domNode.querySelector('.hidden-input')
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionstart', target: inputNode))
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionupdate', data: 's', target: inputNode))
+        expect(normalModeEditor.getModel().getText()).toEqual 's'
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionupdate', data: 'sd', target: inputNode))
+        expect(normalModeEditor.getModel().getText()).toEqual 'sd'
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionend', target: inputNode))
+        domNode.dispatchEvent(buildTextInputEvent(data: '速度', target: inputNode))
+        expect(editor.getText()).toBe '速度2\n速度4\n\n'
+
   describe 'the m keybinding', ->
     beforeEach ->
       editor.setText('12\n34\n56\n')
