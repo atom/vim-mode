@@ -1,5 +1,12 @@
 ## HEAD
 
+## 0.60
+
+* Fixed an issue where commands that took one character of input didn't
+  work with characters composed via IME - @jacekkopecky
+* Fixed an issue where the '%' motion would select the wrong range
+  when moving backwards - @jacekkopecky
+
 ## 0.59
 
 * Fixed an issue where normal Atom commands and mouse drags couldn't
