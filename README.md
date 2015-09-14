@@ -17,7 +17,7 @@ wasn't built in a day).
 If you want the vim ex line (for `:w`, `:s`, etc.), you can try [ex-mode](https://atom.io/packages/ex-mode)
 which works in conjuction with this plugin.
 
-Currently, vim-mode has some issues with international keyboard layouts.
+Currently, vim-mode has some issues with non-US keyboard layouts. If you are using a keyboard layout which *isn't* American and having problems, try installing [keyboard-localization](https://atom.io/packages/keyboard-localization).
 
 If there's a feature of Vim you're missing, it might just be that you use it
 more often than other developers. Adding a feature can be quick and easy. Check
