@@ -68,7 +68,15 @@ class VimState
       'activate-characterwise-visual-mode': => @activateVisualMode('characterwise')
       'activate-blockwise-visual-mode': => @activateVisualMode('blockwise')
       'reset-normal-mode': => @resetNormalMode()
-      'repeat-prefix': (e) => @repeatPrefix(e)
+      'repeat-prefix-1': (e) => @repeatPrefix(e, 1)
+      'repeat-prefix-2': (e) => @repeatPrefix(e, 2)
+      'repeat-prefix-3': (e) => @repeatPrefix(e, 3)
+      'repeat-prefix-4': (e) => @repeatPrefix(e, 4)
+      'repeat-prefix-5': (e) => @repeatPrefix(e, 5)
+      'repeat-prefix-6': (e) => @repeatPrefix(e, 6)
+      'repeat-prefix-7': (e) => @repeatPrefix(e, 7)
+      'repeat-prefix-8': (e) => @repeatPrefix(e, 8)
+      'repeat-prefix-9': (e) => @repeatPrefix(e, 9)
       'reverse-selections': (e) => @reverseSelections(e)
       'undo': (e) => @undo(e)
       'replace-mode-backspace': => @replaceModeUndo()
@@ -583,9 +591,7 @@ class VimState
   # e - The event that triggered the Number prefix.
   #
   # Returns nothing.
-  repeatPrefix: (e) ->
-    keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
-    num = parseInt(atom.keymaps.keystrokeForKeyboardEvent(keyboardEvent))
+  repeatPrefix: (e, num) ->
     if @topOperation() instanceof Prefixes.Repeat
       @topOperation().addDigit(num)
     else

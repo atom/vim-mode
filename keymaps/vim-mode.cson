@@ -200,15 +200,15 @@
 
   '%': 'vim-mode:bracket-matching-motion'
 
-  '1': 'vim-mode:repeat-prefix'
-  '2': 'vim-mode:repeat-prefix'
-  '3': 'vim-mode:repeat-prefix'
-  '4': 'vim-mode:repeat-prefix'
-  '5': 'vim-mode:repeat-prefix'
-  '6': 'vim-mode:repeat-prefix'
-  '7': 'vim-mode:repeat-prefix'
-  '8': 'vim-mode:repeat-prefix'
-  '9': 'vim-mode:repeat-prefix'
+  '1': 'vim-mode:repeat-prefix-1'
+  '2': 'vim-mode:repeat-prefix-2'
+  '3': 'vim-mode:repeat-prefix-3'
+  '4': 'vim-mode:repeat-prefix-4'
+  '5': 'vim-mode:repeat-prefix-5'
+  '6': 'vim-mode:repeat-prefix-6'
+  '7': 'vim-mode:repeat-prefix-7'
+  '8': 'vim-mode:repeat-prefix-8'
+  '9': 'vim-mode:repeat-prefix-9'
 
 'atom-text-editor.vim-mode.normal-mode':
   'i': 'vim-mode:activate-insert-mode'
