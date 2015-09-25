@@ -227,39 +227,155 @@ describe "TextObjects", ->
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 32]]
 
+  expectYankResult = (editorText, cursorPosition, result, {inner}) ->
+    editor.setText(editorText)
+    editor.setCursorBufferPosition(cursorPosition)
+    keydown('y')
+    if inner
+      keydown('i')
+    else
+      keydown('a')
+    keydown('t')
+    expect(vimState.getRegister('"').text).toBe(result)
+
   describe "the 'it' text object", ->
-    beforeEach ->
-      editor.setText("<something>here</something><again>")
-      editor.setCursorScreenPosition([0, 5])
 
-    it "applies only if in the value of a tag", ->
-      keydown('d')
+    describe 'applies the operator in operator-pending-mode', ->
+
+      beforeEach ->
+        vimState.setRegister('"', {text: ''})
+
+      it 'inside the tags', ->
+        expectYankResult('<aa>bbb</aa>', [0, 0], 'bbb', inner: true)
+
+      it 'not inside the tags if the cursor if after the tags', ->
+        expectYankResult('<aa>bbb</aa> ', [0, 12], '', inner: true)
+
+      it 'inside the first pair of tags if the cursor is before the tags', ->
+        expectYankResult('  <aa>bbb</aa>  <aa>ccc</aa>', [0, 0], 'bbb', inner: true)
+
+      it 'inside the first pair of tags if the cursor is inside the tags', ->
+        expectYankResult('  <aa>bbb</aa>  <aa>ccc</aa>', [0, 10], 'bbb', inner: true)
+
+      it 'inside the second pair of tags if the cursor is inside the second pair of tags', ->
+        expectYankResult('  <aa>bbb</aa>  <aa>ccc</aa>', [0, 16], 'ccc', inner: true)
+
+      it 'inside the outer pair of tags', ->
+        expectYankResult('<aa> <bb>ccc</bb></aa>', [0, 4], ' <bb>ccc</bb>', inner: true)
+
+      it 'inside the inner pair of tags', ->
+        expectYankResult('<aa> <bb>ccc</bb></aa>', [0, 5], 'ccc', inner: true)
+
+      it 'inside multiline tags when the cursor is at the start of the opening tag', ->
+        expectYankResult('<aa>\nbb\n</aa>', [0, 0], '\nbb\n', inner: true)
+
+      it 'inside multiline tags when the cursor is inside the opening tag', ->
+        expectYankResult('<a>\ntext\n</a>', [0, 2], '\ntext\n', inner: true)
+
+      it 'inside multiline tags when the cursor is on the same line as the opening tag', ->
+        expectYankResult(' <aa>\nbb\n</aa>' , [0, 0], '\nbb\n', inner: true)
+
+      it 'inside multiline tags when the cursor is on a line between the opening/closing tag', ->
+        expectYankResult('<aa>\nbb\n</aa>' , [1, 0], '\nbb\n', inner: true)
+
+      it 'inside multiline tags when the cursor is on the closing tag', ->
+        expectYankResult('<aa>\nbb\n</aa>' , [2, 0], '\nbb\n', inner: true)
+
+      it 'inside the outer multiline tags when the cursor is after inner the tags', ->
+        expectYankResult('<aa>\n<bb></bb> \n</aa>' , [1, 15], '\n<bb></bb> \n', inner: true)
+
+      it 'ignores the unclosed inner tag', ->
+        expectYankResult('<aa>\n<bb>\n<c></c>\n</aa>' , [1, 0], '\n<bb>\n<c></c>\n', inner: true)
+
+      it 'still ignores the unclosed tag with the cursor inside it', ->
+        expectYankResult('<a>\n<c>text</c>' , [0, 1], '', inner: true)
+
+      it 'ignores the last closing tag and the inner unclosed tag', ->
+        expectYankResult('<a>\ntext\n<b></a></c>' , [1, 0], '\ntext\n<b>', inner: true)
+
+    it 'selects inside the tags', ->
+      editor.setText('<aa>bbb</aa>')
+      editor.setCursorBufferPosition([0, 0])
+      keydown('v')
       keydown('i')
       keydown('t')
-      expect(editor.getText()).toBe "<something>here</something><again>"
-      expect(editor.getCursorScreenPosition()).toEqual [0, 5]
-      expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
-      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 4], [0, 7]]
 
-    it "applies operators inside the current word in operator-pending mode", ->
-      editor.setCursorScreenPosition([0, 13])
-      keydown('d')
+  describe "the 'at' text object", ->
+
+    describe 'applies the operator in operator-pending-mode', ->
+
+      beforeEach ->
+        vimState.setRegister('"', {text: ''})
+
+      it 'around the tags', ->
+        expectYankResult('<aa>bbb</aa>', [0, 0], '<aa>bbb</aa>', inner: false)
+
+      it 'not around the tags if the cursor if after the tags', ->
+        expectYankResult('<aa>bbb</aa> ', [0, 12], '', inner: false)
+
+      it 'around the first pair of tags if the cursor is before the tags', ->
+        expectYankResult('  <aa>bbb</aa>  <aa>ccc</aa>', [0, 0], '<aa>bbb</aa>', inner: false)
+
+      it 'around the first pair of tags if the cursor is inside the tags', ->
+        expectYankResult('  <aa>bbb</aa>  <aa>ccc</aa>', [0, 10], '<aa>bbb</aa>', inner: false)
+
+      it 'around the second pair of tags if the cursor is inside the second pair of tags', ->
+        expectYankResult('  <aa>bbb</aa>  <aa>ccc</aa>', [0, 16], '<aa>ccc</aa>', inner: false)
+
+      it 'around the outer pair of tags', ->
+        expectYankResult('<aa> <bb>ccc</bb></aa>', [0, 4], '<aa> <bb>ccc</bb></aa>', inner: false)
+
+      it 'around the inner pair of tags', ->
+        expectYankResult('<aa> <bb>ccc</bb></aa>', [0, 5], '<bb>ccc</bb>', inner: false)
+
+      it 'around multiline tags when the cursor is at the start of the opening tag', ->
+        expectYankResult('<aa>\nbb\n</aa>', [0, 0], '<aa>\nbb\n</aa>', inner: false)
+
+      it 'around multiline tags when the cursor is inside the opening tag', ->
+        expectYankResult('<a>\ntext\n</a>', [0, 2], '<a>\ntext\n</a>', inner: false)
+
+      it 'around multiline tags when the cursor is on the same line as the opening tag', ->
+        expectYankResult(' <aa>\nbb\n</aa>' , [0, 0], '<aa>\nbb\n</aa>', inner: false)
+
+      it 'around multiline tags when the cursor is on a line between the opening/closing tag', ->
+        expectYankResult('<aa>\nbb\n</aa>' , [1, 0], '<aa>\nbb\n</aa>', inner: false)
+
+      it 'around multiline tags when the cursor is on the closing tag', ->
+        expectYankResult('<aa>\nbb\n</aa>' , [2, 0], '<aa>\nbb\n</aa>', inner: false)
+
+      it 'around the outer multiline tags when the cursor is after inner the tags', ->
+        expectYankResult('<aa>\n<bb></bb> \n</aa>' , [1, 15], '<aa>\n<bb></bb> \n</aa>', inner: false)
+
+      it 'around the outer tags, ignoring the unclosed inner tag', ->
+        expectYankResult('<aa>\n<bb>\n<c></c>\n</aa>' , [1, 0], '<aa>\n<bb>\n<c></c>\n</aa>', inner: false)
+
+      it 'ignores the unclosed tag with the cursor inside it', ->
+        expectYankResult('<a>\n<c>text</c>' , [0, 1], '', inner: false)
+
+      it 'around the <a> tag, ignoring the last closing tag and the inner unclosed tag', ->
+        expectYankResult('<a>\ntext\n<b></a></c>' , [1, 0], '<a>\ntext\n<b></a>', inner: false)
+
+    it 'selects around the tags', ->
+      editor.setText('<aa>bbb</aa>')
+      editor.setCursorBufferPosition([0, 0])
+      keydown('v')
       keydown('i')
       keydown('t')
-      expect(editor.getText()).toBe "<something></something><again>"
-      expect(editor.getCursorScreenPosition()).toEqual [0, 11]
-      expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
-      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 4], [0, 7]]
 
-    it "expands an existing selection in visual mode", ->
-      editor.setCursorScreenPosition([0, 7])
+    it "does not expands an existing selection in visual mode", ->
+      editor.setText('text <a>innerTag</a>')
+
+      editor.setCursorScreenPosition([0, 0])
       keydown('v')
       keydown('6')
       keydown('l')
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 0], [0, 7]]
+
       keydown('i')
       keydown('t')
-
-      expect(editor.getSelectedScreenRange()).toEqual [[0, 7], [0, 15]]
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 8], [0, 16]]
 
   describe "the 'ip' text object", ->
     beforeEach ->
