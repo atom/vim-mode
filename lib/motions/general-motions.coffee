@@ -431,12 +431,12 @@ class ScrollKeepingCursor extends MoveToLine
   select: (count, options) ->
     finalDestination = @scrollScreen(count)
     super(count, options)
-    @editorElement.setScrollTop(finalDestination)
+    @editor.setScrollTop(finalDestination)
 
   execute: (count) ->
     finalDestination = @scrollScreen(count)
     super(count)
-    @editorElement.setScrollTop(finalDestination)
+    @editor.setScrollTop(finalDestination)
 
   moveCursor: (cursor, count=1) ->
     cursor.setScreenPosition([@getDestinationRow(count), 0])
@@ -448,27 +448,27 @@ class ScrollKeepingCursor extends MoveToLine
   scrollScreen: (count=1) ->
     @previousFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
     destination = @scrollDestination(count)
-    @editorElement.setScrollTop(destination)
+    @editor.setScrollTop(destination)
     @currentFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
     destination
 
 class ScrollHalfUpKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
     half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
-    @editorElement.getScrollTop() - count * half
+    @editor.getScrollTop() - count * half
 
 class ScrollFullUpKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
-    @editorElement.getScrollTop() - (count * @editorElement.getHeight())
+    @editor.getScrollTop() - (count * @editor.getHeight())
 
 class ScrollHalfDownKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
     half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
-    @editorElement.getScrollTop() + count * half
+    @editor.getScrollTop() + count * half
 
 class ScrollFullDownKeepCursor extends ScrollKeepingCursor
   scrollDestination: (count) ->
-    @editorElement.getScrollTop() + (count * @editorElement.getHeight())
+    @editor.getScrollTop() + (count * @editor.getHeight())
 
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
