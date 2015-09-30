@@ -19,8 +19,8 @@ getEditorElement = (callback) ->
       textEditor = e
 
   runs ->
-    element = atom.views.getView(textEditor)
-    element.setUpdatedSynchronously(true)
+    element = document.createElement("atom-text-editor")
+    element.setModel(textEditor)
     element.classList.add('vim-mode')
     statusBarManager ?= new StatusBarManager
     globalVimState ?= new GlobalVimState
@@ -30,7 +30,7 @@ getEditorElement = (callback) ->
       atom.keymaps.handleKeyboardEvent(e)
 
     # mock parent element for the text editor
-    document.createElement("html").appendChild(element)
+    document.createElement('html').appendChild(atom.views.getView(textEditor))
 
     callback(element)
 
@@ -58,7 +58,7 @@ keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
   key = "U+#{key.charCodeAt(0).toString(16)}" unless key is 'escape' or raw?
   element ||= document.activeElement
   eventArgs = [
-    false, # bubbles
+    true, # bubbles
     true, # cancelable
     null, # view
     key,  # key
