@@ -1131,9 +1131,12 @@ describe "Operators", ->
 
     describe "in a long file", ->
       beforeEach ->
-        editor.setHeight(400)
-        editor.setLineHeightInPixels(10)
-        editor.setDefaultCharWidth(10)
+        jasmine.attachToDOM(editorElement)
+        editorElement.setHeight(400)
+        editorElement.style.lineHeight = "10px"
+        editorElement.style.font = "16px monospace"
+        atom.views.performDocumentPoll()
+
         text = ""
         for i in [1..200]
           text += "#{i}\n"
@@ -1142,7 +1145,7 @@ describe "Operators", ->
       describe "yanking many lines forward", ->
         it "does not scroll the window", ->
           editor.setCursorBufferPosition [40, 1]
-          previousScrollTop = editor.getScrollTop()
+          previousScrollTop = editorElement.getScrollTop()
 
           # yank many lines
           keydown('y')
@@ -1151,14 +1154,14 @@ describe "Operators", ->
           keydown('0')
           keydown('G', shift: true)
 
-          expect(editor.getScrollTop()).toEqual(previousScrollTop)
+          expect(editorElement.getScrollTop()).toEqual(previousScrollTop)
           expect(editor.getCursorBufferPosition()).toEqual [40, 1]
           expect(vimState.getRegister('"').text.split('\n').length).toBe 121
 
       describe "yanking many lines backwards", ->
         it "scrolls the window", ->
           editor.setCursorBufferPosition [140, 1]
-          previousScrollTop = editor.getScrollTop()
+          previousScrollTop = editorElement.getScrollTop()
 
           # yank many lines
           keydown('y')
@@ -1166,7 +1169,7 @@ describe "Operators", ->
           keydown('0')
           keydown('G', shift: true)
 
-          expect(editor.getScrollTop()).toNotEqual previousScrollTop
+          expect(editorElement.getScrollTop()).toNotEqual previousScrollTop
           expect(editor.getCursorBufferPosition()).toEqual [59, 1]
           expect(vimState.getRegister('"').text.split('\n').length).toBe 83
 
