@@ -170,6 +170,7 @@ class Yank extends Operator
   register: null
 
   constructor: (@editor, @vimState) ->
+    @editorElement = atom.views.getView(@editor)
     @register = settings.defaultRegister()
 
   # Public: Copies the text selected by the given motion.
@@ -178,8 +179,8 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count) ->
-    oldTop = @editor.getScrollTop()
-    oldLeft = @editor.getScrollLeft()
+    oldTop = @editorElement.getScrollTop()
+    oldLeft = @editorElement.getScrollLeft()
     oldLastCursorPosition = @editor.getCursorBufferPosition()
 
     originalPositions = @editor.getCursorBufferPositions()
@@ -203,8 +204,8 @@ class Yank extends Operator
     @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
 
     if oldLastCursorPosition.isEqual(@editor.getCursorBufferPosition())
-      @editor.setScrollLeft(oldLeft)
-      @editor.setScrollTop(oldTop)
+      @editorElement.setScrollLeft(oldLeft)
+      @editorElement.setScrollTop(oldTop)
 
     @vimState.activateNormalMode()
 

@@ -1,7 +1,7 @@
 helpers = require './spec-helper'
 
 describe "Motions", ->
-  [editor, editorElement, vimState] = []
+  [editor, editorElement, parentElement, vimState] = []
 
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
@@ -1378,17 +1378,17 @@ describe "Motions", ->
       spyOn(editor.getLastCursor(), 'setScreenPosition')
 
     it "moves the cursor to the first row if visible", ->
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(0)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(0)
       keydown('H', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([0, 0])
 
     it "moves the cursor to the first visible row plus offset", ->
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(2)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(2)
       keydown('H', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([4, 0])
 
     it "respects counts", ->
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(0)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(0)
       keydown('3')
       keydown('H', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([2, 0])
@@ -1400,17 +1400,17 @@ describe "Motions", ->
       spyOn(editor.getLastCursor(), 'setScreenPosition')
 
     it "moves the cursor to the first row if visible", ->
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(10)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(10)
       keydown('L', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([10, 0])
 
     it "moves the cursor to the first visible row plus offset", ->
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(6)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(6)
       keydown('L', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([4, 0])
 
     it "respects counts", ->
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(10)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(10)
       keydown('3')
       keydown('L', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([8, 0])
@@ -1420,8 +1420,8 @@ describe "Motions", ->
       editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")
       editor.setCursorScreenPosition([8, 0])
       spyOn(editor.getLastCursor(), 'setScreenPosition')
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(10)
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(0)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(10)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(0)
 
     it "moves the cursor to the first row if visible", ->
       keydown('M', shift: true)
@@ -1920,16 +1920,21 @@ describe "Motions", ->
 
   describe "scrolling screen and keeping cursor in the same screen position", ->
     beforeEach ->
+      jasmine.attachToDOM(editorElement)
+
       editor.setText([0...80].join("\n"))
-      editor.setHeight(20 * 10)
-      editor.setLineHeightInPixels(10)
-      editor.setScrollTop(40 * 10)
+
+      editorElement.setHeight(20 * 10)
+      editorElement.style.lineHeight = "10px"
+      atom.views.performDocumentPoll()
+
+      editorElement.setScrollTop(40 * 10)
       editor.setCursorBufferPosition([42, 0])
 
     describe "the ctrl-u keybinding", ->
       it "moves the screen down by half screen size and keeps cursor onscreen", ->
         keydown('u', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 300
+        expect(editorElement.getScrollTop()).toEqual 300
         expect(editor.getCursorBufferPosition()).toEqual [32, 0]
 
       it "selects on visual mode", ->
@@ -1946,7 +1951,7 @@ describe "Motions", ->
     describe "the ctrl-b keybinding", ->
       it "moves screen up one page", ->
         keydown('b', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 200
+        expect(editorElement.getScrollTop()).toEqual 200
         expect(editor.getCursorScreenPosition()).toEqual [22, 0]
 
       it "selects on visual mode", ->
@@ -1964,7 +1969,7 @@ describe "Motions", ->
     describe "the ctrl-d keybinding", ->
       it "moves the screen down by half screen size and keeps cursor onscreen", ->
         keydown('d', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 500
+        expect(editorElement.getScrollTop()).toEqual 500
         expect(editor.getCursorBufferPosition()).toEqual [52, 0]
 
       it "selects on visual mode", ->
@@ -1981,7 +1986,7 @@ describe "Motions", ->
     describe "the ctrl-f keybinding", ->
       it "moves screen down one page", ->
         keydown('f', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 600
+        expect(editorElement.getScrollTop()).toEqual 600
         expect(editor.getCursorScreenPosition()).toEqual [62, 0]
 
       it "selects on visual mode", ->
