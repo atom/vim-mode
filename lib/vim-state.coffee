@@ -559,7 +559,7 @@ class VimState
     @clearOpStack()
     @editor.clearSelections()
     @activateNormalMode()
-    atom.commands.dispatch(@workspaceElement, 'find-and-replace:hide-all')
+    atom.commands.dispatch(@workspaceElement, 'core:cancel')
 
   # Private: A generic way to create a Register prefix based on the event.
   #
