@@ -1927,7 +1927,7 @@ describe "Motions", ->
       editor.setCursorBufferPosition([42, 0])
 
     describe "the ctrl-u keybinding", ->
-      it "moves the screen down by half screen size and keeps cursor onscreen", ->
+      it "moves the screen up by half screen size and keeps cursor onscreen", ->
         keydown('u', ctrl: true)
         expect(editor.getScrollTop()).toEqual 300
         expect(editor.getCursorBufferPosition()).toEqual [32, 0]
