@@ -1,5 +1,9 @@
 ## HEAD
 
+## 0.61
+
+* Implemented '(' and ')' sentence motion operators - @jonasws
+
 ## 0.60
 
 * Fixed an issue where commands that took one character of input didn't
