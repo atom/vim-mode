@@ -289,6 +289,36 @@ class MoveToEndOfWord extends Motion
 class MoveToEndOfWholeWord extends MoveToEndOfWord
   wordRegex: WholeWordRegex
 
+class MoveToNextSentence extends Motion
+  moveCursor: (cursor, count=1) ->
+    _.times count, ->
+      start = cursor.getBufferPosition().translate new Point(0, 1)
+      eof = cursor.editor.getBuffer().getEndPosition()
+      scanRange = [start, eof]
+
+      cursor.editor.scanInBufferRange /(^$)|(([\.!?] )|^[A-Za-z0-9])/, scanRange, ({matchText, range, stop}) ->
+        adjustment = new Point(0, 0)
+        if matchText.match /[\.!?]/
+          adjustment = new Point(0, 2)
+
+        cursor.setBufferPosition range.start.translate(adjustment)
+        stop()
+
+class MoveToPreviousSentence extends Motion
+  moveCursor: (cursor, count=1) ->
+    _.times count, ->
+      end = cursor.getBufferPosition().translate new Point(0, -1)
+      bof = cursor.editor.getBuffer().getFirstPosition()
+      scanRange = [bof, end]
+
+      cursor.editor.backwardsScanInBufferRange /(^$)|(([\.!?] )|^[A-Za-z0-9])/, scanRange, ({matchText, range, stop}) ->
+        adjustment = new Point(0, 0)
+        if matchText.match /[\.!?]/
+          adjustment = new Point(0, 2)
+
+        cursor.setBufferPosition range.start.translate(adjustment)
+        stop()
+
 class MoveToNextParagraph extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, ->
@@ -473,7 +503,7 @@ class ScrollFullDownKeepCursor extends ScrollKeepingCursor
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
   MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
-  MoveToEndOfWord, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
+  MoveToEndOfWord, MoveToNextSentence, MoveToPreviousSentence, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine,
   MoveToLastNonblankCharacterOfLineAndDown, MoveToStartOfFile,

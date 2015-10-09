@@ -316,6 +316,55 @@ describe "Motions", ->
         it "selects to the end of the current word", ->
           expect(vimState.getRegister('"').text).toBe 'ab  cde1+-'
 
+  describe "the ) keybinding", ->
+    beforeEach ->
+      editor.setText "This is a sentence. This is a second sentence.\nThis is a third sentence.\n\nThis sentence is past the paragraph boundary."
+      editor.setCursorBufferPosition [0, 0]
+
+    describe "as a motion", ->
+      it "moves the cursor to the beginning of the next sentence", ->
+        keydown ')'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 20]
+
+        keydown ')'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        keydown ')'
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+    describe "as a selection", ->
+      beforeEach ->
+        keydown('y')
+        keydown(')')
+
+      it 'selects to the start of the next sentence', ->
+        expect(vimState.getRegister('"').text).toBe "This is a sentence. "
+
+  describe "the ( keybinding", ->
+    beforeEach ->
+      editor.setText "This first sentence is in its own paragraph.\n\nThis is a sentence. This is a second sentence.\nThis is a third sentence"
+      editor.setCursorBufferPosition [3, 0]
+
+    describe "as a motion", ->
+      it "moves the cursor to the beginning of the previous sentence", ->
+        keydown '('
+        expect(editor.getCursorBufferPosition()).toEqual [2, 20]
+
+        keydown '('
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        keydown '('
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+
+    describe "as a selection", ->
+      beforeEach ->
+        keydown('y')
+        keydown('(')
+
+      it 'selects to the end of the previous sentence', ->
+        expect(vimState.getRegister('"').text).toBe "This is a second sentence.\n"
+
   describe "the } keybinding", ->
     beforeEach ->
       editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")

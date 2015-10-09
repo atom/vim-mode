@@ -96,7 +96,9 @@
   'e': 'vim-mode:move-to-end-of-word'
   'E': 'vim-mode:move-to-end-of-whole-word'
   'b': 'vim-mode:move-to-previous-word'
-  'B': 'vim-mode:move-to-previous-whole-word'
+  'B': 'vim-mode:move-to-previous-whole-word',
+  ')': 'vim-mode:move-to-next-sentence',
+  '(': 'vim-mode:move-to-previous-sentence',
   '}': 'vim-mode:move-to-next-paragraph'
   '{': 'vim-mode:move-to-previous-paragraph'
   '0': 'vim-mode:move-to-beginning-of-line'
