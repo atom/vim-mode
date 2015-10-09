@@ -575,6 +575,9 @@ class VimState
   # Returns the name of the register
   registerName: (e) ->
     keyboardEvent = e.originalEvent?.originalEvent ? e.originalEvent
+    if not keyboardEvent?
+      atom.beep()
+      return null
     name = atom.keymaps.keystrokeForKeyboardEvent(keyboardEvent)
     if name.lastIndexOf('shift-', 0) is 0
       name = name.slice(6)
