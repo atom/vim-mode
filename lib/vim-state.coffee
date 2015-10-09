@@ -117,6 +117,8 @@ class VimState
       'move-to-previous-word': => new Motions.MoveToPreviousWord(@editor, this)
       'move-to-previous-whole-word': => new Motions.MoveToPreviousWholeWord(@editor, this)
       'move-to-next-paragraph': => new Motions.MoveToNextParagraph(@editor, this)
+      'move-to-next-sentence': => new Motions.MoveToNextSentence(@editor, this)
+      'move-to-previous-sentence': => new Motions.MoveToPreviousSentence(@editor, this)
       'move-to-previous-paragraph': => new Motions.MoveToPreviousParagraph(@editor, this)
       'move-to-first-character-of-line': => new Motions.MoveToFirstCharacterOfLine(@editor, this)
       'move-to-first-character-of-line-and-down': => new Motions.MoveToFirstCharacterOfLineAndDown(@editor, this)
