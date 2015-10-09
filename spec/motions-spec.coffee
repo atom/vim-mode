@@ -356,7 +356,6 @@ describe "Motions", ->
         keydown '('
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
 
-
     describe "as a selection", ->
       beforeEach ->
         keydown('y')
