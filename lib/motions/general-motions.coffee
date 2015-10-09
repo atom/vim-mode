@@ -296,7 +296,7 @@ class MoveToNextSentence extends Motion
       eof = cursor.editor.getBuffer().getEndPosition()
       scanRange = [start, eof]
 
-      cursor.editor.scanInBufferRange /([\.!?] )|^[A-Za-z0-9]/, scanRange, ({matchText, range, stop}) ->
+      cursor.editor.scanInBufferRange /(^$)|(([\.!?] )|^[A-Za-z0-9])/, scanRange, ({matchText, range, stop}) ->
         adjustment = new Point(0, 0)
         if matchText.match /[\.!?]/
           adjustment = new Point(0, 2)
@@ -311,7 +311,7 @@ class MoveToPreviousSentence extends Motion
       bof = cursor.editor.getBuffer().getFirstPosition()
       scanRange = [bof, end]
 
-      cursor.editor.backwardsScanInBufferRange /([\.!?] )|^[A-Za-z0-9]/, scanRange, ({matchText, range, stop}) ->
+      cursor.editor.backwardsScanInBufferRange /(^$)|(([\.!?] )|^[A-Za-z0-9])/, scanRange, ({matchText, range, stop}) ->
         adjustment = new Point(0, 0)
         if matchText.match /[\.!?]/
           adjustment = new Point(0, 2)
