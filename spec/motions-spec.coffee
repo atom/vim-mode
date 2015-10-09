@@ -318,7 +318,7 @@ describe "Motions", ->
 
   describe "the ) keybinding", ->
     beforeEach ->
-      editor.setText "This is a sentence. This is a second sentence.\nThis is a third sentence"
+      editor.setText "This is a sentence. This is a second sentence.\nThis is a third sentence.\n\nThis sentence is past the paragraph boundary."
       editor.setCursorBufferPosition [0, 0]
 
     describe "as a motion", ->
@@ -328,6 +328,9 @@ describe "Motions", ->
 
         keydown ')'
         expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        keydown ')'
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
 
     describe "as a selection", ->
       beforeEach ->
@@ -339,16 +342,20 @@ describe "Motions", ->
 
   describe "the ( keybinding", ->
     beforeEach ->
-      editor.setText "This is a sentence. This is a second sentence.\nThis is a third sentence"
-      editor.setCursorBufferPosition [1, 0]
+      editor.setText "This first sentence is in its own paragraph.\n\nThis is a sentence. This is a second sentence.\nThis is a third sentence"
+      editor.setCursorBufferPosition [3, 0]
 
     describe "as a motion", ->
       it "moves the cursor to the beginning of the previous sentence", ->
         keydown '('
-        expect(editor.getCursorBufferPosition()).toEqual [0, 20]
+        expect(editor.getCursorBufferPosition()).toEqual [2, 20]
 
         keydown '('
-        expect(editor.getCursorBufferPosition()).toEqual [0, 0]
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        keydown '('
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
 
     describe "as a selection", ->
       beforeEach ->
