@@ -31,7 +31,7 @@ describe "TextObjects", ->
 
   describe "the 'iw' text object", ->
     beforeEach ->
-      editor.setText("12345 abcde ABCDE")
+      editor.setText("12345 abcde (ABCDE)")
       editor.setCursorScreenPosition([0, 9])
 
     it "applies operators inside the current word in operator-pending mode", ->
@@ -39,7 +39,7 @@ describe "TextObjects", ->
       keydown('i')
       keydown('w')
 
-      expect(editor.getText()).toBe "12345  ABCDE"
+      expect(editor.getText()).toBe "12345  (ABCDE)"
       expect(editor.getCursorScreenPosition()).toEqual [0, 6]
       expect(vimState.getRegister('"').text).toBe "abcde"
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
@@ -60,7 +60,7 @@ describe "TextObjects", ->
       keydown('i')
       keydown('w')
 
-      expect(editor.getSelectedScreenRange()).toEqual [[0, 9], [0, 17]]
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 9], [0, 18]]
 
     it "works with multiple cursors", ->
       editor.addCursorAtBufferPosition([0, 1])
@@ -71,6 +71,15 @@ describe "TextObjects", ->
         [[0, 6], [0, 11]]
         [[0, 0], [0, 5]]
       ]
+
+    it "doesn't expand to include delimeters", ->
+      editor.setCursorScreenPosition([0, 13])
+      keydown('d')
+      keydown('i')
+      keydown('w')
+
+      expect(editor.getText()).toBe "12345 abcde ()"
+
 
   describe "the 'iW' text object", ->
     beforeEach ->
