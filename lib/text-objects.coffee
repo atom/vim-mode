@@ -14,6 +14,8 @@ class TextObject
 class SelectInsideWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
+      if selection.isEmpty()
+        selection.selectRight()
       selection.expandOverWord()
     [true]
 
@@ -144,6 +146,8 @@ class SelectInsideBrackets extends TextObject
 class SelectAWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
+      if selection.isEmpty()
+        selection.selectRight()
       selection.expandOverWord()
       loop
         endPoint = selection.getBufferRange().end
