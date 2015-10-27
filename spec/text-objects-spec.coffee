@@ -77,9 +77,7 @@ describe "TextObjects", ->
       keydown('d')
       keydown('i')
       keydown('w')
-
       expect(editor.getText()).toBe "12345 abcde ()"
-
 
   describe "the 'iW' text object", ->
     beforeEach ->
