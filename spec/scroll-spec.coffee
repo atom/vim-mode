@@ -171,7 +171,7 @@ describe "Scrolling", ->
         pos340 = zsPos(340)
         expect(pos340).toBeLessThan(posEnd)
         pos342 = zsPos(342)
-        expect(pos342 - pos340).toEqual(20)
+        expect(pos342 - pos340).toEqual(19)
 
       it "does nothing if all lines are short", ->
         editor.setText('short')
@@ -222,7 +222,7 @@ describe "Scrolling", ->
         expect(pos380).toBeLessThan(posEnd)
 
         pos382 = zePos(382)
-        expect(pos382 - pos380).toEqual(20)
+        expect(pos382 - pos380).toEqual(19)
 
       it "does nothing if all lines are short", ->
         editor.setText('short')
