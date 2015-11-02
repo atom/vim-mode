@@ -1991,10 +1991,10 @@ describe "Motions", ->
         keydown('u', ctrl: true)
         expect(editor.getSelectedText()).toEqual [32..42].join("\n")
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('u', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [32..42].join("\n").concat("\n")
+        expect(editor.getSelectedText()).toEqual [33..42].join("\n").concat("\n")
 
     describe "the ctrl-b keybinding", ->
       it "moves screen up one page", ->
@@ -2008,11 +2008,10 @@ describe "Motions", ->
         keydown('b', ctrl: true)
         expect(editor.getSelectedText()).toEqual [22..42].join("\n")
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('b', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [22..42].join("\n").concat("\n")
-
+        expect(editor.getSelectedText()).toEqual [23..42].join("\n").concat("\n")
 
     describe "the ctrl-d keybinding", ->
       it "moves the screen down by half screen size and keeps cursor onscreen", ->
@@ -2026,10 +2025,10 @@ describe "Motions", ->
         keydown('d', ctrl: true)
         expect(editor.getSelectedText()).toEqual [42..52].join("\n").slice(1, -1)
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('d', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [42..52].join("\n").concat("\n")
+        expect(editor.getSelectedText()).toEqual [42..53].join("\n").concat("\n")
 
     describe "the ctrl-f keybinding", ->
       it "moves screen down one page", ->
@@ -2043,7 +2042,7 @@ describe "Motions", ->
         keydown('f', ctrl: true)
         expect(editor.getSelectedText()).toEqual [42..62].join("\n").slice(1, -1)
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('f', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [42..62].join("\n").concat("\n")
+        expect(editor.getSelectedText()).toEqual [42..63].join("\n").concat("\n")

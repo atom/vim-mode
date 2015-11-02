@@ -15,7 +15,7 @@ getEditorElement = (callback) ->
   textEditor = null
 
   waitsForPromise ->
-    atom.project.open().then (e) ->
+    atom.workspace.open().then (e) ->
       textEditor = e
 
   runs ->
