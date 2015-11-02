@@ -451,54 +451,50 @@ class MoveToMiddleOfScreen extends MoveToScreenLine
     height = lastScreenRow - firstScreenRow
     Math.floor(firstScreenRow + (height / 2))
 
-class ScrollKeepingCursor extends MoveToLine
-  previousFirstScreenRow: 0
-  currentFirstScreenRow: 0
+class ScrollKeepingCursor extends Motion
+  operatesLinewise: true
+  cursorRow: null
 
   constructor: (@editorElement, @vimState) ->
     super(@editorElement.getModel(), @vimState)
 
   select: (count, options) ->
-    finalDestination = @scrollScreen(count)
+    scrollTop = @scrollScreen(count)
     super(count, options)
-    @editorElement.setScrollTop(finalDestination)
+    @editorElement.setScrollTop(scrollTop)
 
   execute: (count) ->
-    finalDestination = @scrollScreen(count)
+    scrollTop = @scrollScreen(count)
     super(count)
-    @editorElement.setScrollTop(finalDestination)
+    @editorElement.setScrollTop(scrollTop)
 
-  moveCursor: (cursor, count=1) ->
-    cursor.setScreenPosition([@getDestinationRow(count), 0])
-
-  getDestinationRow: (count) ->
-    {row, column} = @editor.getCursorScreenPosition()
-    @currentFirstScreenRow - @previousFirstScreenRow + row
+  moveCursor: (cursor) ->
+    cursor.setScreenPosition(Point(@cursorRow, 0), autoscroll: false)
 
   scrollScreen: (count=1) ->
-    @previousFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
-    destination = @scrollDestination(count)
-    @editorElement.setScrollTop(destination)
-    @currentFirstScreenRow = @editorElement.getFirstVisibleScreenRow()
-    destination
+    # TODO: We need to create an API for reading an editor's logical scroll
+    # position which may not yet have been flushed to the DOM. Currently, the
+    # only way to access this information is through this piece of private state.
+    currentScrollTop = @editorElement.component.presenter.pendingScrollTop ? @editorElement.getScrollTop()
+
+    currentCursorRow = @editor.getCursorScreenPosition().row
+    rowsPerPage = @editor.getRowsPerPage()
+    lineHeight = @editor.getLineHeightInPixels()
+    scrollRows = Math.floor(@pageScrollFraction * rowsPerPage * count)
+    @cursorRow = currentCursorRow + scrollRows
+    currentScrollTop + scrollRows * lineHeight
 
 class ScrollHalfUpKeepCursor extends ScrollKeepingCursor
-  scrollDestination: (count) ->
-    half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
-    @editorElement.getScrollTop() - count * half
+  pageScrollFraction: -1 / 2
 
 class ScrollFullUpKeepCursor extends ScrollKeepingCursor
-  scrollDestination: (count) ->
-    @editorElement.getScrollTop() - (count * @editorElement.getHeight())
+  pageScrollFraction: -1
 
 class ScrollHalfDownKeepCursor extends ScrollKeepingCursor
-  scrollDestination: (count) ->
-    half = (Math.floor(@editor.getRowsPerPage() / 2) * @editor.getLineHeightInPixels())
-    @editorElement.getScrollTop() + count * half
+  pageScrollFraction: 1 / 2
 
 class ScrollFullDownKeepCursor extends ScrollKeepingCursor
-  scrollDestination: (count) ->
-    @editorElement.getScrollTop() + (count * @editorElement.getHeight())
+  pageScrollFraction: 1
 
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
