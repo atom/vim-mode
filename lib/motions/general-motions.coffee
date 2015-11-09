@@ -459,30 +459,47 @@ class ScrollKeepingCursor extends Motion
     super(@editorElement.getModel(), @vimState)
 
   select: (count, options) ->
-    scrollTop = @scrollScreen(count)
-    super(count, options)
-    @editorElement.setScrollTop(scrollTop)
+    # TODO: remove this conditional once after Atom v1.1.0 is released.
+    if @editor.setFirstVisibleScreenRow?
+      newTopRow = @getNewFirstVisibleScreenRow(count)
+      super(count, options)
+      @editor.setFirstVisibleScreenRow(newTopRow)
+    else
+      scrollTop = @getNewScrollTop(count)
+      super(count, options)
+      @editorElement.setScrollTop(scrollTop)
 
   execute: (count) ->
-    scrollTop = @scrollScreen(count)
-    super(count)
-    @editorElement.setScrollTop(scrollTop)
+    # TODO: remove this conditional once after Atom v1.1.0 is released.
+    if @editor.setFirstVisibleScreenRow?
+      newTopRow = @getNewFirstVisibleScreenRow(count)
+      super(count)
+      @editor.setFirstVisibleScreenRow(newTopRow)
+    else
+      scrollTop = @getNewScrollTop(count)
+      super(count)
+      @editorElement.setScrollTop(scrollTop)
 
   moveCursor: (cursor) ->
     cursor.setScreenPosition(Point(@cursorRow, 0), autoscroll: false)
 
-  scrollScreen: (count=1) ->
-    # TODO: We need to create an API for reading an editor's logical scroll
-    # position which may not yet have been flushed to the DOM. Currently, the
-    # only way to access this information is through this piece of private state.
+  # TODO: remove this method once after Atom v1.1.0 is released.
+  getNewScrollTop: (count=1) ->
     currentScrollTop = @editorElement.component.presenter.pendingScrollTop ? @editorElement.getScrollTop()
-
     currentCursorRow = @editor.getCursorScreenPosition().row
     rowsPerPage = @editor.getRowsPerPage()
     lineHeight = @editor.getLineHeightInPixels()
     scrollRows = Math.floor(@pageScrollFraction * rowsPerPage * count)
     @cursorRow = currentCursorRow + scrollRows
     currentScrollTop + scrollRows * lineHeight
+
+  getNewFirstVisibleScreenRow: (count=1) ->
+    currentTopRow = @editor.getFirstVisibleScreenRow()
+    currentCursorRow = @editor.getCursorScreenPosition().row
+    rowsPerPage = @editor.getRowsPerPage()
+    scrollRows = Math.ceil(@pageScrollFraction * rowsPerPage * count)
+    @cursorRow = currentCursorRow + scrollRows
+    currentTopRow + scrollRows
 
 class ScrollHalfUpKeepCursor extends ScrollKeepingCursor
   pageScrollFraction: -1 / 2
