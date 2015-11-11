@@ -1970,7 +1970,7 @@ describe "Motions", ->
     beforeEach ->
       jasmine.attachToDOM(editorElement)
 
-      editor.setText([0...80].join("\n"))
+      editor.setText([0...100].join("\n"))
 
       editorElement.setHeight(20 * 10)
       editorElement.style.lineHeight = "10px"
