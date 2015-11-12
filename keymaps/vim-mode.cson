@@ -102,6 +102,7 @@
   '}': 'vim-mode:move-to-next-paragraph'
   '{': 'vim-mode:move-to-previous-paragraph'
   '0': 'vim-mode:move-to-beginning-of-line'
+  '|': 'vim-mode:move-to-beginning-of-line'
   '^': 'vim-mode:move-to-first-character-of-line'
   '_': 'vim-mode:move-to-first-character-of-line-and-down'
   '$': 'vim-mode:move-to-last-character-of-line'
