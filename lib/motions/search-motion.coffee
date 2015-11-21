@@ -6,10 +6,10 @@ SearchViewModel = require '../view-models/search-view-model'
 settings = require '../settings'
 
 class SearchBase extends MotionWithInput
-  constructor: (@editor, @vimState, options = {}) ->
+  constructor: (@editor, @vimState, @options = {}) ->
     super(@editor, @vimState)
     @reverse = @initiallyReversed = false
-    @updateCurrentSearch() unless options.dontUpdateCurrentSearch
+    @updateCurrentSearch() unless @options.dontUpdateCurrentSearch
 
   reversed: =>
     @initiallyReversed = @reverse = true
@@ -23,6 +23,21 @@ class SearchBase extends MotionWithInput
       cursor.setBufferPosition(range.start)
     else
       atom.beep()
+    unless @options.dontUpdateCurrentSearch
+      rangeMarkers = @vimState.globalVimState.currentSearch.rangeMarkers
+      rangeMarkers ?= []
+      i = 0
+      if rangeMarkers?
+        for marker in rangeMarkers
+          i++
+          marker.destroy()
+      rangeMarkers = []
+      for range in ranges
+        marker = @editor.markBufferRange(range, {invalidate: 'inside'})
+        rangeMarkers.push(marker)
+        decoration = @editor.decorateMarker(marker,
+          {type: 'highlight', class: 'find-result'})
+      @vimState.globalVimState.currentSearch.rangeMarkers = rangeMarkers
 
   scan: (cursor) ->
     return [] if @input.characters is ""

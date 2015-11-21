@@ -144,3 +144,22 @@ atom-text-editor.vim-mode.operator-pending-mode.is-focused
 .reverse-search-input atom-text-editor[mini]::before {
   content: '?';
 }
+
+// Search highlights, copied from atom/find-and-replace
+atom-text-editor,
+atom-text-editor::shadow {
+  .find-result .region {
+    background-color: transparent;
+    border-radius: @component-border-radius;
+    border: 1px solid @syntax-result-marker-color;
+    box-sizing: border-box;
+    z-index: 0;
+  }
+
+  .current-result .region {
+    border-radius: @component-border-radius;
+    border: 1px solid @syntax-result-marker-color-selected;
+    box-sizing: border-box;
+    z-index: 0;
+  }
+}

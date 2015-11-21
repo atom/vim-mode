@@ -1306,6 +1306,53 @@ describe "Motions", ->
         expect(inputEditor.getModel().getText()).toEqual ''
         expect(atom.beep).not.toHaveBeenCalled()
 
+    describe "it highlights search results", ->
+      beforeEach ->
+        keydown('/')
+        submitNormalModeInputText('abc')
+
+      it "highlights all occurences of the text", ->
+        decorations = editor.getDecorations({type: 'highlight', class: 'find-result'})
+        expect(decorations.length).toBe(2)
+        found1 = false
+        found2 = false
+        for decoration in decorations
+          if decoration.marker.getBufferRange().isEqual([[0, 0], [0, 3]])
+            found1 = true
+          if decoration.marker.getBufferRange().isEqual([[2, 0], [2, 3]])
+            found2 = true
+        expect(found1).toBe(true)
+        expect(found2).toBe(true)
+
+      it "replaces the highlights when searching for something else", ->
+        keydown('/')
+        submitNormalModeInputText('def')
+        decorations = editor.getDecorations({type: 'highlight', class: 'find-result'})
+        expect(decorations.length).toBe(2)
+        found1 = false
+        found2 = false
+        for decoration in decorations
+          if decoration.marker.getBufferRange().isEqual([[1, 0], [1, 3]])
+            found1 = true
+          if decoration.marker.getBufferRange().isEqual([[3, 0], [3, 3]])
+            found2 = true
+        expect(found1).toBe(true)
+        expect(found2).toBe(true)
+
+      it "retains highlights when using the n keybinding", ->
+        keydown('n')
+        decorations = editor.getDecorations({type: 'highlight', class: 'find-result'})
+        expect(decorations.length).toBe(2)
+        found1 = false
+        found2 = false
+        for decoration in decorations
+          if decoration.marker.getBufferRange().isEqual([[0, 0], [0, 3]])
+            found1 = true
+          if decoration.marker.getBufferRange().isEqual([[2, 0], [2, 3]])
+            found2 = true
+        expect(found1).toBe(true)
+        expect(found2).toBe(true)
+
   describe "the * keybinding", ->
     beforeEach ->
       editor.setText("abd\n@def\nabd\ndef\n")
@@ -1375,6 +1422,37 @@ describe "Motions", ->
           keydown("*")
           expect(editor.getCursorBufferPosition()).toEqual [3, 0]
 
+    describe "it highlights search results", ->
+      beforeEach ->
+        keydown('*')
+
+      it "highlights all occurences of the text", ->
+        decorations = editor.getDecorations({type: 'highlight', class: 'find-result'})
+        expect(decorations.length).toBe(2)
+        found1 = false
+        found2 = false
+        for decoration in decorations
+          if decoration.marker.getBufferRange().isEqual([[0, 0], [0, 3]])
+            found1 = true
+          if decoration.marker.getBufferRange().isEqual([[2, 0], [2, 3]])
+            found2 = true
+        expect(found1).toBe(true)
+        expect(found2).toBe(true)
+
+      it "retains highlights when using * again", ->
+        keydown('*')
+        decorations = editor.getDecorations({type: 'highlight', class: 'find-result'})
+        expect(decorations.length).toBe(2)
+        found1 = false
+        found2 = false
+        for decoration in decorations
+          if decoration.marker.getBufferRange().isEqual([[0, 0], [0, 3]])
+            found1 = true
+          if decoration.marker.getBufferRange().isEqual([[2, 0], [2, 3]])
+            found2 = true
+        expect(found1).toBe(true)
+        expect(found2).toBe(true)
+
   describe "the hash keybinding", ->
     describe "as a motion", ->
       it "moves cursor to previous occurence of word under cursor", ->
@@ -1418,6 +1496,39 @@ describe "Motions", ->
           editor.setCursorBufferPosition([1, 0])
           keydown("*")
           expect(editor.getCursorBufferPosition()).toEqual [3, 0]
+
+    describe "it highlights search results", ->
+      beforeEach ->
+        editor.setText("abd\n@def\nabd\ndef\n")
+        editor.setCursorBufferPosition([0, 0])
+        keydown('#')
+
+      it "highlights all occurences of the text", ->
+        decorations = editor.getDecorations({type: 'highlight', class: 'find-result'})
+        expect(decorations.length).toBe(2)
+        found1 = false
+        found2 = false
+        for decoration in decorations
+          if decoration.marker.getBufferRange().isEqual([[0, 0], [0, 3]])
+            found1 = true
+          if decoration.marker.getBufferRange().isEqual([[2, 0], [2, 3]])
+            found2 = true
+        expect(found1).toBe(true)
+        expect(found2).toBe(true)
+
+      it "retains highlights when using # again", ->
+        keydown('#')
+        decorations = editor.getDecorations({type: 'highlight', class: 'find-result'})
+        expect(decorations.length).toBe(2)
+        found1 = false
+        found2 = false
+        for decoration in decorations
+          if decoration.marker.getBufferRange().isEqual([[0, 0], [0, 3]])
+            found1 = true
+          if decoration.marker.getBufferRange().isEqual([[2, 0], [2, 3]])
+            found2 = true
+        expect(found1).toBe(true)
+        expect(found2).toBe(true)
 
   describe "the H keybinding", ->
     beforeEach ->
