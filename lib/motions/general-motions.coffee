@@ -60,7 +60,7 @@ class Motion
       if wasReversed and not isReversed
         newStartRow = Math.min(newStartRow, oldEndRow)
 
-      selection.setBufferRange([[newStartRow, 0], [newEndRow + 1, 0]])
+      selection.setBufferRange([[newStartRow, 0], [newEndRow + 1, 0]], autoscroll: false)
 
   moveSelectionInclusively: (selection, count, options) ->
     return @moveSelectionVisual(selection, count, options) unless selection.isEmpty()
