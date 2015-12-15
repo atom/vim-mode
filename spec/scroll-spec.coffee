@@ -21,30 +21,41 @@ describe "Scrolling", ->
 
   describe "scrolling keybindings", ->
     beforeEach ->
-      editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10")
-      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(2)
-      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(8)
-      spyOn(editor, 'scrollToScreenPosition')
+      editor.setText """
+        100
+        200
+        300
+        400
+        500
+        600
+        700
+        800
+        900
+        1000
+      """
 
-    describe "the ctrl-e keybinding", ->
-      beforeEach ->
-        spyOn(editor, 'getCursorScreenPosition').andReturn({row: 4, column: 0})
-        spyOn(editor, 'setCursorScreenPosition')
+      editor.setCursorBufferPosition([1, 2])
+      editorElement.setHeight(editorElement.getHeight() * 4 / 10)
+      expect(editor.getVisibleRowRange()).toEqual [0, 4]
 
-      it "moves the screen down by one and keeps cursor onscreen", ->
+    describe "the ctrl-e and ctrl-y keybindings", ->
+      it "moves the screen up and down by one and keeps cursor onscreen", ->
         keydown('e', ctrl: true)
-        expect(editor.scrollToScreenPosition).toHaveBeenCalledWith([7, 0])
-        expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([6, 0])
+        expect(editor.getFirstVisibleScreenRow()).toBe 1
+        expect(editor.getLastVisibleScreenRow()).toBe 5
+        expect(editor.getCursorScreenPosition()).toEqual [2, 2]
 
-    describe "the ctrl-y keybinding", ->
-      beforeEach ->
-        spyOn(editor, 'getCursorScreenPosition').andReturn({row: 6, column: 0})
-        spyOn(editor, 'setCursorScreenPosition')
+        keydown('2')
+        keydown('e', ctrl: true)
+        expect(editor.getFirstVisibleScreenRow()).toBe 3
+        expect(editor.getLastVisibleScreenRow()).toBe 7
+        expect(editor.getCursorScreenPosition()).toEqual [4, 2]
 
-      it "moves the screen up by one and keeps the cursor onscreen", ->
+        keydown('2')
         keydown('y', ctrl: true)
-        expect(editor.scrollToScreenPosition).toHaveBeenCalledWith([3, 0])
-        expect(editor.setCursorScreenPosition).toHaveBeenCalledWith([4, 0])
+        expect(editor.getFirstVisibleScreenRow()).toBe 1
+        expect(editor.getLastVisibleScreenRow()).toBe 5
+        expect(editor.getCursorScreenPosition()).toEqual [2, 2]
 
   describe "scroll cursor keybindings", ->
     beforeEach ->

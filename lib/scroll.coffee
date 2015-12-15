@@ -11,33 +11,38 @@ class Scroll
 
 class ScrollDown extends Scroll
   execute: (count=1) ->
-    @keepCursorOnScreen(count)
-    @scrollUp(count)
+    oldFirstRow = @editor.getFirstVisibleScreenRow()
+    @editor.setFirstVisibleScreenRow(oldFirstRow + count)
+    newFirstRow = @editor.getFirstVisibleScreenRow()
 
-  keepCursorOnScreen: (count) ->
-    {row, column} = @editor.getCursorScreenPosition()
-    firstScreenRow = @rows.first + @scrolloff + 1
-    if row - count <= firstScreenRow
-      @editor.setCursorScreenPosition([firstScreenRow + count, column])
+    for cursor in @editor.getCursors()
+      position = cursor.getScreenPosition()
+      if position.row <= newFirstRow + @scrolloff
+        cursor.setScreenPosition([position.row + newFirstRow - oldFirstRow, position.column], autoscroll: false)
 
-  scrollUp: (count) ->
-    lastScreenRow = @rows.last - @scrolloff
-    @editor.scrollToScreenPosition([lastScreenRow + count, 0])
+    # TODO: remove
+    # This is a workaround for a bug fixed in atom/atom#10062
+    @editorElement.component.updateSync()
+
+    return
 
 class ScrollUp extends Scroll
   execute: (count=1) ->
-    @keepCursorOnScreen(count)
-    @scrollDown(count)
+    oldFirstRow = @editor.getFirstVisibleScreenRow()
+    oldLastRow = @editor.getLastVisibleScreenRow()
+    @editor.setFirstVisibleScreenRow(oldFirstRow - count)
+    newLastRow = @editor.getLastVisibleScreenRow()
 
-  keepCursorOnScreen: (count) ->
-    {row, column} = @editor.getCursorScreenPosition()
-    lastScreenRow = @rows.last - @scrolloff - 1
-    if row + count >= lastScreenRow
-      @editor.setCursorScreenPosition([lastScreenRow - count, column])
+    for cursor in @editor.getCursors()
+      position = cursor.getScreenPosition()
+      if position.row >= newLastRow - @scrolloff
+        cursor.setScreenPosition([position.row - (oldLastRow - newLastRow), position.column], autoscroll: false)
 
-  scrollDown: (count) ->
-    firstScreenRow = @rows.first + @scrolloff
-    @editor.scrollToScreenPosition([firstScreenRow - count, 0])
+    # TODO: remove
+    # This is a workaround for a bug fixed in atom/atom#10062
+    @editorElement.component.updateSync()
+
+    return
 
 class ScrollCursor extends Scroll
   constructor: (@editorElement, @opts={}) ->
