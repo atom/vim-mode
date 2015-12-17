@@ -12,7 +12,7 @@ settings =
       default: false
     useClipboardAsDefaultRegister:
       type: 'boolean'
-      default: false
+      default: true
     numberRegex:
       type: 'string'
       default: '-?[0-9]+'
