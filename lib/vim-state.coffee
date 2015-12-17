@@ -31,6 +31,8 @@ class VimState
     @marks = {}
     @subscriptions.add @editor.onDidDestroy => @destroy()
 
+    @workspaceElement = atom.views.getView(atom.workspace)
+
     @editorElement.addEventListener 'mouseup', @checkSelections
     if atom.commands.onDidDispatch?
       @subscriptions.add atom.commands.onDidDispatch (e) =>
@@ -559,6 +561,7 @@ class VimState
     @clearOpStack()
     @editor.clearSelections()
     @activateNormalMode()
+    atom.commands.dispatch(@workspaceElement, 'core:cancel')
 
   # Private: A generic way to create a Register prefix based on the event.
   #
