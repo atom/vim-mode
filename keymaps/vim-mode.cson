@@ -399,3 +399,7 @@
   '" +': 'vim-mode:register-prefix'
   '" %': 'vim-mode:register-prefix'
   '" _': 'vim-mode:register-prefix'
+
+'.tree-view':
+  'g g': 'core:move-to-top'
+  'shift-g': 'core:move-to-bottom'
