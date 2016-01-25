@@ -524,6 +524,32 @@ describe "Operators", ->
           keydown('G', shift: true)
           expect(editor.getText()).toBe("12345\nABCDE")
 
+      describe "when followed by a T!", ->
+        describe "with the entire line yanked before", ->
+          beforeEach ->
+            editor.setText("if (!something()) {")
+            editor.setCursorScreenPosition([0, 13])
+
+          it "deletes until exclamation point ! exclude", ->
+            keydown('d')
+            keydown('T', shift: true)
+            normalModeInputKeydown('!')
+            expect(editor.getText()).toBe("if (!g()) {")
+            expect(editor.getCursorScreenPosition()).toEqual [0, 5]
+
+      describe "when followed by a F!", ->
+        describe "with the entire line yanked before", ->
+          beforeEach ->
+            editor.setText("if (!something()) {")
+            editor.setCursorScreenPosition([0, 13])
+
+          it "deletes until exclamation point ! include", ->
+            keydown('d')
+            keydown('F', shift: true)
+            normalModeInputKeydown('!')
+            expect(editor.getText()).toBe("if (g()) {")
+            expect(editor.getCursorScreenPosition()).toEqual [0, 4]
+
     describe "when followed by a t)", ->
       describe "with the entire line yanked before", ->
         beforeEach ->
