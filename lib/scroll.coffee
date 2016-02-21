@@ -4,16 +4,23 @@ class Scroll
   constructor: (@editorElement) ->
     @scrolloff = 2 # atom default
     @editor = @editorElement.getModel()
+
+    first = @editor.getFirstVisibleScreenRow()
+    last = first + @editor.getRowsPerPage()
+
     @rows =
-      first: @editorElement.getFirstVisibleScreenRow()
-      last: @editorElement.getLastVisibleScreenRow()
+      first: first
+      last: last
       final: @editor.getLastScreenRow()
 
 class ScrollDown extends Scroll
   execute: (count=1) ->
+
     oldFirstRow = @editor.getFirstVisibleScreenRow()
-    @editor.setFirstVisibleScreenRow(oldFirstRow + count)
-    newFirstRow = @editor.getFirstVisibleScreenRow()
+    newFirstRow = oldFirstRow + count
+    oldScrollTop = @editorElement.getScrollTop()
+    newScrollTop = oldScrollTop + @editor.getLineHeightInPixels()*count
+    @editorElement.setScrollTop( newScrollTop )
 
     for cursor in @editor.getCursors()
       position = cursor.getScreenPosition()
@@ -28,10 +35,13 @@ class ScrollDown extends Scroll
 
 class ScrollUp extends Scroll
   execute: (count=1) ->
+
     oldFirstRow = @editor.getFirstVisibleScreenRow()
-    oldLastRow = @editor.getLastVisibleScreenRow()
-    @editor.setFirstVisibleScreenRow(oldFirstRow - count)
-    newLastRow = @editor.getLastVisibleScreenRow()
+    oldLastRow = oldFirstRow + @editor.getRowsPerPage()
+    newLastRow = oldLastRow - count
+    oldScrollTop = @editorElement.getScrollTop()
+    newScrollTop = oldScrollTop - @editor.getLineHeightInPixels()*count
+    @editorElement.setScrollTop( newScrollTop )
 
     for cursor in @editor.getCursors()
       position = cursor.getScreenPosition()

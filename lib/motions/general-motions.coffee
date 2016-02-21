@@ -470,15 +470,17 @@ class ScrollKeepingCursor extends Motion
       @editorElement.setScrollTop(scrollTop)
 
   execute: (count) ->
+
     # TODO: remove this conditional once after Atom v1.1.0 is released.
-    if @editor.setFirstVisibleScreenRow?
-      newTopRow = @getNewFirstVisibleScreenRow(count)
-      super(count)
-      @editor.setFirstVisibleScreenRow(newTopRow)
-    else
-      scrollTop = @getNewScrollTop(count)
-      super(count)
-      @editorElement.setScrollTop(scrollTop)
+    # TODO: Atom v1.1.0 was released. But setFirstVisibleScreenRow() use getLineCount() not getScreenLineCount(). Once after it use getScreenLineCount(), change setScrollTop() to setFirstVisibleScreenRow()
+
+    # newTopRow = @getNewFirstVisibleScreenRow(count)
+    # super(count)
+    # @editor.setFirstVisibleScreenRow(newTopRow)
+
+    scrollTop = @getNewScrollTop(count)
+    super(count)
+    @editorElement.setScrollTop(scrollTop)
 
   moveCursor: (cursor) ->
     cursor.setScreenPosition(Point(@cursorRow, 0), autoscroll: false)
