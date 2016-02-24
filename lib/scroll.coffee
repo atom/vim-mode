@@ -12,8 +12,10 @@ class Scroll
 class ScrollDown extends Scroll
   execute: (count=1) ->
     oldFirstRow = @editor.getFirstVisibleScreenRow()
-    @editor.setFirstVisibleScreenRow(oldFirstRow + count)
-    newFirstRow = @editor.getFirstVisibleScreenRow()
+    newFirstRow = oldFirstRow + count
+    oldScrollTop = @editorElement.getScrollTop()
+    newScrollTop = oldScrollTop + @editor.getLineHeightInPixels()*count
+    @editorElement.setScrollTop( newScrollTop )
 
     for cursor in @editor.getCursors()
       position = cursor.getScreenPosition()
@@ -28,10 +30,11 @@ class ScrollDown extends Scroll
 
 class ScrollUp extends Scroll
   execute: (count=1) ->
-    oldFirstRow = @editor.getFirstVisibleScreenRow()
-    oldLastRow = @editor.getLastVisibleScreenRow()
-    @editor.setFirstVisibleScreenRow(oldFirstRow - count)
-    newLastRow = @editor.getLastVisibleScreenRow()
+    oldLastRow = @editorElement.getLastVisibleScreenRow()
+    newLastRow = oldLastRow - count
+    oldScrollTop = @editorElement.getScrollTop()
+    newScrollTop = oldScrollTop - @editor.getLineHeightInPixels()*count
+    @editorElement.setScrollTop( newScrollTop )
 
     for cursor in @editor.getCursors()
       position = cursor.getScreenPosition()
