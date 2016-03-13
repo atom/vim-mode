@@ -2222,24 +2222,38 @@ describe "Operators", ->
       editor.insertText "foo"
       keydown "R", shift: true
 
-      editor.insertText "a"
-      editor.insertText "b"
+      # simulate every key press comes after a second
+      now = Date.now()
+      spyOn(Date, 'now').andCallFake -> now
+
+      # groupUndo is necessary to enable the normal grouping of undo changes
+      editor.insertText "a", groupUndo: true
+
+      now += 1000
+      editor.insertText "b", groupUndo: true
       expect(editor.getText()).toBe "12fooab5\n67890"
 
+      now += 1000
       keydown 'backspace', raw: true
       expect(editor.getText()).toBe "12fooa45\n67890"
 
-      editor.insertText "c"
+      now += 1000
+      editor.insertText "c", groupUndo: true
 
       expect(editor.getText()).toBe "12fooac5\n67890"
 
+      now += 1000
       keydown 'backspace', raw: true
+
+      now += 1000
       keydown 'backspace', raw: true
 
       expect(editor.getText()).toBe "12foo345\n67890"
       expect(editor.getSelectedText()).toBe ""
 
+      now += 1000
       keydown 'backspace', raw: true
+
       expect(editor.getText()).toBe "12foo345\n67890"
       expect(editor.getSelectedText()).toBe ""
 
@@ -2262,9 +2276,9 @@ describe "Operators", ->
 
     it "repeats correctly when backspace was used in the text", ->
       keydown "R", shift: true
-      editor.insertText "a"
+      editor.insertText "a", groupUndo: true
       keydown 'backspace', raw: true
-      editor.insertText "b"
+      editor.insertText "b", groupUndo: true
       keydown 'escape'
       editor.setCursorBufferPosition([1, 2])
       keydown '.'
