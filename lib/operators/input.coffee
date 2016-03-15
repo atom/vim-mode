@@ -68,8 +68,9 @@ class InsertAtBeginningOfLine extends Insert
 class InsertAboveWithNewline extends Insert
   execute: ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
-    @editor.insertNewlineAbove()
-    @editor.getLastCursor().skipLeadingWhitespace()
+    @editor.transact Infinity, =>
+      @editor.insertNewlineAbove()
+      @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       # We'll have captured the inserted newline, but we want to do that
@@ -83,8 +84,9 @@ class InsertAboveWithNewline extends Insert
 class InsertBelowWithNewline extends Insert
   execute: ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
-    @editor.insertNewlineBelow()
-    @editor.getLastCursor().skipLeadingWhitespace()
+    @editor.transact Infinity, =>
+      @editor.insertNewlineBelow()
+      @editor.getLastCursor().skipLeadingWhitespace()
 
     if @typingCompleted
       # We'll have captured the inserted newline, but we want to do that
@@ -116,17 +118,18 @@ class Change extends Insert
       # undo transactions are already handled.
       @vimState.setInsertionCheckpoint() unless @typingCompleted
 
-      @setTextRegister(@register, @editor.getSelectedText())
-      if @motion.isLinewise?() and not @typingCompleted
-        for selection in @editor.getSelections()
-          if selection.getBufferRange().end.row is 0
+      @editor.transact Infinity, =>
+        @setTextRegister(@register, @editor.getSelectedText())
+        if @motion.isLinewise?() and not @typingCompleted
+          for selection in @editor.getSelections()
+            if selection.getBufferRange().end.row is 0
+              selection.deleteSelectedText()
+            else
+              selection.insertText("\n", autoIndent: true)
+            selection.cursor.moveLeft()
+        else
+          for selection in @editor.getSelections()
             selection.deleteSelectedText()
-          else
-            selection.insertText("\n", autoIndent: true)
-          selection.cursor.moveLeft()
-      else
-        for selection in @editor.getSelections()
-          selection.deleteSelectedText()
 
       return super if @typingCompleted
 
