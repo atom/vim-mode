@@ -15,6 +15,8 @@ class Insert extends Operator
   confirmChanges: (changes) ->
     bundler = new TransactionBundler(changes, @editor)
     @typedText = bundler.buildInsertText()
+    if @typedText? and @typedText.length > 0
+      @vimState.setLastInsertMarks bundler
 
   execute: ->
     if @typingCompleted

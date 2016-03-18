@@ -52,7 +52,8 @@ class Put extends Operator
         @editor.moveToBeginningOfLine()
         originalPosition = @editor.getCursorScreenPosition()
 
-    @editor.insertText(textToInsert)
+    [range] = @editor.insertText(textToInsert)
+    @vimState.setLastInsertMarks range
 
     if originalPosition?
       @editor.setCursorScreenPosition(originalPosition)
