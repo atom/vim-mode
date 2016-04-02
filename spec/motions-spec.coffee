@@ -1027,6 +1027,61 @@ describe "Motions", ->
       it "moves the cursor to the last line after whitespace", ->
         expect(editor.getCursorScreenPosition()).toEqual [3, 1]
 
+  describe "the ge keybinding", ->
+    beforeEach ->
+      editor.setText("some words\nand more\n\nsnake-case--words")
+
+    describe "as a motion", ->
+      it "moves the cursor between words separated by spaces", ->
+        editor.setCursorScreenPosition([0, 5])
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
+
+      it "moves the cursor between words separated by newlines", ->
+        editor.setCursorScreenPosition([1, 1])
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 9]
+
+      it "moves the cursor between words separated by nonkeywords", ->
+        editor.setCursorScreenPosition([3, 7])
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [3, 5]
+
+      it "moves the cursor from a nonkeyword to a word", ->
+        editor.setCursorScreenPosition([3, 5])
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [3, 4]
+
+      it "moves the cursor from a nonkeyword to the previous word character", ->
+        editor.setCursorScreenPosition([3, 11])
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [3, 9]
+
+      it "moves the cursor from a blank line to the end of the previous line", ->
+        editor.setCursorScreenPosition([2, 0])
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [1, 7]
+
+      it "does not move the cursor when at the beginning of the buffer", ->
+        editor.setCursorScreenPosition([0, 0])
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [0, 0]
+
+    describe "as a repeated motion", ->
+      it "moves the cursor back two words", ->
+        editor.setCursorScreenPosition([3, 7])
+        keydown('2')
+        keydown('g')
+        keydown('e')
+        expect(editor.getCursorScreenPosition()).toEqual [3, 4]
+
   describe "the / keybinding", ->
     pane = null
 
