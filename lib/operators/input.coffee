@@ -150,55 +150,17 @@ class TransactionBundler
       ""
 
   addChange: (change) ->
-    return unless change.newRange?
-    if @isRemovingFromPrevious(change)
-      @subtractRange change.oldRange
-    if @isAddingWithinPrevious(change)
-      @addRange change.newRange
-
-  isAddingWithinPrevious: (change) ->
-    return false unless @isAdding(change)
-
-    return true if @start is null
-
-    @start.isLessThanOrEqual(change.newRange.start) and
-      @end.isGreaterThanOrEqual(change.newRange.start)
-
-  isRemovingFromPrevious: (change) ->
-    return false unless @isRemoving(change) and @start?
-
-    @start.isLessThanOrEqual(change.oldRange.start) and
-      @end.isGreaterThanOrEqual(change.oldRange.end)
-
-  isAdding: (change) ->
-    change.newText.length > 0
-
-  isRemoving: (change) ->
-    change.oldText.length > 0
-
-  addRange: (range) ->
-    if @start is null
-      {@start, @end} = range
-      return
-
-    rows = range.end.row - range.start.row
-
-    if (range.start.row is @end.row)
-      cols = range.end.column - range.start.column
+    return unless change.newExtent?
+    if @start?
+      if @start.isGreaterThanOrEqual(change.start)
+        @start = change.start
     else
-      cols = 0
-
-    @end = @end.translate [rows, cols]
-
-  subtractRange: (range) ->
-    rows = range.end.row - range.start.row
-
-    if (range.end.row is @end.row)
-      cols = range.end.column - range.start.column
+      @start = change.start
+    if @end?
+      if @end.isLessThanOrEqual(change.start.translate(change.newExtent))
+        @end = change.start.translate(change.newExtent)
     else
-      cols = 0
-
-    @end = @end.translate [-rows, -cols]
+      @end = change.start.translate(change.newExtent)
 
 
 module.exports = {

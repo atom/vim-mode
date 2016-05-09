@@ -453,7 +453,7 @@ class VimState
     @editorElement.component.setInputEnabled(false)
     @editorElement.classList.remove('replace-mode')
     @editor.groupChangesSinceCheckpoint(@insertionCheckpoint)
-    changes = getChangesSinceCheckpoint(@editor.buffer, @insertionCheckpoint)
+    changes = @editor.buffer.getChangesSinceCheckpoint(@insertionCheckpoint)
     item = @inputOperator(@history[0])
     @insertionCheckpoint = null
     if item?
@@ -670,13 +670,3 @@ class VimState
       cursor.goalColumn = goalColumn
 
     @editor.mergeCursors()
-
-# This uses private APIs and may break if TextBuffer is refactored.
-# Package authors - copy and paste this code at your own risk.
-getChangesSinceCheckpoint = (buffer, checkpoint) ->
-  {history} = buffer
-
-  if (index = history.getCheckpointIndex(checkpoint))?
-    history.undoStack.slice(index)
-  else
-    []
