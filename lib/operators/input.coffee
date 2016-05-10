@@ -13,8 +13,10 @@ class Insert extends Operator
   isComplete: -> @standalone or super
 
   confirmChanges: (changes) ->
-    bundler = new TransactionBundler(changes, @editor)
-    @typedText = bundler.buildInsertText()
+    if changes.length > 0
+      @typedText = changes[0].newText
+    else
+      @typedText = ""
 
   execute: ->
     if @typingCompleted
@@ -134,33 +136,6 @@ class Change extends Insert
       @typingCompleted = true
     else
       @vimState.activateNormalMode()
-
-# Takes a transaction and turns it into a string of what was typed.
-# This class is an implementation detail of Insert
-class TransactionBundler
-  constructor: (@changes, @editor) ->
-    @start = null
-    @end = null
-
-  buildInsertText: ->
-    @addChange(change) for change in @changes
-    if @start?
-      @editor.getTextInBufferRange [@start, @end]
-    else
-      ""
-
-  addChange: (change) ->
-    return unless change.newExtent?
-    if @start?
-      if @start.isGreaterThanOrEqual(change.start)
-        @start = change.start
-    else
-      @start = change.start
-    if @end?
-      if @end.isLessThanOrEqual(change.start.translate(change.newExtent))
-        @end = change.start.translate(change.newExtent)
-    else
-      @end = change.start.translate(change.newExtent)
 
 
 module.exports = {
