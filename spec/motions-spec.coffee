@@ -1597,13 +1597,21 @@ describe "Motions", ->
       normalModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
-    it "composes with d", ->
+    it "f composes with d", ->
       editor.setCursorScreenPosition([0, 3])
       keydown('d')
       keydown('2')
       keydown('f')
       normalModeInputKeydown('a')
       expect(editor.getText()).toEqual 'abcbc\n'
+
+    it "F composes with d", ->
+      editor.setCursorScreenPosition([0, 7])
+      keydown('d')
+      keydown('2')
+      keydown('F', shift: true)
+      normalModeInputKeydown('b')
+      expect(editor.getText()).toEqual 'abcabc\n'
 
     it "cancels c when no match found", ->
       keydown('c')
@@ -1707,13 +1715,21 @@ describe "Motions", ->
       normalModeInputKeydown('a')
       expect(editor.getCursorScreenPosition()).toEqual [0, 6]
 
-    it "composes with d", ->
+    it "t composes with d", ->
       editor.setCursorScreenPosition([0, 3])
       keydown('d')
       keydown('2')
       keydown('t')
       normalModeInputKeydown('b')
       expect(editor.getText()).toBe 'abcbcabc\n'
+
+    it "T composes with d", ->
+      editor.setCursorScreenPosition([0, 7])
+      keydown('d')
+      keydown('2')
+      keydown('T', shift: true)
+      normalModeInputKeydown('c')
+      expect(editor.getText()).toEqual 'abcbcabc\n'
 
     it "selects character under cursor even when no movement happens", ->
       editor.setCursorBufferPosition([0, 0])
