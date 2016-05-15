@@ -360,9 +360,15 @@ class VimState
   #
   # Returns nothing.
   setMark: (name, pos) ->
+    if @marks[name]
+      marker = @marks[name]
+      marker.destroy()
+      @marks[name] = null
     # check to make sure name is in [a-z] or is `
-    if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
+    else if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
       marker = @editor.markBufferRange(new Range(pos, pos), {invalidate: 'never', persistent: false})
+      @editor.decorateMarker(marker, type: "line-number", class: "vim-mark-gutter");
+      @editor.decorateMarker(marker, type: "line-number", class: "vim-mark-gutter" + name);
       @marks[name] = marker
 
   # Public: Append a search to the search history.
