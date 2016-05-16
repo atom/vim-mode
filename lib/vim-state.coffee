@@ -370,7 +370,7 @@ class VimState
     if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
       marker = @editor.markBufferRange(new Range(pos, pos), {invalidate: 'never', persistent: false})
       @editor.decorateMarker(marker, type: "line-number", class: "vim-mark-gutter")
-      @editor.decorateMarker(marker, type: "line-number", class: "vim-mark-gutter" + name)
+      @editor.decorateMarker(marker, type: "line-number", class: "vim-mark-gutter-" + name)
       @marks[name] = marker
 
   # Public: Append a search to the search history.

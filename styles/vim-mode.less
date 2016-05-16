@@ -137,11 +137,63 @@ atom-text-editor.vim-mode.operator-pending-mode.is-focused
   }
 }
 
+.gutter-highlight(@color) {
+  border-left: 2px solid @color !important;
+  // background-color: @color !important;
+  color: @color !important;
+}
+
 atom-text-editor::shadow .gutter .vim-mark-gutter {
-  @shiny-blue: #209fd3;
-  border-left: 2px solid @shiny-blue !important;
-  background-color: @shiny-blue !important;
-  color: @white !important;
+  @candy-red: #FF3155;
+  @candy-blue: #209fd3;
+  @candy-orange: #FFAF42;
+  @candy-yellow: #FFED5E;
+  @candy-green: #49F770;
+  @candy-purple: #BF00FF;
+
+  &.vim-mark-gutter-f, &.vim-mark-gutter-F,
+  &.vim-mark-gutter-k, &.vim-mark-gutter-K,
+  &.vim-mark-gutter-p, &.vim-mark-gutter-P,
+  &.vim-mark-gutter-u, &.vim-mark-gutter-U {
+    .gutter-highlight(@candy-red);
+  }
+
+  &.vim-mark-gutter-b, &.vim-mark-gutter-B,
+  &.vim-mark-gutter-g, &.vim-mark-gutter-G,
+  &.vim-mark-gutter-l, &.vim-mark-gutter-L,
+  &.vim-mark-gutter-q, &.vim-mark-gutter-Q,
+  &.vim-mark-gutter-v, &.vim-mark-gutter-V {
+    .gutter-highlight(@candy-blue);
+  }
+
+  &.vim-mark-gutter-c, &.vim-mark-gutter-C,
+  &.vim-mark-gutter-h, &.vim-mark-gutter-H,
+  &.vim-mark-gutter-m, &.vim-mark-gutter-M,
+  &.vim-mark-gutter-r, &.vim-mark-gutter-R,
+  &.vim-mark-gutter-w, &.vim-mark-gutter-W {
+    .gutter-highlight(@candy-orange);
+  }
+
+  &.vim-mark-gutter-d, &.vim-mark-gutter-D,
+  &.vim-mark-gutter-i, &.vim-mark-gutter-I,
+  &.vim-mark-gutter-n, &.vim-mark-gutter-N,
+  &.vim-mark-gutter-s, &.vim-mark-gutter-S,
+  &.vim-mark-gutter-x, &.vim-mark-gutter-X {
+    .gutter-highlight(@candy-yellow);
+  }
+
+  &.vim-mark-gutter-e, &.vim-mark-gutter-E,
+  &.vim-mark-gutter-j, &.vim-mark-gutter-J,
+  &.vim-mark-gutter-o, &.vim-mark-gutter-O,
+  &.vim-mark-gutter-t, &.vim-mark-gutter-T,
+  &.vim-mark-gutter-y, &.vim-mark-gutter-Y {
+    .gutter-highlight(@candy-green);
+  }
+
+  &.vim-mark-gutter-a, &.vim-mark-gutter-A,
+  &.vim-mark-gutter-z, &.vim-mark-gutter-Z {
+    .gutter-highlight(@candy-purple);
+  }
 }
 
 .search-input atom-text-editor[mini]::before {
