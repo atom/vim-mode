@@ -13,8 +13,10 @@ class Insert extends Operator
   isComplete: -> @standalone or super
 
   confirmChanges: (changes) ->
-    bundler = new TransactionBundler(changes, @editor)
-    @typedText = bundler.buildInsertText()
+    if changes.length > 0
+      @typedText = changes[0].newText
+    else
+      @typedText = ""
 
   execute: ->
     if @typingCompleted
@@ -134,71 +136,6 @@ class Change extends Insert
       @typingCompleted = true
     else
       @vimState.activateNormalMode()
-
-# Takes a transaction and turns it into a string of what was typed.
-# This class is an implementation detail of Insert
-class TransactionBundler
-  constructor: (@changes, @editor) ->
-    @start = null
-    @end = null
-
-  buildInsertText: ->
-    @addChange(change) for change in @changes
-    if @start?
-      @editor.getTextInBufferRange [@start, @end]
-    else
-      ""
-
-  addChange: (change) ->
-    return unless change.newRange?
-    if @isRemovingFromPrevious(change)
-      @subtractRange change.oldRange
-    if @isAddingWithinPrevious(change)
-      @addRange change.newRange
-
-  isAddingWithinPrevious: (change) ->
-    return false unless @isAdding(change)
-
-    return true if @start is null
-
-    @start.isLessThanOrEqual(change.newRange.start) and
-      @end.isGreaterThanOrEqual(change.newRange.start)
-
-  isRemovingFromPrevious: (change) ->
-    return false unless @isRemoving(change) and @start?
-
-    @start.isLessThanOrEqual(change.oldRange.start) and
-      @end.isGreaterThanOrEqual(change.oldRange.end)
-
-  isAdding: (change) ->
-    change.newText.length > 0
-
-  isRemoving: (change) ->
-    change.oldText.length > 0
-
-  addRange: (range) ->
-    if @start is null
-      {@start, @end} = range
-      return
-
-    rows = range.end.row - range.start.row
-
-    if (range.start.row is @end.row)
-      cols = range.end.column - range.start.column
-    else
-      cols = 0
-
-    @end = @end.translate [rows, cols]
-
-  subtractRange: (range) ->
-    rows = range.end.row - range.start.row
-
-    if (range.end.row is @end.row)
-      cols = range.end.column - range.start.column
-    else
-      cols = 0
-
-    @end = @end.translate [-rows, -cols]
 
 
 module.exports = {
