@@ -17,8 +17,13 @@ class SearchBase extends MotionWithInput
     this
 
   moveCursor: (cursor, count=1) ->
+    console.log('DEBUG: SearchBase::moveCursor()')
+    console.log(cursor.getBufferPosition())
     ranges = @scan(cursor)
     if ranges.length > 0
+      console.log('DEBUG: Saving position:')
+      console.log(cursor.getBufferPosition())
+      @saveCurrentContext(cursor);
       range = ranges[(count - 1) % ranges.length]
       cursor.setBufferPosition(range.start)
     else
@@ -47,6 +52,7 @@ class SearchBase extends MotionWithInput
       rangesAfter.concat(rangesBefore)
 
   getSearchTerm: (term) ->
+    @vimState.setRegister('/', { text:term, type:'character' })
     modifiers = {'g': true}
 
     if not term.match('[A-Z]') and settings.useSmartcaseForSearch()
@@ -202,6 +208,7 @@ class BracketMatchingMotion extends SearchBase
     return unless inCharacter?
 
     if matchPosition = @searchForMatch(startPosition, reverse, inCharacter, outCharacter)
+      @saveCurrentContext(cursor)
       cursor.setBufferPosition(matchPosition)
 
 class RepeatSearch extends SearchBase

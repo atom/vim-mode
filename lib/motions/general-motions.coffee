@@ -129,6 +129,13 @@ class Motion
     else
       @operatesLinewise
 
+  saveCurrentContext: (cursor) ->
+    # console.log('saveCurrentContext: Entering')
+    @vimState.setMark('`', cursor.getBufferPosition())
+    #if @operatesLinewise
+      # console.log('saveCurrentContext: linewise')
+    @vimState.setMark("'", cursor.getBufferPosition())
+
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
@@ -291,6 +298,7 @@ class MoveToEndOfWholeWord extends MoveToEndOfWord
 
 class MoveToNextSentence extends Motion
   moveCursor: (cursor, count=1) ->
+    @saveCurrentContext(cursor)
     _.times count, ->
       start = cursor.getBufferPosition().translate new Point(0, 1)
       eof = cursor.editor.getBuffer().getEndPosition()
@@ -306,6 +314,7 @@ class MoveToNextSentence extends Motion
 
 class MoveToPreviousSentence extends Motion
   moveCursor: (cursor, count=1) ->
+    @saveCurrentContext(cursor)
     _.times count, ->
       end = cursor.getBufferPosition().translate new Point(0, -1)
       bof = cursor.editor.getBuffer().getFirstPosition()
@@ -321,11 +330,13 @@ class MoveToPreviousSentence extends Motion
 
 class MoveToNextParagraph extends Motion
   moveCursor: (cursor, count=1) ->
+    @saveCurrentContext(cursor)
     _.times count, ->
       cursor.moveToBeginningOfNextParagraph()
 
 class MoveToPreviousParagraph extends Motion
   moveCursor: (cursor, count=1) ->
+    @saveCurrentContext(cursor)
     _.times count, ->
       cursor.moveToBeginningOfPreviousParagraph()
 
@@ -337,12 +348,14 @@ class MoveToLine extends Motion
 
 class MoveToAbsoluteLine extends MoveToLine
   moveCursor: (cursor, count) ->
+    @saveCurrentContext(cursor)
     cursor.setBufferPosition([@getDestinationRow(count), Infinity])
     cursor.moveToFirstCharacterOfLine()
     cursor.moveToEndOfLine() if cursor.getBufferColumn() is 0
 
 class MoveToRelativeLine extends MoveToLine
   moveCursor: (cursor, count=1) ->
+    @saveCurrentContext(cursor)
     {row, column} = cursor.getBufferPosition()
     cursor.setBufferPosition([row + (count - 1), 0])
 
@@ -420,6 +433,7 @@ class MoveToFirstCharacterOfLineDown extends Motion
 
 class MoveToStartOfFile extends MoveToLine
   moveCursor: (cursor, count=1) ->
+    @saveCurrentContext(cursor)
     {row, column} = @editor.getCursorBufferPosition()
     cursor.setBufferPosition([@getDestinationRow(count), 0])
     unless @isLinewise()

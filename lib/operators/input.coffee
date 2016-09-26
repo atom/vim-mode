@@ -118,7 +118,7 @@ class Change extends Insert
       # undo transactions are already handled.
       @vimState.setInsertionCheckpoint() unless @typingCompleted
 
-      @setTextRegister(@register, @editor.getSelectedText())
+      @setTextRegister(@register, @editor.getSelectedText(), true)
       if @motion.isLinewise?() and not @typingCompleted
         for selection in @editor.getSelections()
           if selection.getBufferRange().end.row is 0

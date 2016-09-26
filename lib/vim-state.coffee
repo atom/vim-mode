@@ -298,15 +298,27 @@ class VimState
       type = Utils.copyType(text)
       {text, type}
     else if name is '%'
-      text = @editor.getURI()
+      text = @editor.getURI() ? ''
       type = Utils.copyType(text)
       {text, type}
     else if name is "_" # Blackhole always returns nothing
       text = ''
       type = Utils.copyType(text)
       {text, type}
-    else
-      @globalVimState.registers[name.toLowerCase()]
+    else if name is '-'
+      {text, type} = @globalVimState.registers.smallRegister ? { text:'', type:'character' }
+      {text, type}
+    else if name is '0'
+      {text, type} = @globalVimState.registers.yankRegister ? { text:'', type:'character' }
+      #type = Utils.copyType(text)
+      {text, type}
+    else if name in ['1','2','3','4','5','6','7','8','9']
+      idx = parseInt(name) - 1 # numberedRegisters is 0-based
+      {text, type} = @globalVimState.registers.numberedRegisters[idx] ? { text:'', type:'character' }
+      #type = Utils.copyType(text)
+      {text, type}
+    else # a-z or / or other literally named reg
+      @globalVimState.registers[name.toLowerCase()] ? { text:'', type:'character' }
 
   # Private: Fetches the value of a given mark.
   #
@@ -324,18 +336,33 @@ class VimState
   #
   # name  - The name of the register to fetch.
   # value - The value to set the register to.
+  # fromDelete - Indicates whether the change causing the
+  #         setRegister is from a change/delete operation
+  #         which goes in the 1..9 numbered registers or a
+  #         yank operation which goes in the 0 numbered register.
   #
   # Returns nothing.
-  setRegister: (name, value) ->
+  setRegister: (name, value, fromDelete=true) ->
     if name is '"'
       name = settings.defaultRegister()
+    if name is settings.defaultRegister() # even if '*'
+      regs = @globalVimState.registers
+      if value.type == 'linewise' # only linewise changes go into numbered registers
+        if fromDelete # deletes/changes go in numbered register 1..9
+          regs.numberedRegisters.unshift(value)
+          if regs.numberedRegisters.length > 10
+            regs.numberedRegisters.pop()
+        else # yanked text goes in numbered register 0
+          regs.yankRegister = value
+      else # less than a line - put it in the "- register
+        regs.smallRegister = value
     if name in ['*', '+']
       atom.clipboard.write(value.text)
     else if name is '_'
       # Blackhole register, nothing to do
     else if /^[A-Z]$/.test(name)
       @appendRegister(name.toLowerCase(), value)
-    else
+    else # assume a-z register (or / or other literal)
       @globalVimState.registers[name] = value
 
 
@@ -360,8 +387,9 @@ class VimState
   #
   # Returns nothing.
   setMark: (name, pos) ->
-    # check to make sure name is in [a-z] or is `
-    if (charCode = name.charCodeAt(0)) >= 96 and charCode <= 122
+    # check to make sure name is in [a-z] or back-quote or single-quote
+    if ((charCode = name.charCodeAt(0)) >= 96 and charCode <= 122) or name in ["'", "`"]
+      # console.log('setMark: Setting '+name)
       marker = @editor.markBufferRange(new Range(pos, pos), {invalidate: 'never', persistent: false})
       @marks[name] = marker
 
