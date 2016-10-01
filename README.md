@@ -2,7 +2,7 @@
 
 Provides Vim modal control for Atom, blending the best of Vim and Atom.
 
-### Current Status - DEPRECATED in favor of vim-mode-plus
+### Current Status - DEPRECATED in favor of [vim-mode-plus](https://github.com/t9md/atom-vim-mode-plus)
 
 We're not developing new features on this package right now, though we still want to fix regressions and keep it working. A lot of people now use vim-mode-plus which is very well maintained.
 
