@@ -2,12 +2,11 @@
 
 Provides Vim modal control for Atom, blending the best of Vim and Atom.
 
-### Current Status
+### Current Status - DEPRECATED in favor of [vim-mode-plus](https://github.com/t9md/atom-vim-mode-plus)
+
+We're not developing new features on this package right now, though we still want to fix regressions and keep it working. A lot of people now use vim-mode-plus which is very well maintained.
 
 Sizable portions of Vim work as you'd expect, including many complex combinations.
-Even so, this package is far from finished (Vim wasn't built in a day).
-
-If there's a feature of Vim you're missing, it might just be that you use it more often than other developers. Adding a feature can be quick and easy. Check out the [closed pull requests][prs] to see examples of community contributions, and look at the [issues][issues] to see if anyone has already solved your problem.
 
 [prs]: https://github.com/atom/vim-mode/pulls?direction=desc&page=1&sort=created&state=closed
 [issues]: https://github.com/atom/vim-mode/issues
