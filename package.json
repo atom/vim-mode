@@ -2,7 +2,7 @@
   "name": "vim-mode",
   "main": "./lib/vim-mode",
   "version": "0.65.1",
-  "description": "Add vim modal control",
+  "description": "Deprecated - please install vim-mode-plus instead",
   "license": "MIT",
   "private": true,
   "repository": "https://github.com/atom/vim-mode",
