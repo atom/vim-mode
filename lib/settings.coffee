@@ -10,6 +10,10 @@ settings =
     wrapLeftRightMotion:
       type: 'boolean'
       default: false
+    overrideDefaultRegister:
+      type: 'string',
+      default: '',
+      description: 'Enter the key of the register (other than "), to override the default register used'
     useClipboardAsDefaultRegister:
       type: 'boolean'
       default: true
@@ -23,6 +27,8 @@ Object.keys(settings.config).forEach (k) ->
     atom.config.get('vim-mode.'+k)
 
 settings.defaultRegister = ->
-  if settings.useClipboardAsDefaultRegister() then '*' else '"'
+  defaultRegister = if settings.overrideDefaultRegister() then settings.overrideDefaultRegister() else '""
+  '
+  if settings.useClipboardAsDefaultRegister() then '*' else defaultRegister
 
 module.exports = settings
