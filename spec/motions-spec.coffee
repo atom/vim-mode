@@ -366,7 +366,7 @@ describe "Motions", ->
 
   describe "the } keybinding", ->
     beforeEach ->
-      editor.setText("abcde\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \nthe end")
+      editor.setText("abcde\n\n\nfghij\nhijk\n  xyz  \n\nzip\n\n  \n  \n\n \nthe end")
       editor.setCursorScreenPosition([0, 0])
 
     describe "as a motion", ->
@@ -375,13 +375,16 @@ describe "Motions", ->
         expect(editor.getCursorScreenPosition()).toEqual [1, 0]
 
         keydown('}')
-        expect(editor.getCursorScreenPosition()).toEqual [5, 0]
+        expect(editor.getCursorScreenPosition()).toEqual [6, 0]
 
         keydown('}')
-        expect(editor.getCursorScreenPosition()).toEqual [7, 0]
+        expect(editor.getCursorScreenPosition()).toEqual [8, 0]
 
         keydown('}')
-        expect(editor.getCursorScreenPosition()).toEqual [9, 6]
+        expect(editor.getCursorScreenPosition()).toEqual [11, 0]
+
+        keydown('}')
+        expect(editor.getCursorScreenPosition()).toEqual [13, 6]
 
     describe "as a selection", ->
       beforeEach ->

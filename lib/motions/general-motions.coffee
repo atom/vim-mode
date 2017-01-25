@@ -322,7 +322,16 @@ class MoveToPreviousSentence extends Motion
 class MoveToNextParagraph extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, ->
-      cursor.moveToBeginningOfNextParagraph()
+      start = cursor.getBufferPosition()
+      eof = cursor.editor.getEofBufferPosition()
+      scanRange = [start, eof]
+      position = start
+
+      cursor.editor.scanInBufferRange /[^\n]\n(?=\n)|[^\r\n]\r\n(?=\r\n)/, scanRange, ({range, stop}) ->
+        position = range.end
+        stop() if position.isGreaterThan(start)
+      position = eof if position.isEqual(start)
+      cursor.setBufferPosition(position)
 
 class MoveToPreviousParagraph extends Motion
   moveCursor: (cursor, count=1) ->
