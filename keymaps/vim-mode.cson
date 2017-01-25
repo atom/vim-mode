@@ -213,6 +213,8 @@
   '8': 'vim-mode:repeat-prefix'
   '9': 'vim-mode:repeat-prefix'
 
+  'g c c': 'editor:toggle-line-comments'
+
 'atom-text-editor.vim-mode.normal-mode':
   'i': 'vim-mode:activate-insert-mode'
   'insert': 'vim-mode:activate-insert-mode'
