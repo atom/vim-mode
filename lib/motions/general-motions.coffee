@@ -5,6 +5,7 @@ settings = require '../settings'
 WholeWordRegex = /\S+/
 WholeWordOrEmptyLineRegex = /^\s*$|\S+/
 AllWhitespace = /^\s$/
+NonKeyWords = /\s|\(|\)|\[|\]|,|\-/
 
 class MotionError
   constructor: (@message) ->
@@ -217,6 +218,44 @@ class MoveToPreviousWord extends Motion
   moveCursor: (cursor, count=1) ->
     _.times count, ->
       cursor.moveToBeginningOfWord()
+
+class MoveToEndOfPreviousWord extends Motion
+  moveCursor: (cursor, count=1) ->
+    _.times count, =>
+      atEnd = false
+      found = false
+      startType = @getCurrentCharacterType(cursor)
+      while (@isWhitespace(@getCharacterUnderMarker(cursor)) or not found) and not atEnd
+        atEnd = atEnd or @moveCursorBack(cursor)
+        found = found or @getCurrentCharacterType(cursor) isnt startType
+
+  getCurrentCharacterType: (cursor) ->
+    currChar = @getCharacterUnderMarker(cursor)
+    if @isNonkeyword(currChar)
+      return 'nonword'
+    else
+      return 'word'
+
+  moveCursorBack: (cursor) ->
+    if cursor.isAtBeginningOfLine() and cursor.getBufferRow()
+      cursor.moveUp()
+      cursor.moveToEndOfLine()
+      return true
+    else if cursor.isAtBeginningOfLine()
+      return true
+    else
+      cursor.moveLeft()
+
+  isNonkeyword: (char) ->
+    NonKeyWords.test(char)
+
+  isWhitespace: (char) ->
+    AllWhitespace.test(char)
+
+  getCharacterUnderMarker: (cursor) ->
+    currPoint = cursor.getBufferPosition().copy()
+    currPoint.column += 1
+    @editor.getTextInBufferRange([cursor.getBufferPosition(), currPoint])
 
 class MoveToPreviousWholeWord extends Motion
   moveCursor: (cursor, count=1) ->
@@ -515,7 +554,7 @@ class ScrollFullDownKeepCursor extends ScrollKeepingCursor
 
 module.exports = {
   Motion, MotionWithInput, CurrentSelection, MoveLeft, MoveRight, MoveUp, MoveDown,
-  MoveToPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
+  MoveToPreviousWord, MoveToEndOfPreviousWord, MoveToPreviousWholeWord, MoveToNextWord, MoveToNextWholeWord,
   MoveToEndOfWord, MoveToNextSentence, MoveToPreviousSentence, MoveToNextParagraph, MoveToPreviousParagraph, MoveToAbsoluteLine, MoveToRelativeLine, MoveToBeginningOfLine,
   MoveToFirstCharacterOfLineUp, MoveToFirstCharacterOfLineDown,
   MoveToFirstCharacterOfLine, MoveToFirstCharacterOfLineAndDown, MoveToLastCharacterOfLine,
