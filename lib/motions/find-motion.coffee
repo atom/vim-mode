@@ -49,6 +49,7 @@ class Find extends MotionWithInput
 
   moveCursor: (cursor, count=1) ->
     if (match = @match(cursor, count))?
+      #@saveCurrentContext() if (@offset == 0);
       cursor.setBufferPosition(match)
 
 class Till extends Find

@@ -147,6 +147,72 @@ describe "Prefixes", ->
           vimState.setRegister('%', "new content")
           expect(vimState.getRegister('%').text).toEqual '/Users/atom/known_value.txt'
 
+    describe "the 0 register", ->
+      beforeEach ->
+        editor.setText("1111\n2222\n3333\n4444")
+        editor.setCursorScreenPosition([1, 0])
+      describe "reading", ->
+        it "returns the last text yanked without specifying a register"
+          keydown('y')
+          keydown('y')
+          expect(vimState.getRegister("0").text).toEqual '2222'
+          keydown('d')
+          keydown('d')
+          expect(vimState.getRegister("0").text).toEqual '2222'
+
+      describe "writing", ->
+        it "overwrites the last value that was yanked", ->
+          keydown('y')
+          keydown('y')
+          expect(vimState.getRegister("0").text).toEqual '2222'
+          keydown('j')
+          keydown('y')
+          keydown('y')
+          expect(vimState.getRegister("0").text).toEqual '3333'
+
+    describe "the 1..9 registers", ->
+      beforeEach ->
+        editor.setText("1111\n2222\n3333\n4444\n5555\n6666\n7777")
+        editor.setCursorScreenPosition([1, 0])
+      describe "reading", ->
+        it "returns the text that was deleted n deletes ago (n=1 for the most recent delete)"
+          keydown('d')
+          keydown('d')
+          expect(vimState.getRegister("1").text).toEqual '2222'
+
+      describe "writing", ->
+        it "saves the last line-oriented delete in 1 and moves all previous numbered registers to n+1", ->
+          keydown('d')
+          keydown('d')
+          keydown('2')
+          keydown('d')
+          keydown('d')
+          keydown('d')
+          keydown('d')
+          expect(vimState.getRegister("1").text).toEqual '5555'
+          expect(vimState.getRegister("2").text).toEqual '3333\n4444'
+          expect(vimState.getRegister("3").text).toEqual '2222'
+
+    describe "the - register ('small' register)", ->
+      beforeEach ->
+        editor.setText("line 1\nword1 word2 word3\nabcdefghijklmno")
+        editor.setCursorScreenPosition([1, 7])
+      describe "reading", ->
+        it "returns the last non-linewise text deleted/changed without specifying a register"
+          keydown('d')
+          keydown('w')
+          expect(vimState.getRegister("-").text).toEqual 'word2'
+
+      describe "writing", ->
+        it "is written by deleting or changing text within a line", ->
+          keydown('d')
+          keydown('w')
+          expect(vimState.getRegister("-").text).toEqual 'word2'
+          keydown('j')
+          keydown('d')
+          keydown('$')
+          expect(vimState.getRegister("-").text).toEqual 'ghijklmno'
+
     describe "the ctrl-r command in insert mode", ->
       beforeEach ->
         editor.setText "02\n"

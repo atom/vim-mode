@@ -1,6 +1,6 @@
 module.exports =
 class GlobalVimState
-  registers: {}
+  registers: {numberedRegisters: []}
   searchHistory: []
   currentSearch: {}
   currentFind: null

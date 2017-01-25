@@ -44,14 +44,14 @@ class Operator
   # Public: Preps text and sets the text register
   #
   # Returns nothing
-  setTextRegister: (register, text) ->
+  setTextRegister: (register, text, fromDelete=true) ->
     if @motion?.isLinewise?()
       type = 'linewise'
       if text[-1..] isnt '\n'
         text += '\n'
     else
       type = Utils.copyType(text)
-    @vimState.setRegister(register, {text, type}) unless text is ''
+    @vimState.setRegister(register, {text, type}, fromDelete) unless text is ''
 
 # Public: Generic class for an operator that requires extra input
 class OperatorWithInput extends Operator
@@ -85,7 +85,7 @@ class Delete extends Operator
   # Returns nothing.
   execute: (count) ->
     if _.contains(@motion.select(count), true)
-      @setTextRegister(@register, @editor.getSelectedText())
+      @setTextRegister(@register, @editor.getSelectedText(), true)
       @editor.transact =>
         for selection in @editor.getSelections()
           selection.deleteSelectedText()
@@ -199,7 +199,7 @@ class Yank extends Operator
       text = ''
       newPositions = originalPositions
 
-    @setTextRegister(@register, text)
+    @setTextRegister(@register, text, false)
 
     @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
 
