@@ -52,12 +52,8 @@ atom-text-editor.vim-mode.normal-mode,
 atom-text-editor.vim-mode.operator-pending-mode,
 atom-text-editor.vim-mode.visual-mode,
 {
-  &::shadow, // shadow-DOM enabled
-  &           // shadow-DOM disabled
-  {
-    .cursor {
-      .block-cursor(hidden);
-    }
+  .cursor {
+    .block-cursor(hidden);
   }
 }
 
@@ -65,75 +61,51 @@ atom-text-editor.vim-mode.normal-mode.is-focused,
 atom-text-editor.vim-mode.operator-pending-mode.is-focused,
 atom-text-editor.vim-mode.visual-mode.is-focused
 {
-  &::shadow, // shadow-DOM enabled
-  &           // shadow-DOM disabled
-  {
-    .cursor {
-      .block-cursor;
-    }
+  .cursor {
+    .block-cursor;
   }
 }
 
 atom-text-editor.vim-mode.visual-mode
 {
-  &::shadow, // shadow-DOM enabled
-  &           // shadow-DOM disabled
-  {
-    .cursor.hidden-cursor {
-      display: block;
-    }
+  .cursor.hidden-cursor {
+    display: block;
   }
 }
 
 atom-text-editor.vim-mode.replace-mode
 {
-  &::shadow, // shadow-DOM enabled
-  &           // shadow-DOM disabled
-  {
-    .cursor {
-      .underline-cursor(hidden);
-    }
+  .cursor {
+    .underline-cursor(hidden);
   }
 }
 
 atom-text-editor.vim-mode.replace-mode.is-focused
 {
-  &::shadow, // shadow-DOM enabled
-  &           // shadow-DOM disabled
-  {
-    .cursor {
-      .underline-cursor;
-    }
+  .cursor {
+    .underline-cursor;
+  }
 
-    .cursors.blink-off .cursor {
-      .underline-cursor(hidden);
-    }
+  .cursors.blink-off .cursor {
+    .underline-cursor(hidden);
   }
 }
 
 atom-text-editor.vim-mode.operator-pending-mode
 {
-  &::shadow, // shadow-DOM enabled
-  &           // shadow-DOM disabled
-  {
-    .cursor {
-      .low-block-cursor(hidden);
-    }
+  .cursor {
+    .low-block-cursor(hidden);
   }
 }
 
 atom-text-editor.vim-mode.operator-pending-mode.is-focused
 {
-  &::shadow, // shadow-DOM enabled
-  &           // shadow-DOM disabled
-  {
-    .cursor {
-      .low-block-cursor;
-    }
+  .cursor {
+    .low-block-cursor;
+  }
 
-    .cursors.blink-off .cursor {
-      .low-block-cursor(hidden);
-    }
+  .cursors.blink-off .cursor {
+    .low-block-cursor(hidden);
   }
 }
 
