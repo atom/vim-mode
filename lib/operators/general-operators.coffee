@@ -94,6 +94,11 @@ class Delete extends Operator
           cursor.skipLeadingWhitespace()
         else
           cursor.moveLeft() if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
+    else
+      currentLine = @editor.getCursorBufferPosition().row
+      totalLine = @editor.getLineCount() - 1
+      if @motion.isLinewise() and not @editor.hasMultipleCursors() and currentLine is totalLine
+        @editor.buffer.deleteRow(currentLine)
 
     @vimState.activateNormalMode()
 
