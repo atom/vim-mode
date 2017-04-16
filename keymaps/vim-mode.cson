@@ -91,6 +91,9 @@
   'j': 'vim-mode:move-down'
   'down': 'vim-mode:move-down'
 
+  ': w enter': 'core:save'
+  ': q enter': 'core:close'
+
   'w': 'vim-mode:move-to-next-word'
   'W': 'vim-mode:move-to-next-whole-word'
   'e': 'vim-mode:move-to-end-of-word'
