@@ -200,6 +200,8 @@
   '#': 'vim-mode:reverse-search-current-word'
   'n': 'vim-mode:repeat-search'
   'N': 'vim-mode:repeat-search-backwards'
+  ';': 'command-palette:toggle'
+  ':': 'command-palette:toggle'
 
   '%': 'vim-mode:bracket-matching-motion'
 
