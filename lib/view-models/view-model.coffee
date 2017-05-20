@@ -5,7 +5,11 @@ class ViewModel
     {@editor, @vimState} = @operation
     @view = new VimNormalModeInputElement().initialize(this, atom.views.getView(@editor), opts)
     @editor.normalModeInputView = @view
-    @vimState.onDidFailToCompose => @view.remove()
+    @vimState.onDidFailToCompose =>
+      try
+        @view.remove()
+      catch err
+        # console.log err
 
   confirm: (view) ->
     @vimState.pushOperations(new Input(@view.value))
