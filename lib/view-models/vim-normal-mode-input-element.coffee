@@ -57,10 +57,16 @@ class VimNormalModeInputElement extends HTMLDivElement
     if @panel?
       @panel.destroy()
     else
-      try
-        this.remove()
-      catch err
-        # console.log(err)
+      @safeRemove()
+
+  safeRemove: ->
+    # A combination of @confirm, the blur event (@cancel), and @viewModel's
+    # onDidFailToCompose handler can result in redundant calls to remove this
+    # element. Only call this.remove on the first such request
+    return if @removed
+    @removed = true
+    this.remove()
+
 
 module.exports =
 document.registerElement("vim-normal-mode-input"
