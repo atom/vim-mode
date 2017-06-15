@@ -33,6 +33,19 @@ module.exports =
     @disposables.add new Disposable =>
       @vimStates.forEach (vimState) -> vimState.destroy()
 
+    # Protect against edge cases where after splitting a pane, input would be
+    #  enabled in the original pane in command mode
+    @disposables.add atom.workspace.onDidAddPane =>
+      for paneItem in atom.workspace.getPaneItems()
+        vimState = @vimStatesByEditor.get(paneItem)
+        if vimState? and vimState.mode isnt 'insert'
+          vimState.editorElement.component.setInputEnabled(false)
+    @disposables.add atom.workspace.onDidDestroyPane =>
+      for paneItem in atom.workspace.getPaneItems()
+        vimState = @vimStatesByEditor.get(paneItem)
+        if vimState? and vimState.mode isnt 'insert'
+          vimState.editorElement.component.setInputEnabled(false)
+
   deactivate: ->
     @disposables.dispose()
 

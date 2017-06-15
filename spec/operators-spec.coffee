@@ -349,6 +349,22 @@ describe "Operators", ->
         expect(editor.getText()).toBe "  abcde\n"
         expect(editor.getCursorScreenPosition()).toEqual [0, 2]
 
+      it "doesn't insert a d when used with pane splits", ->
+        editor.setText("12345\nabcde\n\nABCDE")
+        editor.setCursorScreenPosition([1, 1])
+        atom.workspace.getActivePane().splitDown()
+
+        keydown('d')
+        keydown('d')
+        expect(editor.getText()).toBe "12345\n\nABCDE"
+
+        editor.setText("12345\nabcde\n\nABCDE")
+        editor.setCursorScreenPosition([1, 1])
+        atom.workspace.activatePreviousPane()
+        keydown('d')
+        keydown('d')
+        expect(editor.getText()).toBe "12345\n\nABCDE"
+
     describe "undo behavior", ->
       beforeEach ->
         editor.setText("12345\nabcde\nABCDE\nQWERT")
