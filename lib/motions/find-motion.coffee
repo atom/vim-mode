@@ -45,6 +45,7 @@ class Find extends MotionWithInput
 
   reverse: ->
     @backwards = not @backwards
+    @operatesInclusively = false
     this
 
   moveCursor: (cursor, count=1) ->
