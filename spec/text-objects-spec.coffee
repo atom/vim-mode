@@ -460,17 +460,13 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
-    it "expands an existing selection in visual mode", ->
-      editor.setCursorScreenPosition([0, 25])
+    it 'selects inside the nearest string', ->
+      editor.setText('var a = \'awesome string\'')
+      editor.setCursorScreenPosition([0, 0])
       keydown('v')
-      keydown('l')
-      keydown('l')
-      keydown('l')
-      keydown('l')
       keydown('i')
       keydown('\'')
-
-      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 34]]
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 9], [0, 23]]
 
   describe "the 'i\"' text object", ->
     beforeEach ->
@@ -505,17 +501,13 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 39]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
 
-    it "expands an existing selection in visual mode", ->
-      editor.setCursorScreenPosition([0, 25])
+    it 'selects inside the nearest string', ->
+      editor.setText('var a = "awesome string"')
+      editor.setCursorScreenPosition([0, 0])
       keydown('v')
-      keydown('l')
-      keydown('l')
-      keydown('l')
-      keydown('l')
       keydown('i')
       keydown('"')
-
-      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 34]]
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 9], [0, 23]]
 
   describe "the 'aw' text object", ->
     beforeEach ->
@@ -783,17 +775,13 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
-    it "expands an existing selection in visual mode", ->
-      editor.setCursorScreenPosition([0, 25])
+    it 'selects around the nearest string', ->
+      editor.setText('var a = \'awesome string\'')
+      editor.setCursorScreenPosition([0, 0])
       keydown('v')
-      keydown('l')
-      keydown('l')
-      keydown('l')
-      keydown('l')
       keydown('a')
       keydown('\'')
-
-      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 35]]
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 8], [0, 24]]
 
   describe "the 'a\"' text object", ->
     beforeEach ->
@@ -819,14 +807,10 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
-    it "expands an existing selection in visual mode", ->
-      editor.setCursorScreenPosition([0, 25])
+    it 'selects around the nearest string', ->
+      editor.setText('var a = "awesome string"')
+      editor.setCursorScreenPosition([0, 0])
       keydown('v')
-      keydown('l')
-      keydown('l')
-      keydown('l')
-      keydown('l')
       keydown('a')
       keydown('"')
-
-      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 35]]
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 8], [0, 24]]

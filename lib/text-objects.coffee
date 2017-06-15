@@ -90,7 +90,7 @@ class SelectInsideQuotes extends TextObject
         ++ start.column # skip the opening quote
         end = @findClosingQuote(start)
         if end?
-          selection.setBufferRange(mergeRanges(selection.getBufferRange(), [start, end]))
+          selection.setBufferRange([start, end])
       not selection.isEmpty()
 
 # SelectInsideBrackets and the previous class defined (SelectInsideQuotes) are
