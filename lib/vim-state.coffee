@@ -173,6 +173,7 @@ class VimState
       'repeat-search-backwards': (e) => new Motions.RepeatSearch(@editor, this).reversed()
       'move-to-mark': (e) => new Motions.MoveToMark(@editor, this)
       'move-to-mark-literal': (e) => new Motions.MoveToMark(@editor, this, false)
+      'move-to-definition': (e) => new Motions.MoveToDefinition(@editor, this)
       'mark': (e) => new Operators.Mark(@editor, this)
       'find': (e) => new Motions.Find(@editor, this)
       'find-backwards': (e) => new Motions.Find(@editor, this).reverse()

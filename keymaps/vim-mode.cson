@@ -186,6 +186,7 @@
   'm': 'vim-mode:mark'
   '`': 'vim-mode:move-to-mark-literal'
   '\'': 'vim-mode:move-to-mark'
+  'g D': 'vim-mode:move-to-definition'
 
   'f': 'vim-mode:find'
   'F': 'vim-mode:find-backwards'
