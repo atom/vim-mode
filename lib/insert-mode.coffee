@@ -1,3 +1,4 @@
+# todo add specs with bracket-matcher for these two
 copyCharacterFromAbove = (editor, vimState) ->
   editor.transact ->
     for cursor in editor.getCursors()

@@ -426,6 +426,13 @@ class VimState
     @subscriptions.add @replaceModeListener = @editor.onWillInsertText @replaceModeInsertHandler
     @subscriptions.add @replaceModeUndoListener = @editor.onDidInsertText @replaceModeUndoHandler
 
+    # todo add bracket matcher specs for replace mode
+    if @replaceModeBracketMatcherGuard ?= atom.packages.getActivePackage('bracket-matcher')
+      # suppress bracket matching in replace mode
+      _.adviseBefore @editor, 'insertText', (text, options) =>
+        options?.matchBrackets = false if not @destroyed and @mode is 'insert' and @submode is 'replace'
+        return true
+
   replaceModeInsertHandler: (event) =>
     chars = event.text?.split('') or []
     selections = @editor.getSelections()
@@ -650,7 +657,8 @@ class VimState
   # Returns nothing.
   insertRegister: (name) ->
     text = @getRegister(name)?.text
-    @editor.insertText(text) if text?
+    # todo add specs with bracket-matcher for this
+    @editor.insertText(text, groupUndo: true, matchBrackets: false) if text?
 
   # Private: ensure the mode follows the state of selections
   checkSelections: =>

@@ -52,7 +52,8 @@ class Put extends Operator
         @editor.moveToBeginningOfLine()
         originalPosition = @editor.getCursorScreenPosition()
 
-    @editor.insertText(textToInsert)
+    # todo add specs with bracket-matcher for this
+    @editor.insertText(textToInsert, matchBrackets: false)
 
     if originalPosition?
       @editor.setCursorScreenPosition(originalPosition)
