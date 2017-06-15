@@ -182,6 +182,7 @@
   'ctrl-w q': 'core:close'
   'g t': 'pane:show-next-item'
   'g T': 'pane:show-previous-item'
+  'Z Z': 'pane:close'
 
   'm': 'vim-mode:mark'
   '`': 'vim-mode:move-to-mark-literal'
