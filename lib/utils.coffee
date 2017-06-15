@@ -1,5 +1,8 @@
 {Range} = require 'atom'
 
+# copied from atom/atom-keymap src/helpers.coffee
+AtomModifierRegex = /(ctrl|alt|shift|cmd)$/
+
 module.exports =
   # Public: Determines if a string should be considered linewise or character
   #
@@ -25,3 +28,8 @@ module.exports =
       newRange
     else
       oldRange.union(newRange)
+
+  # copied and simplified from atom/atom-keymap src/helpers.coffee
+  # see atom/atom-keymap#97
+  isAtomModifier: (keystroke) ->
+    AtomModifierRegex.test(keystroke)
